@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import {
   PREF_TIPOS,
   TIPO_CONTROLE_VALUES,
@@ -18,6 +17,7 @@ import {
   TIPOS_ACAO_PROGRAMADA,
   TIPOS_CONTROLE,
 } from '@/data';
+import { CatalogMulti } from '@/components/CatalogMulti';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/utils/cn';
 
@@ -285,6 +285,8 @@ function TriggerCampos({ trigger, setTrigger }: TriggerCamposProps) {
               t.tipo === 'E' ? { tipo: 'E', eventoIds: ids } : { ...t, eventoIds: ids },
             )
           }
+          placeholder="Buscar evento…"
+          ariaLabel="Eventos do gatilho"
         />
       </Field>
     );
@@ -392,6 +394,8 @@ function FiltrosBloco({ filtros, setFiltros }: FiltrosBlocoProps) {
             values={filtros.classesJudiciaisIds ?? []}
             options={CLASSES_JUDICIAIS}
             onChange={(ids) => setFiltros({ classesJudiciaisIds: ids })}
+            placeholder="Buscar classe judicial…"
+            ariaLabel="Classes judiciais"
           />
         </div>
         <div>
@@ -400,6 +404,8 @@ function FiltrosBloco({ filtros, setFiltros }: FiltrosBlocoProps) {
             values={filtros.competenciaIds ?? []}
             options={COMPETENCIAS}
             onChange={(ids) => setFiltros({ competenciaIds: ids })}
+            placeholder="Buscar competência…"
+            ariaLabel="Competências"
           />
         </div>
         <div>
@@ -408,6 +414,8 @@ function FiltrosBloco({ filtros, setFiltros }: FiltrosBlocoProps) {
             values={filtros.statusProcessoIds ?? []}
             options={STATUS_PROCESSO}
             onChange={(ids) => setFiltros({ statusProcessoIds: ids })}
+            placeholder="Buscar situação…"
+            ariaLabel="Situações do processo"
           />
         </div>
       </div>
@@ -416,37 +424,6 @@ function FiltrosBloco({ filtros, setFiltros }: FiltrosBlocoProps) {
 }
 
 /* ====================== Componentes auxiliares ============================ */
-
-interface CatalogMultiProps {
-  values: string[];
-  options: { value: string; label: string }[];
-  onChange: (values: string[]) => void;
-}
-
-function CatalogMulti({ values, options, onChange }: CatalogMultiProps) {
-  // Native multi-select é cru, mas funcional offline e sem libs.
-  // Polish (search/typeahead/virtualização) fica para evolução futura.
-  const set = useMemo(() => new Set(values), [values]);
-  return (
-    <select
-      multiple
-      className="select"
-      style={{ minHeight: 120 }}
-      value={values}
-      onChange={(e) =>
-        onChange(Array.from(e.target.selectedOptions, (o) => o.value))
-      }
-      size={6}
-    >
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {set.has(o.value) ? '✓ ' : ''}
-          {o.label}
-        </option>
-      ))}
-    </select>
-  );
-}
 
 void TIPO_CONTROLE_VALUES; // referenciado em tipos; importação não pode ser apagada
 
