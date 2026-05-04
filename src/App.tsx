@@ -1,108 +1,51 @@
+import { useState } from 'react';
+import { Header } from '@/components/Header';
+import { Sidebar } from '@/components/Sidebar';
+import type { FlowMode } from '@/domain';
+
 /**
- * Página de teste visual da Fase 3 — confere que os tokens portados do BETA_2
- * funcionam como utilitárias do Tailwind e que a Inter está carregando local.
+ * Página de teste visual da Fase 4 — Header + Sidebar com handlers stub,
+ * área central de placeholder onde o canvas (FlowCanvas) entra na Fase 6.
  *
- * Substituída na Fase 6 pelo App real (Header + Sidebar + FlowCanvas + painéis).
+ * O `flowMode` real virá da store; aqui é só state local para confirmar que
+ * o toggle visual funciona.
  */
-
-interface Token {
-  classe: string;
-  rotulo: string;
-  /** True para fundos claros que precisam de texto escuro para contraste. */
-  claro?: boolean;
-}
-
-const FUNDOS: Token[] = [
-  { classe: 'bg-fundo', rotulo: 'fundo', claro: true },
-  { classe: 'bg-superficie', rotulo: 'superficie', claro: true },
-  { classe: 'bg-superficie-2', rotulo: 'superficie-2', claro: true },
-];
-
-const ACENTOS: Token[] = [
-  { classe: 'bg-destaque text-superficie', rotulo: 'destaque' },
-  { classe: 'bg-destaque-suave text-destaque', rotulo: 'destaque-suave', claro: true },
-  { classe: 'bg-ok text-superficie', rotulo: 'ok' },
-  { classe: 'bg-ok-suave text-ok', rotulo: 'ok-suave', claro: true },
-  { classe: 'bg-aviso text-superficie', rotulo: 'aviso' },
-  { classe: 'bg-aviso-suave text-aviso', rotulo: 'aviso-suave', claro: true },
-];
-
-const ARESTAS: Token[] = [
-  { classe: 'bg-aresta-atp text-superficie', rotulo: 'aresta-atp' },
-  { classe: 'bg-aresta-pref text-superficie', rotulo: 'aresta-pref' },
-  { classe: 'bg-aresta-manual text-superficie', rotulo: 'aresta-manual' },
-];
-
-function ChipsRow({ tokens }: { tokens: Token[] }) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {tokens.map((t) => (
-        <span
-          key={t.rotulo}
-          className={[
-            'inline-flex items-center px-3 h-7 rounded-md text-xs font-medium border border-borda',
-            t.claro ? 'text-texto-2' : '',
-            t.classe,
-          ].join(' ')}
-        >
-          {t.rotulo}
-        </span>
-      ))}
-    </div>
-  );
-}
+const NOOP = () => {};
 
 export default function App() {
+  const [planoNome, setPlanoNome] = useState('Plano sem título');
+  const [flowMode, setFlowMode] = useState<FlowMode>('organic');
+
   return (
-    <main className="min-h-screen bg-fundo p-8">
-      <header className="mb-6">
-        <div className="text-xs uppercase tracking-wider text-texto-3 font-semibold">
-          Fase 3 · teste visual
-        </div>
-        <h1 className="text-xl font-semibold text-texto mt-1">PlanejoEproc</h1>
-        <p className="text-sm text-texto-2 mt-1">
-          Tokens portados do BETA_2 · Inter local · família mono em fallback de sistema.
-        </p>
-      </header>
+    <div className="flex flex-col h-screen">
+      <Header
+        planoNome={planoNome}
+        onPlanoNomeChange={setPlanoNome}
+        onNovo={NOOP}
+        onImportar={NOOP}
+        onExportar={NOOP}
+        onChecklist={NOOP}
+        flowMode={flowMode}
+        onFlowModeChange={setFlowMode}
+        stats={{ nodes: 0, edges: 0, pendentes: 0 }}
+      />
 
-      <section className="space-y-5 max-w-3xl">
-        <div>
-          <div className="text-xs uppercase tracking-wider text-texto-3 font-semibold mb-2">
-            Estrutura
-          </div>
-          <ChipsRow tokens={FUNDOS} />
-        </div>
+      <div className="flex flex-1 min-h-0">
+        <Sidebar onCreateNode={NOOP} />
 
-        <div>
-          <div className="text-xs uppercase tracking-wider text-texto-3 font-semibold mb-2">
-            Acentos
-          </div>
-          <ChipsRow tokens={ACENTOS} />
-        </div>
-
-        <div>
-          <div className="text-xs uppercase tracking-wider text-texto-3 font-semibold mb-2">
-            Tipos de aresta
-          </div>
-          <ChipsRow tokens={ARESTAS} />
-        </div>
-
-        <div>
-          <div className="text-xs uppercase tracking-wider text-texto-3 font-semibold mb-2">
-            Tipografia
-          </div>
-          <div className="space-y-1 bg-superficie border border-borda rounded-md p-4">
-            <div className="text-base font-normal">Inter 400 — corpo de texto.</div>
-            <div className="text-base font-medium">Inter 500 — ênfase média.</div>
-            <div className="text-base font-semibold">Inter 600 — títulos.</div>
-            <div className="text-base font-bold">Inter 700 — destaque máximo.</div>
-            <div className="text-sm font-mono text-texto-2 mt-2">
-              JetBrains Mono → <span className="text-texto">fallback ui-monospace</span>{' '}
-              (não embutido).
+        <main className="flex-1 relative bg-fundo flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="text-xs uppercase tracking-wider text-texto-3 font-semibold">
+              Fase 4 · placeholder
             </div>
+            <p className="text-sm text-texto-2 mt-2">
+              O <code className="mono text-texto">FlowCanvas</code> entra aqui na Fase 6.
+              Header e Sidebar usam handlers vazios temporários — todos eles serão
+              conectados à store na Fase 5/6.
+            </p>
           </div>
-        </div>
-      </section>
-    </main>
+        </main>
+      </div>
+    </div>
   );
 }
