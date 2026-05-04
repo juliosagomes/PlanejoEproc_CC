@@ -39,6 +39,14 @@ export function NodePanel({ node }: NodePanelProps) {
             autoFocus
             value={data.nome}
             onChange={(e) => updateNode(node.id, { nome: e.target.value })}
+            onKeyDown={(e) => {
+              // Permite cancelar um nó criado por engano (autoFocus rouba o
+              // Delete global do ReactFlow): com o campo vazio, Delete remove.
+              if (e.key === 'Delete' && data.nome.length === 0) {
+                e.preventDefault();
+                deleteNode(node.id);
+              }
+            }}
             placeholder="Ex: Aguardando despacho"
           />
         </div>
