@@ -102,6 +102,7 @@ const AtpRuleSchema = z.object({
   trigger: AtpTriggerSchema.optional(),
   filtros: AtpFiltrosSchema.optional(),
   condicoes: z.string().optional(),
+  acaoTipo: z.string().optional(),
   acao: z.string().optional(),
   observacoes: z.string().optional(),
 });

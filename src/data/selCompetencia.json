@@ -1,0 +1,1458 @@
+[
+  {
+    "value": "1",
+    "label": "Cível"
+  },
+  {
+    "value": "2",
+    "label": "Cível/Agrária"
+  },
+  {
+    "value": "3",
+    "label": "Cível/Ambiental"
+  },
+  {
+    "value": "4",
+    "label": "Cível/Coop. int. sequestro criança"
+  },
+  {
+    "value": "5",
+    "label": "Cível/Coop. internacional"
+  },
+  {
+    "value": "6",
+    "label": "Ambiental Cível"
+  },
+  {
+    "value": "8",
+    "label": "Cumprimento de Sentença Cível - Centrase"
+  },
+  {
+    "value": "9",
+    "label": "JEF Habitacional"
+  },
+  {
+    "value": "10",
+    "label": "JEF Previdenciária"
+  },
+  {
+    "value": "11",
+    "label": "JEF Benefício Assistencial"
+  },
+  {
+    "value": "12",
+    "label": "JEF Cível"
+  },
+  {
+    "value": "13",
+    "label": "JEF Tributária"
+  },
+  {
+    "value": "14",
+    "label": "JEF Benefício p incapacidade"
+  },
+  {
+    "value": "15",
+    "label": "JEF SFH"
+  },
+  {
+    "value": "16",
+    "label": "JEF Ambiental/Cível"
+  },
+  {
+    "value": "17",
+    "label": "JEF Ambiental/Tributária"
+  },
+  {
+    "value": "18",
+    "label": "JEF Ambiental/Criminal"
+  },
+  {
+    "value": "19",
+    "label": "JEF Saúde"
+  },
+  {
+    "value": "20",
+    "label": "JEF Criminal"
+  },
+  {
+    "value": "21",
+    "label": "Criminal"
+  },
+  {
+    "value": "22",
+    "label": "Criminal/Execução Penal"
+  },
+  {
+    "value": "23",
+    "label": "Criminal/Ambiental"
+  },
+  {
+    "value": "24",
+    "label": "Criminal/Ambiental/Exec.Penal"
+  },
+  {
+    "value": "25",
+    "label": "Criminal Especializada"
+  },
+  {
+    "value": "26",
+    "label": "Criminal/OrganizaçãoCriminosa"
+  },
+  {
+    "value": "27",
+    "label": "Criminal/Júri"
+  },
+  {
+    "value": "28",
+    "label": "Criminal/Exec.Penit.Federal"
+  },
+  {
+    "value": "29",
+    "label": "Contrabando/Dir. Autoral"
+  },
+  {
+    "value": "30",
+    "label": "Criminal/Coop. internacional"
+  },
+  {
+    "value": "41",
+    "label": "Execução Fiscal"
+  },
+  {
+    "value": "43",
+    "label": "Execução Fiscal/Ambiental"
+  },
+  {
+    "value": "51",
+    "label": "Tributária"
+  },
+  {
+    "value": "53",
+    "label": "Tributária/Ambiental"
+  },
+  {
+    "value": "61",
+    "label": "Previdência Pública - Delegada"
+  },
+  {
+    "value": "62",
+    "label": "Saúde"
+  },
+  {
+    "value": "70",
+    "label": "Medidas Protetivas Idoso"
+  },
+  {
+    "value": "81",
+    "label": "Cível/SFH"
+  },
+  {
+    "value": "82",
+    "label": "Habitacional"
+  },
+  {
+    "value": "90",
+    "label": "JEF Recurso Previdenciário"
+  },
+  {
+    "value": "91",
+    "label": "JEF Recurso Cível"
+  },
+  {
+    "value": "92",
+    "label": "JEF Recurso SFH"
+  },
+  {
+    "value": "93",
+    "label": "JEF Recurso Criminal"
+  },
+  {
+    "value": "94",
+    "label": "JEF Recurso Tributário"
+  },
+  {
+    "value": "95",
+    "label": "Pres.TR"
+  },
+  {
+    "value": "96",
+    "label": "JEF Recurso Ambiental/Cível"
+  },
+  {
+    "value": "97",
+    "label": "JEF Recurso Ambiental/Tribut."
+  },
+  {
+    "value": "98",
+    "label": "JEF Recurso Ambiental/Criminal"
+  },
+  {
+    "value": "99",
+    "label": "JEF Recurso Assistencial"
+  },
+  {
+    "value": "100",
+    "label": "Execução Fiscal Municipal - Não Tributária"
+  },
+  {
+    "value": "101",
+    "label": "Fazenda Pública Municipal"
+  },
+  {
+    "value": "102",
+    "label": "Ambiental Municipal"
+  },
+  {
+    "value": "103",
+    "label": "Improbidade Administrativa Municipal"
+  },
+  {
+    "value": "104",
+    "label": "Saúde Pública Municipal"
+  },
+  {
+    "value": "105",
+    "label": "Grandes Eventos Fazenda Pública Municipal"
+  },
+  {
+    "value": "106",
+    "label": "Execução Fiscal Estadual - Matéria Não Tributária"
+  },
+  {
+    "value": "107",
+    "label": "Fazenda Pública Estadual"
+  },
+  {
+    "value": "108",
+    "label": "Cumprimento de Sentença Faz. Púb. Est. - Centrase"
+  },
+  {
+    "value": "109",
+    "label": "Ambiental Estadual"
+  },
+  {
+    "value": "110",
+    "label": "Improbidade Administrativa Estadual"
+  },
+  {
+    "value": "111",
+    "label": "Saúde Pública Estadual"
+  },
+  {
+    "value": "112",
+    "label": "Grandes Eventos Fazenda Pública Estadual"
+  },
+  {
+    "value": "200",
+    "label": "Acidentes do Trabalho"
+  },
+  {
+    "value": "201",
+    "label": "Agrária de Minas Gerais"
+  },
+  {
+    "value": "202",
+    "label": "Cível do Barreiro"
+  },
+  {
+    "value": "203",
+    "label": "Empresarial"
+  },
+  {
+    "value": "204",
+    "label": "Família do Barreiro"
+  },
+  {
+    "value": "205",
+    "label": "Infância e Juventude - Saúde Pública Estadual"
+  },
+  {
+    "value": "206",
+    "label": "Infância e Juventude - Saúde Pública Municipal"
+  },
+  {
+    "value": "207",
+    "label": "Infância e Juventude - Saúde Suplementar"
+  },
+  {
+    "value": "208",
+    "label": "Infância e Juventude Cível CPC"
+  },
+  {
+    "value": "209",
+    "label": "Infância e Juventude Cível ECA"
+  },
+  {
+    "value": "210",
+    "label": "Infância e Juventude Cível ECA - Belo Horizonte"
+  },
+  {
+    "value": "211",
+    "label": "Reconhecimento de Paternidade CRP"
+  },
+  {
+    "value": "212",
+    "label": "Reconhecimento de Paternidade SRP"
+  },
+  {
+    "value": "213",
+    "label": "Registros Públicos e Averiguação de Paternidade"
+  },
+  {
+    "value": "214",
+    "label": "Registros Públicos"
+  },
+  {
+    "value": "500",
+    "label": "Curatelas"
+  },
+  {
+    "value": "501",
+    "label": "Família"
+  },
+  {
+    "value": "502",
+    "label": "Sucessões e Ausências"
+  },
+  {
+    "value": "751",
+    "label": "Feitos Tributários Estaduais"
+  },
+  {
+    "value": "752",
+    "label": "Feitos Tributários Municipais"
+  },
+  {
+    "value": "786",
+    "label": "Cível JIJ I POA"
+  },
+  {
+    "value": "787",
+    "label": "Cível JIJ II POA"
+  },
+  {
+    "value": "791",
+    "label": "Cível JIJ"
+  },
+  {
+    "value": "904",
+    "label": "Organizações e Lavagem de Dinheiro"
+  },
+  {
+    "value": "1000",
+    "label": "Pré-Processual Cível"
+  },
+  {
+    "value": "1001",
+    "label": "Pré-Processual Relação de Consumo"
+  },
+  {
+    "value": "1002",
+    "label": "Pré-Processual Execução de Título Extrajudicial"
+  },
+  {
+    "value": "1003",
+    "label": "Pré-Processual Família"
+  },
+  {
+    "value": "1004",
+    "label": "Execução de Título Extrajudicial"
+  },
+  {
+    "value": "1005",
+    "label": "Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1006",
+    "label": "Locação de Imóveis Urbanos - Lei nº. 8.245/91"
+  },
+  {
+    "value": "1007",
+    "label": "Cível Relação de Consumo"
+  },
+  {
+    "value": "1008",
+    "label": "Saúde Suplementar"
+  },
+  {
+    "value": "1010",
+    "label": "Turma Recursal Cível - Competência Originária"
+  },
+  {
+    "value": "1011",
+    "label": "NÃO DISTRIBUIR - CEJUSC VIRTUAL"
+  },
+  {
+    "value": "1012",
+    "label": "Pré-Processual Juizado Especial"
+  },
+  {
+    "value": "1013",
+    "label": "Jesp Telefonia"
+  },
+  {
+    "value": "1014",
+    "label": "Jesp Residual Cível e Seguro DPVAT"
+  },
+  {
+    "value": "1015",
+    "label": "Jesp Relação de Consumo"
+  },
+  {
+    "value": "1016",
+    "label": "Jesp Execução de Títulos Extrajudiciais"
+  },
+  {
+    "value": "1017",
+    "label": "Jesp Acidente de Trânsito"
+  },
+  {
+    "value": "1018",
+    "label": "Jesp Telefonia Barreiro"
+  },
+  {
+    "value": "1019",
+    "label": "Jesp Residual Cível e Seguro DPVAT Barreiro"
+  },
+  {
+    "value": "1020",
+    "label": "Jesp Relação de Consumo Barreiro"
+  },
+  {
+    "value": "1021",
+    "label": "Jesp Saúde Suplementar"
+  },
+  {
+    "value": "1022",
+    "label": "Jesp Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1023",
+    "label": "Jesp Microempresa"
+  },
+  {
+    "value": "1024",
+    "label": "Jesp Execução de Títulos Extrajudiciais Barreiro"
+  },
+  {
+    "value": "1025",
+    "label": "Jesp Acidente de Trânsito Barreiro"
+  },
+  {
+    "value": "1026",
+    "label": "Jesp Fazenda Pública Estadual"
+  },
+  {
+    "value": "1027",
+    "label": "Jesp Fazenda Pública Municipal"
+  },
+  {
+    "value": "1028",
+    "label": "Jesp Saúde Pública Estadual"
+  },
+  {
+    "value": "1029",
+    "label": "Jesp Saúde Pública Municipal"
+  },
+  {
+    "value": "1030",
+    "label": "Jesp Grandes Eventos Fazenda Pública Estadual"
+  },
+  {
+    "value": "1031",
+    "label": "Jesp Grandes Eventos Fazenda Pública Municipal"
+  },
+  {
+    "value": "1032",
+    "label": "Turma Recursal Telefonia - Competência Originária"
+  },
+  {
+    "value": "1033",
+    "label": "Turma Recursal Fazenda Pública Estadual - Cmp Org"
+  },
+  {
+    "value": "1034",
+    "label": "Turma Recursal Fazenda Pública Municipal - Cmp Org"
+  },
+  {
+    "value": "1035",
+    "label": "Turma Recursal Cível"
+  },
+  {
+    "value": "1900",
+    "label": "JEE Recurso Criminal"
+  },
+  {
+    "value": "1901",
+    "label": "JEE Recurso Cível"
+  },
+  {
+    "value": "1902",
+    "label": "JEE Recurso Fazenda Pública"
+  },
+  {
+    "value": "1903",
+    "label": "Execução Fiscal Federal - Delegada"
+  },
+  {
+    "value": "1904",
+    "label": "Fazenda Pública Federal - Delegada"
+  },
+  {
+    "value": "1905",
+    "label": "Precatória Cível"
+  },
+  {
+    "value": "1906",
+    "label": "Precatória Sucessões e Ausência"
+  },
+  {
+    "value": "1907",
+    "label": "Precatória Família"
+  },
+  {
+    "value": "1908",
+    "label": "Precatória Feitos Tributários Municipais"
+  },
+  {
+    "value": "1909",
+    "label": "Precatória Exc. Fiscal Municipal - Não Tributária"
+  },
+  {
+    "value": "1910",
+    "label": "Precatória Fazenda Pública Municipal"
+  },
+  {
+    "value": "1911",
+    "label": "Precatória Ambiental Municipal"
+  },
+  {
+    "value": "1912",
+    "label": "Precatória Improbidade Administrativa Municipal"
+  },
+  {
+    "value": "1913",
+    "label": "Precatória Saúde Pública Municipal"
+  },
+  {
+    "value": "1914",
+    "label": "Precatória Grandes Eventos Fazenda Púb. Municipal"
+  },
+  {
+    "value": "1915",
+    "label": "Precatória Feitos Tributários Estaduais"
+  },
+  {
+    "value": "1916",
+    "label": "Precatória Exc. Fiscal Estadual - Não Tributária"
+  },
+  {
+    "value": "1917",
+    "label": "Precatória Fazenda Pública Estadual"
+  },
+  {
+    "value": "1918",
+    "label": "Precatória Cumprimento de Sentença - Fazenda Púb."
+  },
+  {
+    "value": "1919",
+    "label": "Precatória Ambiental Estadual"
+  },
+  {
+    "value": "1920",
+    "label": "Precatória Improbidade Administrativa Estadual"
+  },
+  {
+    "value": "1921",
+    "label": "Precatória Saúde Pública Estadual"
+  },
+  {
+    "value": "1922",
+    "label": "Precatória Grandes Eventos Fazenda Púb. Estadual"
+  },
+  {
+    "value": "1923",
+    "label": "Precatória Execução Fiscal Federal"
+  },
+  {
+    "value": "1924",
+    "label": "Precatória Fazenda Pública Federal"
+  },
+  {
+    "value": "1925",
+    "label": "Precatória Registros Públicos"
+  },
+  {
+    "value": "1926",
+    "label": "Precatória Acidente do Trabalho"
+  },
+  {
+    "value": "1927",
+    "label": "Precatória Agrária de Minas Gerais"
+  },
+  {
+    "value": "1928",
+    "label": "Precatória Relação de Consumo"
+  },
+  {
+    "value": "1929",
+    "label": "Precatória Cumprimento de Sentença"
+  },
+  {
+    "value": "1930",
+    "label": "Precatória Execução de Título Extrajudicial"
+  },
+  {
+    "value": "1931",
+    "label": "Precatória Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1932",
+    "label": "Precatória Locação de Imóveis Urbanos"
+  },
+  {
+    "value": "1933",
+    "label": "Precatória Medidas Protetivas - Estatuto do Idoso"
+  },
+  {
+    "value": "1934",
+    "label": "Precatória Empresarial"
+  },
+  {
+    "value": "1935",
+    "label": "Precatória Saúde Suplementar"
+  },
+  {
+    "value": "1936",
+    "label": "Precatória Ambiental Cível"
+  },
+  {
+    "value": "1937",
+    "label": "Precatória Infância e Juventude Cível"
+  },
+  {
+    "value": "1938",
+    "label": "Precatória Jesp Saúde Suplementar"
+  },
+  {
+    "value": "1939",
+    "label": "Precatória Jesp Saúde Pública Estadual"
+  },
+  {
+    "value": "1940",
+    "label": "Precatória Jesp Saúde Pública Municipal"
+  },
+  {
+    "value": "1941",
+    "label": "Precatória Jesp Fazenda Pública Estadual"
+  },
+  {
+    "value": "1942",
+    "label": "Precatória Jesp Fazenda Pública Municipal"
+  },
+  {
+    "value": "1943",
+    "label": "Precatória Jesp G. Eventos Faz. Púb. Estadual"
+  },
+  {
+    "value": "1944",
+    "label": "Precatória Jesp G. Eventos Faz. Púb. Municipal"
+  },
+  {
+    "value": "1945",
+    "label": "Precatória Jesp Telefonia"
+  },
+  {
+    "value": "1946",
+    "label": "Precatória Jesp Residual Cível e Seguro DPVAT"
+  },
+  {
+    "value": "1947",
+    "label": "Precatória Jesp Relação de Consumo"
+  },
+  {
+    "value": "1948",
+    "label": "Precatória Jesp Execução de Título Extrajudiciais"
+  },
+  {
+    "value": "1949",
+    "label": "Precatória Jesp Acidente de Trânsito"
+  },
+  {
+    "value": "1950",
+    "label": "Precatória Jesp Microempresa"
+  },
+  {
+    "value": "1952",
+    "label": "Precatória Jesp Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1953",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Ambiental"
+  },
+  {
+    "value": "1954",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Empresarial"
+  },
+  {
+    "value": "1955",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Família"
+  },
+  {
+    "value": "1956",
+    "label": "NÃO DISTRIBUIR - CEJUSC Espec. Povos Comun. Trad."
+  },
+  {
+    "value": "1957",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Saúde"
+  },
+  {
+    "value": "1958",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Social"
+  },
+  {
+    "value": "1959",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Tributário"
+  },
+  {
+    "value": "1960",
+    "label": "Procedimento Administrativo Custas Finais"
+  },
+  {
+    "value": "1961",
+    "label": "Cumprimento de Sentença - Cível"
+  },
+  {
+    "value": "1962",
+    "label": "Cumprimento de Sentença - Fazenda Pública Estadual"
+  },
+  {
+    "value": "1",
+    "label": "Cível"
+  },
+  {
+    "value": "2",
+    "label": "Cível/Agrária"
+  },
+  {
+    "value": "3",
+    "label": "Cível/Ambiental"
+  },
+  {
+    "value": "4",
+    "label": "Cível/Coop. int. sequestro criança"
+  },
+  {
+    "value": "5",
+    "label": "Cível/Coop. internacional"
+  },
+  {
+    "value": "6",
+    "label": "Ambiental Cível"
+  },
+  {
+    "value": "8",
+    "label": "Cumprimento de Sentença Cível - Centrase"
+  },
+  {
+    "value": "9",
+    "label": "JEF Habitacional"
+  },
+  {
+    "value": "10",
+    "label": "JEF Previdenciária"
+  },
+  {
+    "value": "11",
+    "label": "JEF Benefício Assistencial"
+  },
+  {
+    "value": "12",
+    "label": "JEF Cível"
+  },
+  {
+    "value": "13",
+    "label": "JEF Tributária"
+  },
+  {
+    "value": "14",
+    "label": "JEF Benefício p incapacidade"
+  },
+  {
+    "value": "15",
+    "label": "JEF SFH"
+  },
+  {
+    "value": "16",
+    "label": "JEF Ambiental/Cível"
+  },
+  {
+    "value": "17",
+    "label": "JEF Ambiental/Tributária"
+  },
+  {
+    "value": "18",
+    "label": "JEF Ambiental/Criminal"
+  },
+  {
+    "value": "19",
+    "label": "JEF Saúde"
+  },
+  {
+    "value": "20",
+    "label": "JEF Criminal"
+  },
+  {
+    "value": "21",
+    "label": "Criminal"
+  },
+  {
+    "value": "22",
+    "label": "Criminal/Execução Penal"
+  },
+  {
+    "value": "23",
+    "label": "Criminal/Ambiental"
+  },
+  {
+    "value": "24",
+    "label": "Criminal/Ambiental/Exec.Penal"
+  },
+  {
+    "value": "25",
+    "label": "Criminal Especializada"
+  },
+  {
+    "value": "26",
+    "label": "Criminal/OrganizaçãoCriminosa"
+  },
+  {
+    "value": "27",
+    "label": "Criminal/Júri"
+  },
+  {
+    "value": "28",
+    "label": "Criminal/Exec.Penit.Federal"
+  },
+  {
+    "value": "29",
+    "label": "Contrabando/Dir. Autoral"
+  },
+  {
+    "value": "30",
+    "label": "Criminal/Coop. internacional"
+  },
+  {
+    "value": "41",
+    "label": "Execução Fiscal"
+  },
+  {
+    "value": "43",
+    "label": "Execução Fiscal/Ambiental"
+  },
+  {
+    "value": "51",
+    "label": "Tributária"
+  },
+  {
+    "value": "53",
+    "label": "Tributária/Ambiental"
+  },
+  {
+    "value": "61",
+    "label": "Previdência Pública - Delegada"
+  },
+  {
+    "value": "62",
+    "label": "Saúde"
+  },
+  {
+    "value": "70",
+    "label": "Medidas Protetivas Idoso"
+  },
+  {
+    "value": "81",
+    "label": "Cível/SFH"
+  },
+  {
+    "value": "82",
+    "label": "Habitacional"
+  },
+  {
+    "value": "90",
+    "label": "JEF Recurso Previdenciário"
+  },
+  {
+    "value": "91",
+    "label": "JEF Recurso Cível"
+  },
+  {
+    "value": "92",
+    "label": "JEF Recurso SFH"
+  },
+  {
+    "value": "93",
+    "label": "JEF Recurso Criminal"
+  },
+  {
+    "value": "94",
+    "label": "JEF Recurso Tributário"
+  },
+  {
+    "value": "95",
+    "label": "Pres.TR"
+  },
+  {
+    "value": "96",
+    "label": "JEF Recurso Ambiental/Cível"
+  },
+  {
+    "value": "97",
+    "label": "JEF Recurso Ambiental/Tribut."
+  },
+  {
+    "value": "98",
+    "label": "JEF Recurso Ambiental/Criminal"
+  },
+  {
+    "value": "99",
+    "label": "JEF Recurso Assistencial"
+  },
+  {
+    "value": "100",
+    "label": "Execução Fiscal Municipal - Não Tributária"
+  },
+  {
+    "value": "101",
+    "label": "Fazenda Pública Municipal"
+  },
+  {
+    "value": "102",
+    "label": "Ambiental Municipal"
+  },
+  {
+    "value": "103",
+    "label": "Improbidade Administrativa Municipal"
+  },
+  {
+    "value": "104",
+    "label": "Saúde Pública Municipal"
+  },
+  {
+    "value": "105",
+    "label": "Grandes Eventos Fazenda Pública Municipal"
+  },
+  {
+    "value": "106",
+    "label": "Execução Fiscal Estadual - Matéria Não Tributária"
+  },
+  {
+    "value": "107",
+    "label": "Fazenda Pública Estadual"
+  },
+  {
+    "value": "108",
+    "label": "Cumprimento de Sentença Faz. Púb. Est. - Centrase"
+  },
+  {
+    "value": "109",
+    "label": "Ambiental Estadual"
+  },
+  {
+    "value": "110",
+    "label": "Improbidade Administrativa Estadual"
+  },
+  {
+    "value": "111",
+    "label": "Saúde Pública Estadual"
+  },
+  {
+    "value": "112",
+    "label": "Grandes Eventos Fazenda Pública Estadual"
+  },
+  {
+    "value": "200",
+    "label": "Acidentes do Trabalho"
+  },
+  {
+    "value": "201",
+    "label": "Agrária de Minas Gerais"
+  },
+  {
+    "value": "202",
+    "label": "Cível do Barreiro"
+  },
+  {
+    "value": "203",
+    "label": "Empresarial"
+  },
+  {
+    "value": "204",
+    "label": "Família do Barreiro"
+  },
+  {
+    "value": "205",
+    "label": "Infância e Juventude - Saúde Pública Estadual"
+  },
+  {
+    "value": "206",
+    "label": "Infância e Juventude - Saúde Pública Municipal"
+  },
+  {
+    "value": "207",
+    "label": "Infância e Juventude - Saúde Suplementar"
+  },
+  {
+    "value": "208",
+    "label": "Infância e Juventude Cível CPC"
+  },
+  {
+    "value": "209",
+    "label": "Infância e Juventude Cível ECA"
+  },
+  {
+    "value": "210",
+    "label": "Infância e Juventude Cível ECA - Belo Horizonte"
+  },
+  {
+    "value": "211",
+    "label": "Reconhecimento de Paternidade CRP"
+  },
+  {
+    "value": "212",
+    "label": "Reconhecimento de Paternidade SRP"
+  },
+  {
+    "value": "213",
+    "label": "Registros Públicos e Averiguação de Paternidade"
+  },
+  {
+    "value": "214",
+    "label": "Registros Públicos"
+  },
+  {
+    "value": "500",
+    "label": "Curatelas"
+  },
+  {
+    "value": "501",
+    "label": "Família"
+  },
+  {
+    "value": "502",
+    "label": "Sucessões e Ausências"
+  },
+  {
+    "value": "751",
+    "label": "Feitos Tributários Estaduais"
+  },
+  {
+    "value": "752",
+    "label": "Feitos Tributários Municipais"
+  },
+  {
+    "value": "786",
+    "label": "Cível JIJ I POA"
+  },
+  {
+    "value": "787",
+    "label": "Cível JIJ II POA"
+  },
+  {
+    "value": "791",
+    "label": "Cível JIJ"
+  },
+  {
+    "value": "904",
+    "label": "Organizações e Lavagem de Dinheiro"
+  },
+  {
+    "value": "1000",
+    "label": "Pré-Processual Cível"
+  },
+  {
+    "value": "1001",
+    "label": "Pré-Processual Relação de Consumo"
+  },
+  {
+    "value": "1002",
+    "label": "Pré-Processual Execução de Título Extrajudicial"
+  },
+  {
+    "value": "1003",
+    "label": "Pré-Processual Família"
+  },
+  {
+    "value": "1004",
+    "label": "Execução de Título Extrajudicial"
+  },
+  {
+    "value": "1005",
+    "label": "Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1006",
+    "label": "Locação de Imóveis Urbanos - Lei nº. 8.245/91"
+  },
+  {
+    "value": "1007",
+    "label": "Cível Relação de Consumo"
+  },
+  {
+    "value": "1008",
+    "label": "Saúde Suplementar"
+  },
+  {
+    "value": "1010",
+    "label": "Turma Recursal Cível - Competência Originária"
+  },
+  {
+    "value": "1011",
+    "label": "NÃO DISTRIBUIR - CEJUSC VIRTUAL"
+  },
+  {
+    "value": "1012",
+    "label": "Pré-Processual Juizado Especial"
+  },
+  {
+    "value": "1013",
+    "label": "Jesp Telefonia"
+  },
+  {
+    "value": "1014",
+    "label": "Jesp Residual Cível e Seguro DPVAT"
+  },
+  {
+    "value": "1015",
+    "label": "Jesp Relação de Consumo"
+  },
+  {
+    "value": "1016",
+    "label": "Jesp Execução de Títulos Extrajudiciais"
+  },
+  {
+    "value": "1017",
+    "label": "Jesp Acidente de Trânsito"
+  },
+  {
+    "value": "1018",
+    "label": "Jesp Telefonia Barreiro"
+  },
+  {
+    "value": "1019",
+    "label": "Jesp Residual Cível e Seguro DPVAT Barreiro"
+  },
+  {
+    "value": "1020",
+    "label": "Jesp Relação de Consumo Barreiro"
+  },
+  {
+    "value": "1021",
+    "label": "Jesp Saúde Suplementar"
+  },
+  {
+    "value": "1022",
+    "label": "Jesp Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1023",
+    "label": "Jesp Microempresa"
+  },
+  {
+    "value": "1024",
+    "label": "Jesp Execução de Títulos Extrajudiciais Barreiro"
+  },
+  {
+    "value": "1025",
+    "label": "Jesp Acidente de Trânsito Barreiro"
+  },
+  {
+    "value": "1026",
+    "label": "Jesp Fazenda Pública Estadual"
+  },
+  {
+    "value": "1027",
+    "label": "Jesp Fazenda Pública Municipal"
+  },
+  {
+    "value": "1028",
+    "label": "Jesp Saúde Pública Estadual"
+  },
+  {
+    "value": "1029",
+    "label": "Jesp Saúde Pública Municipal"
+  },
+  {
+    "value": "1030",
+    "label": "Jesp Grandes Eventos Fazenda Pública Estadual"
+  },
+  {
+    "value": "1031",
+    "label": "Jesp Grandes Eventos Fazenda Pública Municipal"
+  },
+  {
+    "value": "1032",
+    "label": "Turma Recursal Telefonia - Competência Originária"
+  },
+  {
+    "value": "1033",
+    "label": "Turma Recursal Fazenda Pública Estadual - Cmp Org"
+  },
+  {
+    "value": "1034",
+    "label": "Turma Recursal Fazenda Pública Municipal - Cmp Org"
+  },
+  {
+    "value": "1035",
+    "label": "Turma Recursal Cível"
+  },
+  {
+    "value": "1900",
+    "label": "JEE Recurso Criminal"
+  },
+  {
+    "value": "1901",
+    "label": "JEE Recurso Cível"
+  },
+  {
+    "value": "1902",
+    "label": "JEE Recurso Fazenda Pública"
+  },
+  {
+    "value": "1903",
+    "label": "Execução Fiscal Federal - Delegada"
+  },
+  {
+    "value": "1904",
+    "label": "Fazenda Pública Federal - Delegada"
+  },
+  {
+    "value": "1905",
+    "label": "Precatória Cível"
+  },
+  {
+    "value": "1906",
+    "label": "Precatória Sucessões e Ausência"
+  },
+  {
+    "value": "1907",
+    "label": "Precatória Família"
+  },
+  {
+    "value": "1908",
+    "label": "Precatória Feitos Tributários Municipais"
+  },
+  {
+    "value": "1909",
+    "label": "Precatória Exc. Fiscal Municipal - Não Tributária"
+  },
+  {
+    "value": "1910",
+    "label": "Precatória Fazenda Pública Municipal"
+  },
+  {
+    "value": "1911",
+    "label": "Precatória Ambiental Municipal"
+  },
+  {
+    "value": "1912",
+    "label": "Precatória Improbidade Administrativa Municipal"
+  },
+  {
+    "value": "1913",
+    "label": "Precatória Saúde Pública Municipal"
+  },
+  {
+    "value": "1914",
+    "label": "Precatória Grandes Eventos Fazenda Púb. Municipal"
+  },
+  {
+    "value": "1915",
+    "label": "Precatória Feitos Tributários Estaduais"
+  },
+  {
+    "value": "1916",
+    "label": "Precatória Exc. Fiscal Estadual - Não Tributária"
+  },
+  {
+    "value": "1917",
+    "label": "Precatória Fazenda Pública Estadual"
+  },
+  {
+    "value": "1918",
+    "label": "Precatória Cumprimento de Sentença - Fazenda Púb."
+  },
+  {
+    "value": "1919",
+    "label": "Precatória Ambiental Estadual"
+  },
+  {
+    "value": "1920",
+    "label": "Precatória Improbidade Administrativa Estadual"
+  },
+  {
+    "value": "1921",
+    "label": "Precatória Saúde Pública Estadual"
+  },
+  {
+    "value": "1922",
+    "label": "Precatória Grandes Eventos Fazenda Púb. Estadual"
+  },
+  {
+    "value": "1923",
+    "label": "Precatória Execução Fiscal Federal"
+  },
+  {
+    "value": "1924",
+    "label": "Precatória Fazenda Pública Federal"
+  },
+  {
+    "value": "1925",
+    "label": "Precatória Registros Públicos"
+  },
+  {
+    "value": "1926",
+    "label": "Precatória Acidente do Trabalho"
+  },
+  {
+    "value": "1927",
+    "label": "Precatória Agrária de Minas Gerais"
+  },
+  {
+    "value": "1928",
+    "label": "Precatória Relação de Consumo"
+  },
+  {
+    "value": "1929",
+    "label": "Precatória Cumprimento de Sentença"
+  },
+  {
+    "value": "1930",
+    "label": "Precatória Execução de Título Extrajudicial"
+  },
+  {
+    "value": "1931",
+    "label": "Precatória Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1932",
+    "label": "Precatória Locação de Imóveis Urbanos"
+  },
+  {
+    "value": "1933",
+    "label": "Precatória Medidas Protetivas - Estatuto do Idoso"
+  },
+  {
+    "value": "1934",
+    "label": "Precatória Empresarial"
+  },
+  {
+    "value": "1935",
+    "label": "Precatória Saúde Suplementar"
+  },
+  {
+    "value": "1936",
+    "label": "Precatória Ambiental Cível"
+  },
+  {
+    "value": "1937",
+    "label": "Precatória Infância e Juventude Cível"
+  },
+  {
+    "value": "1938",
+    "label": "Precatória Jesp Saúde Suplementar"
+  },
+  {
+    "value": "1939",
+    "label": "Precatória Jesp Saúde Pública Estadual"
+  },
+  {
+    "value": "1940",
+    "label": "Precatória Jesp Saúde Pública Municipal"
+  },
+  {
+    "value": "1941",
+    "label": "Precatória Jesp Fazenda Pública Estadual"
+  },
+  {
+    "value": "1942",
+    "label": "Precatória Jesp Fazenda Pública Municipal"
+  },
+  {
+    "value": "1943",
+    "label": "Precatória Jesp G. Eventos Faz. Púb. Estadual"
+  },
+  {
+    "value": "1944",
+    "label": "Precatória Jesp G. Eventos Faz. Púb. Municipal"
+  },
+  {
+    "value": "1945",
+    "label": "Precatória Jesp Telefonia"
+  },
+  {
+    "value": "1946",
+    "label": "Precatória Jesp Residual Cível e Seguro DPVAT"
+  },
+  {
+    "value": "1947",
+    "label": "Precatória Jesp Relação de Consumo"
+  },
+  {
+    "value": "1948",
+    "label": "Precatória Jesp Execução de Título Extrajudiciais"
+  },
+  {
+    "value": "1949",
+    "label": "Precatória Jesp Acidente de Trânsito"
+  },
+  {
+    "value": "1950",
+    "label": "Precatória Jesp Microempresa"
+  },
+  {
+    "value": "1952",
+    "label": "Precatória Jesp Grandes Eventos Cíveis"
+  },
+  {
+    "value": "1953",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Ambiental"
+  },
+  {
+    "value": "1954",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Empresarial"
+  },
+  {
+    "value": "1955",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Família"
+  },
+  {
+    "value": "1956",
+    "label": "NÃO DISTRIBUIR - CEJUSC Espec. Povos Comun. Trad."
+  },
+  {
+    "value": "1957",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Saúde"
+  },
+  {
+    "value": "1958",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Social"
+  },
+  {
+    "value": "1959",
+    "label": "NÃO DISTRIBUIR - CEJUSC Especializado Tributário"
+  },
+  {
+    "value": "1960",
+    "label": "Procedimento Administrativo Custas Finais"
+  },
+  {
+    "value": "1961",
+    "label": "Cumprimento de Sentença - Cível"
+  },
+  {
+    "value": "1962",
+    "label": "Cumprimento de Sentença - Fazenda Pública Estadual"
+  }
+]

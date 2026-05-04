@@ -1,0 +1,38 @@
+[
+  {
+    "value": "A",
+    "label": "Por Evento OU Tipo de Petição OU Documento"
+  },
+  {
+    "value": "E",
+    "label": "Por Evento"
+  },
+  {
+    "value": "P",
+    "label": "Por Tipo de Petição"
+  },
+  {
+    "value": "O",
+    "label": "Por Documento"
+  },
+  {
+    "value": "D",
+    "label": "Por Data ou Periodicamente"
+  },
+  {
+    "value": "L",
+    "label": "Por Tempo no Localizador"
+  },
+  {
+    "value": "S",
+    "label": "Por Tempo na Situação"
+  },
+  {
+    "value": "V",
+    "label": "Verificação Processos Sem Movimentação"
+  },
+  {
+    "value": "M",
+    "label": "Por Ação Manual"
+  }
+]

@@ -96,7 +96,17 @@ export interface AtpRule {
    * condições em rule-builder está fora do escopo. Ver decisoes.md#D-3.
    */
   condicoes?: string;
-  /** Ação executada quando a regra dispara (texto livre por enquanto). */
+  /**
+   * Código do tipo de ação programada (catálogo `selTipoAcaoProgramada`).
+   * É a "Ação" canônica do Eproc — ex.: 'CAR' (Citação por AR), 'CMA'
+   * (Citação por Mandado). Coexiste com `acao` (descrição livre) — ver
+   * decisoes.md#D-4.
+   */
+  acaoTipo?: string;
+  /**
+   * Descrição livre do efeito da regra (ex.: "lançar movimento X; intimar
+   * a parte"). Suplementa `acaoTipo` com detalhes que o catálogo não cobre.
+   */
   acao?: string;
   observacoes?: string;
 }
