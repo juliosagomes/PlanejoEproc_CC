@@ -1,0 +1,134 @@
+[
+  {
+    "value": "11770222771045089612100608542",
+    "label": "Certidão contadoria"
+  },
+  {
+    "value": "11770222771045089612332826514",
+    "label": "Certidão contadoria - sem custas"
+  },
+  {
+    "value": "11773667520263547634388593348",
+    "label": "Decretação de Divórcio - Intimação IBGE"
+  },
+  {
+    "value": "11776180419144121636124061407",
+    "label": "Devolução CEJUSC - Abertura de prazo para contestação"
+  },
+  {
+    "value": "11773145126202673879372999536",
+    "label": "Especificação de Provas"
+  },
+  {
+    "value": "11770915907308441715685229456",
+    "label": "NÃO XXXXZ3.1.2 - NÃO Carta AR- Intimação Inicial - Execução Prisão - 3 dias"
+  },
+  {
+    "value": "11772027734669582002121828379",
+    "label": "Nomeação Perito"
+  },
+  {
+    "value": "11768928076635051435931708731",
+    "label": "Parecer MP - Carta de Ipojuca"
+  },
+  {
+    "value": "11766782639088549210634458027",
+    "label": "Petição Adv - Justiça Gratuita - 1"
+  },
+  {
+    "value": "11766783657130478530880100761",
+    "label": "Petição Adv - Tutela urgência - 1"
+  },
+  {
+    "value": "11770829026758238536263767457",
+    "label": "Remessa à Contadoria - Sentença com determinação de pagamento de custas"
+  },
+  {
+    "value": "11766162966165431196792433387",
+    "label": "XXXXZ.4.1 - Mandado - Audiência CEJUSC"
+  },
+  {
+    "value": "11766162966165431196793113169",
+    "label": "XXXXZ.4.2 - Mandado - Audiência GAB"
+  },
+  {
+    "value": "11766162966165431196763076605",
+    "label": "XXXXZ3.1.1 - Mandado - Citação - Proc. Comum"
+  },
+  {
+    "value": "11766162966165431196790721886",
+    "label": "XXXXZ3.1.2 - Carta-AR - Intimação Inicial - Execução Expropriação - 15 dias"
+  },
+  {
+    "value": "11766176731425655067563915430",
+    "label": "XXXXZ3.1.3 - Mandado - Citação e Intimação de Liminar - Proc. Comum"
+  },
+  {
+    "value": "11766176731425655067565144379",
+    "label": "XXXXZ3.1.4 - Mandado / Carta AR- Intimação Inicial - Execução Prisão - 3 dias"
+  },
+  {
+    "value": "11766176731425655067967095875",
+    "label": "XXXXZ3.1.5 - Carta AR - Intimação após hora-certa"
+  },
+  {
+    "value": "11766947389278629068116886151",
+    "label": "XXXXZ3.1.6 - Mandado de avaliação"
+  },
+  {
+    "value": "11766162966165431195804572669",
+    "label": "XXXXZ3.5.1 - WhatsApp - Contestação de Família Sem Cejusc"
+  },
+  {
+    "value": "11766162966165431195805508307",
+    "label": "XXXXZ3.5.2 - WhatsApp - Contestação de Família Com CEJUSC"
+  },
+  {
+    "value": "11766162966165431195806660556",
+    "label": "XXXXZ3.5.3 - WhatsApp - Execuções pagar em 3 dias"
+  },
+  {
+    "value": "11766162966165431195807523271",
+    "label": "XXXXZ3.5.4 - WhatsApp - Execuções pagar em 15 dias"
+  },
+  {
+    "value": "11766162966165431195887091259",
+    "label": "XXXXZ3.5.5 - WhatsApp - Audiência Gabinete"
+  },
+  {
+    "value": "11768497564324253272211633877",
+    "label": "XXXXZ6.1 - Cartas Precatórias - Conclusão - Determinar Cumprimento"
+  },
+  {
+    "value": "11768497564324253272213150609",
+    "label": "XXXXZ6.2 - Cartas Precatórias - Falta Documentos - Devolver"
+  },
+  {
+    "value": "11765996328915487879067962713",
+    "label": "Z1.0 - Ato ordinatório decurso de prazo para pagamento"
+  },
+  {
+    "value": "11763135293286315338739141700",
+    "label": "[Triagem] Ag. Pagamento das Custas"
+  },
+  {
+    "value": "11762883587558160862806974011",
+    "label": "[Triagem] Intimação da parte para emendar"
+  },
+  {
+    "value": "11771865905759099755044264090",
+    "label": "[Triagem] Minutar em secretaria"
+  },
+  {
+    "value": "11773145126202673879063582580",
+    "label": "[Triagem] NÃO justiça gratuita"
+  },
+  {
+    "value": "11771865905759099755099014635",
+    "label": "[Triagem] NÃO minutar em secretaria"
+  },
+  {
+    "value": "11763135293286315338655681410",
+    "label": "[Triagem] Prosseguir cumprimento - 2"
+  }
+]

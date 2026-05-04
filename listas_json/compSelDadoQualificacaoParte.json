@@ -1,0 +1,114 @@
+[
+  {
+    "value": "43",
+    "label": "Absolutamente Incapaz (Art. 3º CC)"
+  },
+  {
+    "value": "11",
+    "label": "Absolutamente Incapaz (Art. 3º, I CC)"
+  },
+  {
+    "value": "12",
+    "label": "Absolutamente Incapaz (Art. 3º, II e III CC)"
+  },
+  {
+    "value": "37,20",
+    "label": "Administrador Judicial"
+  },
+  {
+    "value": "50",
+    "label": "Chamado"
+  },
+  {
+    "value": "49",
+    "label": "Chamante"
+  },
+  {
+    "value": "27",
+    "label": "Curador"
+  },
+  {
+    "value": "48",
+    "label": "Denunciado"
+  },
+  {
+    "value": "47",
+    "label": "Denunciante"
+  },
+  {
+    "value": "42",
+    "label": "Em Liquidação Extrajudicial"
+  },
+  {
+    "value": "38",
+    "label": "Em Liquidação Judicial"
+  },
+  {
+    "value": "36",
+    "label": "Em Recuperação Judicial"
+  },
+  {
+    "value": "5",
+    "label": "Espólio"
+  },
+  {
+    "value": "46",
+    "label": "Guardião"
+  },
+  {
+    "value": "8",
+    "label": "Inventariante"
+  },
+  {
+    "value": "39",
+    "label": "Liquidante"
+  },
+  {
+    "value": "6",
+    "label": "Massa Falida/Insolvente"
+  },
+  {
+    "value": "53",
+    "label": "Opoente"
+  },
+  {
+    "value": "54",
+    "label": "Oposto"
+  },
+  {
+    "value": "30",
+    "label": "Pais"
+  },
+  {
+    "value": "52",
+    "label": "Reconvindo"
+  },
+  {
+    "value": "51",
+    "label": "Reconvinte"
+  },
+  {
+    "value": "13",
+    "label": "Relativamente Incapaz (Art. 4º CC)"
+  },
+  {
+    "value": "29",
+    "label": "Sociedade"
+  },
+  {
+    "value": "23",
+    "label": "Sócio"
+  },
+  {
+    "value": "31",
+    "label": "Sucessão"
+  },
+  {
+    "value": "10",
+    "label": "Sucessor"
+  },
+  {
+    "value": "26",
+    "label": "Tutor"
+  }
+]

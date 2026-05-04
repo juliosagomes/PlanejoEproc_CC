@@ -1,0 +1,14 @@
+[
+  {
+    "value": "C",
+    "label": "Precedentes Vinculados"
+  },
+  {
+    "value": "S",
+    "label": "Precedentes por IA"
+  },
+  {
+    "value": "I",
+    "label": "Precedentes pelo Peticionante"
+  }
+]

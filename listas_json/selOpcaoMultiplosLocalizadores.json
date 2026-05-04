@@ -1,0 +1,10 @@
+[
+  {
+    "value": "OR",
+    "label": "Selecionar processos que estiverem em qualquer um dos localizadores (condição \"OU\")"
+  },
+  {
+    "value": "AND",
+    "label": "Selecionar somente os processos que estiverem em todos os localizadores (condição \"E\")"
+  }
+]

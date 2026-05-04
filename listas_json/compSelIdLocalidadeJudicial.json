@@ -1,0 +1,886 @@
+[
+  {
+    "value": "226",
+    "label": "Abaeté"
+  },
+  {
+    "value": "227",
+    "label": "Abre Campo"
+  },
+  {
+    "value": "228",
+    "label": "Açucena"
+  },
+  {
+    "value": "229",
+    "label": "Águas Formosas"
+  },
+  {
+    "value": "230",
+    "label": "Aimorés"
+  },
+  {
+    "value": "233",
+    "label": "Alfenas"
+  },
+  {
+    "value": "234",
+    "label": "Almenara"
+  },
+  {
+    "value": "235",
+    "label": "Alpinópolis"
+  },
+  {
+    "value": "236",
+    "label": "Alto Rio Doce"
+  },
+  {
+    "value": "237",
+    "label": "Alvinópolis"
+  },
+  {
+    "value": "239",
+    "label": "Andrelândia"
+  },
+  {
+    "value": "240",
+    "label": "Araçuaí"
+  },
+  {
+    "value": "242",
+    "label": "Araxá"
+  },
+  {
+    "value": "244",
+    "label": "Areado"
+  },
+  {
+    "value": "246",
+    "label": "Baependi"
+  },
+  {
+    "value": "248",
+    "label": "Barão de Cocais"
+  },
+  {
+    "value": "249",
+    "label": "Barbacena"
+  },
+  {
+    "value": "250",
+    "label": "Barroso"
+  },
+  {
+    "value": "185",
+    "label": "Belo Horizonte"
+  },
+  {
+    "value": "187",
+    "label": "Belo Vale"
+  },
+  {
+    "value": "188",
+    "label": "Betim"
+  },
+  {
+    "value": "251",
+    "label": "Bicas"
+  },
+  {
+    "value": "255",
+    "label": "Bom Sucesso"
+  },
+  {
+    "value": "256",
+    "label": "Bonfim"
+  },
+  {
+    "value": "257",
+    "label": "Bonfinópolis de Minas"
+  },
+  {
+    "value": "189",
+    "label": "Botelhos"
+  },
+  {
+    "value": "260",
+    "label": "Brumadinho"
+  },
+  {
+    "value": "262",
+    "label": "Buenópolis"
+  },
+  {
+    "value": "190",
+    "label": "Cabo Verde"
+  },
+  {
+    "value": "264",
+    "label": "Cachoeira de Minas"
+  },
+  {
+    "value": "265",
+    "label": "Caeté"
+  },
+  {
+    "value": "191",
+    "label": "Caldas"
+  },
+  {
+    "value": "266",
+    "label": "Camanducaia"
+  },
+  {
+    "value": "267",
+    "label": "Cambuí"
+  },
+  {
+    "value": "268",
+    "label": "Cambuquira"
+  },
+  {
+    "value": "269",
+    "label": "Campanha"
+  },
+  {
+    "value": "192",
+    "label": "Campestre"
+  },
+  {
+    "value": "270",
+    "label": "Campina Verde"
+  },
+  {
+    "value": "274",
+    "label": "Canápolis"
+  },
+  {
+    "value": "276",
+    "label": "Capelinha"
+  },
+  {
+    "value": "277",
+    "label": "Capinópolis"
+  },
+  {
+    "value": "278",
+    "label": "Carandaí"
+  },
+  {
+    "value": "279",
+    "label": "Carangola"
+  },
+  {
+    "value": "280",
+    "label": "Caratinga"
+  },
+  {
+    "value": "281",
+    "label": "Carlos Chagas"
+  },
+  {
+    "value": "286",
+    "label": "Carmo do Rio Claro"
+  },
+  {
+    "value": "288",
+    "label": "Cássia"
+  },
+  {
+    "value": "289",
+    "label": "Cataguases"
+  },
+  {
+    "value": "290",
+    "label": "Caxambu"
+  },
+  {
+    "value": "292",
+    "label": "Conceição das Alagoas"
+  },
+  {
+    "value": "293",
+    "label": "Conceição do Mato Dentro"
+  },
+  {
+    "value": "294",
+    "label": "Conceição do Rio Verde"
+  },
+  {
+    "value": "193",
+    "label": "Congonhas"
+  },
+  {
+    "value": "295",
+    "label": "Conquista"
+  },
+  {
+    "value": "194",
+    "label": "Conselheiro Lafaiete"
+  },
+  {
+    "value": "296",
+    "label": "Conselheiro Pena"
+  },
+  {
+    "value": "195",
+    "label": "Contagem"
+  },
+  {
+    "value": "298",
+    "label": "Corinto"
+  },
+  {
+    "value": "299",
+    "label": "Coromandel"
+  },
+  {
+    "value": "196",
+    "label": "Coronel Fabriciano"
+  },
+  {
+    "value": "301",
+    "label": "Cruzília"
+  },
+  {
+    "value": "302",
+    "label": "Curvelo"
+  },
+  {
+    "value": "303",
+    "label": "Diamantina"
+  },
+  {
+    "value": "304",
+    "label": "Divino"
+  },
+  {
+    "value": "197",
+    "label": "Divinópolis"
+  },
+  {
+    "value": "305",
+    "label": "Dores do Indaiá"
+  },
+  {
+    "value": "198",
+    "label": "Entre Rios de Minas"
+  },
+  {
+    "value": "307",
+    "label": "Ervália"
+  },
+  {
+    "value": "199",
+    "label": "Esmeraldas"
+  },
+  {
+    "value": "308",
+    "label": "Espera Feliz"
+  },
+  {
+    "value": "309",
+    "label": "Espinosa"
+  },
+  {
+    "value": "311",
+    "label": "Eugenópolis"
+  },
+  {
+    "value": "312",
+    "label": "Extrema"
+  },
+  {
+    "value": "313",
+    "label": "Ferros"
+  },
+  {
+    "value": "316",
+    "label": "Frutal"
+  },
+  {
+    "value": "317",
+    "label": "Galiléia"
+  },
+  {
+    "value": "318",
+    "label": "Governador Valadares"
+  },
+  {
+    "value": "320",
+    "label": "Guanhães"
+  },
+  {
+    "value": "322",
+    "label": "Guaranésia"
+  },
+  {
+    "value": "323",
+    "label": "Guarani"
+  },
+  {
+    "value": "324",
+    "label": "Guaxupé"
+  },
+  {
+    "value": "326",
+    "label": "Ibiraci"
+  },
+  {
+    "value": "327",
+    "label": "Ibirité"
+  },
+  {
+    "value": "328",
+    "label": "Igarapé"
+  },
+  {
+    "value": "330",
+    "label": "Inhapim"
+  },
+  {
+    "value": "331",
+    "label": "Ipanema"
+  },
+  {
+    "value": "332",
+    "label": "Ipatinga"
+  },
+  {
+    "value": "333",
+    "label": "Itabira"
+  },
+  {
+    "value": "334",
+    "label": "Itabirito"
+  },
+  {
+    "value": "337",
+    "label": "Itamarandiba"
+  },
+  {
+    "value": "338",
+    "label": "Itambacuri"
+  },
+  {
+    "value": "339",
+    "label": "Itamogi"
+  },
+  {
+    "value": "342",
+    "label": "Itanhomi"
+  },
+  {
+    "value": "343",
+    "label": "Itapagipe"
+  },
+  {
+    "value": "346",
+    "label": "Ituiutaba"
+  },
+  {
+    "value": "347",
+    "label": "Itumirim"
+  },
+  {
+    "value": "348",
+    "label": "Iturama"
+  },
+  {
+    "value": "200",
+    "label": "Jaboticatubas"
+  },
+  {
+    "value": "349",
+    "label": "Jacinto"
+  },
+  {
+    "value": "350",
+    "label": "Jacuí"
+  },
+  {
+    "value": "355",
+    "label": "Jequeri"
+  },
+  {
+    "value": "356",
+    "label": "Jequitinhonha"
+  },
+  {
+    "value": "357",
+    "label": "João Monlevade"
+  },
+  {
+    "value": "358",
+    "label": "João Pinheiro"
+  },
+  {
+    "value": "201",
+    "label": "Juiz de Fora"
+  },
+  {
+    "value": "202",
+    "label": "Lagoa Santa"
+  },
+  {
+    "value": "203",
+    "label": "Lajinha"
+  },
+  {
+    "value": "361",
+    "label": "Lambari"
+  },
+  {
+    "value": "362",
+    "label": "Lavras"
+  },
+  {
+    "value": "364",
+    "label": "Lima Duarte"
+  },
+  {
+    "value": "365",
+    "label": "Luz"
+  },
+  {
+    "value": "367",
+    "label": "Malacacheta"
+  },
+  {
+    "value": "204",
+    "label": "Manhuaçu"
+  },
+  {
+    "value": "205",
+    "label": "Manhumirim"
+  },
+  {
+    "value": "369",
+    "label": "Mantena"
+  },
+  {
+    "value": "370",
+    "label": "Mar de Espanha"
+  },
+  {
+    "value": "371",
+    "label": "Mariana"
+  },
+  {
+    "value": "372",
+    "label": "Martinho Campos"
+  },
+  {
+    "value": "374",
+    "label": "Matias Barbosa"
+  },
+  {
+    "value": "206",
+    "label": "Matozinhos"
+  },
+  {
+    "value": "375",
+    "label": "Medina"
+  },
+  {
+    "value": "207",
+    "label": "Mercês"
+  },
+  {
+    "value": "376",
+    "label": "Mesquita"
+  },
+  {
+    "value": "377",
+    "label": "Minas Novas"
+  },
+  {
+    "value": "378",
+    "label": "Miradouro"
+  },
+  {
+    "value": "379",
+    "label": "Miraí"
+  },
+  {
+    "value": "381",
+    "label": "Monte Alegre de Minas"
+  },
+  {
+    "value": "382",
+    "label": "Monte Azul"
+  },
+  {
+    "value": "383",
+    "label": "Monte Belo"
+  },
+  {
+    "value": "385",
+    "label": "Monte Santo de Minas"
+  },
+  {
+    "value": "208",
+    "label": "Montes Claros"
+  },
+  {
+    "value": "387",
+    "label": "Morada Nova de Minas"
+  },
+  {
+    "value": "388",
+    "label": "Muriaé"
+  },
+  {
+    "value": "209",
+    "label": "Mutum"
+  },
+  {
+    "value": "389",
+    "label": "Muzambinho"
+  },
+  {
+    "value": "390",
+    "label": "Nanuque"
+  },
+  {
+    "value": "391",
+    "label": "Natércia"
+  },
+  {
+    "value": "392",
+    "label": "Nepomuceno"
+  },
+  {
+    "value": "393",
+    "label": "Nova Era"
+  },
+  {
+    "value": "394",
+    "label": "Nova Lima"
+  },
+  {
+    "value": "395",
+    "label": "Nova Ponte"
+  },
+  {
+    "value": "396",
+    "label": "Nova Resende"
+  },
+  {
+    "value": "397",
+    "label": "Nova Serrana"
+  },
+  {
+    "value": "398",
+    "label": "Novo Cruzeiro"
+  },
+  {
+    "value": "210",
+    "label": "Ouro Branco"
+  },
+  {
+    "value": "401",
+    "label": "Ouro Preto"
+  },
+  {
+    "value": "403",
+    "label": "Pará de Minas"
+  },
+  {
+    "value": "404",
+    "label": "Paracatu"
+  },
+  {
+    "value": "211",
+    "label": "Paraopeba"
+  },
+  {
+    "value": "409",
+    "label": "Passos"
+  },
+  {
+    "value": "212",
+    "label": "Patos de Minas"
+  },
+  {
+    "value": "410",
+    "label": "Patrocínio"
+  },
+  {
+    "value": "411",
+    "label": "Peçanha"
+  },
+  {
+    "value": "412",
+    "label": "Pedra Azul"
+  },
+  {
+    "value": "213",
+    "label": "Pedro Leopoldo"
+  },
+  {
+    "value": "414",
+    "label": "Perdizes"
+  },
+  {
+    "value": "415",
+    "label": "Perdões"
+  },
+  {
+    "value": "214",
+    "label": "Piranga"
+  },
+  {
+    "value": "417",
+    "label": "Pirapora"
+  },
+  {
+    "value": "418",
+    "label": "Pitangui"
+  },
+  {
+    "value": "215",
+    "label": "Poços de Caldas"
+  },
+  {
+    "value": "421",
+    "label": "Pompéu"
+  },
+  {
+    "value": "422",
+    "label": "Ponte Nova"
+  },
+  {
+    "value": "423",
+    "label": "Porteirinha"
+  },
+  {
+    "value": "424",
+    "label": "Pouso Alegre"
+  },
+  {
+    "value": "425",
+    "label": "Prados"
+  },
+  {
+    "value": "426",
+    "label": "Prata"
+  },
+  {
+    "value": "427",
+    "label": "Pratápolis"
+  },
+  {
+    "value": "216",
+    "label": "Presidente Olegário"
+  },
+  {
+    "value": "428",
+    "label": "Raul Soares"
+  },
+  {
+    "value": "429",
+    "label": "Resende Costa"
+  },
+  {
+    "value": "430",
+    "label": "Resplendor"
+  },
+  {
+    "value": "217",
+    "label": "Ribeirão das Neves"
+  },
+  {
+    "value": "431",
+    "label": "Rio Casca"
+  },
+  {
+    "value": "432",
+    "label": "Rio Novo"
+  },
+  {
+    "value": "434",
+    "label": "Rio Pardo de Minas"
+  },
+  {
+    "value": "435",
+    "label": "Rio Piracicaba"
+  },
+  {
+    "value": "218",
+    "label": "Rio Pomba"
+  },
+  {
+    "value": "436",
+    "label": "Rio Preto"
+  },
+  {
+    "value": "437",
+    "label": "Rio Vermelho"
+  },
+  {
+    "value": "438",
+    "label": "Sabará"
+  },
+  {
+    "value": "439",
+    "label": "Sabinópolis"
+  },
+  {
+    "value": "440",
+    "label": "Sacramento"
+  },
+  {
+    "value": "441",
+    "label": "Salinas"
+  },
+  {
+    "value": "442",
+    "label": "Santa Bárbara"
+  },
+  {
+    "value": "443",
+    "label": "Santa Luzia"
+  },
+  {
+    "value": "444",
+    "label": "Santa Maria do Suaçuí"
+  },
+  {
+    "value": "219",
+    "label": "Santa Rita de Caldas"
+  },
+  {
+    "value": "445",
+    "label": "Santa Rita do Sapucaí"
+  },
+  {
+    "value": "446",
+    "label": "Santa Vitória"
+  },
+  {
+    "value": "448",
+    "label": "Santos Dumont"
+  },
+  {
+    "value": "449",
+    "label": "São Domingos do Prata"
+  },
+  {
+    "value": "451",
+    "label": "São Gonçalo do Sapucaí"
+  },
+  {
+    "value": "454",
+    "label": "São João del-Rei"
+  },
+  {
+    "value": "455",
+    "label": "São João do Paraíso"
+  },
+  {
+    "value": "456",
+    "label": "São João Evangelista"
+  },
+  {
+    "value": "457",
+    "label": "São João Nepomuceno"
+  },
+  {
+    "value": "461",
+    "label": "São Sebastião do Paraíso"
+  },
+  {
+    "value": "220",
+    "label": "Senador Firmino"
+  },
+  {
+    "value": "462",
+    "label": "Serro"
+  },
+  {
+    "value": "221",
+    "label": "Sete Lagoas"
+  },
+  {
+    "value": "463",
+    "label": "Silvianópolis"
+  },
+  {
+    "value": "464",
+    "label": "Taiobeiras"
+  },
+  {
+    "value": "465",
+    "label": "Tarumirim"
+  },
+  {
+    "value": "466",
+    "label": "Teixeiras"
+  },
+  {
+    "value": "467",
+    "label": "Teófilo Otoni"
+  },
+  {
+    "value": "222",
+    "label": "Timóteo"
+  },
+  {
+    "value": "469",
+    "label": "Tombos"
+  },
+  {
+    "value": "470",
+    "label": "Três Corações"
+  },
+  {
+    "value": "471",
+    "label": "Três Marias"
+  },
+  {
+    "value": "474",
+    "label": "Turmalina"
+  },
+  {
+    "value": "223",
+    "label": "Ubá"
+  },
+  {
+    "value": "475",
+    "label": "Uberaba"
+  },
+  {
+    "value": "476",
+    "label": "Uberlândia"
+  },
+  {
+    "value": "478",
+    "label": "Varginha"
+  },
+  {
+    "value": "479",
+    "label": "Várzea da Palma"
+  },
+  {
+    "value": "224",
+    "label": "Vazante"
+  },
+  {
+    "value": "225",
+    "label": "Vespasiano"
+  },
+  {
+    "value": "480",
+    "label": "Viçosa"
+  },
+  {
+    "value": "481",
+    "label": "Virginópolis"
+  },
+  {
+    "value": "482",
+    "label": "Visconde do Rio Branco"
+  }
+]

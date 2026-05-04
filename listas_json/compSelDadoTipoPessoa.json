@@ -1,0 +1,70 @@
+[
+  {
+    "value": "A_ENT",
+    "label": "Autor - Entidade"
+  },
+  {
+    "value": "A_PF",
+    "label": "Autor - Pessoa Física"
+  },
+  {
+    "value": "A_PJ",
+    "label": "Autor - Pessoa Jurídica"
+  },
+  {
+    "value": "A_PES_CDJE",
+    "label": "Autor - Pessoa - Com DJE"
+  },
+  {
+    "value": "A_PES_SDJE",
+    "label": "Autor - Pessoa - Sem DJE"
+  },
+  {
+    "value": "R_ENT",
+    "label": "Réu - Entidade"
+  },
+  {
+    "value": "R_PF",
+    "label": "Réu - Pessoa Física"
+  },
+  {
+    "value": "R_PF_REG",
+    "label": "Réu - Pessoa Física - CPF Regular"
+  },
+  {
+    "value": "R_PF_INV",
+    "label": "Réu - Pessoa Física - CPF Não Regular ou Inexistente"
+  },
+  {
+    "value": "R_PF_FAL",
+    "label": "Réu - Pessoa Física - Falecido"
+  },
+  {
+    "value": "R_PJ",
+    "label": "Réu - Pessoa Jurídica"
+  },
+  {
+    "value": "R_PJ_REG",
+    "label": "Réu - Pessoa Jurídica - CNPJ Ativo"
+  },
+  {
+    "value": "R_PJ_INV",
+    "label": "Réu - Pessoa Jurídica - CNPJ Inativo ou Inexistente"
+  },
+  {
+    "value": "R_PES_CDJE",
+    "label": "Réu - Pessoa - Com DJE"
+  },
+  {
+    "value": "R_PES_SDJE",
+    "label": "Réu - Pessoa - Sem DJE"
+  },
+  {
+    "value": "R_AAPURAR",
+    "label": "Réu - A Apurar"
+  },
+  {
+    "value": "R_OSMESMOS",
+    "label": "Réu - Os Mesmos"
+  }
+]

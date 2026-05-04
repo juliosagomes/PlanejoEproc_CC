@@ -1,0 +1,1702 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8">
+<title>Planej · Whiteboard de Planejamento (Eproc)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+
+<style>
+  /* Minimal Tailwind utility shim */
+  .flex{display:flex}.grid{display:grid}.hidden{display:none}.inline-flex{display:inline-flex}
+  .flex-1{flex:1 1 0%}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.flex-shrink-0{flex-shrink:0}
+  .items-start{align-items:flex-start}.items-center{align-items:center}.items-baseline{align-items:baseline}
+  .justify-center{justify-content:center}.justify-end{justify-content:flex-end}.justify-between{justify-content:space-between}
+  .gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-3{gap:.75rem}
+  .h-full{height:100%}.h-screen{height:100vh}.w-full{width:100%}.min-w-0{min-width:0}.min-h-0{min-height:0}
+  .p-2{padding:.5rem}.p-3{padding:.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}
+  .px-2{padding-left:.5rem;padding-right:.5rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}
+  .py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}
+  .pt-3{padding-top:.75rem}.pt-4{padding-top:1rem}.pb-2{padding-bottom:.5rem}.pb-3{padding-bottom:.75rem}
+  .mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:.75rem}.mt-2{margin-top:.5rem}.ml-auto{margin-left:auto}
+  .text-xs{font-size:.75rem;line-height:1rem}.text-left{text-align:left}
+  .truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.font-medium{font-weight:500}
+  .relative{position:relative}.absolute{position:absolute}
+  .overflow-auto{overflow:auto}.overflow-hidden{overflow:hidden}
+  .rounded-md{border-radius:.375rem}
+  @media (min-width:768px){.md\:flex{display:flex}}
+</style>
+
+<style>
+  :root {
+    --bg: #FAFAFA;
+    --surface: #FFFFFF;
+    --surface-2: #F4F5F7;
+    --border: #E6E7EB;
+    --border-strong: #D4D6DC;
+    --text: #16181D;
+    --text-2: #4A4D55;
+    --text-3: #80848E;
+    --accent: oklch(0.55 0.15 265);
+    --accent-soft: oklch(0.96 0.025 265);
+    --accent-border: oklch(0.86 0.06 265);
+
+    --ok: oklch(0.55 0.14 155);
+    --ok-soft: oklch(0.96 0.03 155);
+    --ok-border: oklch(0.84 0.08 155);
+    --warn: oklch(0.65 0.13 75);
+    --warn-soft: oklch(0.97 0.045 85);
+
+    --edge-atp: oklch(0.55 0.15 265);
+    --edge-pref: oklch(0.55 0.14 155);
+    --edge-manual: oklch(0.65 0.01 270);
+
+    --grid-dot: #E6E7EB;
+  }
+
+  html, body, #root { height: 100%; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.005em;
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+  .react-flow__node { font-size: 12px; }
+  .react-flow__handle {
+    width: 8px; height: 8px;
+    background: #fff;
+    border: 1.5px solid var(--border-strong);
+  }
+  .react-flow__handle:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .react-flow__attribution { display: none; }
+  .react-flow__controls {
+    box-shadow: 0 0 0 1px var(--border), 0 1px 2px rgba(0,0,0,0.04) !important;
+    border-radius: 6px; overflow: hidden;
+  }
+  .react-flow__controls-button {
+    border-bottom: 1px solid var(--border) !important;
+    background: #fff !important;
+    width: 28px; height: 28px;
+  }
+  .react-flow__controls-button svg { fill: var(--text-2); }
+
+  /* Custom node */
+  .pj-node {
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 9px 11px 10px 11px;
+    min-width: 168px; max-width: 230px;
+    box-shadow: 0 1px 0 rgba(20,22,28,0.02), 0 1px 2px rgba(20,22,28,0.04);
+    transition: box-shadow .12s ease, border-color .12s ease, opacity .12s;
+    position: relative;
+  }
+  .pj-node.not-created {
+    border-style: dashed;
+    background: #FCFCFD;
+  }
+  .pj-node.created {
+    border-color: var(--ok-border);
+  }
+  .pj-node .ok-corner {
+    position: absolute; top: -7px; right: -7px;
+    width: 18px; height: 18px;
+    border-radius: 999px;
+    background: var(--ok);
+    color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 2px #fff;
+  }
+  .pj-node.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 4px 14px -6px oklch(0.55 0.15 265 / 0.35);
+  }
+  .pj-node-name {
+    font-weight: 600; color: var(--text);
+    font-size: 12.5px; line-height: 1.25;
+  }
+  .pj-node-desc {
+    font-size: 11px; color: var(--text-3);
+    margin-top: 2px; line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .pj-node-flags {
+    display: flex; gap: 3px; margin-top: 5px; flex-wrap: wrap;
+  }
+
+  .flag-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    height: 16px; min-width: 16px; padding: 0 4px;
+    border-radius: 3px;
+    font-weight: 600; font-size: 9.5px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.04em;
+  }
+  .flag-T { background: oklch(0.94 0.04 265); color: oklch(0.40 0.13 265); }
+  .flag-E { background: oklch(0.95 0.04 75);  color: oklch(0.42 0.13 75); }
+  .flag-G { background: oklch(0.94 0.05 25);  color: oklch(0.42 0.14 25); }
+  .flag-F { background: oklch(0.95 0.02 250); color: oklch(0.40 0.04 250); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    height: 28px; padding: 0 10px;
+    border-radius: 6px;
+    font-size: 12.5px; font-weight: 500;
+    border: 1px solid var(--border-strong);
+    background: #fff; color: var(--text);
+    transition: background .1s, border-color .1s, color .1s;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn-primary { background: var(--text); color: #fff; border-color: var(--text); }
+  .btn-primary:hover { background: #000; }
+  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-accent:hover { filter: brightness(1.08); }
+  .btn-ghost { border-color: transparent; background: transparent; }
+  .btn-ghost:hover { background: var(--surface-2); }
+  .btn-danger { color: oklch(0.50 0.18 25); border-color: var(--border-strong); }
+  .btn-danger:hover { background: oklch(0.97 0.04 25); border-color: oklch(0.80 0.10 25); }
+  .btn-sm { height: 24px; padding: 0 8px; font-size: 11.5px; }
+  .btn-icon { width: 28px; padding: 0; justify-content: center; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Inputs */
+  .input, .textarea, .select {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: inherit;
+    transition: border-color .1s, box-shadow .1s;
+  }
+  .input:focus, .textarea:focus, .select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px oklch(0.55 0.15 265 / 0.12);
+  }
+  .textarea { resize: vertical; min-height: 60px; line-height: 1.45; }
+  .label {
+    display: block;
+    font-size: 11px; font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    margin-bottom: 5px;
+  }
+  .section-h {
+    font-size: 10.5px; font-weight: 600; color: var(--text-3);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* Checkbox */
+  .pj-check {
+    appearance: none;
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: background .1s, border-color .1s;
+  }
+  .pj-check:hover { border-color: var(--text-3); }
+  .pj-check:checked {
+    background: var(--ok); border-color: var(--ok);
+  }
+  .pj-check:checked::after {
+    content: '';
+    position: absolute; left: 3px; top: 1px;
+    width: 5px; height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* Edge swatch (radio cards) */
+  .edge-swatch {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12.5px;
+    background: #fff;
+    transition: border-color .1s, background .1s;
+    user-select: none;
+  }
+  .edge-swatch.active { border-color: var(--accent); background: var(--accent-soft); }
+  .edge-swatch .line { width: 32px; height: 2px; flex-shrink: 0; }
+  .edge-swatch.atp .line { background: var(--edge-atp); }
+  .edge-swatch.pref .line { background: var(--edge-pref); }
+  .edge-swatch.manual .line {
+    background: transparent; border-top: 2px dashed var(--edge-manual);
+  }
+
+  /* Modal */
+  .scrim {
+    position: fixed; inset: 0; background: rgba(20,22,28,0.36);
+    backdrop-filter: blur(2px); z-index: 50;
+  }
+  .modal {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: min(720px, 92vw);
+    max-height: 88vh;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 24px 64px -12px rgba(20,22,28,0.30), 0 0 0 1px var(--border);
+    display: flex; flex-direction: column;
+    z-index: 51; overflow: hidden;
+  }
+
+  /* Subitem rows */
+  .subitem {
+    display: grid;
+    grid-template-columns: 22px 110px 1fr 28px;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 6px 6px 6px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #fff;
+  }
+  .subitem + .subitem { margin-top: 5px; }
+  .subitem.created { background: var(--ok-soft); border-color: var(--ok-border); }
+
+  /* Scrollbar */
+  .scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scroll::-webkit-scrollbar-thumb { background: #D4D6DC; border-radius: 4px; }
+  .scroll::-webkit-scrollbar-track { background: transparent; }
+
+  /* Drag-over canvas */
+  .canvas-drag-over::after {
+    content: '';
+    position: absolute; inset: 8px;
+    border: 1.5px dashed var(--accent);
+    border-radius: 10px;
+    pointer-events: none;
+    background: oklch(0.55 0.15 265 / 0.04);
+    z-index: 10;
+  }
+
+  /* Empty state */
+  .empty-state {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .empty-card {
+    background: #fff; border: 1px dashed var(--border-strong);
+    border-radius: 10px; padding: 18px 22px; text-align: center;
+    max-width: 320px; pointer-events: auto;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; }
+    .no-print { display: none !important; }
+    .modal { position: static; max-height: none; box-shadow: none; border-radius: 0; transform: none; left: 0; top: 0; width: 100%; }
+    .scrim { display: none; }
+  }
+
+  kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    padding: 1px 5px;
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 1.5px;
+    border-radius: 4px;
+    background: #fff;
+    color: var(--text-2);
+  }
+
+  /* Edge label */
+  .edge-label {
+    font-size: 10px; font-weight: 600;
+    padding: 2px 7px; border-radius: 999px;
+    background: #fff;
+    line-height: 1.4;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+    box-shadow: 0 1px 0 rgba(20,22,28,.04);
+    white-space: nowrap;
+    width: fit-content;
+  }
+
+  .badge-count {
+    display: inline-flex; align-items: center; gap: 3px;
+    padding: 1px 5px;
+    margin-left: 4px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.06);
+    font-size: 9.5px;
+    font-weight: 600;
+    color: rgba(0,0,0,0.7);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-count.complete {
+    background: var(--ok-soft);
+    color: oklch(0.40 0.10 155);
+  }
+
+  /* Brand mark */
+  .brand-mark {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: linear-gradient(135deg, oklch(0.65 0.13 245), oklch(0.55 0.15 265));
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:12px;
+    letter-spacing: -0.02em;
+    box-shadow: 0 1px 2px rgba(20,22,28,0.12);
+  }
+</style>
+<link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css">
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js"></script>
+
+<script type="text/babel" data-presets="env,react">
+/* global React, ReactDOM, ReactFlow */
+const { useState, useCallback, useMemo, useRef, useEffect } = React;
+const RF = window.ReactFlow;
+const {
+  ReactFlow: Flow,
+  ReactFlowProvider,
+  Background, Controls, MiniMap,
+  addEdge, applyNodeChanges, applyEdgeChanges,
+  Handle, Position, useReactFlow,
+  MarkerType,
+} = RF;
+
+/* ===================== CONST ===================== */
+const STORAGE_KEY = 'eproc-whiteboard';
+
+const TIPO_FLAGS = [
+  { code: 'T', key: 'trabalhado', label: 'Trabalhado' },
+  { code: 'E', key: 'espera',     label: 'Espera' },
+  { code: 'G', key: 'gatilho',    label: 'Gatilho' },
+  { code: 'F', key: 'fixo',       label: 'Fixo de fluxo' },
+];
+
+const SUBITEM_CATS = [
+  'Texto padrão',
+  'Preferência',
+  'Modelo',
+  'Regra de ATP',
+  'Outro',
+];
+
+const KIND_LABEL = { atp: 'ATP', pref: 'Preferência', manual: 'Manual' };
+
+/* ===================== UTILS ===================== */
+const uid = (() => { let n = Date.now(); return (p='id') => `${p}-${(++n).toString(36)}`; })();
+const cls = (...xs) => xs.filter(Boolean).join(' ');
+const todayBR = () => {
+  const d = new Date();
+  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+};
+
+/* ===================== ICONS ===================== */
+const Icon = {
+  Plus:    (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M7 2.5v9M2.5 7h9" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  X:       (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="m3.5 3.5 7 7M10.5 3.5l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
+  Trash:   (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M3 4h8M5.5 4V2.5h3V4M4 4l.6 7.5h4.8L10 4M6 6.5v3.5M8 6.5v3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  Bolt:    (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M7.5 1 3 8h3.2L6 13l4.5-7H7.3z" fill="currentColor"/></svg>,
+  Download:(p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M7 1.5v8m0 0L4 7m3 2.5L10 7M2 11.5h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  Upload:  (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M7 9.5v-8m0 0L4 4m3-2.5L10 4M2 11.5h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  File:    (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><path d="M3 1.5h5l3 3v8H3v-11Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/><path d="M8 1.5v3h3" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round"/></svg>,
+  Copy:    (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><rect x="2.5" y="4.5" width="7" height="8" rx="1.2" stroke="currentColor" strokeWidth="1.4"/><path d="M4.5 4.5v-2a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
+  Print:   (p) => <svg width="14" height="14" viewBox="0 0 14 14" fill="none" {...p}><rect x="3" y="6" width="8" height="5" rx="1" stroke="currentColor" strokeWidth="1.4"/><path d="M4 6V2.5h6V6M4.5 11v1.5h5V11" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/></svg>,
+};
+
+/* ===================== STORAGE ===================== */
+const DEFAULT_STATE = () => ({
+  planoNome: 'Plano sem título',
+  nodes: [],
+  edges: [],
+  flowMode: 'organic',
+});
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_STATE();
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return DEFAULT_STATE();
+    return {
+      planoNome: parsed.planoNome || 'Plano sem título',
+      nodes: Array.isArray(parsed.nodes) ? parsed.nodes : [],
+      edges: Array.isArray(parsed.edges) ? parsed.edges : [],
+      flowMode: parsed.flowMode === 'sharp' ? 'sharp' : 'organic',
+    };
+  } catch { return DEFAULT_STATE(); }
+}
+function saveState(s) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {}
+}
+
+/* ===================== CUSTOM NODE ===================== */
+function LocalizadorNode({ data, selected }) {
+  const flags = TIPO_FLAGS.filter(f => data.flags?.[f.key]);
+  return (
+    <div className={cls('pj-node', selected && 'selected', data.ja_criado ? 'created' : 'not-created')}>
+      <Handle type="target" position={Position.Left} />
+      {data.ja_criado && (
+        <span className="ok-corner" title="Já criado no Eproc">
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="m2 5.2 2 2 4-4.4" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </span>
+      )}
+      <div className="pj-node-name">{data.nome || <span style={{ color: 'var(--text-3)', fontWeight: 400, fontStyle: 'italic' }}>Sem nome</span>}</div>
+      {data.descricao && <div className="pj-node-desc">{data.descricao}</div>}
+      {flags.length > 0 && (
+        <div className="pj-node-flags">
+          {flags.map(f => <span key={f.key} className={`flag-chip flag-${f.code}`} title={f.label}>{f.code}</span>)}
+        </div>
+      )}
+      <Handle type="source" position={Position.Right} />
+    </div>
+  );
+}
+const nodeTypes = { localizador: LocalizadorNode };
+
+/* ===================== CUSTOM EDGE ===================== */
+function PjEdge({ id, sourceX, sourceY, targetX, targetY, data, markerEnd, selected, sourcePosition, targetPosition }) {
+  const kind = data?.kind || 'manual';
+  const { getBezierPath, getSmoothStepPath } = RF;
+  const mode = (typeof document !== 'undefined' && document.body.dataset.flowMode) || 'organic';
+  const pathFn = mode === 'sharp' ? getSmoothStepPath : getBezierPath;
+  const args = { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition };
+  if (mode === 'sharp') args.borderRadius = 4;
+  const [path, labelX, labelY] = pathFn(args);
+  const styles = {
+    atp:    { stroke: 'var(--edge-atp)',    strokeWidth: 1.8 },
+    pref:   { stroke: 'var(--edge-pref)',   strokeWidth: 1.8 },
+    manual: { stroke: 'var(--edge-manual)', strokeWidth: 1.6, strokeDasharray: '4 4' },
+  };
+  const style = styles[kind];
+  const subitems = data?.subitems || [];
+  const total = subitems.length;
+  const done  = subitems.filter(s => s.ja_criado).length;
+  const showCount = total > 0;
+
+  const labelText = (() => {
+    if (kind === 'atp')    return 'ATP';
+    if (kind === 'pref')   return 'Pref.';
+    return 'Manual';
+  })();
+
+  return (
+    <>
+      <path
+        id={id}
+        d={path}
+        fill="none"
+        style={{
+          ...style,
+          strokeDasharray: kind === 'atp' ? '6 4' : style.strokeDasharray,
+          strokeWidth: selected ? style.strokeWidth + 0.7 : style.strokeWidth,
+        }}
+        markerEnd={markerEnd}
+      >
+        {kind === 'atp' && <animate attributeName="stroke-dashoffset" from="0" to="-20" dur="1s" repeatCount="indefinite" />}
+      </path>
+      <path d={path} fill="none" stroke="transparent" strokeWidth={18} style={{ cursor: 'pointer' }} />
+      <foreignObject x={labelX - 60} y={labelY - 13} width="120" height="26" style={{ overflow: 'visible' }}>
+        <div style={{ display:'flex', justifyContent:'center' }}>
+          <div className="edge-label" style={{ border: `1px solid ${style.stroke}`, color: style.stroke }}>
+            {labelText}
+            {showCount && (
+              <span className={cls('badge-count', done === total && 'complete')}>{done}/{total}</span>
+            )}
+          </div>
+        </div>
+      </foreignObject>
+    </>
+  );
+}
+const edgeTypes = { pj: PjEdge };
+
+/* ===================== HEADER ===================== */
+function Header({ planoNome, setPlanoNome, onNovo, onImport, onExport, onChecklist, stats, flowMode, setFlowMode }) {
+  return (
+    <header className="flex items-center gap-3 px-4 no-print" style={{
+      height: 50, borderBottom: '1px solid var(--border)',
+      background:'#fff', flexShrink: 0
+    }}>
+      <div className="flex items-center gap-2">
+        <span className="brand-mark">eP</span>
+        <span style={{ fontWeight: 600, fontSize: 13 }}>PlanejoEproc</span>
+      </div>
+
+      <input
+        className="input"
+        style={{ width: 320, height: 28, padding: '4px 10px', fontWeight: 500, border: '1px solid transparent', background: 'transparent' }}
+        value={planoNome}
+        onChange={e => setPlanoNome(e.target.value)}
+        placeholder="Nome do plano"
+        onFocus={e => e.target.style.background = 'var(--surface-2)'}
+        onBlur={e => e.target.style.background = 'transparent'}
+      />
+
+      <div className="flex-1" />
+
+      <div className="flow-toggle" role="group" aria-label="Modo de fluxo" style={{
+        display: 'inline-flex', padding: 2, borderRadius: 7,
+        background: 'var(--surface-2)', border: '1px solid var(--border)', marginRight: 8
+      }}>
+        {[
+          { id: 'organic', label: 'Orgânico' },
+          { id: 'sharp',   label: 'Diagrama' },
+        ].map(opt => (
+          <button
+            key={opt.id}
+            onClick={() => setFlowMode(opt.id)}
+            className={cls('flow-toggle-btn', flowMode === opt.id && 'active')}
+            style={{
+              padding: '3px 10px', fontSize: 11.5, fontWeight: 500,
+              borderRadius: 5, border: 'none', cursor: 'pointer',
+              background: flowMode === opt.id ? '#fff' : 'transparent',
+              color: flowMode === opt.id ? 'var(--text)' : 'var(--text-2)',
+              boxShadow: flowMode === opt.id ? '0 1px 2px rgba(0,0,0,0.04), 0 0 0 1px var(--border)' : 'none',
+              transition: 'all 0.12s'
+            }}
+          >{opt.label}</button>
+        ))}
+      </div>
+
+      <div className="hidden md:flex items-center gap-3 mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>
+        <span><span style={{color:'var(--text-2)'}}>{stats.nodes}</span> nós</span>
+        <span style={{color:'#D4D6DC'}}>·</span>
+        <span><span style={{color:'var(--text-2)'}}>{stats.edges}</span> arestas</span>
+        <span style={{color:'#D4D6DC'}}>·</span>
+        <span><span style={{color: stats.pendentes > 0 ? 'oklch(0.50 0.13 75)' : 'var(--ok)'}}>{stats.pendentes}</span> a criar</span>
+      </div>
+
+      <button className="btn btn-sm btn-danger" onClick={onNovo} title="Limpa o quadro atual"><Icon.File /> Novo plano</button>
+      <button className="btn btn-sm" onClick={onImport}><Icon.Upload /> Importar</button>
+      <button className="btn btn-sm" onClick={onExport}><Icon.Download /> Exportar</button>
+      <button className="btn btn-sm btn-accent" onClick={onChecklist}><Icon.Bolt /> Gerar Checklist</button>
+    </header>
+  );
+}
+
+/* ===================== SIDEBAR ===================== */
+function Sidebar({ onCreateNode }) {
+  const onDragStart = (e) => {
+    e.dataTransfer.setData('application/x-pj-newnode', '1');
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  return (
+    <aside className="flex flex-col h-full no-print" style={{
+      width: 220, flexShrink: 0,
+      background: '#fff',
+      borderRight: '1px solid var(--border)'
+    }}>
+      <div className="p-3" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="section-h mb-2">Adicionar</div>
+        <div
+          className="loc-item flex flex-col items-center justify-center gap-1"
+          draggable
+          onDragStart={onDragStart}
+          onDoubleClick={onCreateNode}
+          style={{
+            border: '1px dashed var(--border-strong)',
+            borderRadius: 8,
+            background: 'var(--surface-2)',
+            padding: '14px 10px',
+            cursor: 'grab',
+            textAlign: 'center',
+          }}
+          title="Arraste para o canvas, ou clique"
+        >
+          <span style={{
+            width: 28, height: 28, borderRadius: 6,
+            background: '#fff', border: '1px solid var(--border-strong)',
+            display:'inline-flex', alignItems:'center', justifyContent:'center',
+            color: 'var(--text-2)',
+          }}><Icon.Plus /></span>
+          <div style={{ fontSize: 12, fontWeight: 500, marginTop: 4 }}>Novo localizador</div>
+          <div style={{ fontSize: 10.5, color: 'var(--text-3)', lineHeight: 1.4 }}>
+            arraste, ou clique para criar
+          </div>
+        </div>
+        <button className="btn w-full justify-center mt-2" onClick={onCreateNode}>
+          <Icon.Plus /> Criar nó
+        </button>
+      </div>
+
+      <div className="p-3 flex-1 overflow-auto scroll" style={{ fontSize: 11.5, color: 'var(--text-2)', lineHeight: 1.55 }}>
+        <div className="section-h mb-2">Como usar</div>
+        <ul style={{ listStyle: 'disc', paddingLeft: 16, marginBottom: 14 }}>
+          <li>Clique num nó/aresta para editar à direita.</li>
+          <li>Conecte nós arrastando das alças laterais.</li>
+          <li>Marque <strong>já existe no Eproc</strong> conforme criar.</li>
+          <li>Tudo é salvo automaticamente.</li>
+        </ul>
+
+        <div className="section-h mb-2">Tipos de transição</div>
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center gap-2"><span style={{ width: 24, height: 2, background: 'var(--edge-atp)' }} /> ATP <span style={{ color:'var(--text-3)' }}>animada</span></div>
+          <div className="flex items-center gap-2"><span style={{ width: 24, height: 2, background: 'var(--edge-pref)' }} /> Preferência</div>
+          <div className="flex items-center gap-2"><span style={{ width: 24, height: 0, borderTop: '2px dashed var(--edge-manual)' }} /> Manual</div>
+        </div>
+
+        <div style={{
+          marginTop: 18, paddingTop: 12, borderTop: '1px solid var(--border)',
+          fontSize: 10.5, color: 'var(--text-3)', lineHeight: 1.5
+        }}>
+          <div>Criado por <span style={{ color: 'var(--text-2)' }}>Júlio Henrique de Sá Gomes</span></div>
+          <div className="mono">julio.sa@tjmg.jus.br</div>
+          <div style={{ marginTop: 6 }}>© Todos os direitos reservados.</div>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
+/* ===================== NODE PANEL ===================== */
+function NodePanel({ node, onChange, onDelete }) {
+  const data = node.data || {};
+  const setFlag = (key, v) => onChange({ flags: { ...(data.flags || {}), [key]: v } });
+
+  return (
+    <div className="flex flex-col h-full">
+      <PanelHeader
+        eyebrow="Nó · Localizador"
+        title={data.nome || 'Sem nome'}
+        right={<button className="btn btn-sm btn-ghost" onClick={onDelete}><Icon.Trash /> Remover</button>}
+      />
+      <div className="flex-1 overflow-auto scroll p-4" style={{ display:'flex', flexDirection:'column', gap: 14 }}>
+
+        <div>
+          <label className="label">Nome do localizador</label>
+          <input className="input" autoFocus value={data.nome || ''} onChange={e => onChange({ nome: e.target.value })} placeholder="Ex: Aguardando despacho" />
+        </div>
+
+        <div>
+          <label className="label">Descrição</label>
+          <textarea className="textarea" rows={2} value={data.descricao || ''} onChange={e => onChange({ descricao: e.target.value })} placeholder="Para que serve esta etapa…" />
+        </div>
+
+        <div style={{
+          display:'flex', alignItems:'center', gap:10,
+          padding: '10px 12px', borderRadius: 8,
+          background: data.ja_criado ? 'var(--ok-soft)' : 'var(--surface-2)',
+          border: '1px solid', borderColor: data.ja_criado ? 'var(--ok-border)' : 'var(--border)',
+        }}>
+          <input
+            type="checkbox"
+            className="pj-check"
+            checked={!!data.ja_criado}
+            onChange={e => onChange({ ja_criado: e.target.checked })}
+            id={`chk-${node.id}`}
+          />
+          <label htmlFor={`chk-${node.id}`} style={{ fontSize: 12.5, fontWeight: 500, cursor: 'pointer', flex: 1 }}>
+            Já existe no Eproc
+            <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 400, marginTop: 1 }}>
+              Marque quando o localizador estiver criado.
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <label className="label">Flags de tipo (opcional)</label>
+          <div className="flex flex-wrap gap-1.5">
+            {TIPO_FLAGS.map(f => {
+              const on = !!(data.flags && data.flags[f.key]);
+              return (
+                <button
+                  key={f.key}
+                  className={cls('btn btn-sm', on && 'btn-primary')}
+                  onClick={() => setFlag(f.key, !on)}
+                >
+                  <span className={`flag-chip flag-${f.code}`} style={on ? { background:'rgba(255,255,255,.18)', color:'#fff' } : null}>{f.code}</span>
+                  {f.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div>
+          <label className="label">Observação</label>
+          <textarea className="textarea" rows={3} value={data.observacao || ''} onChange={e => onChange({ observacao: e.target.value })} placeholder="Notas livres…" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===================== EDGE PANEL ===================== */
+function EdgePanel({ edge, onChange, onDelete }) {
+  const data = edge.data || { kind: 'manual', subitems: [] };
+  const kind = data.kind || 'manual';
+  const subitems = data.subitems || [];
+  const [detailOpen, setDetailOpen] = useState(false);
+  const detailKey = kind === 'pref' ? 'pref' : 'atp';
+  const detailLabel = kind === 'pref' ? 'Preferência' : 'ATP';
+  const detail = data[detailKey] || {};
+  const updateDetail = (patch) => onChange({ [detailKey]: { ...detail, ...patch } });
+
+  const setKind = (k) => {
+    const patch = { kind: k };
+    if (k === 'manual') patch.subitems = [];
+    else if (!Array.isArray(data.subitems)) patch.subitems = [];
+    onChange(patch);
+  };
+
+  const updateSub = (idx, patch) => {
+    const next = subitems.map((s, i) => i === idx ? { ...s, ...patch } : s);
+    onChange({ subitems: next });
+  };
+  const addSub = () => {
+    onChange({ subitems: [...subitems, { id: uid('si'), categoria: 'Modelo', nome: '', descricao: '', ja_criado: false }] });
+  };
+  const removeSub = (idx) => onChange({ subitems: subitems.filter((_, i) => i !== idx) });
+
+  return (
+    <>
+    <div className="flex flex-col h-full">
+      <PanelHeader
+        eyebrow="Aresta · Transição"
+        title={KIND_LABEL[kind]}
+        right={<button className="btn btn-sm btn-ghost" onClick={onDelete}><Icon.Trash /> Remover</button>}
+      />
+      <div className="flex-1 overflow-auto scroll p-4" style={{ display:'flex', flexDirection:'column', gap: 14 }}>
+
+        <div>
+          <label className="label">Tipo</label>
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+            <div className={cls('edge-swatch atp', kind === 'atp' && 'active')} onClick={() => setKind('atp')}>
+              <span className="line"/><span>ATP</span>
+            </div>
+            <div className={cls('edge-swatch pref', kind === 'pref' && 'active')} onClick={() => setKind('pref')}>
+              <span className="line"/><span>Preferência</span>
+            </div>
+            <div className={cls('edge-swatch manual', kind === 'manual' && 'active')} onClick={() => setKind('manual')}>
+              <span className="line"/><span>Manual</span>
+            </div>
+          </div>
+        </div>
+
+        {(kind === 'atp' || kind === 'pref') && (
+          <button
+            className="btn btn-sm w-full justify-center"
+            onClick={() => setDetailOpen(true)}
+            title={`Abrir detalhamento da ${detailLabel.toLowerCase()}`}
+          >
+            <Icon.Bolt /> Detalhar {detailLabel}
+          </button>
+        )}
+
+        <div>
+          <label className="label">Resumo</label>
+          <textarea
+            className="textarea"
+            rows={2}
+            placeholder="Em uma frase: o que esta transição faz…"
+            value={data.resumo || ''}
+            onChange={e => onChange({ resumo: e.target.value })}
+          />
+        </div>
+
+        {(kind === 'atp' || kind === 'pref') && (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="label" style={{ marginBottom: 0 }}>
+                Recursos atrelados
+                {subitems.length > 0 && (
+                  <span className="mono" style={{
+                    marginLeft: 8, fontSize: 10.5, fontWeight: 500,
+                    color: 'var(--text-3)', textTransform: 'none', letterSpacing: 0
+                  }}>
+                    {subitems.filter(s => s.ja_criado).length} de {subitems.length} criados
+                  </span>
+                )}
+              </label>
+              <button className="btn btn-sm" onClick={addSub}><Icon.Plus /> Adicionar</button>
+            </div>
+
+            {subitems.length === 0 && (
+              <div style={{
+                padding: '10px 12px', border: '1px dashed var(--border-strong)',
+                borderRadius: 8, fontSize: 12, color: 'var(--text-3)',
+                textAlign: 'center', background: 'var(--surface-2)'
+              }}>
+                Liste aqui os recursos do Eproc que esta transição precisa.
+                Marque ✓ conforme criar cada um.
+              </div>
+            )}
+
+            <div>
+              {subitems.map((s, i) => (
+                <div key={s.id || i} className={cls('subitem', s.ja_criado && 'created')}>
+                  <input
+                    type="checkbox"
+                    className="pj-check"
+                    checked={!!s.ja_criado}
+                    onChange={e => updateSub(i, { ja_criado: e.target.checked })}
+                    title="Marcar como criado no Eproc"
+                  />
+                  <select
+                    className="select"
+                    style={{ height: 26, padding: '2px 6px', fontSize: 11.5 }}
+                    value={s.categoria}
+                    onChange={e => updateSub(i, { categoria: e.target.value })}
+                  >
+                    {SUBITEM_CATS.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <div style={{ display:'flex', flexDirection:'column', gap: 2, minWidth: 0 }}>
+                    <input
+                      className="input"
+                      style={{ height: 26, padding: '2px 6px', fontSize: 12 }}
+                      placeholder="Nome do recurso"
+                      value={s.nome}
+                      onChange={e => updateSub(i, { nome: e.target.value })}
+                    />
+                    <input
+                      className="input"
+                      style={{ height: 22, padding: '2px 6px', fontSize: 11, color: 'var(--text-2)' }}
+                      placeholder="descrição (opcional)"
+                      value={s.descricao || ''}
+                      onChange={e => updateSub(i, { descricao: e.target.value })}
+                    />
+                  </div>
+                  <button className="btn btn-icon btn-sm btn-ghost" onClick={() => removeSub(i)} title="Remover">
+                    <Icon.X />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label className="label">Observação</label>
+          <textarea className="textarea" rows={3} value={data.observacao || ''} onChange={e => onChange({ observacao: e.target.value })} placeholder="Notas livres sobre esta transição…" />
+        </div>
+      </div>
+    </div>
+
+    {detailOpen && (kind === 'atp' || kind === 'pref') && (
+      <>
+        <div className="scrim no-print" onClick={() => setDetailOpen(false)} />
+        <div className="modal" role="dialog" aria-modal="true">
+          <div className="px-5 pt-4 pb-3 flex items-start gap-3 no-print" style={{ borderBottom: '1px solid var(--border)' }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 8,
+              background: 'var(--accent-soft)', color: 'var(--accent)',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              border: '1px solid var(--accent-border)'
+            }}><Icon.Bolt /></div>
+            <div className="flex-1">
+              <div className="section-h">Detalhamento de {detailLabel}</div>
+              <div style={{ fontSize: 14.5, fontWeight: 600 }}>{data.resumo || (kind === 'pref' ? 'Preferência' : 'Regra de ATP')}</div>
+              <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 4 }}>
+                Marque <span className="mono">Implantar no checklist</span> para que esta {detailLabel.toLowerCase()} apareça como item a ser criado no Eproc, com seus recursos atrelados como subitens.
+              </div>
+            </div>
+            <button className="btn btn-sm btn-icon btn-ghost" onClick={() => setDetailOpen(false)}><Icon.X /></button>
+          </div>
+
+          <div className="px-5 py-4" style={{ display:'flex', flexDirection:'column', gap: 14, maxHeight: '60vh', overflow: 'auto' }}>
+            <label className="flex items-center gap-2" style={{
+              padding: '8px 10px',
+              border: '1px solid var(--accent-border)',
+              background: 'var(--accent-soft)',
+              borderRadius: 8,
+              cursor: 'pointer',
+            }}>
+              <input
+                type="checkbox"
+                className="pj-check"
+                checked={!!detail.implantar}
+                onChange={e => updateDetail({ implantar: e.target.checked })}
+              />
+              <div className="flex-1">
+                <div style={{ fontSize: 13, fontWeight: 600 }}>Implantar no checklist</div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-2)' }}>
+                  A {detailLabel.toLowerCase()} entra como item próprio na seção “{kind === 'pref' ? 'Preferência' : 'Regra de ATP'}”.
+                </div>
+              </div>
+              <input
+                type="checkbox"
+                className="pj-check"
+                style={{ marginLeft: 'auto' }}
+                title="Já criado no Eproc"
+                checked={!!detail.ja_criado}
+                onChange={e => updateDetail({ ja_criado: e.target.checked })}
+              />
+              <span className="mono" style={{ fontSize: 10.5, color: 'var(--text-3)' }}>já criado</span>
+            </label>
+
+            <div>
+              <label className="label">Nome da {detailLabel.toLowerCase()}</label>
+              <input
+                className="input"
+                placeholder={kind === 'pref'
+                  ? 'Ex.: Preferência de processos com prioridade legal'
+                  : 'Ex.: Após citação válida, mover para conclusão'}
+                value={detail.nome || ''}
+                onChange={e => updateDetail({ nome: e.target.value })}
+              />
+            </div>
+
+            {kind === 'atp' && (
+              <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div>
+                  <label className="label">Evento gatilho</label>
+                  <select
+                    className="select"
+                    value={detail.evento || ''}
+                    onChange={e => updateDetail({ evento: e.target.value })}
+                  >
+                    <option value="">— selecione —</option>
+                    <option value="juntada">Juntada de documento</option>
+                    <option value="prazo">Decurso de prazo</option>
+                    <option value="movimento">Lançamento de movimento</option>
+                    <option value="intimacao">Intimação cumprida</option>
+                    <option value="audiencia">Audiência realizada</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="label">Prazo (dias)</label>
+                  <input
+                    className="input"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    value={detail.prazo ?? ''}
+                    onChange={e => updateDetail({ prazo: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+
+            {kind === 'pref' && (
+              <div>
+                <label className="label">Tipo de preferência</label>
+                <div className="grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+                  {['Minuta', 'Movimentação', 'Intimação', 'Automatização'].map(opt => {
+                    const active = detail.tipo === opt;
+                    return (
+                      <button
+                        key={opt}
+                        type="button"
+                        className={cls('btn btn-sm', active && 'btn-primary')}
+                        style={{ justifyContent: 'center' }}
+                        onClick={() => updateDetail({ tipo: opt })}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {kind === 'atp' && (
+            <div>
+              <label className="label">Condições / filtros</label>
+              <textarea
+                className="textarea"
+                rows={3}
+                placeholder="Ex.: tipo do documento = Petição inicial; classe = Cumprimento de sentença…"
+                value={detail.condicoes || ''}
+                onChange={e => updateDetail({ condicoes: e.target.value })}
+              />
+            </div>
+            )}
+
+            <div>
+              <label className="label">{kind === 'pref' ? 'Efeito da preferência' : 'Ação executada'}</label>
+              <textarea
+                className="textarea"
+                rows={3}
+                placeholder={kind === 'pref'
+                  ? 'Ex.: conclusão para despacho'
+                  : 'Ex.: mover para localizador X; lançar movimento Y; intimar parte…'}
+                value={detail.acao || ''}
+                onChange={e => updateDetail({ acao: e.target.value })}
+              />
+            </div>
+
+            <div>
+              <label className="label">Observações</label>
+              <textarea
+                className="textarea"
+                rows={2}
+                placeholder="Notas, exceções, dependências…"
+                value={detail.observacoes || ''}
+                onChange={e => updateDetail({ observacoes: e.target.value })}
+              />
+            </div>
+
+            {subitems.length > 0 && (
+              <div style={{
+                padding: '10px 12px',
+                border: '1px solid var(--border)',
+                borderRadius: 8,
+                background: 'var(--surface-2)',
+                fontSize: 11.5, color: 'var(--text-2)',
+              }}>
+                <div style={{ fontWeight: 600, marginBottom: 4, color: 'var(--text)' }}>
+                  {subitems.length} recurso{subitems.length === 1 ? '' : 's'} atrelado{subitems.length === 1 ? '' : 's'}
+                </div>
+                No checklist, aparecerão como subitens desta {detailLabel.toLowerCase()}.
+              </div>
+            )}
+          </div>
+
+          <div className="px-5 py-3 flex items-center gap-2 no-print" style={{ borderTop: '1px solid var(--border)' }}>
+            <div className="text-xs" style={{ color: 'var(--text-3)' }}>
+              As alterações são salvas automaticamente no quadro.
+            </div>
+            <div className="ml-auto flex gap-2">
+              <button className="btn btn-primary" onClick={() => setDetailOpen(false)}>Concluído</button>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
+    </>
+  );
+}
+
+function PanelHeader({ eyebrow, title, right }) {
+  return (
+    <div className="flex items-start gap-2 px-4 pt-4 pb-3" style={{ borderBottom: '1px solid var(--border)' }}>
+      <div className="flex-1 min-w-0">
+        <div className="section-h" style={{ marginBottom: 2 }}>{eyebrow}</div>
+        <div className="truncate" style={{ fontSize: 14.5, fontWeight: 600 }}>{title}</div>
+      </div>
+      {right}
+    </div>
+  );
+}
+
+/* ===================== CHECKLIST MODAL ===================== */
+function ChecklistModal({ open, onClose, planoNome, nodes, edges, onToggleNode, onToggleSubitem, onToggleEdgeRule }) {
+  const [copied, setCopied] = useState(false);
+
+  if (!open) return null;
+
+  const groups = {
+    'Localizador': [],
+    'Texto padrão': [],
+    'Preferência': [],
+    'Modelo': [],
+    'Regra de ATP': [],
+    'Outro': [],
+  };
+
+  nodes.forEach(n => {
+    groups['Localizador'].push({
+      kind: 'node',
+      id: n.id,
+      nome: n.data?.nome || '(sem nome)',
+      descricao: n.data?.descricao,
+      ja_criado: !!n.data?.ja_criado,
+    });
+  });
+
+  edges.forEach(e => {
+    const subs = e.data?.subitems || [];
+    const src = nodes.find(n => n.id === e.source)?.data?.nome || '?';
+    const tgt = nodes.find(n => n.id === e.target)?.data?.nome || '?';
+    const ek = e.data?.kind;
+    const ruleKey = ek === 'pref' ? 'pref' : (ek === 'atp' ? 'atp' : null);
+    const rule = ruleKey ? (e.data?.[ruleKey] || {}) : null;
+    const ruleImplantar = !!(rule && rule.implantar);
+    const ruleCat = ek === 'pref' ? 'Preferência' : 'Regra de ATP';
+
+    if (ruleImplantar) {
+      // Add the ATP/pref rule itself as a parent item
+      groups[ruleCat].push({
+        kind: 'rule',
+        edgeId: e.id,
+        nome: rule.nome || e.data?.resumo || ruleCat,
+        descricao: rule.acao || rule.criterio || rule.observacoes,
+        contexto: `${src} → ${tgt}`,
+        ja_criado: !!rule.ja_criado,
+        children: subs.map((s, idx) => ({
+          kind: 'sub',
+          edgeId: e.id,
+          index: idx,
+          nome: s.nome || '(sem nome)',
+          descricao: s.descricao,
+          categoria: s.categoria,
+          ja_criado: !!s.ja_criado,
+        })),
+      });
+      // Subitens of an implanted rule are nested under it, not in their own group
+      return;
+    }
+
+    subs.forEach((s, idx) => {
+      const cat = SUBITEM_CATS.includes(s.categoria) ? s.categoria : 'Outro';
+      groups[cat].push({
+        kind: 'sub',
+        edgeId: e.id,
+        index: idx,
+        nome: s.nome || '(sem nome)',
+        descricao: s.descricao,
+        contexto: `${src} → ${tgt}`,
+        ja_criado: !!s.ja_criado,
+      });
+    });
+  });
+
+  const totalAll = Object.values(groups).reduce((a, b) => a + b.length + b.reduce((c, x) => c + (x.children?.length || 0), 0), 0);
+  const doneAll = Object.values(groups).reduce((a, b) =>
+    a + b.filter(x => x.ja_criado).length
+      + b.reduce((c, x) => c + (x.children?.filter(ch => ch.ja_criado).length || 0), 0), 0);
+
+  const copyMd = async () => {
+    const lines = [];
+    lines.push(`# Checklist · ${planoNome}`);
+    lines.push(`_${todayBR()}_`);
+    lines.push('');
+    Object.entries(groups).forEach(([cat, items]) => {
+      if (items.length === 0) return;
+      const dn = items.filter(i => i.ja_criado).length;
+      lines.push(`## ${cat} (${dn}/${items.length})`);
+      items.forEach(it => {
+        const mark = it.ja_criado ? 'x' : ' ';
+        const ctx = it.contexto ? ` _(${it.contexto})_` : '';
+        lines.push(`- [${mark}] ${it.nome}${ctx}${it.descricao ? ` — ${it.descricao}` : ''}`);
+        if (it.children && it.children.length) {
+          it.children.forEach(ch => {
+            const cm = ch.ja_criado ? 'x' : ' ';
+            const cat2 = ch.categoria ? ` _[${ch.categoria}]_` : '';
+            lines.push(`  - [${cm}] ${ch.nome}${cat2}${ch.descricao ? ` — ${ch.descricao}` : ''}`);
+          });
+        }
+      });
+      lines.push('');
+    });
+    const md = lines.join('\n');
+    try {
+      await navigator.clipboard.writeText(md);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = md; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      setCopied(true); setTimeout(() => setCopied(false), 1800);
+    }
+  };
+
+  const onPrint = () => window.print();
+
+  return (
+    <>
+      <div className="scrim no-print" onClick={onClose} />
+      <div className="modal" role="dialog" aria-modal="true">
+        <div className="px-5 pt-4 pb-3 flex items-start gap-3 no-print" style={{ borderBottom: '1px solid var(--border)' }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: 'var(--accent-soft)', color: 'var(--accent)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            border: '1px solid var(--accent-border)'
+          }}><Icon.Bolt /></div>
+          <div className="flex-1">
+            <div className="section-h">Checklist · {todayBR()}</div>
+            <div style={{ fontSize: 14.5, fontWeight: 600, marginTop: 2 }}>{planoNome}</div>
+            <div style={{ fontSize: 12, color:'var(--text-3)', marginTop: 2 }}>
+              {doneAll} de {totalAll} criados · {totalAll - doneAll} pendentes
+            </div>
+          </div>
+          <button className="btn btn-sm btn-icon btn-ghost" onClick={onClose}><Icon.X /></button>
+        </div>
+
+        <div className="flex-1 overflow-auto scroll p-5" style={{ display:'flex', flexDirection:'column', gap: 18 }}>
+          {totalAll === 0 && (
+            <div style={{
+              padding: '24px', textAlign:'center', color: 'var(--text-3)',
+              border: '1px dashed var(--border-strong)', borderRadius: 8,
+            }}>
+              Nada para listar ainda. Adicione localizadores e recursos no canvas.
+            </div>
+          )}
+          {Object.entries(groups).map(([cat, items]) => {
+            if (items.length === 0) return null;
+            const ownDone = items.filter(i => i.ja_criado).length;
+            const childTotal = items.reduce((s, x) => s + (x.children?.length || 0), 0);
+            const childDone = items.reduce((s, x) => s + (x.children?.filter(c => c.ja_criado).length || 0), 0);
+            const total = items.length + childTotal;
+            const dn = ownDone + childDone;
+            const allDone = dn === total;
+            return (
+              <div key={cat}>
+                <div className="flex items-center gap-2 mb-2" style={{ borderBottom: '1px solid var(--border)', paddingBottom: 6 }}>
+                  <span className="section-h" style={{ color: allDone ? 'var(--ok)' : 'var(--text-2)' }}>{cat}</span>
+                  <span className="mono" style={{ fontSize: 11, color: allDone ? 'var(--ok)' : 'var(--text-3)' }}>
+                    {dn}/{total}{allDone ? ' ✓' : ''}
+                  </span>
+                </div>
+                <div style={{ display:'flex', flexDirection:'column' }}>
+                  {items.map((it, i) => {
+                    const isRule = it.kind === 'rule';
+                    const childCount = it.children?.length || 0;
+                    const childDoneCount = it.children?.filter(c => c.ja_criado).length || 0;
+                    return (
+                    <div key={`${cat}-${i}`} style={{ borderBottom: '1px solid var(--border)' }}>
+                      <label
+                        className="flex items-start gap-3"
+                        style={{
+                          padding: '8px 6px',
+                          cursor: 'pointer',
+                          opacity: it.ja_criado ? 0.65 : 1,
+                          background: isRule ? 'var(--accent-soft)' : 'transparent',
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          className="pj-check"
+                          style={{ marginTop: 2 }}
+                          checked={it.ja_criado}
+                          onChange={() => {
+                            if (it.kind === 'node') onToggleNode(it.id);
+                            else if (it.kind === 'rule') onToggleEdgeRule && onToggleEdgeRule(it.edgeId);
+                            else onToggleSubitem(it.edgeId, it.index);
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-baseline gap-2" style={{ flexWrap: 'wrap' }}>
+                            <div style={{
+                              fontWeight: isRule ? 600 : 500, fontSize: 13,
+                              textDecoration: it.ja_criado ? 'line-through' : 'none',
+                              color: it.ja_criado ? 'var(--text-3)' : 'var(--text)',
+                            }}>{it.nome}</div>
+                            {isRule && childCount > 0 && (
+                              <span className="mono" style={{
+                                fontSize: 10.5,
+                                color: childDoneCount === childCount ? 'var(--ok)' : 'var(--text-3)',
+                              }}>
+                                {childDoneCount}/{childCount} subiten{childCount === 1 ? '' : 's'}
+                              </span>
+                            )}
+                          </div>
+                          {(it.descricao || it.contexto) && (
+                            <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 2, lineHeight: 1.4 }}>
+                              {it.contexto && <span className="mono" style={{ fontSize: 10.5 }}>{it.contexto}</span>}
+                              {it.contexto && it.descricao && ' · '}
+                              {it.descricao}
+                            </div>
+                          )}
+                        </div>
+                      </label>
+                      {isRule && childCount > 0 && (
+                        <div style={{
+                          marginLeft: 28,
+                          borderLeft: '2px solid var(--accent-border)',
+                          paddingLeft: 10,
+                          marginBottom: 4,
+                        }}>
+                          {it.children.map((ch, ci) => (
+                            <label
+                              key={`${cat}-${i}-c-${ci}`}
+                              className="flex items-start gap-3"
+                              style={{
+                                padding: '6px 6px',
+                                cursor: 'pointer',
+                                opacity: ch.ja_criado ? 0.6 : 1,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                className="pj-check"
+                                style={{ marginTop: 2 }}
+                                checked={ch.ja_criado}
+                                onChange={() => onToggleSubitem(ch.edgeId, ch.index)}
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-baseline gap-2" style={{ flexWrap: 'wrap' }}>
+                                  {ch.categoria && (
+                                    <span className="mono" style={{
+                                      fontSize: 10, color: 'var(--text-3)',
+                                      border: '1px solid var(--border-strong)',
+                                      borderRadius: 4, padding: '0 5px',
+                                      lineHeight: '15px',
+                                    }}>{ch.categoria}</span>
+                                  )}
+                                  <div style={{
+                                    fontSize: 12.5, fontWeight: 500,
+                                    textDecoration: ch.ja_criado ? 'line-through' : 'none',
+                                    color: ch.ja_criado ? 'var(--text-3)' : 'var(--text)',
+                                  }}>{ch.nome}</div>
+                                </div>
+                                {ch.descricao && (
+                                  <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 1, lineHeight: 1.4 }}>
+                                    {ch.descricao}
+                                  </div>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="px-5 py-3 flex items-center gap-3 no-print" style={{ borderTop: '1px solid var(--border)', background:'#FAFAFA' }}>
+          <div style={{ fontSize: 11.5, color:'var(--text-3)', flex:1 }}>
+            Marcações persistem no quadro.
+          </div>
+          <button className="btn" onClick={onPrint}><Icon.Print /> Imprimir</button>
+          <button className="btn" onClick={copyMd}><Icon.Copy /> {copied ? 'Copiado!' : 'Copiar como Markdown'}</button>
+          <button className="btn btn-primary" onClick={onClose}>Fechar</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ===================== CANVAS ===================== */
+function FlowCanvas({
+  nodes, edges, setNodes, setEdges,
+  selectedId, setSelectedId,
+  onCreateNodeAt, isEmpty,
+}) {
+  const wrapperRef = useRef(null);
+  const { screenToFlowPosition } = useReactFlow();
+  const [dragOver, setDragOver] = useState(false);
+
+  const onNodesChange = useCallback((ch) => setNodes(ns => applyNodeChanges(ch, ns)), [setNodes]);
+  const onEdgesChange = useCallback((ch) => setEdges(es => applyEdgeChanges(ch, es)), [setEdges]);
+
+  const onConnect = useCallback((conn) => {
+    setEdges(es => addEdge({
+      ...conn,
+      id: uid('e'),
+      type: 'pj',
+      data: { kind: 'manual', resumo: '', observacao: '', subitems: [] },
+    }, es));
+  }, [setEdges]);
+
+  const decoratedNodes = useMemo(() => nodes.map(n => ({
+    ...n,
+    selected: n.id === selectedId,
+  })), [nodes, selectedId]);
+
+  const decoratedEdges = useMemo(() => edges.map(e => ({
+    ...e,
+    selected: e.id === selectedId,
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: e.data?.kind === 'atp' ? 'oklch(0.55 0.15 265)' : e.data?.kind === 'pref' ? 'oklch(0.55 0.14 155)' : 'oklch(0.65 0.01 270)',
+      width: 14, height: 14,
+    },
+  })), [edges, selectedId]);
+
+  const onDragOver = (e) => {
+    if (e.dataTransfer.types.includes('application/x-pj-newnode')) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (!dragOver) setDragOver(true);
+    }
+  };
+  const onDragLeave = () => setDragOver(false);
+  const onDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    if (!e.dataTransfer.types.includes('application/x-pj-newnode')) return;
+    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+    onCreateNodeAt(position);
+  };
+
+  const onPaneDoubleClick = (e) => {
+    const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
+    onCreateNodeAt(position);
+  };
+
+  return (
+    <div
+      ref={wrapperRef}
+      className={cls('relative flex-1', dragOver && 'canvas-drag-over')}
+      style={{ background: 'var(--bg)' }}
+      onDragOver={onDragOver}
+      onDragLeave={onDragLeave}
+      onDrop={onDrop}
+    >
+      <Flow
+        nodes={decoratedNodes}
+        edges={decoratedEdges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeClick={(_, n) => setSelectedId(n.id)}
+        onEdgeClick={(_, e) => setSelectedId(e.id)}
+        onPaneClick={() => setSelectedId(null)}
+        onDoubleClick={onPaneDoubleClick}
+        nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
+        defaultEdgeOptions={{ type: 'pj' }}
+        minZoom={0.4}
+        maxZoom={1.8}
+        defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+      >
+        <Background gap={20} size={1} color="var(--grid-dot)" />
+        <Controls showInteractive={false} position="bottom-left" />
+        <MiniMap
+          pannable zoomable
+          style={{ width: 140, height: 90, background: '#fff', border: '1px solid var(--border)', borderRadius: 6 }}
+          maskColor="rgba(20,22,28,0.04)"
+          nodeColor={(n) => n.data?.ja_criado ? 'oklch(0.84 0.08 155)' : '#D4D6DC'}
+        />
+      </Flow>
+
+      {isEmpty && (
+        <div className="empty-state">
+          <div className="empty-card">
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Quadro vazio</div>
+            <div style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.55 }}>
+              Arraste <strong>Novo localizador</strong> da barra lateral, ou clique duas vezes no canvas para criar um nó.
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ===================== APP ===================== */
+function App() {
+  const initial = useMemo(() => loadState(), []);
+  const [planoNome, setPlanoNome] = useState(initial.planoNome);
+  const [nodes, setNodes] = useState(initial.nodes);
+  const [edges, setEdges] = useState(initial.edges);
+  const [selectedId, setSelectedId] = useState(null);
+  const [showChecklist, setShowChecklist] = useState(false);
+  const [flowMode, setFlowMode] = useState(initial.flowMode);
+
+  useEffect(() => { document.body.dataset.flowMode = flowMode; }, [flowMode]);
+
+  useEffect(() => {
+    saveState({ planoNome, nodes, edges, flowMode });
+  }, [planoNome, nodes, edges, flowMode]);
+
+  const selectedNode = nodes.find(n => n.id === selectedId);
+  const selectedEdge = !selectedNode ? edges.find(e => e.id === selectedId) : null;
+
+  const createNodeAt = (position) => {
+    const nid = uid('n');
+    setNodes(ns => [...ns, {
+      id: nid, type: 'localizador', position,
+      data: {
+        nome: '', descricao: '', observacao: '',
+        ja_criado: false,
+        flags: {},
+      }
+    }]);
+    setSelectedId(nid);
+  };
+  const createNodeCenter = () => {
+    createNodeAt({ x: 200 + Math.random() * 80, y: 120 + Math.random() * 80 });
+  };
+
+  const updateNode = (id, patch) => {
+    setNodes(ns => ns.map(n => n.id === id ? { ...n, data: { ...n.data, ...patch } } : n));
+  };
+  const updateEdge = (id, patch) => {
+    setEdges(es => es.map(e => e.id === id ? { ...e, data: { ...(e.data || {}), ...patch } } : e));
+  };
+  const deleteNode = (id) => {
+    setNodes(ns => ns.filter(n => n.id !== id));
+    setEdges(es => es.filter(e => e.source !== id && e.target !== id));
+    setSelectedId(null);
+  };
+  const deleteEdge = (id) => {
+    setEdges(es => es.filter(e => e.id !== id));
+    setSelectedId(null);
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+      const t = e.target;
+      const tag = t && t.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.isContentEditable)) return;
+      if (!selectedId) return;
+      e.preventDefault();
+      if (nodes.some(n => n.id === selectedId))      deleteNode(selectedId);
+      else if (edges.some(ed => ed.id === selectedId)) deleteEdge(selectedId);
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [selectedId, nodes, edges]);
+
+  const toggleNodeCreated = (id) => {
+    setNodes(ns => ns.map(n => n.id === id ? { ...n, data: { ...n.data, ja_criado: !n.data?.ja_criado } } : n));
+  };
+  const toggleSubCreated = (edgeId, index) => {
+    setEdges(es => es.map(e => {
+      if (e.id !== edgeId) return e;
+      const subs = e.data?.subitems || [];
+      const next = subs.map((s, i) => i === index ? { ...s, ja_criado: !s.ja_criado } : s);
+      return { ...e, data: { ...e.data, subitems: next } };
+    }));
+  };
+  const toggleEdgeRuleCreated = (edgeId) => {
+    setEdges(es => es.map(e => {
+      if (e.id !== edgeId) return e;
+      const k = e.data?.kind === 'pref' ? 'pref' : 'atp';
+      const cur = e.data?.[k] || {};
+      return { ...e, data: { ...e.data, [k]: { ...cur, ja_criado: !cur.ja_criado } } };
+    }));
+  };
+
+  const onNovo = () => {
+    const ok = window.confirm('Limpar tudo e começar um novo plano?\n\nEsta ação não pode ser desfeita (mas você pode exportar antes).');
+    if (!ok) return;
+    setPlanoNome('Plano sem título');
+    setNodes([]); setEdges([]); setSelectedId(null);
+  };
+
+  const onExport = () => {
+    const data = { planoNome, nodes, edges, exportedAt: new Date().toISOString(), version: 1 };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const safeName = (planoNome || 'plano').replace(/[^\p{L}\p{N}_-]+/gu, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'plano';
+    a.href = url; a.download = `${safeName}.json`;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+  };
+
+  const onImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json,.json';
+    input.onchange = async () => {
+      const f = input.files?.[0]; if (!f) return;
+      try {
+        const text = await f.text();
+        const parsed = JSON.parse(text);
+        if (!parsed || typeof parsed !== 'object') throw new Error('JSON inválido');
+        const ns = Array.isArray(parsed.nodes) ? parsed.nodes : [];
+        const es = Array.isArray(parsed.edges) ? parsed.edges : [];
+        const ok = (nodes.length || edges.length)
+          ? window.confirm('Importar substituirá o plano atual. Continuar?')
+          : true;
+        if (!ok) return;
+        setPlanoNome(parsed.planoNome || 'Plano importado');
+        setNodes(ns);
+        setEdges(es);
+        setSelectedId(null);
+      } catch (e) {
+        alert('Falha ao importar: ' + e.message);
+      }
+    };
+    input.click();
+  };
+
+  const stats = useMemo(() => {
+    let pendentes = 0;
+    nodes.forEach(n => { if (!n.data?.ja_criado) pendentes++; });
+    edges.forEach(e => {
+      const subs = e.data?.subitems || [];
+      subs.forEach(s => { if (!s.ja_criado) pendentes++; });
+    });
+    return { nodes: nodes.length, edges: edges.length, pendentes };
+  }, [nodes, edges]);
+
+  return (
+    <div className="flex flex-col h-screen">
+      <Header
+        planoNome={planoNome} setPlanoNome={setPlanoNome}
+        onNovo={onNovo} onImport={onImport} onExport={onExport}
+        onChecklist={() => setShowChecklist(true)}
+        stats={stats}
+        flowMode={flowMode} setFlowMode={setFlowMode}
+      />
+
+      <div className="flex flex-1 min-h-0">
+        <Sidebar onCreateNode={createNodeCenter} />
+
+        <ReactFlowProvider>
+          <FlowCanvas
+            nodes={nodes} edges={edges}
+            setNodes={setNodes} setEdges={setEdges}
+            selectedId={selectedId} setSelectedId={setSelectedId}
+            onCreateNodeAt={createNodeAt}
+            isEmpty={nodes.length === 0}
+          />
+        </ReactFlowProvider>
+
+        <aside className="no-print" style={{
+          width: (selectedNode || selectedEdge) ? 380 : 0,
+          flexShrink: 0,
+          background: '#fff',
+          borderLeft: (selectedNode || selectedEdge) ? '1px solid var(--border)' : 'none',
+          transition: 'width .15s ease',
+          overflow: 'hidden',
+        }}>
+          {selectedNode && (
+            <NodePanel
+              key={selectedNode.id}
+              node={selectedNode}
+              onChange={(p) => updateNode(selectedNode.id, p)}
+              onDelete={() => deleteNode(selectedNode.id)}
+            />
+          )}
+          {selectedEdge && (
+            <EdgePanel
+              key={selectedEdge.id}
+              edge={selectedEdge}
+              onChange={(p) => updateEdge(selectedEdge.id, p)}
+              onDelete={() => deleteEdge(selectedEdge.id)}
+            />
+          )}
+        </aside>
+      </div>
+
+      <ChecklistModal
+        open={showChecklist}
+        onClose={() => setShowChecklist(false)}
+        planoNome={planoNome}
+        nodes={nodes}
+        edges={edges}
+        onToggleNode={toggleNodeCreated}
+        onToggleSubitem={toggleSubCreated}
+        onToggleEdgeRule={toggleEdgeRuleCreated}
+      />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+
+</body></html>

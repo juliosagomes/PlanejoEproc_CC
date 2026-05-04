@@ -1,0 +1,94 @@
+[
+  {
+    "value": "AJG",
+    "label": "Alterar Situação da Justiça Gratuita da Parte"
+  },
+  {
+    "value": "ACP",
+    "label": "Atualizar Situação Citação Parte Sem Procurador"
+  },
+  {
+    "value": "CAR",
+    "label": "Citação por AR"
+  },
+  {
+    "value": "CPE",
+    "label": "Citação por Edital"
+  },
+  {
+    "value": "CMA",
+    "label": "Citação por Mandado"
+  },
+  {
+    "value": "DPL",
+    "label": "Distribuir Processos entre Localizadores"
+  },
+  {
+    "value": "EOM",
+    "label": "Expedição de Mandado"
+  },
+  {
+    "value": "EOC",
+    "label": "Expedição de Ofício por Carta AR"
+  },
+  {
+    "value": "E",
+    "label": "Lançar evento automatizado"
+  },
+  {
+    "value": "CAE",
+    "label": "Seleção de Endereço para Citação/Intimação"
+  },
+  {
+    "value": "VRA",
+    "label": "Verificação de Dados Processuais"
+  },
+  {
+    "value": "A",
+    "label": "Preparar minuta para assinatura e agendar evento"
+  },
+  {
+    "value": "PMP",
+    "label": "Preparar minuta baseada em preferência de unidade"
+  },
+  {
+    "value": "EDP",
+    "label": "Lançar Evento e Documento baseado em preferência de unidade"
+  },
+  {
+    "value": "P",
+    "label": "Executar prevenção"
+  },
+  {
+    "value": "D",
+    "label": "Verificar Dados PrevidenciÃ¡rios"
+  },
+  {
+    "value": "R",
+    "label": "Retificar Autuação"
+  },
+  {
+    "value": "O",
+    "label": "Gerar Ofício Requisitório"
+  },
+  {
+    "value": "C",
+    "label": "Redistribuir Central de Controle"
+  },
+  {
+    "value": "B",
+    "label": "Retornar da Central de Controle para Vara de Origem"
+  },
+  {
+    "value": "IDC",
+    "label": "Inserir dado complementar no processo"
+  },
+  {
+    "value": "AST",
+    "label": "Alterar Situação Automaticamente"
+  },
+  {
+    "value": "LBT",
+    "label": "Incluir Lembrete"
+  }
+]

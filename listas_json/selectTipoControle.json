@@ -1,0 +1,18 @@
+[
+  {
+    "value": "E",
+    "label": "o(s) evento(s)"
+  },
+  {
+    "value": "P",
+    "label": "o(s) tipo(s) de petição"
+  },
+  {
+    "value": "G",
+    "label": "o(s) grupo(s) de evento ou petição"
+  },
+  {
+    "value": "C",
+    "label": "o complemento"
+  }
+]

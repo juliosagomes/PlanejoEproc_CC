@@ -1,0 +1,22 @@
+[
+  {
+    "value": "15",
+    "label": "Somente processos sem movimentação nos últimos 15 dias"
+  },
+  {
+    "value": "30",
+    "label": "Somente processos sem movimentação nos últimos 30 dias"
+  },
+  {
+    "value": "45",
+    "label": "Somente processos sem movimentação nos últimos 45 dias"
+  },
+  {
+    "value": "60",
+    "label": "Somente processos sem movimentação nos últimos 60 dias"
+  },
+  {
+    "value": "0",
+    "label": "Somente processos sem movimentação (Por Tempo no Localizador)"
+  }
+]

@@ -1,0 +1,1214 @@
+[
+  {
+    "value": "4|1",
+    "label": "Justiça Gratuita-Deferida"
+  },
+  {
+    "value": "4|2",
+    "label": "Justiça Gratuita-Indeferida"
+  },
+  {
+    "value": "4|3",
+    "label": "Justiça Gratuita-Não requerida"
+  },
+  {
+    "value": "4|4",
+    "label": "Justiça Gratuita-Parcialmente Deferida"
+  },
+  {
+    "value": "4|6",
+    "label": "Justiça Gratuita-Requerida"
+  },
+  {
+    "value": "4|7",
+    "label": "Justiça Gratuita-Requerida em Recurso"
+  },
+  {
+    "value": "4|5",
+    "label": "Justiça Gratuita-Revogada"
+  },
+  {
+    "value": "4|0",
+    "label": "Justiça Gratuita-Não Cadastrado"
+  },
+  {
+    "value": "109|2",
+    "label": "Abertura Prazo Litisconsórcio Passivo-Abertura prazo após cumprimento individual"
+  },
+  {
+    "value": "109|1",
+    "label": "Abertura Prazo Litisconsórcio Passivo-Abertura prazo após último cumprimento"
+  },
+  {
+    "value": "109|0",
+    "label": "Abertura Prazo Litisconsórcio Passivo-Não Cadastrado"
+  },
+  {
+    "value": "77|2",
+    "label": "Abuso do direito de demandar-Não"
+  },
+  {
+    "value": "77|1",
+    "label": "Abuso do direito de demandar-Sim"
+  },
+  {
+    "value": "77|0",
+    "label": "Abuso do direito de demandar-Não Cadastrado"
+  },
+  {
+    "value": "32|2",
+    "label": "Admitida execução-Não"
+  },
+  {
+    "value": "32|1",
+    "label": "Admitida execução-Sim"
+  },
+  {
+    "value": "32|0",
+    "label": "Admitida execução-Não Cadastrado"
+  },
+  {
+    "value": "53|2",
+    "label": "Adolescente Internado-Não"
+  },
+  {
+    "value": "53|1",
+    "label": "Adolescente Internado-Sim"
+  },
+  {
+    "value": "53|0",
+    "label": "Adolescente Internado-Não Cadastrado"
+  },
+  {
+    "value": "68|2",
+    "label": "Adoção-Não"
+  },
+  {
+    "value": "68|1",
+    "label": "Adoção-Sim"
+  },
+  {
+    "value": "68|0",
+    "label": "Adoção-Não Cadastrado"
+  },
+  {
+    "value": "7|2",
+    "label": "Agravo Retido-Não"
+  },
+  {
+    "value": "7|1",
+    "label": "Agravo Retido-Sim"
+  },
+  {
+    "value": "7|0",
+    "label": "Agravo Retido-Não Cadastrado"
+  },
+  {
+    "value": "26|2",
+    "label": "Agravo de Competência Delegada-Não"
+  },
+  {
+    "value": "26|1",
+    "label": "Agravo de Competência Delegada-Sim"
+  },
+  {
+    "value": "26|0",
+    "label": "Agravo de Competência Delegada-Não Cadastrado"
+  },
+  {
+    "value": "1|2",
+    "label": "Antecipação de Tutela-Deferida"
+  },
+  {
+    "value": "1|3",
+    "label": "Antecipação de Tutela-Indeferida"
+  },
+  {
+    "value": "1|4",
+    "label": "Antecipação de Tutela-Não Requerida"
+  },
+  {
+    "value": "1|5",
+    "label": "Antecipação de Tutela-Parcialmente Deferida"
+  },
+  {
+    "value": "1|1",
+    "label": "Antecipação de Tutela-Requerida"
+  },
+  {
+    "value": "1|6",
+    "label": "Antecipação de Tutela-Revogada"
+  },
+  {
+    "value": "1|0",
+    "label": "Antecipação de Tutela-Não Cadastrado"
+  },
+  {
+    "value": "35|2",
+    "label": "Apelação de Competência Delegada-Não"
+  },
+  {
+    "value": "35|1",
+    "label": "Apelação de Competência Delegada-Sim"
+  },
+  {
+    "value": "35|0",
+    "label": "Apelação de Competência Delegada-Não Cadastrado"
+  },
+  {
+    "value": "89|2",
+    "label": "Assunto validado-Não"
+  },
+  {
+    "value": "89|1",
+    "label": "Assunto validado-Sim"
+  },
+  {
+    "value": "89|0",
+    "label": "Assunto validado-Não Cadastrado"
+  },
+  {
+    "value": "25|2",
+    "label": "Autor manifesta desinteresse na conciliação-Não"
+  },
+  {
+    "value": "25|1",
+    "label": "Autor manifesta desinteresse na conciliação-Sim"
+  },
+  {
+    "value": "25|0",
+    "label": "Autor manifesta desinteresse na conciliação-Não Cadastrado"
+  },
+  {
+    "value": "55|3",
+    "label": "Auxílio Emergencial-Elegível Judicial"
+  },
+  {
+    "value": "55|2",
+    "label": "Auxílio Emergencial-Elegível pela CEF"
+  },
+  {
+    "value": "55|1",
+    "label": "Auxílio Emergencial-Inelegível pela CEF"
+  },
+  {
+    "value": "55|4",
+    "label": "Auxílio Emergencial-Inibida informação"
+  },
+  {
+    "value": "55|0",
+    "label": "Auxílio Emergencial-Não Cadastrado"
+  },
+  {
+    "value": "11|2",
+    "label": "Ação Coletiva de subst. processual-Não"
+  },
+  {
+    "value": "11|1",
+    "label": "Ação Coletiva de subst. processual-Sim"
+  },
+  {
+    "value": "11|0",
+    "label": "Ação Coletiva de subst. processual-Não Cadastrado"
+  },
+  {
+    "value": "48|1",
+    "label": "Bem Apreendido Pedente de Cadastro-Sim"
+  },
+  {
+    "value": "48|0",
+    "label": "Bem Apreendido Pedente de Cadastro-Não Cadastrado"
+  },
+  {
+    "value": "104|2",
+    "label": "Contumácia-Não"
+  },
+  {
+    "value": "104|1",
+    "label": "Contumácia-Sim"
+  },
+  {
+    "value": "104|0",
+    "label": "Contumácia-Não Cadastrado"
+  },
+  {
+    "value": "34|2",
+    "label": "Criança e Adolescente-Não"
+  },
+  {
+    "value": "34|1",
+    "label": "Criança e Adolescente-Sim"
+  },
+  {
+    "value": "34|0",
+    "label": "Criança e Adolescente-Não Cadastrado"
+  },
+  {
+    "value": "59|2",
+    "label": "Criança/Adolescente Acolhido-Não"
+  },
+  {
+    "value": "59|1",
+    "label": "Criança/Adolescente Acolhido-Sim"
+  },
+  {
+    "value": "59|0",
+    "label": "Criança/Adolescente Acolhido-Não Cadastrado"
+  },
+  {
+    "value": "64|2",
+    "label": "Crime Praticado contra Criança/Adolescente-Não"
+  },
+  {
+    "value": "64|1",
+    "label": "Crime Praticado contra Criança/Adolescente-Sim"
+  },
+  {
+    "value": "64|0",
+    "label": "Crime Praticado contra Criança/Adolescente-Não Cadastrado"
+  },
+  {
+    "value": "86|2",
+    "label": "DESASTRE CLIMÁTICO-Não"
+  },
+  {
+    "value": "86|1",
+    "label": "DESASTRE CLIMÁTICO-Sim"
+  },
+  {
+    "value": "86|0",
+    "label": "DESASTRE CLIMÁTICO-Não Cadastrado"
+  },
+  {
+    "value": "72|2",
+    "label": "Declinação de Competência-Não"
+  },
+  {
+    "value": "72|1",
+    "label": "Declinação de Competência-Sim"
+  },
+  {
+    "value": "72|0",
+    "label": "Declinação de Competência-Não Cadastrado"
+  },
+  {
+    "value": "54|2",
+    "label": "Decretada Internação-Não"
+  },
+  {
+    "value": "54|1",
+    "label": "Decretada Internação-Sim"
+  },
+  {
+    "value": "54|0",
+    "label": "Decretada Internação-Não Cadastrado"
+  },
+  {
+    "value": "9|2",
+    "label": "Defesa Intimada Contrarrazões-Não"
+  },
+  {
+    "value": "9|1",
+    "label": "Defesa Intimada Contrarrazões-Sim"
+  },
+  {
+    "value": "9|0",
+    "label": "Defesa Intimada Contrarrazões-Não Cadastrado"
+  },
+  {
+    "value": "85|2",
+    "label": "Demanda Complexa-Não"
+  },
+  {
+    "value": "85|1",
+    "label": "Demanda Complexa-Sim"
+  },
+  {
+    "value": "85|0",
+    "label": "Demanda Complexa-Não Cadastrado"
+  },
+  {
+    "value": "20|2",
+    "label": "Depósito Judicial-Não"
+  },
+  {
+    "value": "20|1",
+    "label": "Depósito Judicial-Sim"
+  },
+  {
+    "value": "20|0",
+    "label": "Depósito Judicial-Não Cadastrado"
+  },
+  {
+    "value": "69|2",
+    "label": "Destituição do poder familiar-Não"
+  },
+  {
+    "value": "69|1",
+    "label": "Destituição do poder familiar-Sim"
+  },
+  {
+    "value": "69|0",
+    "label": "Destituição do poder familiar-Não Cadastrado"
+  },
+  {
+    "value": "83|2",
+    "label": "Digitalizado 2G-Não"
+  },
+  {
+    "value": "83|1",
+    "label": "Digitalizado 2G-Sim"
+  },
+  {
+    "value": "83|0",
+    "label": "Digitalizado 2G-Não Cadastrado"
+  },
+  {
+    "value": "63|2",
+    "label": "Digitalizado 2G - Gabinetes-Não"
+  },
+  {
+    "value": "63|1",
+    "label": "Digitalizado 2G - Gabinetes-Sim"
+  },
+  {
+    "value": "63|0",
+    "label": "Digitalizado 2G - Gabinetes-Não Cadastrado"
+  },
+  {
+    "value": "22|1",
+    "label": "Diligência APS-Aberta"
+  },
+  {
+    "value": "22|2",
+    "label": "Diligência APS-Cumprida"
+  },
+  {
+    "value": "22|0",
+    "label": "Diligência APS-Não Cadastrado"
+  },
+  {
+    "value": "23|1",
+    "label": "Diligência CEF-Aberta"
+  },
+  {
+    "value": "23|2",
+    "label": "Diligência CEF-Cumprida"
+  },
+  {
+    "value": "23|0",
+    "label": "Diligência CEF-Não Cadastrado"
+  },
+  {
+    "value": "27|2",
+    "label": "Doença Grave-Não"
+  },
+  {
+    "value": "27|1",
+    "label": "Doença Grave-Sim"
+  },
+  {
+    "value": "27|0",
+    "label": "Doença Grave-Não Cadastrado"
+  },
+  {
+    "value": "8|2",
+    "label": "Efeito Suspensivo-Não"
+  },
+  {
+    "value": "8|1",
+    "label": "Efeito Suspensivo-Sim"
+  },
+  {
+    "value": "8|0",
+    "label": "Efeito Suspensivo-Não Cadastrado"
+  },
+  {
+    "value": "101|2",
+    "label": "Em Diligência-Não"
+  },
+  {
+    "value": "101|1",
+    "label": "Em Diligência-Sim"
+  },
+  {
+    "value": "101|0",
+    "label": "Em Diligência-Não Cadastrado"
+  },
+  {
+    "value": "103|2",
+    "label": "Embargos Protelatórios-Não"
+  },
+  {
+    "value": "103|1",
+    "label": "Embargos Protelatórios-Sim"
+  },
+  {
+    "value": "103|0",
+    "label": "Embargos Protelatórios-Não Cadastrado"
+  },
+  {
+    "value": "19|3",
+    "label": "Esgotamento de Instância-Não Informado"
+  },
+  {
+    "value": "19|1",
+    "label": "Esgotamento de Instância-Ok"
+  },
+  {
+    "value": "19|2",
+    "label": "Esgotamento de Instância-Sem acórdão"
+  },
+  {
+    "value": "19|0",
+    "label": "Esgotamento de Instância-Não Cadastrado"
+  },
+  {
+    "value": "39|2",
+    "label": "Fórum de Conciliação requerido-Não"
+  },
+  {
+    "value": "39|1",
+    "label": "Fórum de Conciliação requerido-Sim"
+  },
+  {
+    "value": "39|0",
+    "label": "Fórum de Conciliação requerido-Não Cadastrado"
+  },
+  {
+    "value": "108|2",
+    "label": "Gaia Assistente-Não"
+  },
+  {
+    "value": "108|1",
+    "label": "Gaia Assistente-Sim"
+  },
+  {
+    "value": "108|0",
+    "label": "Gaia Assistente-Não Cadastrado"
+  },
+  {
+    "value": "21|2",
+    "label": "Grande devedor-Não"
+  },
+  {
+    "value": "21|1",
+    "label": "Grande devedor-Sim"
+  },
+  {
+    "value": "21|0",
+    "label": "Grande devedor-Não Cadastrado"
+  },
+  {
+    "value": "10|2",
+    "label": "Há Contrarrazões-Não"
+  },
+  {
+    "value": "10|1",
+    "label": "Há Contrarrazões-Sim"
+  },
+  {
+    "value": "10|0",
+    "label": "Há Contrarrazões-Não Cadastrado"
+  },
+  {
+    "value": "28|2",
+    "label": "Idoso-Não"
+  },
+  {
+    "value": "28|1",
+    "label": "Idoso-Sim"
+  },
+  {
+    "value": "28|0",
+    "label": "Idoso-Não Cadastrado"
+  },
+  {
+    "value": "41|2",
+    "label": "Idoso - maior de 80 anos-Não"
+  },
+  {
+    "value": "41|1",
+    "label": "Idoso - maior de 80 anos-Sim"
+  },
+  {
+    "value": "41|0",
+    "label": "Idoso - maior de 80 anos-Não Cadastrado"
+  },
+  {
+    "value": "45|2",
+    "label": "Impugnação à Fase de Cumprimento de Sentença-Não"
+  },
+  {
+    "value": "45|1",
+    "label": "Impugnação à Fase de Cumprimento de Sentença-Sim"
+  },
+  {
+    "value": "45|0",
+    "label": "Impugnação à Fase de Cumprimento de Sentença-Não Cadastrado"
+  },
+  {
+    "value": "84|2",
+    "label": "Intérprete em Libras-Não"
+  },
+  {
+    "value": "84|1",
+    "label": "Intérprete em Libras-Sim"
+  },
+  {
+    "value": "84|0",
+    "label": "Intérprete em Libras-Não Cadastrado"
+  },
+  {
+    "value": "29|2",
+    "label": "Julg.Sobrest - art. 942 CPC-Não"
+  },
+  {
+    "value": "29|1",
+    "label": "Julg.Sobrest - art. 942 CPC-Sim"
+  },
+  {
+    "value": "29|0",
+    "label": "Julg.Sobrest - art. 942 CPC-Não Cadastrado"
+  },
+  {
+    "value": "67|2",
+    "label": "Justiça Inclusiva-Não"
+  },
+  {
+    "value": "67|1",
+    "label": "Justiça Inclusiva-Sim"
+  },
+  {
+    "value": "67|0",
+    "label": "Justiça Inclusiva-Não Cadastrado"
+  },
+  {
+    "value": "92|1",
+    "label": "Litigância Abusiva-Analisar indícios"
+  },
+  {
+    "value": "92|3",
+    "label": "Litigância Abusiva-Indícios ausentes"
+  },
+  {
+    "value": "92|2",
+    "label": "Litigância Abusiva-Indícios presentes"
+  },
+  {
+    "value": "92|4",
+    "label": "Litigância Abusiva-Reconhecida a litigância abusiva"
+  },
+  {
+    "value": "92|0",
+    "label": "Litigância Abusiva-Não Cadastrado"
+  },
+  {
+    "value": "102|2",
+    "label": "Litisconsórcio Passivo-Não"
+  },
+  {
+    "value": "102|1",
+    "label": "Litisconsórcio Passivo-Sim"
+  },
+  {
+    "value": "102|0",
+    "label": "Litisconsórcio Passivo-Não Cadastrado"
+  },
+  {
+    "value": "78|2",
+    "label": "Meta 2-Não"
+  },
+  {
+    "value": "78|1",
+    "label": "Meta 2-Sim"
+  },
+  {
+    "value": "78|0",
+    "label": "Meta 2-Não Cadastrado"
+  },
+  {
+    "value": "79|2",
+    "label": "Meta 4-Não"
+  },
+  {
+    "value": "79|1",
+    "label": "Meta 4-Sim"
+  },
+  {
+    "value": "79|0",
+    "label": "Meta 4-Não Cadastrado"
+  },
+  {
+    "value": "80|2",
+    "label": "Meta 8-Não"
+  },
+  {
+    "value": "80|1",
+    "label": "Meta 8-Sim"
+  },
+  {
+    "value": "80|0",
+    "label": "Meta 8-Não Cadastrado"
+  },
+  {
+    "value": "74|1",
+    "label": "NÃºmero do benefÃ­cio-Sim"
+  },
+  {
+    "value": "74|0",
+    "label": "NÃºmero do benefÃ­cio-Não Cadastrado"
+  },
+  {
+    "value": "58|2",
+    "label": "Opção por Juízo 100% Digital-Não"
+  },
+  {
+    "value": "58|1",
+    "label": "Opção por Juízo 100% Digital-Sim"
+  },
+  {
+    "value": "58|0",
+    "label": "Opção por Juízo 100% Digital-Não Cadastrado"
+  },
+  {
+    "value": "36|2",
+    "label": "Originário Eletrônico-Não"
+  },
+  {
+    "value": "36|1",
+    "label": "Originário Eletrônico-Sim"
+  },
+  {
+    "value": "36|0",
+    "label": "Originário Eletrônico-Não Cadastrado"
+  },
+  {
+    "value": "87|2",
+    "label": "Originário tramita no SEEU-Não"
+  },
+  {
+    "value": "87|1",
+    "label": "Originário tramita no SEEU-Sim"
+  },
+  {
+    "value": "87|0",
+    "label": "Originário tramita no SEEU-Não Cadastrado"
+  },
+  {
+    "value": "91|2",
+    "label": "PCD-Não"
+  },
+  {
+    "value": "91|1",
+    "label": "PCD-Sim"
+  },
+  {
+    "value": "91|0",
+    "label": "PCD-Não Cadastrado"
+  },
+  {
+    "value": "93|2",
+    "label": "Pagamento valor diferenciado - AJG-Não"
+  },
+  {
+    "value": "93|1",
+    "label": "Pagamento valor diferenciado - AJG-Sim"
+  },
+  {
+    "value": "93|0",
+    "label": "Pagamento valor diferenciado - AJG-Não Cadastrado"
+  },
+  {
+    "value": "96|2",
+    "label": "Parte internada por outro processo-Não"
+  },
+  {
+    "value": "96|1",
+    "label": "Parte internada por outro processo-Sim"
+  },
+  {
+    "value": "96|0",
+    "label": "Parte internada por outro processo-Não Cadastrado"
+  },
+  {
+    "value": "95|2",
+    "label": "Parte presa por outro processo-Não"
+  },
+  {
+    "value": "95|1",
+    "label": "Parte presa por outro processo-Sim"
+  },
+  {
+    "value": "95|0",
+    "label": "Parte presa por outro processo-Não Cadastrado"
+  },
+  {
+    "value": "60|2",
+    "label": "Patrulha Mª Penha-Não"
+  },
+  {
+    "value": "60|1",
+    "label": "Patrulha Mª Penha-Sim"
+  },
+  {
+    "value": "60|0",
+    "label": "Patrulha Mª Penha-Não Cadastrado"
+  },
+  {
+    "value": "15|2",
+    "label": "Penhora no rosto dos autos-Não"
+  },
+  {
+    "value": "15|1",
+    "label": "Penhora no rosto dos autos-Sim"
+  },
+  {
+    "value": "15|0",
+    "label": "Penhora no rosto dos autos-Não Cadastrado"
+  },
+  {
+    "value": "12|2",
+    "label": "Penhora/apreensão de bens-Não"
+  },
+  {
+    "value": "12|1",
+    "label": "Penhora/apreensão de bens-Sim"
+  },
+  {
+    "value": "12|0",
+    "label": "Penhora/apreensão de bens-Não Cadastrado"
+  },
+  {
+    "value": "82|2",
+    "label": "Pessoa Protegida-Não"
+  },
+  {
+    "value": "82|1",
+    "label": "Pessoa Protegida-Sim"
+  },
+  {
+    "value": "82|0",
+    "label": "Pessoa Protegida-Não Cadastrado"
+  },
+  {
+    "value": "33|2",
+    "label": "Pessoa com deficiência-Não"
+  },
+  {
+    "value": "33|1",
+    "label": "Pessoa com deficiência-Sim"
+  },
+  {
+    "value": "33|0",
+    "label": "Pessoa com deficiência-Não Cadastrado"
+  },
+  {
+    "value": "70|2",
+    "label": "Pessoa em situação de rua-Não"
+  },
+  {
+    "value": "70|1",
+    "label": "Pessoa em situação de rua-Sim"
+  },
+  {
+    "value": "70|0",
+    "label": "Pessoa em situação de rua-Não Cadastrado"
+  },
+  {
+    "value": "71|2",
+    "label": "Pessoa enquadrada na LEI 14.289-Não"
+  },
+  {
+    "value": "71|1",
+    "label": "Pessoa enquadrada na LEI 14.289-Sim"
+  },
+  {
+    "value": "71|0",
+    "label": "Pessoa enquadrada na LEI 14.289-Não Cadastrado"
+  },
+  {
+    "value": "5|2",
+    "label": "Petição Urgente-Não"
+  },
+  {
+    "value": "5|1",
+    "label": "Petição Urgente-Sim"
+  },
+  {
+    "value": "5|0",
+    "label": "Petição Urgente-Não Cadastrado"
+  },
+  {
+    "value": "46|2",
+    "label": "Possui bem associado-Não"
+  },
+  {
+    "value": "46|1",
+    "label": "Possui bem associado-Sim"
+  },
+  {
+    "value": "46|0",
+    "label": "Possui bem associado-Não Cadastrado"
+  },
+  {
+    "value": "17|2",
+    "label": "Preparo Resp/RE/Ord-Deserto"
+  },
+  {
+    "value": "17|1",
+    "label": "Preparo Resp/RE/Ord-Ok"
+  },
+  {
+    "value": "17|0",
+    "label": "Preparo Resp/RE/Ord-Não Cadastrado"
+  },
+  {
+    "value": "50|2",
+    "label": "Presa com filho menor de 12 anos-Não"
+  },
+  {
+    "value": "50|1",
+    "label": "Presa com filho menor de 12 anos-Sim"
+  },
+  {
+    "value": "50|0",
+    "label": "Presa com filho menor de 12 anos-Não Cadastrado"
+  },
+  {
+    "value": "44|2",
+    "label": "Prescrição Próxima-Não"
+  },
+  {
+    "value": "44|1",
+    "label": "Prescrição Próxima-Sim"
+  },
+  {
+    "value": "44|0",
+    "label": "Prescrição Próxima-Não Cadastrado"
+  },
+  {
+    "value": "105|2",
+    "label": "Primeira Infância-Não"
+  },
+  {
+    "value": "105|1",
+    "label": "Primeira Infância-Sim"
+  },
+  {
+    "value": "105|0",
+    "label": "Primeira Infância-Não Cadastrado"
+  },
+  {
+    "value": "2|2",
+    "label": "Prioridade Atendimento-Não"
+  },
+  {
+    "value": "2|1",
+    "label": "Prioridade Atendimento-Sim"
+  },
+  {
+    "value": "2|0",
+    "label": "Prioridade Atendimento-Não Cadastrado"
+  },
+  {
+    "value": "38|2",
+    "label": "Processo Digitalizado-Não"
+  },
+  {
+    "value": "38|1",
+    "label": "Processo Digitalizado-Sim"
+  },
+  {
+    "value": "38|0",
+    "label": "Processo Digitalizado-Não Cadastrado"
+  },
+  {
+    "value": "62|2",
+    "label": "Processo Migrado-Não"
+  },
+  {
+    "value": "62|1",
+    "label": "Processo Migrado-Sim"
+  },
+  {
+    "value": "62|0",
+    "label": "Processo Migrado-Não Cadastrado"
+  },
+  {
+    "value": "51|2",
+    "label": "Processo Urgente-Não"
+  },
+  {
+    "value": "51|1",
+    "label": "Processo Urgente-Sim"
+  },
+  {
+    "value": "51|0",
+    "label": "Processo Urgente-Não Cadastrado"
+  },
+  {
+    "value": "106|2",
+    "label": "Publicação da Lista Anual de Jurados-Não"
+  },
+  {
+    "value": "106|1",
+    "label": "Publicação da Lista Anual de Jurados-Sim"
+  },
+  {
+    "value": "106|0",
+    "label": "Publicação da Lista Anual de Jurados-Não Cadastrado"
+  },
+  {
+    "value": "88|2",
+    "label": "REEXAME NECESSÁRIO-Não"
+  },
+  {
+    "value": "88|1",
+    "label": "REEXAME NECESSÁRIO-Sim"
+  },
+  {
+    "value": "88|0",
+    "label": "REEXAME NECESSÁRIO-Não Cadastrado"
+  },
+  {
+    "value": "31|2",
+    "label": "RPV/Precatório-Com Saldo"
+  },
+  {
+    "value": "31|1",
+    "label": "RPV/Precatório-Sem Saldo"
+  },
+  {
+    "value": "31|0",
+    "label": "RPV/Precatório-Não Cadastrado"
+  },
+  {
+    "value": "18|2",
+    "label": "Ratificação de Resp/RE/Ord-Não ratificado"
+  },
+  {
+    "value": "18|1",
+    "label": "Ratificação de Resp/RE/Ord-Ok"
+  },
+  {
+    "value": "18|0",
+    "label": "Ratificação de Resp/RE/Ord-Não Cadastrado"
+  },
+  {
+    "value": "13|2",
+    "label": "Reconvenção-Não"
+  },
+  {
+    "value": "13|1",
+    "label": "Reconvenção-Sim"
+  },
+  {
+    "value": "13|0",
+    "label": "Reconvenção-Não Cadastrado"
+  },
+  {
+    "value": "14|2",
+    "label": "Renúncia excedente 60 salários-Não"
+  },
+  {
+    "value": "14|1",
+    "label": "Renúncia excedente 60 salários-Sim"
+  },
+  {
+    "value": "14|0",
+    "label": "Renúncia excedente 60 salários-Não Cadastrado"
+  },
+  {
+    "value": "43|2",
+    "label": "Representativo de Controvérsia-Não"
+  },
+  {
+    "value": "43|1",
+    "label": "Representativo de Controvérsia-Sim"
+  },
+  {
+    "value": "43|0",
+    "label": "Representativo de Controvérsia-Não Cadastrado"
+  },
+  {
+    "value": "56|2",
+    "label": "Réu Foragido-Não"
+  },
+  {
+    "value": "56|1",
+    "label": "Réu Foragido-Sim"
+  },
+  {
+    "value": "56|0",
+    "label": "Réu Foragido-Não Cadastrado"
+  },
+  {
+    "value": "6|2",
+    "label": "Réu Preso-Não"
+  },
+  {
+    "value": "6|1",
+    "label": "Réu Preso-Sim"
+  },
+  {
+    "value": "6|0",
+    "label": "Réu Preso-Não Cadastrado"
+  },
+  {
+    "value": "57|2",
+    "label": "Réu Procurado-Não"
+  },
+  {
+    "value": "57|1",
+    "label": "Réu Procurado-Sim"
+  },
+  {
+    "value": "57|0",
+    "label": "Réu Procurado-Não Cadastrado"
+  },
+  {
+    "value": "90|2",
+    "label": "Réu revel-Não"
+  },
+  {
+    "value": "90|1",
+    "label": "Réu revel-Sim"
+  },
+  {
+    "value": "90|0",
+    "label": "Réu revel-Não Cadastrado"
+  },
+  {
+    "value": "16|2",
+    "label": "Tempestividade Resp/RE/Ord-Intempestivo"
+  },
+  {
+    "value": "16|3",
+    "label": "Tempestividade Resp/RE/Ord-Não Informado"
+  },
+  {
+    "value": "16|1",
+    "label": "Tempestividade Resp/RE/Ord-No prazo"
+  },
+  {
+    "value": "16|0",
+    "label": "Tempestividade Resp/RE/Ord-Não Cadastrado"
+  },
+  {
+    "value": "24|3",
+    "label": "Tipo de Requisição-Não Informado"
+  },
+  {
+    "value": "24|1",
+    "label": "Tipo de Requisição-Pagto. por Precatório"
+  },
+  {
+    "value": "24|2",
+    "label": "Tipo de Requisição-Pagto. por RPV"
+  },
+  {
+    "value": "24|0",
+    "label": "Tipo de Requisição-Não Cadastrado"
+  },
+  {
+    "value": "49|2",
+    "label": "Tramita no Anexo Fiscal-Não"
+  },
+  {
+    "value": "49|1",
+    "label": "Tramita no Anexo Fiscal-Sim"
+  },
+  {
+    "value": "49|0",
+    "label": "Tramita no Anexo Fiscal-Não Cadastrado"
+  },
+  {
+    "value": "73|2",
+    "label": "TramitaÃ§Ã£o Ã¡gil-Não"
+  },
+  {
+    "value": "73|1",
+    "label": "TramitaÃ§Ã£o Ã¡gil-Sim"
+  },
+  {
+    "value": "73|0",
+    "label": "TramitaÃ§Ã£o Ã¡gil-Não Cadastrado"
+  },
+  {
+    "value": "99|2",
+    "label": "Tramitação ágil-Não"
+  },
+  {
+    "value": "99|1",
+    "label": "Tramitação ágil-Sim"
+  },
+  {
+    "value": "99|0",
+    "label": "Tramitação ágil-Não Cadastrado"
+  },
+  {
+    "value": "37|2",
+    "label": "Verificar situação de condenado-Verificado"
+  },
+  {
+    "value": "37|1",
+    "label": "Verificar situação de condenado-Verificar"
+  },
+  {
+    "value": "37|0",
+    "label": "Verificar situação de condenado-Não Cadastrado"
+  },
+  {
+    "value": "3|2",
+    "label": "Vista Ministério Público-Não"
+  },
+  {
+    "value": "3|1",
+    "label": "Vista Ministério Público-Sim"
+  },
+  {
+    "value": "3|0",
+    "label": "Vista Ministério Público-Não Cadastrado"
+  },
+  {
+    "value": "52|4",
+    "label": "Última petição com prioridade-Alvará de Soltura"
+  },
+  {
+    "value": "52|3",
+    "label": "Última petição com prioridade-Busca e Apreensão"
+  },
+  {
+    "value": "52|9",
+    "label": "Última petição com prioridade-Designação de data de perícia"
+  },
+  {
+    "value": "52|2",
+    "label": "Última petição com prioridade-Internação"
+  },
+  {
+    "value": "52|1",
+    "label": "Última petição com prioridade-Liminar/Antecipação de Tutela"
+  },
+  {
+    "value": "52|6",
+    "label": "Última petição com prioridade-Pedido de Alvará"
+  },
+  {
+    "value": "52|7",
+    "label": "Última petição com prioridade-Pedido de Liberação de Valores"
+  },
+  {
+    "value": "52|8",
+    "label": "Última petição com prioridade-Processo com sessão/audiência designada"
+  },
+  {
+    "value": "52|5",
+    "label": "Última petição com prioridade-Revogação de Prisão"
+  },
+  {
+    "value": "52|0",
+    "label": "Última petição com prioridade-Não Cadastrado"
+  }
+]

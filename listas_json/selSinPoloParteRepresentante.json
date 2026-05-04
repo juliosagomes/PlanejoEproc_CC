@@ -1,0 +1,26 @@
+[
+  {
+    "value": "A",
+    "label": "AUTOR"
+  },
+  {
+    "value": "R",
+    "label": "RÉU"
+  },
+  {
+    "value": "I",
+    "label": "INTERESSADO"
+  },
+  {
+    "value": "Q",
+    "label": "QUALQUER"
+  },
+  {
+    "value": "N",
+    "label": "MP"
+  },
+  {
+    "value": "EP",
+    "label": "EXCETO PETICIONANTE"
+  }
+]

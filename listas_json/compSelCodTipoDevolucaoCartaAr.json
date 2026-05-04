@@ -1,0 +1,102 @@
+[
+  {
+    "value": "0",
+    "label": "Entregue"
+  },
+  {
+    "value": "1",
+    "label": "Não entregue - Destinatário mudou-se"
+  },
+  {
+    "value": "2",
+    "label": "Não entregue - Endereço insuficiente para entrega"
+  },
+  {
+    "value": "3",
+    "label": "Não entregue - Não existe o número indicado"
+  },
+  {
+    "value": "4",
+    "label": "Não entregue - Destinatário desconhecido no endereço"
+  },
+  {
+    "value": "5",
+    "label": "Não entregue - Recusado"
+  },
+  {
+    "value": "6",
+    "label": "Não entregue - Não Procurado pelo remetente"
+  },
+  {
+    "value": "7",
+    "label": "Não entregue - Destinatário ausente"
+  },
+  {
+    "value": "8",
+    "label": "Não entregue - Destinatário falecido"
+  },
+  {
+    "value": "32",
+    "label": "Não entregue - Não procurado pelo destinatário"
+  },
+  {
+    "value": "33",
+    "label": "Não entregue - Mercadoria avariada"
+  },
+  {
+    "value": "35",
+    "label": "Não entregue - Documentação não fornecida pelo destinatário"
+  },
+  {
+    "value": "39",
+    "label": "Não entregue - Objeto conteúdo avariado - Veículo acidentado"
+  },
+  {
+    "value": "51",
+    "label": "Não entregue - Roubo a carteiro"
+  },
+  {
+    "value": "52",
+    "label": "Não entregue - Roubo a veículo"
+  },
+  {
+    "value": "53",
+    "label": "Não entregue - Roubo a unidade"
+  },
+  {
+    "value": "138",
+    "label": "Não entregue - Objeto atingido por incêndio em unidade operacional"
+  },
+  {
+    "value": "139",
+    "label": "Não entregue - Endereço incorreto"
+  },
+  {
+    "value": "140",
+    "label": "Não entregue - Localidade desconhecida"
+  },
+  {
+    "value": "141",
+    "label": "Não entregue - Endereço insuficiente"
+  },
+  {
+    "value": "142",
+    "label": "Não entregue - Não existe o número"
+  },
+  {
+    "value": "143",
+    "label": "Não entregue - Endereço sem distribuição domiciliária"
+  },
+  {
+    "value": "144",
+    "label": "Não entregue - Entregue"
+  },
+  {
+    "value": "145",
+    "label": "Não entregue - Objeto extraviado"
+  },
+  {
+    "value": "146",
+    "label": "Não entregue - Solicitação de Suspensão de Entrega"
+  }
+]

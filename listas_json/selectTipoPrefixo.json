@@ -1,0 +1,10 @@
+[
+  {
+    "value": "IN",
+    "label": "Que contenha"
+  },
+  {
+    "value": "NOT IN",
+    "label": "Que NÃO contenha"
+  }
+]

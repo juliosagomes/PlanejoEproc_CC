@@ -1,0 +1,2594 @@
+[
+  {
+    "value": "0000100000",
+    "label": "ABERTURA, REGISTRO E CUMPRIMENTO DE TESTAMENTO"
+  },
+  {
+    "value": "0000000003",
+    "label": "AÇÃO CIVIL COLETIVA"
+  },
+  {
+    "value": "0000000002",
+    "label": "AÇÃO CIVIL DE IMPROBIDADE ADMINISTRATIVA"
+  },
+  {
+    "value": "0000000001",
+    "label": "AÇÃO CIVIL PÚBLICA"
+  },
+  {
+    "value": "0000100072",
+    "label": "AÇÃO CIVIL PÚBLICA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100095",
+    "label": "AÇÃO DE ALIMENTOS DE INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000218",
+    "label": "AÇÃO DE EXIGIR CONTAS"
+  },
+  {
+    "value": "0000100037",
+    "label": "AÇÃO DE PARTILHA"
+  },
+  {
+    "value": "0000000230",
+    "label": "AÇÃO PENAL - PROCEDIMENTO ORDINÁRIO"
+  },
+  {
+    "value": "0000000171",
+    "label": "AÇÃO PENAL - PROCEDIMENTO SUMÁRIO"
+  },
+  {
+    "value": "0000000165",
+    "label": "AÇÃO PENAL - PROCEDIMENTO SUMARÍSSIMO"
+  },
+  {
+    "value": "0000000169",
+    "label": "AÇÃO PENAL DE COMPETÊNCIA DO JÚRI"
+  },
+  {
+    "value": "0000000032",
+    "label": "AÇÃO POPULAR"
+  },
+  {
+    "value": "0000014627",
+    "label": "ACORDO DE NÃO PERSECUÇÃO CÍVEL"
+  },
+  {
+    "value": "0000100244",
+    "label": "ACORDO DE NÃO PERSECUÇÃO PENAL"
+  },
+  {
+    "value": "0000100098",
+    "label": "ADOÇÃO"
+  },
+  {
+    "value": "0000100225",
+    "label": "ADOÇÃO FORA DO CADASTRO"
+  },
+  {
+    "value": "0000100226",
+    "label": "ADOÇÃO FORA DO CADASTRO c/c DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000100227",
+    "label": "ADOÇÃO PELO CADASTRO"
+  },
+  {
+    "value": "0000000037",
+    "label": "AGRAVO DE EXECUÇÃO PENAL"
+  },
+  {
+    "value": "0000000038",
+    "label": "AGRAVO DE INSTRUMENTO"
+  },
+  {
+    "value": "0000000464",
+    "label": "AGRAVO DE INSTRUMENTO TR"
+  },
+  {
+    "value": "0000100250",
+    "label": "AGRAVO INTERNO CÍVEL"
+  },
+  {
+    "value": "0000100245",
+    "label": "AGRAVO INTERNO CRIMINAL"
+  },
+  {
+    "value": "0000000203",
+    "label": "ALIENAÇÃO DE BENS DO ACUSADO"
+  },
+  {
+    "value": "0000000045",
+    "label": "ALIENAÇÃO JUDICIAL DE BENS"
+  },
+  {
+    "value": "0000000004",
+    "label": "ALIMENTOS - LEI ESPECIAL Nº 5.478/68"
+  },
+  {
+    "value": "0000100001",
+    "label": "ALTERAÇÃO DE REGIME DE BENS"
+  },
+  {
+    "value": "0000100002",
+    "label": "ALVARÁ JUDICIAL - LEI 6858/80"
+  },
+  {
+    "value": "0000000048",
+    "label": "APELAÇÃO CRIMINAL"
+  },
+  {
+    "value": "0000100086",
+    "label": "APURAÇÃO DE INFRAÇÃO ADMINISTRATIVA ÀS NORMAS DE PROTEÇÃO À CRIANÇA OU ADOLESCENTE"
+  },
+  {
+    "value": "0000100085",
+    "label": "APURAÇÃO DE IRREGULARIDADES EM ENTIDADES DE ATENDIMENTO"
+  },
+  {
+    "value": "0000100003",
+    "label": "ARRECADAÇÃO DAS COISAS VAGAS"
+  },
+  {
+    "value": "0000000214",
+    "label": "ARRESTO / HIPOTECA LEGAL"
+  },
+  {
+    "value": "0000100004",
+    "label": "ARROLAMENTO COMUM"
+  },
+  {
+    "value": "0000100005",
+    "label": "ARROLAMENTO SUMÁRIO"
+  },
+  {
+    "value": "0000100118",
+    "label": "AUTO DE APREENSÃO EM FLAGRANTE"
+  },
+  {
+    "value": "0000100092",
+    "label": "AUTORIZAÇÃO JUDICIAL"
+  },
+  {
+    "value": "0000000204",
+    "label": "AVALIAÇÃO PARA ATESTAR DEPENDÊNCIA DE DROGAS"
+  },
+  {
+    "value": "0000100042",
+    "label": "AVERIGUAÇÃO DE PATERNIDADE"
+  },
+  {
+    "value": "0000100119",
+    "label": "BOLETIM DE OCORRÊNCIA CIRCUNSTANCIADA"
+  },
+  {
+    "value": "0000000007",
+    "label": "BUSCA E APREENSÃO EM ALIENAÇÃO FIDUCIÁRIA"
+  },
+  {
+    "value": "0000100076",
+    "label": "BUSCA E APREENSÃO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100112",
+    "label": "BUSCA E APREENSÃO INFRACIONAL"
+  },
+  {
+    "value": "0000000057",
+    "label": "CANCELAMENTO DE NATURALIZAÇÃO"
+  },
+  {
+    "value": "0000014550",
+    "label": "CARTA ARBITRAL"
+  },
+  {
+    "value": "0000100158",
+    "label": "CARTA ARBITRAL"
+  },
+  {
+    "value": "0000000058",
+    "label": "CARTA DE ORDEM CÍVEL"
+  },
+  {
+    "value": "0000014603",
+    "label": "CARTA DE ORDEM CÍVEL"
+  },
+  {
+    "value": "0000100055",
+    "label": "CARTA DE ORDEM CRIMINAL"
+  },
+  {
+    "value": "0000100063",
+    "label": "CARTA DE ORDEM INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100115",
+    "label": "CARTA DE ORDEM INFRACIONAL"
+  },
+  {
+    "value": "0000100054",
+    "label": "CARTA PRECATÓRIA CÍVEL"
+  },
+  {
+    "value": "0000100132",
+    "label": "CARTA PRECATÓRIA CRIMINAL"
+  },
+  {
+    "value": "0000100064",
+    "label": "CARTA PRECATÓRIA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100133",
+    "label": "CARTA PRECATÓRIA INFRACIONAL"
+  },
+  {
+    "value": "0000000061",
+    "label": "CARTA ROGATÓRIA CÍVEL"
+  },
+  {
+    "value": "0000014545",
+    "label": "CARTA ROGATÓRIA CRIMINAL"
+  },
+  {
+    "value": "0000000062",
+    "label": "CARTA TESTEMUNHÁVEL"
+  },
+  {
+    "value": "0000000139",
+    "label": "CAUTELAR FISCAL"
+  },
+  {
+    "value": "0000014586",
+    "label": "CAUTELAR INOMINADA CRIMINAL"
+  },
+  {
+    "value": "0000100077",
+    "label": "CAUTELAR INOMINADA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100155",
+    "label": "CLASSIFICAÇÃO DE CRÉDITO PÚBLICO"
+  },
+  {
+    "value": "0000000008",
+    "label": "COBRANÇA DE CÉDULA DE CRÉDITO INDUSTRIAL"
+  },
+  {
+    "value": "0000000009",
+    "label": "COMPROMISSO ARBITRAL"
+  },
+  {
+    "value": "0000100173",
+    "label": "COMUNICADO DE MANDADO DE PRISÃO"
+  },
+  {
+    "value": "0000100006",
+    "label": "CONFIRMAÇÃO DE TESTAMENTO"
+  },
+  {
+    "value": "0000000066",
+    "label": "CONFLITO DE COMPETÊNCIA CÍVEL"
+  },
+  {
+    "value": "0000100252",
+    "label": "CONFLITO DE COMPETÊNCIA CÍVEL TR"
+  },
+  {
+    "value": "0000100065",
+    "label": "CONFLITO DE COMPETÊNCIA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000358",
+    "label": "CONFLITO DE JURISDIÇÃO"
+  },
+  {
+    "value": "0000000011",
+    "label": "CONSIGNAÇÃO EM PAGAMENTO"
+  },
+  {
+    "value": "0000000010",
+    "label": "CONSIGNATÓRIA DE ALUGUÉIS"
+  },
+  {
+    "value": "0000100124",
+    "label": "CONTESTAÇÃO EM FORO DIVERSO"
+  },
+  {
+    "value": "0000100007",
+    "label": "CONVERSÃO DE SEPARAÇÃO JUDICIAL EM DIVÓRCIO"
+  },
+  {
+    "value": "0000100149",
+    "label": "CORREIÇÃO PARCIAL CÍVEL"
+  },
+  {
+    "value": "0000000370",
+    "label": "CORREIÇÃO PARCIAL CRIMINAL"
+  },
+  {
+    "value": "0000000221",
+    "label": "CRIMES AMBIENTAIS"
+  },
+  {
+    "value": "0000000166",
+    "label": "CRIMES CONTRA A PROPRIEDADE IMATERIAL"
+  },
+  {
+    "value": "0000100079",
+    "label": "CRIMES CONTRA A PROPRIEDADE INDUSTRIAL"
+  },
+  {
+    "value": "0000100080",
+    "label": "CRIMES CONTRA A PROPRIEDADE INTELECTUAL"
+  },
+  {
+    "value": "0000000168",
+    "label": "CRIMES DE CALÚNIA, INJÚRIA E DIFAMAÇÃO DE COMPETÊNCIA DO JUIZ SINGULAR"
+  },
+  {
+    "value": "0000000164",
+    "label": "CRIMES DE IMPRENSA"
+  },
+  {
+    "value": "0000000170",
+    "label": "CRIMES DE RESPONSABILIDADE DOS FUNCIONÁRIOS PÚBLICOS"
+  },
+  {
+    "value": "0000000220",
+    "label": "CUMPRIMENTO DE SENTENÇA"
+  },
+  {
+    "value": "0000100083",
+    "label": "CUMPRIMENTO DE SENTENÇA - CENTRASE CÍVEL BH"
+  },
+  {
+    "value": "0000100258",
+    "label": "CUMPRIMENTO DE SENTENÇA - CENTRASE FAZENDÁRIA BH"
+  },
+  {
+    "value": "0000100136",
+    "label": "CUMPRIMENTO DE SENTENÇA - LEI ARBITRAL (LEI 9.307/1996)"
+  },
+  {
+    "value": "0000100237",
+    "label": "CUMPRIMENTO DE SENTENÇA - RECLAMAÇÃO PRÉ-PROCESSUAL"
+  },
+  {
+    "value": "0000014559",
+    "label": "CUMPRIMENTO DE SENTENÇA CONTRA A FAZENDA PÚBLICA"
+  },
+  {
+    "value": "0000100247",
+    "label": "CUMPRIMENTO DE SENTENÇA CONTRA A FAZENDA PÚBLICA - CENTRASE BH"
+  },
+  {
+    "value": "0000100238",
+    "label": "CUMPRIMENTO DE SENTENÇA CONTRA A FAZENDA PÚBLICA MEDIANTE EXECUÇÃO INVERTIDA"
+  },
+  {
+    "value": "0000014640",
+    "label": "Cumprimento de Sentença de Ações Coletivas"
+  },
+  {
+    "value": "0000100221",
+    "label": "CUMPRIMENTO DE SENTENÇA DE AÇÕES COLETIVAS"
+  },
+  {
+    "value": "0000100040",
+    "label": "CUMPRIMENTO DE SENTENÇA DE OBRIGAÇÃO DE PRESTAR ALIMENTOS"
+  },
+  {
+    "value": "0000014638",
+    "label": "Cumprimento Provisório de Decisão"
+  },
+  {
+    "value": "0000100008",
+    "label": "CUMPRIMENTO PROVISÓRIO DE DECISÃO"
+  },
+  {
+    "value": "0000100222",
+    "label": "CUMPRIMENTO PROVISÓRIO DE SENTEÇA DE AÇÕES COLETIVAS"
+  },
+  {
+    "value": "0000000199",
+    "label": "CUMPRIMENTO PROVISÓRIO DE SENTENÇA"
+  },
+  {
+    "value": "0000014642",
+    "label": "Cumprimento Provisório de Sentença de Ações Coletivas"
+  },
+  {
+    "value": "0000000068",
+    "label": "DECLARAÇÃO DE AUSÊNCIA"
+  },
+  {
+    "value": "0000000219",
+    "label": "DEMARCAÇÃO / DIVISÃO"
+  },
+  {
+    "value": "0000000014",
+    "label": "DEPÓSITO DA LEI 8.866/94"
+  },
+  {
+    "value": "0000000070",
+    "label": "DESAFORAMENTO DE JULGAMENTO"
+  },
+  {
+    "value": "0000000015",
+    "label": "DESAPROPRIAÇÃO"
+  },
+  {
+    "value": "0000000016",
+    "label": "DESAPROPRIAÇÃO IMÓVEL RURAL POR INTERESSE SOCIAL"
+  },
+  {
+    "value": "0000000017",
+    "label": "DESPEJO"
+  },
+  {
+    "value": "0000000209",
+    "label": "DESPEJO POR FALTA DE PAGAMENTO"
+  },
+  {
+    "value": "0000000208",
+    "label": "DESPEJO POR FALTA DE PAGAMENTO CUMULADO COM COBRANÇA"
+  },
+  {
+    "value": "0000100243",
+    "label": "DESTINAÇÃO DE BENS APREENDIDOS"
+  },
+  {
+    "value": "0000100228",
+    "label": "DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000000027",
+    "label": "DISCRIMINATÓRIA"
+  },
+  {
+    "value": "0000014558",
+    "label": "DISSOLUÇÃO PARCIAL DE SOCIEDADE"
+  },
+  {
+    "value": "0000100220",
+    "label": "DIVÓRCIO CONSENSUAL"
+  },
+  {
+    "value": "0000100010",
+    "label": "DIVÓRCIO LITIGIOSO"
+  },
+  {
+    "value": "0000000069",
+    "label": "DÚVIDA"
+  },
+  {
+    "value": "0000100088",
+    "label": "EMANCIPAÇÃO"
+  },
+  {
+    "value": "0000100034",
+    "label": "EMBARGOS"
+  },
+  {
+    "value": "0000000073",
+    "label": "EMBARGOS À EXECUÇÃO"
+  },
+  {
+    "value": "0000000074",
+    "label": "EMBARGOS À EXECUÇÃO FISCAL"
+  },
+  {
+    "value": "0000100011",
+    "label": "EMBARGOS DE DECLARAÇÃO CÍVEL"
+  },
+  {
+    "value": "0000000079",
+    "label": "EMBARGOS DE TERCEIRO CÍVEL"
+  },
+  {
+    "value": "0000014596",
+    "label": "EMBARGOS DE TERCEIRO CRIMINAL"
+  },
+  {
+    "value": "0000100073",
+    "label": "EMBARGOS DE TERCEIRO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000202",
+    "label": "EMBARGOS DO ACUSADO"
+  },
+  {
+    "value": "0000000772",
+    "label": "EMBARGOS INFRINGENTES E DE NULIDADE"
+  },
+  {
+    "value": "0000100257",
+    "label": "EMBARGOS INFRINGENTES NA EXECUÇÃO FISCAL"
+  },
+  {
+    "value": "0000100137",
+    "label": "EMBARGOS PARCIAIS À AÇÃO MONITÓRIA"
+  },
+  {
+    "value": "0000100159",
+    "label": "ENTREGA VOLUNTÁRIA"
+  },
+  {
+    "value": "0000000083",
+    "label": "EXCEÇÃO DA VERDADE"
+  },
+  {
+    "value": "0000000084",
+    "label": "EXCEÇÃO DE COISA JULGADA"
+  },
+  {
+    "value": "0000000085",
+    "label": "EXCEÇÃO DE ILEGITIMIDADE DE PARTE"
+  },
+  {
+    "value": "0000000089",
+    "label": "EXCEÇÃO DE INCOMPETÊNCIA DE JUÍZO"
+  },
+  {
+    "value": "0000000090",
+    "label": "EXCEÇÃO DE LITISPENDÊNCIA"
+  },
+  {
+    "value": "0000000097",
+    "label": "EXECUÇÃO DA PENA"
+  },
+  {
+    "value": "0000100102",
+    "label": "EXECUÇÃO DE ALIMENTOS INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100103",
+    "label": "EXECUÇÃO DE MEDIDA DE PROTEÇÃO À CRIANÇA E ADOLESCENTE"
+  },
+  {
+    "value": "0000100224",
+    "label": "EXECUÇÃO DE MEDIDAS ALTERNATIVAS NOS JUIZADOS ESPECIAIS"
+  },
+  {
+    "value": "0000100123",
+    "label": "EXECUÇÃO DE MEDIDAS SOCIOEDUCATIVAS"
+  },
+  {
+    "value": "0000100093",
+    "label": "EXECUÇÃO DE MULTA"
+  },
+  {
+    "value": "0000000094",
+    "label": "EXECUÇÃO DE TÍTULO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000014557",
+    "label": "EXECUÇÃO DE TÍTULO EXTRAJUDICIAL CONTRA A FAZENDA PÚBLICA"
+  },
+  {
+    "value": "0000100041",
+    "label": "EXECUÇÃO EXTRAJUDICIAL DE ALIMENTOS"
+  },
+  {
+    "value": "0000000095",
+    "label": "EXECUÇÃO FISCAL"
+  },
+  {
+    "value": "0000100062",
+    "label": "EXECUÇÃO FISCAL (UNIÃO)"
+  },
+  {
+    "value": "0000000096",
+    "label": "EXECUÇÃO HIPOTECÁRIA DO SISTEMA FINANCEIRO DA HABITAÇÃO"
+  },
+  {
+    "value": "0000000099",
+    "label": "EXIBIÇÃO DE DOCUMENTO OU COISA CÍVEL"
+  },
+  {
+    "value": "0000100139",
+    "label": "EXIBIÇÃO DE DOCUMENTO OU COISA CRIMINAL"
+  },
+  {
+    "value": "0000100066",
+    "label": "EXIBIÇÃO DE DOCUMENTO OU COISA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000196",
+    "label": "EXPROPRIAÇÃO DA LEI 8.257/91"
+  },
+  {
+    "value": "0000100140",
+    "label": "EXTINÇÃO CONSENSUAL DE UNIÃO ESTÁVEL"
+  },
+  {
+    "value": "0000100141",
+    "label": "EXTINÇÃO DAS OBRIGAÇÕES DO FALIDO"
+  },
+  {
+    "value": "0000100043",
+    "label": "FALÊNCIA DE EMPRESÁRIOS, SOCIEDADES EMPRESÁRIAIS, MICROEMPRESAS E EMPRESAS DE PEQUENO PORTE"
+  },
+  {
+    "value": "0000100108",
+    "label": "GUARDA C/C DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000100156",
+    "label": "GUARDA DE FAMÍLIA"
+  },
+  {
+    "value": "0000100100",
+    "label": "GUARDA DE INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000100",
+    "label": "HABEAS CORPUS CÍVEL"
+  },
+  {
+    "value": "0000000249",
+    "label": "HABEAS CORPUS CÍVEL TR"
+  },
+  {
+    "value": "0000100248",
+    "label": "HABEAS CORPUS CRIMINAL"
+  },
+  {
+    "value": "0000000101",
+    "label": "HABEAS DATA CÍVEL"
+  },
+  {
+    "value": "0000100241",
+    "label": "HABEAS DATA CRIMINAL"
+  },
+  {
+    "value": "0000000102",
+    "label": "HABILITAÇÃO"
+  },
+  {
+    "value": "0000100035",
+    "label": "HABILITAÇÃO DE CRÉDITO"
+  },
+  {
+    "value": "0000100105",
+    "label": "HABILITAÇÃO PARA ADOÇÃO"
+  },
+  {
+    "value": "0000100229",
+    "label": "HABILITAÇÃO PARA ADOÇÃO"
+  },
+  {
+    "value": "0000100053",
+    "label": "HABILITAÇÃO PARA CASAMENTO"
+  },
+  {
+    "value": "0000100014",
+    "label": "HERANÇA JACENTE"
+  },
+  {
+    "value": "0000000210",
+    "label": "HOMOLOGAÇÃO DE TRANSAÇÃO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000000130",
+    "label": "HOMOLOGAÇÃO DO PENHOR LEGAL"
+  },
+  {
+    "value": "0000100081",
+    "label": "HOMOLOGAÇÃO EM ACORDO DE COLABORAÇÃO PREMIADA"
+  },
+  {
+    "value": "0000000020",
+    "label": "IMISSÃO NA POSSE"
+  },
+  {
+    "value": "0000100067",
+    "label": "IMPUGNAÇÃO AO VALOR DA CAUSA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100044",
+    "label": "IMPUGNAÇÃO DE CRÉDITO"
+  },
+  {
+    "value": "0000014595",
+    "label": "INCIDENTE DE DESCONSIDERAÇÃO DE PERSONALIDADE JURÍDICA"
+  },
+  {
+    "value": "0000000107",
+    "label": "INCIDENTE DE FALSIDADE"
+  },
+  {
+    "value": "0000100068",
+    "label": "INCIDENTE DE FALSIDADE INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000014547",
+    "label": "INCIDENTE DE IMPEDIMENTO CÍVEL"
+  },
+  {
+    "value": "0000100147",
+    "label": "INCIDENTE DE IMPEDIMENTO CÍVEL TR"
+  },
+  {
+    "value": "0000100069",
+    "label": "INCIDENTE DE IMPEDIMENTO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100110",
+    "label": "INCIDENTE DE SANIDADE MENTAL"
+  },
+  {
+    "value": "0000014556",
+    "label": "INCIDENTE DE SUSPEIÇÃO CÍVEL"
+  },
+  {
+    "value": "0000100148",
+    "label": "INCIDENTE DE SUSPEIÇÃO CÍVEL TR"
+  },
+  {
+    "value": "0000100070",
+    "label": "INCIDENTE DE SUSPEIÇÃO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100015",
+    "label": "INCIDENTES"
+  },
+  {
+    "value": "0000100059",
+    "label": "INCIDENTES"
+  },
+  {
+    "value": "0000100045",
+    "label": "INQUÉRITO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000000112",
+    "label": "INQUÉRITO POLICIAL"
+  },
+  {
+    "value": "0000000108",
+    "label": "INSANIDADE MENTAL DO ACUSADO"
+  },
+  {
+    "value": "0000100016",
+    "label": "INSOLVÊNCIA REQUERIDA PELO CREDOR"
+  },
+  {
+    "value": "0000100017",
+    "label": "INSOLVÊNCIA REQUERIDA PELO DEVEDOR OU PELO ESPÓLIO"
+  },
+  {
+    "value": "0000100018",
+    "label": "INSTRUÇÃO DE RESCISÓRIA"
+  },
+  {
+    "value": "0000100019",
+    "label": "INTERDIÇÃO/CURATELA"
+  },
+  {
+    "value": "0000000113",
+    "label": "INTERDITO PROIBITÓRIO"
+  },
+  {
+    "value": "0000100113",
+    "label": "INTERNAÇÃO PROVISÓRIA"
+  },
+  {
+    "value": "0000000132",
+    "label": "INTERPELAÇÃO"
+  },
+  {
+    "value": "0000100020",
+    "label": "INVENTÁRIO"
+  },
+  {
+    "value": "0000014554",
+    "label": "LIQUIDAÇÃO DE SETENÇA PELO PROCEDIMENTO COMUM"
+  },
+  {
+    "value": "0000000115",
+    "label": "LIQUIDAÇÃO POR ARBITRAMENTO"
+  },
+  {
+    "value": "0000000116",
+    "label": "LIQUIDAÇÃO POR ARTIGOS"
+  },
+  {
+    "value": "0000014555",
+    "label": "LIQUIDAÇÃO PROVISÓRIA DE SENTENÇA PELO PROCEDIMENTO COMUM"
+  },
+  {
+    "value": "0000000212",
+    "label": "LIQUIDAÇÃO PROVISÓRIA POR ARBITRAMENTO"
+  },
+  {
+    "value": "0000000213",
+    "label": "LIQUIDAÇÃO PROVISÓRIA POR ARTIGOS"
+  },
+  {
+    "value": "0000000331",
+    "label": "MANDADO DE INJUNÇÃO"
+  },
+  {
+    "value": "0000000118",
+    "label": "MANDADO DE SEGURANÇA CÍVEL"
+  },
+  {
+    "value": "0000000255",
+    "label": "MANDADO DE SEGURANÇA CÍVEL TR"
+  },
+  {
+    "value": "0000000119",
+    "label": "MANDADO DE SEGURANÇA COLETIVO"
+  },
+  {
+    "value": "0000100249",
+    "label": "MANDADO DE SEGURANÇA CRIMINAL"
+  },
+  {
+    "value": "0000100091",
+    "label": "MANDADO DE SEGURANÇA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100231",
+    "label": "MEDIDAS DE PROTEÇÃO - CRIANÇA E ADOLESCENTE (LEI 13.431) INFRACIONAIS"
+  },
+  {
+    "value": "0000100078",
+    "label": "MEDIDAS DE PROTEÇÃO À PESSOA IDOSA - CRIMINAL"
+  },
+  {
+    "value": "0000000163",
+    "label": "MEDIDAS INVESTIGATÓRIAS SOBRE ORGANIZAÇÕES CRIMINOSAS"
+  },
+  {
+    "value": "0000100210",
+    "label": "MEDIDAS PROTETIVAS - CRIANÇA E ADOLESCENTE (LEI 13.431) CRIMINAIS"
+  },
+  {
+    "value": "0000100116",
+    "label": "MEDIDAS PROTETIVAS - ESTATUTO DO IDOSO INFRACIONAL"
+  },
+  {
+    "value": "0000100232",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA (LEI MARIA DA PENHA) - CÍVEL"
+  },
+  {
+    "value": "0000100056",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA (LEI MARIA DA PENHA) CRIMINAL"
+  },
+  {
+    "value": "0000100117",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA (LEI MARIA DA PENHA) INFRACIONAL"
+  },
+  {
+    "value": "0000100219",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA-CRIANÇAS E ADOLESCENTES(LEI HENRY BOREL-LEI 14.344/2022) CRIMINAIS"
+  },
+  {
+    "value": "0000100211",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA-CRIANÇAS E ADOLESCENTES(LEI HENRY BOREL-LEI 14.344/2022) INFRACIONAIS"
+  },
+  {
+    "value": "0000000028",
+    "label": "MONITÓRIA"
+  },
+  {
+    "value": "0000000141",
+    "label": "NATURALIZAÇÃO"
+  },
+  {
+    "value": "0000000216",
+    "label": "NOMEAÇÃO DE ADVOGADO"
+  },
+  {
+    "value": "0000000134",
+    "label": "NOTIFICAÇÃO"
+  },
+  {
+    "value": "0000000143",
+    "label": "NOTIFICAÇÃO PARA EXPLICAÇÕES"
+  },
+  {
+    "value": "0000000206",
+    "label": "NOTIFICAÇÃO PARA EXPLICAÇÕES (LEI DE IMPRENSA)"
+  },
+  {
+    "value": "0000000144",
+    "label": "OPÇÃO DE NACIONALIDADE"
+  },
+  {
+    "value": "0000000145",
+    "label": "OPOSIÇÃO"
+  },
+  {
+    "value": "0000000146",
+    "label": "ORGANIZAÇÃO E FISCALIZAÇÃO DE FUNDAÇÃO"
+  },
+  {
+    "value": "0000000227",
+    "label": "OUTROS PROCEDIMENTOS DE JURISDIÇÃO VOLUNTÁRIA"
+  },
+  {
+    "value": "0000000149",
+    "label": "PEDIDO DE BUSCA E APREENSÃO CRIMINAL"
+  },
+  {
+    "value": "0000012248",
+    "label": "Pedido de Cooperação Judiciária (Seção)"
+  },
+  {
+    "value": "0000100114",
+    "label": "PEDIDO DE DESINTERNAÇÃO/REAVALIAÇÃO/SUBSTITUIÇÃO/SUSPENSÃO DA MEDIDA"
+  },
+  {
+    "value": "0000100256",
+    "label": "PEDIDO DE INCLUSÃO NO CADASTRO DE PROGRAMA DE APADRINHAMENTO"
+  },
+  {
+    "value": "0000000150",
+    "label": "PEDIDO DE LIBERDADE PROVISÓRIA COM OU SEM FIANÇA"
+  },
+  {
+    "value": "0000100106",
+    "label": "PEDIDO DE MEDIDA DE PROTEÇÃO"
+  },
+  {
+    "value": "0000000153",
+    "label": "PEDIDO DE PRISÃO PREVENTIVA"
+  },
+  {
+    "value": "0000000154",
+    "label": "PEDIDO DE PRISÃO TEMPORÁRIA"
+  },
+  {
+    "value": "0000000155",
+    "label": "PEDIDO DE QUEBRA DE SIGILO DE DADOS E/OU TELEFÔNICO"
+  },
+  {
+    "value": "0000000156",
+    "label": "PEDIDO DE RESPOSTA OU RETIFICAÇÃO DA LEI DE IMPRENSA"
+  },
+  {
+    "value": "0000100154",
+    "label": "PEDIDO DE UNIFORMIZAÇÃO DE INTERPRETAÇÃO DE LEI CÍVEL"
+  },
+  {
+    "value": "0000014521",
+    "label": "PETIÇÃO ADMINISTRATIVA/PENITENCIÁRIA FEDERAL"
+  },
+  {
+    "value": "0000014599",
+    "label": "PETIÇÃO CÍVEL"
+  },
+  {
+    "value": "0000100212",
+    "label": "PETIÇÃO CRIMINAL"
+  },
+  {
+    "value": "0000100071",
+    "label": "PETIÇÃO INFÂNCIA E JUVENTUDE CÍVEL"
+  },
+  {
+    "value": "0000100111",
+    "label": "PETIÇÃO INFRACIONAL"
+  },
+  {
+    "value": "0000100074",
+    "label": "PRESTAÇÃO DE CONTAS INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000029",
+    "label": "PROCEDIMENTO COMUM CÍVEL"
+  },
+  {
+    "value": "0000100075",
+    "label": "PROCEDIMENTO COMUM INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100032",
+    "label": "PROCEDIMENTO CONCILIATÓRIO"
+  },
+  {
+    "value": "0000100234",
+    "label": "PROCEDIMENTO DE REPACTUAÇÃO DE DÍVIDAS (SUPERENDIVIDAMENTO)"
+  },
+  {
+    "value": "0000000161",
+    "label": "PROCEDIMENTO DO JUIZADO ESPECIAL CÍVEL"
+  },
+  {
+    "value": "0000100146",
+    "label": "PROCEDIMENTO DO JUIZADO ESPECIAL DA FAZENDA PÚBLICA"
+  },
+  {
+    "value": "0000000162",
+    "label": "PROCEDIMENTO ESPECIAL DA LEI ANTITÓXICOS"
+  },
+  {
+    "value": "0000000167",
+    "label": "PROCEDIMENTO ESPECIAL DOS CRIMES DE ABUSO DE AUTORIDADE"
+  },
+  {
+    "value": "0000000228",
+    "label": "PROCEDIMENTO INVESTIGATÓRIO CRIMINAL (PIC-MP)"
+  },
+  {
+    "value": "0000100254",
+    "label": "PROCEDIMENTO RELATIVO À POSSE DE MACONHA PARA CONSUMO PESSOAL"
+  },
+  {
+    "value": "0000100036",
+    "label": "PROCEDIMENTOS ESPECIAIS DE JURISDIÇÃO CONTENCIOSA"
+  },
+  {
+    "value": "0000010441",
+    "label": "PROCESSO ADMINISTRATIVO"
+  },
+  {
+    "value": "0000100061",
+    "label": "PROCESSO ADMINISTRATIVO"
+  },
+  {
+    "value": "0000100255",
+    "label": "PROCESSO ADMINISTRATIVO DISCIPLINAR EM FACE DE SERVIDOR"
+  },
+  {
+    "value": "0000100121",
+    "label": "PROCESSO DE APURAÇÃO DE ATO INFRACIONAL"
+  },
+  {
+    "value": "0000000136",
+    "label": "PRODUÇÃO ANTECIPADA DA PROVA"
+  },
+  {
+    "value": "0000100058",
+    "label": "PRODUÇÃO ANTECIPADA DE PROVAS CRIMINAL"
+  },
+  {
+    "value": "0000000137",
+    "label": "PROTESTO"
+  },
+  {
+    "value": "0000000172",
+    "label": "PROTESTO FORMADO A BORDO"
+  },
+  {
+    "value": "0000100090",
+    "label": "PROVIDÊNCIA"
+  },
+  {
+    "value": "0000100060",
+    "label": "QUESTÕES E PROCESSOS INCIDENTES"
+  },
+  {
+    "value": "0000000187",
+    "label": "REABILITAÇÃO"
+  },
+  {
+    "value": "0000100242",
+    "label": "RECLAMAÇÃO CRIMINAL"
+  },
+  {
+    "value": "0000014583",
+    "label": "RECLAMAÇÃO PRÉ-PROCESSUAL"
+  },
+  {
+    "value": "0000100142",
+    "label": "RECONHECIMENTO E EXTINÇÃO DE UNIÃO ESTÁVEL"
+  },
+  {
+    "value": "0000100046",
+    "label": "RECUPERAÇÃO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000100047",
+    "label": "RECUPERAÇÃO JUDICIAL"
+  },
+  {
+    "value": "0000000181",
+    "label": "RECURSO EM SENTIDO ESTRITO"
+  },
+  {
+    "value": "0000100143",
+    "label": "RECURSO EM SENTIDO ESTRITO/RECURSO EX OFFICIO"
+  },
+  {
+    "value": "0000000176",
+    "label": "RECURSO INOMINADO CÍVEL"
+  },
+  {
+    "value": "0000100235",
+    "label": "REGIME CENTRALIZADO DE EXECUÇÕES"
+  },
+  {
+    "value": "0000100048",
+    "label": "REGISTRO DE CASAMENTO NUNCUPATIVO"
+  },
+  {
+    "value": "0000100049",
+    "label": "REGISTRO TORRENS"
+  },
+  {
+    "value": "0000014553",
+    "label": "REGULAÇÃO DE AVARIA GROSSA"
+  },
+  {
+    "value": "0000100021",
+    "label": "REGULAMENTAÇÃO DA CONVIÊNCIA FAMILIAR"
+  },
+  {
+    "value": "0000100089",
+    "label": "REGULARIZAÇÃO DE REGISTRO CIVIL"
+  },
+  {
+    "value": "0000000224",
+    "label": "REINTEGRAÇÃO / MANUTENÇÃO DE POSSE"
+  },
+  {
+    "value": "0000100120",
+    "label": "RELATÓRIO DE INVESTIGAÇÕES"
+  },
+  {
+    "value": "0000100052",
+    "label": "RELATÓRIO FALIMENTAR"
+  },
+  {
+    "value": "0000100240",
+    "label": "RELAXAMENTO DE PRISÃO"
+  },
+  {
+    "value": "0000100246",
+    "label": "REMESSA NECESSÁRIA CRIMINAL"
+  },
+  {
+    "value": "0000000222",
+    "label": "REMIÇÃO DO IMÓVEL HIPOTECADO"
+  },
+  {
+    "value": "0000100033",
+    "label": "REMOÇÃO DE INVENTARIANTE"
+  },
+  {
+    "value": "0000100104",
+    "label": "REMOÇÃO, MODIFICAÇÃO E DISPENSA DE TUTOR OU CURADOR"
+  },
+  {
+    "value": "0000000033",
+    "label": "RENOVATÓRIA DE LOCAÇÃO"
+  },
+  {
+    "value": "0000000186",
+    "label": "REPRESENTAÇÃO CRIMINAL/NOTÍCIA DE CRIME"
+  },
+  {
+    "value": "0000100233",
+    "label": "REQUERIMENTO DE APREENSÃO DE VEÍCULO"
+  },
+  {
+    "value": "0000100236",
+    "label": "REQUERIMENTO DE REINTEGRAÇÃO DE POSSE"
+  },
+  {
+    "value": "0000100107",
+    "label": "RESTABELECIMENTO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000000190",
+    "label": "RESTAURAÇÃO DE AUTOS CÍVEL"
+  },
+  {
+    "value": "0000100150",
+    "label": "RESTAURAÇÃO DE AUTOS CÍVEL TR"
+  },
+  {
+    "value": "0000000442",
+    "label": "RESTAURAÇÃO DE AUTOS CRIMINAL"
+  },
+  {
+    "value": "0000100050",
+    "label": "RESTITUIÇÃO DE COISA OU DINHEIRO NA FALÊNCIA DO DEVEDOR EMPRESÁRIO"
+  },
+  {
+    "value": "0000000109",
+    "label": "RESTITUIÇÃO DE COISAS APREENDIDAS"
+  },
+  {
+    "value": "0000100122",
+    "label": "RESTITUIÇÃO DE COISAS APREENDIDAS INFRACIONAL"
+  },
+  {
+    "value": "0000000191",
+    "label": "RETIFICAÇÃO DE REGISTRO DE IMÓVEL"
+  },
+  {
+    "value": "0000100051",
+    "label": "RETIFICAÇÃO OU SUPRIMENTO OU RESTAURAÇÃO DE REGISTRO CIVIL"
+  },
+  {
+    "value": "0000100135",
+    "label": "REVISÃO CRIMINAL"
+  },
+  {
+    "value": "0000100084",
+    "label": "REVISÃO JUDICIAL DE DECISÃO DO CONSELHO TUTELAR"
+  },
+  {
+    "value": "0000000035",
+    "label": "REVISIONAL DE ALUGUEL"
+  },
+  {
+    "value": "0000100022",
+    "label": "SEPARAÇÃO CONSENSUAL"
+  },
+  {
+    "value": "0000100144",
+    "label": "SEPARAÇÃO CONTENCIOSA"
+  },
+  {
+    "value": "0000000215",
+    "label": "SEQUESTRO"
+  },
+  {
+    "value": "0000100025",
+    "label": "SOBREPARTILHA"
+  },
+  {
+    "value": "0000100026",
+    "label": "SONEGADOS"
+  },
+  {
+    "value": "0000100087",
+    "label": "SUPRIMENTO DE CAPACIDADE OU DE CONSENTIMENTO PARA CASAR"
+  },
+  {
+    "value": "0000100027",
+    "label": "SUPRIMENTO DE IDADE E/OU CONSENTIMENTO"
+  },
+  {
+    "value": "0000100251",
+    "label": "SUSPENSÃO DE SEGURANÇA CÍVEL"
+  },
+  {
+    "value": "0000100253",
+    "label": "SUSPENSÃO DE SEGURANÇA CÍVEL TR"
+  },
+  {
+    "value": "0000100230",
+    "label": "SUSPENSÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000000195",
+    "label": "TERMO CIRCUNSTANCIADO"
+  },
+  {
+    "value": "0000100145",
+    "label": "TOMADA DE DECISÃO APOIADA"
+  },
+  {
+    "value": "0000014552",
+    "label": "TUTELA ANTECIPADA ANTECEDENTE"
+  },
+  {
+    "value": "0000100097",
+    "label": "TUTELA C/C DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000014551",
+    "label": "TUTELA CAUTELAR ANTECEDENTE"
+  },
+  {
+    "value": "0000100038",
+    "label": "TUTELA CÍVEL"
+  },
+  {
+    "value": "0000100096",
+    "label": "TUTELA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100030",
+    "label": "TUTELA PROVISÓRIA"
+  },
+  {
+    "value": "0000000025",
+    "label": "USUCAPIÃO"
+  },
+  {
+    "value": "0000100000",
+    "label": "ABERTURA, REGISTRO E CUMPRIMENTO DE TESTAMENTO"
+  },
+  {
+    "value": "0000000003",
+    "label": "AÇÃO CIVIL COLETIVA"
+  },
+  {
+    "value": "0000000002",
+    "label": "AÇÃO CIVIL DE IMPROBIDADE ADMINISTRATIVA"
+  },
+  {
+    "value": "0000000001",
+    "label": "AÇÃO CIVIL PÚBLICA"
+  },
+  {
+    "value": "0000100072",
+    "label": "AÇÃO CIVIL PÚBLICA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100095",
+    "label": "AÇÃO DE ALIMENTOS DE INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000218",
+    "label": "AÇÃO DE EXIGIR CONTAS"
+  },
+  {
+    "value": "0000100037",
+    "label": "AÇÃO DE PARTILHA"
+  },
+  {
+    "value": "0000000230",
+    "label": "AÇÃO PENAL - PROCEDIMENTO ORDINÁRIO"
+  },
+  {
+    "value": "0000000171",
+    "label": "AÇÃO PENAL - PROCEDIMENTO SUMÁRIO"
+  },
+  {
+    "value": "0000000165",
+    "label": "AÇÃO PENAL - PROCEDIMENTO SUMARÍSSIMO"
+  },
+  {
+    "value": "0000000169",
+    "label": "AÇÃO PENAL DE COMPETÊNCIA DO JÚRI"
+  },
+  {
+    "value": "0000000032",
+    "label": "AÇÃO POPULAR"
+  },
+  {
+    "value": "0000014627",
+    "label": "ACORDO DE NÃO PERSECUÇÃO CÍVEL"
+  },
+  {
+    "value": "0000100244",
+    "label": "ACORDO DE NÃO PERSECUÇÃO PENAL"
+  },
+  {
+    "value": "0000100098",
+    "label": "ADOÇÃO"
+  },
+  {
+    "value": "0000100225",
+    "label": "ADOÇÃO FORA DO CADASTRO"
+  },
+  {
+    "value": "0000100226",
+    "label": "ADOÇÃO FORA DO CADASTRO c/c DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000100227",
+    "label": "ADOÇÃO PELO CADASTRO"
+  },
+  {
+    "value": "0000000037",
+    "label": "AGRAVO DE EXECUÇÃO PENAL"
+  },
+  {
+    "value": "0000000038",
+    "label": "AGRAVO DE INSTRUMENTO"
+  },
+  {
+    "value": "0000000464",
+    "label": "AGRAVO DE INSTRUMENTO TR"
+  },
+  {
+    "value": "0000100250",
+    "label": "AGRAVO INTERNO CÍVEL"
+  },
+  {
+    "value": "0000100245",
+    "label": "AGRAVO INTERNO CRIMINAL"
+  },
+  {
+    "value": "0000000203",
+    "label": "ALIENAÇÃO DE BENS DO ACUSADO"
+  },
+  {
+    "value": "0000000045",
+    "label": "ALIENAÇÃO JUDICIAL DE BENS"
+  },
+  {
+    "value": "0000000004",
+    "label": "ALIMENTOS - LEI ESPECIAL Nº 5.478/68"
+  },
+  {
+    "value": "0000100001",
+    "label": "ALTERAÇÃO DE REGIME DE BENS"
+  },
+  {
+    "value": "0000100002",
+    "label": "ALVARÁ JUDICIAL - LEI 6858/80"
+  },
+  {
+    "value": "0000000048",
+    "label": "APELAÇÃO CRIMINAL"
+  },
+  {
+    "value": "0000100086",
+    "label": "APURAÇÃO DE INFRAÇÃO ADMINISTRATIVA ÀS NORMAS DE PROTEÇÃO À CRIANÇA OU ADOLESCENTE"
+  },
+  {
+    "value": "0000100085",
+    "label": "APURAÇÃO DE IRREGULARIDADES EM ENTIDADES DE ATENDIMENTO"
+  },
+  {
+    "value": "0000100003",
+    "label": "ARRECADAÇÃO DAS COISAS VAGAS"
+  },
+  {
+    "value": "0000000214",
+    "label": "ARRESTO / HIPOTECA LEGAL"
+  },
+  {
+    "value": "0000100004",
+    "label": "ARROLAMENTO COMUM"
+  },
+  {
+    "value": "0000100005",
+    "label": "ARROLAMENTO SUMÁRIO"
+  },
+  {
+    "value": "0000100118",
+    "label": "AUTO DE APREENSÃO EM FLAGRANTE"
+  },
+  {
+    "value": "0000100092",
+    "label": "AUTORIZAÇÃO JUDICIAL"
+  },
+  {
+    "value": "0000000204",
+    "label": "AVALIAÇÃO PARA ATESTAR DEPENDÊNCIA DE DROGAS"
+  },
+  {
+    "value": "0000100042",
+    "label": "AVERIGUAÇÃO DE PATERNIDADE"
+  },
+  {
+    "value": "0000100119",
+    "label": "BOLETIM DE OCORRÊNCIA CIRCUNSTANCIADA"
+  },
+  {
+    "value": "0000000007",
+    "label": "BUSCA E APREENSÃO EM ALIENAÇÃO FIDUCIÁRIA"
+  },
+  {
+    "value": "0000100076",
+    "label": "BUSCA E APREENSÃO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100112",
+    "label": "BUSCA E APREENSÃO INFRACIONAL"
+  },
+  {
+    "value": "0000000057",
+    "label": "CANCELAMENTO DE NATURALIZAÇÃO"
+  },
+  {
+    "value": "0000014550",
+    "label": "CARTA ARBITRAL"
+  },
+  {
+    "value": "0000100158",
+    "label": "CARTA ARBITRAL"
+  },
+  {
+    "value": "0000000058",
+    "label": "CARTA DE ORDEM CÍVEL"
+  },
+  {
+    "value": "0000014603",
+    "label": "CARTA DE ORDEM CÍVEL"
+  },
+  {
+    "value": "0000100055",
+    "label": "CARTA DE ORDEM CRIMINAL"
+  },
+  {
+    "value": "0000100063",
+    "label": "CARTA DE ORDEM INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100115",
+    "label": "CARTA DE ORDEM INFRACIONAL"
+  },
+  {
+    "value": "0000100054",
+    "label": "CARTA PRECATÓRIA CÍVEL"
+  },
+  {
+    "value": "0000100132",
+    "label": "CARTA PRECATÓRIA CRIMINAL"
+  },
+  {
+    "value": "0000100064",
+    "label": "CARTA PRECATÓRIA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100133",
+    "label": "CARTA PRECATÓRIA INFRACIONAL"
+  },
+  {
+    "value": "0000000061",
+    "label": "CARTA ROGATÓRIA CÍVEL"
+  },
+  {
+    "value": "0000014545",
+    "label": "CARTA ROGATÓRIA CRIMINAL"
+  },
+  {
+    "value": "0000000062",
+    "label": "CARTA TESTEMUNHÁVEL"
+  },
+  {
+    "value": "0000000139",
+    "label": "CAUTELAR FISCAL"
+  },
+  {
+    "value": "0000014586",
+    "label": "CAUTELAR INOMINADA CRIMINAL"
+  },
+  {
+    "value": "0000100077",
+    "label": "CAUTELAR INOMINADA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100155",
+    "label": "CLASSIFICAÇÃO DE CRÉDITO PÚBLICO"
+  },
+  {
+    "value": "0000000008",
+    "label": "COBRANÇA DE CÉDULA DE CRÉDITO INDUSTRIAL"
+  },
+  {
+    "value": "0000000009",
+    "label": "COMPROMISSO ARBITRAL"
+  },
+  {
+    "value": "0000100173",
+    "label": "COMUNICADO DE MANDADO DE PRISÃO"
+  },
+  {
+    "value": "0000100006",
+    "label": "CONFIRMAÇÃO DE TESTAMENTO"
+  },
+  {
+    "value": "0000000066",
+    "label": "CONFLITO DE COMPETÊNCIA CÍVEL"
+  },
+  {
+    "value": "0000100252",
+    "label": "CONFLITO DE COMPETÊNCIA CÍVEL TR"
+  },
+  {
+    "value": "0000100065",
+    "label": "CONFLITO DE COMPETÊNCIA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000358",
+    "label": "CONFLITO DE JURISDIÇÃO"
+  },
+  {
+    "value": "0000000011",
+    "label": "CONSIGNAÇÃO EM PAGAMENTO"
+  },
+  {
+    "value": "0000000010",
+    "label": "CONSIGNATÓRIA DE ALUGUÉIS"
+  },
+  {
+    "value": "0000100124",
+    "label": "CONTESTAÇÃO EM FORO DIVERSO"
+  },
+  {
+    "value": "0000100007",
+    "label": "CONVERSÃO DE SEPARAÇÃO JUDICIAL EM DIVÓRCIO"
+  },
+  {
+    "value": "0000100149",
+    "label": "CORREIÇÃO PARCIAL CÍVEL"
+  },
+  {
+    "value": "0000000370",
+    "label": "CORREIÇÃO PARCIAL CRIMINAL"
+  },
+  {
+    "value": "0000000221",
+    "label": "CRIMES AMBIENTAIS"
+  },
+  {
+    "value": "0000000166",
+    "label": "CRIMES CONTRA A PROPRIEDADE IMATERIAL"
+  },
+  {
+    "value": "0000100079",
+    "label": "CRIMES CONTRA A PROPRIEDADE INDUSTRIAL"
+  },
+  {
+    "value": "0000100080",
+    "label": "CRIMES CONTRA A PROPRIEDADE INTELECTUAL"
+  },
+  {
+    "value": "0000000168",
+    "label": "CRIMES DE CALÚNIA, INJÚRIA E DIFAMAÇÃO DE COMPETÊNCIA DO JUIZ SINGULAR"
+  },
+  {
+    "value": "0000000164",
+    "label": "CRIMES DE IMPRENSA"
+  },
+  {
+    "value": "0000000170",
+    "label": "CRIMES DE RESPONSABILIDADE DOS FUNCIONÁRIOS PÚBLICOS"
+  },
+  {
+    "value": "0000000220",
+    "label": "CUMPRIMENTO DE SENTENÇA"
+  },
+  {
+    "value": "0000100083",
+    "label": "CUMPRIMENTO DE SENTENÇA - CENTRASE CÍVEL BH"
+  },
+  {
+    "value": "0000100258",
+    "label": "CUMPRIMENTO DE SENTENÇA - CENTRASE FAZENDÁRIA BH"
+  },
+  {
+    "value": "0000100136",
+    "label": "CUMPRIMENTO DE SENTENÇA - LEI ARBITRAL (LEI 9.307/1996)"
+  },
+  {
+    "value": "0000100237",
+    "label": "CUMPRIMENTO DE SENTENÇA - RECLAMAÇÃO PRÉ-PROCESSUAL"
+  },
+  {
+    "value": "0000014559",
+    "label": "CUMPRIMENTO DE SENTENÇA CONTRA A FAZENDA PÚBLICA"
+  },
+  {
+    "value": "0000100247",
+    "label": "CUMPRIMENTO DE SENTENÇA CONTRA A FAZENDA PÚBLICA - CENTRASE BH"
+  },
+  {
+    "value": "0000100238",
+    "label": "CUMPRIMENTO DE SENTENÇA CONTRA A FAZENDA PÚBLICA MEDIANTE EXECUÇÃO INVERTIDA"
+  },
+  {
+    "value": "0000014640",
+    "label": "Cumprimento de Sentença de Ações Coletivas"
+  },
+  {
+    "value": "0000100221",
+    "label": "CUMPRIMENTO DE SENTENÇA DE AÇÕES COLETIVAS"
+  },
+  {
+    "value": "0000100040",
+    "label": "CUMPRIMENTO DE SENTENÇA DE OBRIGAÇÃO DE PRESTAR ALIMENTOS"
+  },
+  {
+    "value": "0000014638",
+    "label": "Cumprimento Provisório de Decisão"
+  },
+  {
+    "value": "0000100008",
+    "label": "CUMPRIMENTO PROVISÓRIO DE DECISÃO"
+  },
+  {
+    "value": "0000100222",
+    "label": "CUMPRIMENTO PROVISÓRIO DE SENTEÇA DE AÇÕES COLETIVAS"
+  },
+  {
+    "value": "0000000199",
+    "label": "CUMPRIMENTO PROVISÓRIO DE SENTENÇA"
+  },
+  {
+    "value": "0000014642",
+    "label": "Cumprimento Provisório de Sentença de Ações Coletivas"
+  },
+  {
+    "value": "0000000068",
+    "label": "DECLARAÇÃO DE AUSÊNCIA"
+  },
+  {
+    "value": "0000000219",
+    "label": "DEMARCAÇÃO / DIVISÃO"
+  },
+  {
+    "value": "0000000014",
+    "label": "DEPÓSITO DA LEI 8.866/94"
+  },
+  {
+    "value": "0000000070",
+    "label": "DESAFORAMENTO DE JULGAMENTO"
+  },
+  {
+    "value": "0000000015",
+    "label": "DESAPROPRIAÇÃO"
+  },
+  {
+    "value": "0000000016",
+    "label": "DESAPROPRIAÇÃO IMÓVEL RURAL POR INTERESSE SOCIAL"
+  },
+  {
+    "value": "0000000017",
+    "label": "DESPEJO"
+  },
+  {
+    "value": "0000000209",
+    "label": "DESPEJO POR FALTA DE PAGAMENTO"
+  },
+  {
+    "value": "0000000208",
+    "label": "DESPEJO POR FALTA DE PAGAMENTO CUMULADO COM COBRANÇA"
+  },
+  {
+    "value": "0000100243",
+    "label": "DESTINAÇÃO DE BENS APREENDIDOS"
+  },
+  {
+    "value": "0000100228",
+    "label": "DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000000027",
+    "label": "DISCRIMINATÓRIA"
+  },
+  {
+    "value": "0000014558",
+    "label": "DISSOLUÇÃO PARCIAL DE SOCIEDADE"
+  },
+  {
+    "value": "0000100220",
+    "label": "DIVÓRCIO CONSENSUAL"
+  },
+  {
+    "value": "0000100010",
+    "label": "DIVÓRCIO LITIGIOSO"
+  },
+  {
+    "value": "0000000069",
+    "label": "DÚVIDA"
+  },
+  {
+    "value": "0000100088",
+    "label": "EMANCIPAÇÃO"
+  },
+  {
+    "value": "0000100034",
+    "label": "EMBARGOS"
+  },
+  {
+    "value": "0000000073",
+    "label": "EMBARGOS À EXECUÇÃO"
+  },
+  {
+    "value": "0000000074",
+    "label": "EMBARGOS À EXECUÇÃO FISCAL"
+  },
+  {
+    "value": "0000100011",
+    "label": "EMBARGOS DE DECLARAÇÃO CÍVEL"
+  },
+  {
+    "value": "0000000079",
+    "label": "EMBARGOS DE TERCEIRO CÍVEL"
+  },
+  {
+    "value": "0000014596",
+    "label": "EMBARGOS DE TERCEIRO CRIMINAL"
+  },
+  {
+    "value": "0000100073",
+    "label": "EMBARGOS DE TERCEIRO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000202",
+    "label": "EMBARGOS DO ACUSADO"
+  },
+  {
+    "value": "0000000772",
+    "label": "EMBARGOS INFRINGENTES E DE NULIDADE"
+  },
+  {
+    "value": "0000100257",
+    "label": "EMBARGOS INFRINGENTES NA EXECUÇÃO FISCAL"
+  },
+  {
+    "value": "0000100137",
+    "label": "EMBARGOS PARCIAIS À AÇÃO MONITÓRIA"
+  },
+  {
+    "value": "0000100159",
+    "label": "ENTREGA VOLUNTÁRIA"
+  },
+  {
+    "value": "0000000083",
+    "label": "EXCEÇÃO DA VERDADE"
+  },
+  {
+    "value": "0000000084",
+    "label": "EXCEÇÃO DE COISA JULGADA"
+  },
+  {
+    "value": "0000000085",
+    "label": "EXCEÇÃO DE ILEGITIMIDADE DE PARTE"
+  },
+  {
+    "value": "0000000089",
+    "label": "EXCEÇÃO DE INCOMPETÊNCIA DE JUÍZO"
+  },
+  {
+    "value": "0000000090",
+    "label": "EXCEÇÃO DE LITISPENDÊNCIA"
+  },
+  {
+    "value": "0000000097",
+    "label": "EXECUÇÃO DA PENA"
+  },
+  {
+    "value": "0000100102",
+    "label": "EXECUÇÃO DE ALIMENTOS INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100103",
+    "label": "EXECUÇÃO DE MEDIDA DE PROTEÇÃO À CRIANÇA E ADOLESCENTE"
+  },
+  {
+    "value": "0000100224",
+    "label": "EXECUÇÃO DE MEDIDAS ALTERNATIVAS NOS JUIZADOS ESPECIAIS"
+  },
+  {
+    "value": "0000100123",
+    "label": "EXECUÇÃO DE MEDIDAS SOCIOEDUCATIVAS"
+  },
+  {
+    "value": "0000100093",
+    "label": "EXECUÇÃO DE MULTA"
+  },
+  {
+    "value": "0000000094",
+    "label": "EXECUÇÃO DE TÍTULO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000014557",
+    "label": "EXECUÇÃO DE TÍTULO EXTRAJUDICIAL CONTRA A FAZENDA PÚBLICA"
+  },
+  {
+    "value": "0000100041",
+    "label": "EXECUÇÃO EXTRAJUDICIAL DE ALIMENTOS"
+  },
+  {
+    "value": "0000000095",
+    "label": "EXECUÇÃO FISCAL"
+  },
+  {
+    "value": "0000100062",
+    "label": "EXECUÇÃO FISCAL (UNIÃO)"
+  },
+  {
+    "value": "0000000096",
+    "label": "EXECUÇÃO HIPOTECÁRIA DO SISTEMA FINANCEIRO DA HABITAÇÃO"
+  },
+  {
+    "value": "0000000099",
+    "label": "EXIBIÇÃO DE DOCUMENTO OU COISA CÍVEL"
+  },
+  {
+    "value": "0000100139",
+    "label": "EXIBIÇÃO DE DOCUMENTO OU COISA CRIMINAL"
+  },
+  {
+    "value": "0000100066",
+    "label": "EXIBIÇÃO DE DOCUMENTO OU COISA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000196",
+    "label": "EXPROPRIAÇÃO DA LEI 8.257/91"
+  },
+  {
+    "value": "0000100140",
+    "label": "EXTINÇÃO CONSENSUAL DE UNIÃO ESTÁVEL"
+  },
+  {
+    "value": "0000100141",
+    "label": "EXTINÇÃO DAS OBRIGAÇÕES DO FALIDO"
+  },
+  {
+    "value": "0000100043",
+    "label": "FALÊNCIA DE EMPRESÁRIOS, SOCIEDADES EMPRESÁRIAIS, MICROEMPRESAS E EMPRESAS DE PEQUENO PORTE"
+  },
+  {
+    "value": "0000100108",
+    "label": "GUARDA C/C DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000100156",
+    "label": "GUARDA DE FAMÍLIA"
+  },
+  {
+    "value": "0000100100",
+    "label": "GUARDA DE INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000100",
+    "label": "HABEAS CORPUS CÍVEL"
+  },
+  {
+    "value": "0000000249",
+    "label": "HABEAS CORPUS CÍVEL TR"
+  },
+  {
+    "value": "0000100248",
+    "label": "HABEAS CORPUS CRIMINAL"
+  },
+  {
+    "value": "0000000101",
+    "label": "HABEAS DATA CÍVEL"
+  },
+  {
+    "value": "0000100241",
+    "label": "HABEAS DATA CRIMINAL"
+  },
+  {
+    "value": "0000000102",
+    "label": "HABILITAÇÃO"
+  },
+  {
+    "value": "0000100035",
+    "label": "HABILITAÇÃO DE CRÉDITO"
+  },
+  {
+    "value": "0000100105",
+    "label": "HABILITAÇÃO PARA ADOÇÃO"
+  },
+  {
+    "value": "0000100229",
+    "label": "HABILITAÇÃO PARA ADOÇÃO"
+  },
+  {
+    "value": "0000100053",
+    "label": "HABILITAÇÃO PARA CASAMENTO"
+  },
+  {
+    "value": "0000100014",
+    "label": "HERANÇA JACENTE"
+  },
+  {
+    "value": "0000000210",
+    "label": "HOMOLOGAÇÃO DE TRANSAÇÃO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000000130",
+    "label": "HOMOLOGAÇÃO DO PENHOR LEGAL"
+  },
+  {
+    "value": "0000100081",
+    "label": "HOMOLOGAÇÃO EM ACORDO DE COLABORAÇÃO PREMIADA"
+  },
+  {
+    "value": "0000000020",
+    "label": "IMISSÃO NA POSSE"
+  },
+  {
+    "value": "0000100067",
+    "label": "IMPUGNAÇÃO AO VALOR DA CAUSA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100044",
+    "label": "IMPUGNAÇÃO DE CRÉDITO"
+  },
+  {
+    "value": "0000014595",
+    "label": "INCIDENTE DE DESCONSIDERAÇÃO DE PERSONALIDADE JURÍDICA"
+  },
+  {
+    "value": "0000000107",
+    "label": "INCIDENTE DE FALSIDADE"
+  },
+  {
+    "value": "0000100068",
+    "label": "INCIDENTE DE FALSIDADE INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000014547",
+    "label": "INCIDENTE DE IMPEDIMENTO CÍVEL"
+  },
+  {
+    "value": "0000100147",
+    "label": "INCIDENTE DE IMPEDIMENTO CÍVEL TR"
+  },
+  {
+    "value": "0000100069",
+    "label": "INCIDENTE DE IMPEDIMENTO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100110",
+    "label": "INCIDENTE DE SANIDADE MENTAL"
+  },
+  {
+    "value": "0000014556",
+    "label": "INCIDENTE DE SUSPEIÇÃO CÍVEL"
+  },
+  {
+    "value": "0000100148",
+    "label": "INCIDENTE DE SUSPEIÇÃO CÍVEL TR"
+  },
+  {
+    "value": "0000100070",
+    "label": "INCIDENTE DE SUSPEIÇÃO INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100015",
+    "label": "INCIDENTES"
+  },
+  {
+    "value": "0000100059",
+    "label": "INCIDENTES"
+  },
+  {
+    "value": "0000100045",
+    "label": "INQUÉRITO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000000112",
+    "label": "INQUÉRITO POLICIAL"
+  },
+  {
+    "value": "0000000108",
+    "label": "INSANIDADE MENTAL DO ACUSADO"
+  },
+  {
+    "value": "0000100016",
+    "label": "INSOLVÊNCIA REQUERIDA PELO CREDOR"
+  },
+  {
+    "value": "0000100017",
+    "label": "INSOLVÊNCIA REQUERIDA PELO DEVEDOR OU PELO ESPÓLIO"
+  },
+  {
+    "value": "0000100018",
+    "label": "INSTRUÇÃO DE RESCISÓRIA"
+  },
+  {
+    "value": "0000100019",
+    "label": "INTERDIÇÃO/CURATELA"
+  },
+  {
+    "value": "0000000113",
+    "label": "INTERDITO PROIBITÓRIO"
+  },
+  {
+    "value": "0000100113",
+    "label": "INTERNAÇÃO PROVISÓRIA"
+  },
+  {
+    "value": "0000000132",
+    "label": "INTERPELAÇÃO"
+  },
+  {
+    "value": "0000100020",
+    "label": "INVENTÁRIO"
+  },
+  {
+    "value": "0000014554",
+    "label": "LIQUIDAÇÃO DE SETENÇA PELO PROCEDIMENTO COMUM"
+  },
+  {
+    "value": "0000000115",
+    "label": "LIQUIDAÇÃO POR ARBITRAMENTO"
+  },
+  {
+    "value": "0000000116",
+    "label": "LIQUIDAÇÃO POR ARTIGOS"
+  },
+  {
+    "value": "0000014555",
+    "label": "LIQUIDAÇÃO PROVISÓRIA DE SENTENÇA PELO PROCEDIMENTO COMUM"
+  },
+  {
+    "value": "0000000212",
+    "label": "LIQUIDAÇÃO PROVISÓRIA POR ARBITRAMENTO"
+  },
+  {
+    "value": "0000000213",
+    "label": "LIQUIDAÇÃO PROVISÓRIA POR ARTIGOS"
+  },
+  {
+    "value": "0000000331",
+    "label": "MANDADO DE INJUNÇÃO"
+  },
+  {
+    "value": "0000000118",
+    "label": "MANDADO DE SEGURANÇA CÍVEL"
+  },
+  {
+    "value": "0000000255",
+    "label": "MANDADO DE SEGURANÇA CÍVEL TR"
+  },
+  {
+    "value": "0000000119",
+    "label": "MANDADO DE SEGURANÇA COLETIVO"
+  },
+  {
+    "value": "0000100249",
+    "label": "MANDADO DE SEGURANÇA CRIMINAL"
+  },
+  {
+    "value": "0000100091",
+    "label": "MANDADO DE SEGURANÇA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100231",
+    "label": "MEDIDAS DE PROTEÇÃO - CRIANÇA E ADOLESCENTE (LEI 13.431) INFRACIONAIS"
+  },
+  {
+    "value": "0000100078",
+    "label": "MEDIDAS DE PROTEÇÃO À PESSOA IDOSA - CRIMINAL"
+  },
+  {
+    "value": "0000000163",
+    "label": "MEDIDAS INVESTIGATÓRIAS SOBRE ORGANIZAÇÕES CRIMINOSAS"
+  },
+  {
+    "value": "0000100210",
+    "label": "MEDIDAS PROTETIVAS - CRIANÇA E ADOLESCENTE (LEI 13.431) CRIMINAIS"
+  },
+  {
+    "value": "0000100116",
+    "label": "MEDIDAS PROTETIVAS - ESTATUTO DO IDOSO INFRACIONAL"
+  },
+  {
+    "value": "0000100232",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA (LEI MARIA DA PENHA) - CÍVEL"
+  },
+  {
+    "value": "0000100056",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA (LEI MARIA DA PENHA) CRIMINAL"
+  },
+  {
+    "value": "0000100117",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA (LEI MARIA DA PENHA) INFRACIONAL"
+  },
+  {
+    "value": "0000100219",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA-CRIANÇAS E ADOLESCENTES(LEI HENRY BOREL-LEI 14.344/2022) CRIMINAIS"
+  },
+  {
+    "value": "0000100211",
+    "label": "MEDIDAS PROTETIVAS DE URGÊNCIA-CRIANÇAS E ADOLESCENTES(LEI HENRY BOREL-LEI 14.344/2022) INFRACIONAIS"
+  },
+  {
+    "value": "0000000028",
+    "label": "MONITÓRIA"
+  },
+  {
+    "value": "0000000141",
+    "label": "NATURALIZAÇÃO"
+  },
+  {
+    "value": "0000000216",
+    "label": "NOMEAÇÃO DE ADVOGADO"
+  },
+  {
+    "value": "0000000134",
+    "label": "NOTIFICAÇÃO"
+  },
+  {
+    "value": "0000000143",
+    "label": "NOTIFICAÇÃO PARA EXPLICAÇÕES"
+  },
+  {
+    "value": "0000000206",
+    "label": "NOTIFICAÇÃO PARA EXPLICAÇÕES (LEI DE IMPRENSA)"
+  },
+  {
+    "value": "0000000144",
+    "label": "OPÇÃO DE NACIONALIDADE"
+  },
+  {
+    "value": "0000000145",
+    "label": "OPOSIÇÃO"
+  },
+  {
+    "value": "0000000146",
+    "label": "ORGANIZAÇÃO E FISCALIZAÇÃO DE FUNDAÇÃO"
+  },
+  {
+    "value": "0000000227",
+    "label": "OUTROS PROCEDIMENTOS DE JURISDIÇÃO VOLUNTÁRIA"
+  },
+  {
+    "value": "0000000149",
+    "label": "PEDIDO DE BUSCA E APREENSÃO CRIMINAL"
+  },
+  {
+    "value": "0000012248",
+    "label": "Pedido de Cooperação Judiciária (Seção)"
+  },
+  {
+    "value": "0000100114",
+    "label": "PEDIDO DE DESINTERNAÇÃO/REAVALIAÇÃO/SUBSTITUIÇÃO/SUSPENSÃO DA MEDIDA"
+  },
+  {
+    "value": "0000100256",
+    "label": "PEDIDO DE INCLUSÃO NO CADASTRO DE PROGRAMA DE APADRINHAMENTO"
+  },
+  {
+    "value": "0000000150",
+    "label": "PEDIDO DE LIBERDADE PROVISÓRIA COM OU SEM FIANÇA"
+  },
+  {
+    "value": "0000100106",
+    "label": "PEDIDO DE MEDIDA DE PROTEÇÃO"
+  },
+  {
+    "value": "0000000153",
+    "label": "PEDIDO DE PRISÃO PREVENTIVA"
+  },
+  {
+    "value": "0000000154",
+    "label": "PEDIDO DE PRISÃO TEMPORÁRIA"
+  },
+  {
+    "value": "0000000155",
+    "label": "PEDIDO DE QUEBRA DE SIGILO DE DADOS E/OU TELEFÔNICO"
+  },
+  {
+    "value": "0000000156",
+    "label": "PEDIDO DE RESPOSTA OU RETIFICAÇÃO DA LEI DE IMPRENSA"
+  },
+  {
+    "value": "0000100154",
+    "label": "PEDIDO DE UNIFORMIZAÇÃO DE INTERPRETAÇÃO DE LEI CÍVEL"
+  },
+  {
+    "value": "0000014521",
+    "label": "PETIÇÃO ADMINISTRATIVA/PENITENCIÁRIA FEDERAL"
+  },
+  {
+    "value": "0000014599",
+    "label": "PETIÇÃO CÍVEL"
+  },
+  {
+    "value": "0000100212",
+    "label": "PETIÇÃO CRIMINAL"
+  },
+  {
+    "value": "0000100071",
+    "label": "PETIÇÃO INFÂNCIA E JUVENTUDE CÍVEL"
+  },
+  {
+    "value": "0000100111",
+    "label": "PETIÇÃO INFRACIONAL"
+  },
+  {
+    "value": "0000100074",
+    "label": "PRESTAÇÃO DE CONTAS INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000000029",
+    "label": "PROCEDIMENTO COMUM CÍVEL"
+  },
+  {
+    "value": "0000100075",
+    "label": "PROCEDIMENTO COMUM INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100032",
+    "label": "PROCEDIMENTO CONCILIATÓRIO"
+  },
+  {
+    "value": "0000100234",
+    "label": "PROCEDIMENTO DE REPACTUAÇÃO DE DÍVIDAS (SUPERENDIVIDAMENTO)"
+  },
+  {
+    "value": "0000000161",
+    "label": "PROCEDIMENTO DO JUIZADO ESPECIAL CÍVEL"
+  },
+  {
+    "value": "0000100146",
+    "label": "PROCEDIMENTO DO JUIZADO ESPECIAL DA FAZENDA PÚBLICA"
+  },
+  {
+    "value": "0000000162",
+    "label": "PROCEDIMENTO ESPECIAL DA LEI ANTITÓXICOS"
+  },
+  {
+    "value": "0000000167",
+    "label": "PROCEDIMENTO ESPECIAL DOS CRIMES DE ABUSO DE AUTORIDADE"
+  },
+  {
+    "value": "0000000228",
+    "label": "PROCEDIMENTO INVESTIGATÓRIO CRIMINAL (PIC-MP)"
+  },
+  {
+    "value": "0000100254",
+    "label": "PROCEDIMENTO RELATIVO À POSSE DE MACONHA PARA CONSUMO PESSOAL"
+  },
+  {
+    "value": "0000100036",
+    "label": "PROCEDIMENTOS ESPECIAIS DE JURISDIÇÃO CONTENCIOSA"
+  },
+  {
+    "value": "0000010441",
+    "label": "PROCESSO ADMINISTRATIVO"
+  },
+  {
+    "value": "0000100061",
+    "label": "PROCESSO ADMINISTRATIVO"
+  },
+  {
+    "value": "0000100255",
+    "label": "PROCESSO ADMINISTRATIVO DISCIPLINAR EM FACE DE SERVIDOR"
+  },
+  {
+    "value": "0000100121",
+    "label": "PROCESSO DE APURAÇÃO DE ATO INFRACIONAL"
+  },
+  {
+    "value": "0000000136",
+    "label": "PRODUÇÃO ANTECIPADA DA PROVA"
+  },
+  {
+    "value": "0000100058",
+    "label": "PRODUÇÃO ANTECIPADA DE PROVAS CRIMINAL"
+  },
+  {
+    "value": "0000000137",
+    "label": "PROTESTO"
+  },
+  {
+    "value": "0000000172",
+    "label": "PROTESTO FORMADO A BORDO"
+  },
+  {
+    "value": "0000100090",
+    "label": "PROVIDÊNCIA"
+  },
+  {
+    "value": "0000100060",
+    "label": "QUESTÕES E PROCESSOS INCIDENTES"
+  },
+  {
+    "value": "0000000187",
+    "label": "REABILITAÇÃO"
+  },
+  {
+    "value": "0000100242",
+    "label": "RECLAMAÇÃO CRIMINAL"
+  },
+  {
+    "value": "0000014583",
+    "label": "RECLAMAÇÃO PRÉ-PROCESSUAL"
+  },
+  {
+    "value": "0000100142",
+    "label": "RECONHECIMENTO E EXTINÇÃO DE UNIÃO ESTÁVEL"
+  },
+  {
+    "value": "0000100046",
+    "label": "RECUPERAÇÃO EXTRAJUDICIAL"
+  },
+  {
+    "value": "0000100047",
+    "label": "RECUPERAÇÃO JUDICIAL"
+  },
+  {
+    "value": "0000000181",
+    "label": "RECURSO EM SENTIDO ESTRITO"
+  },
+  {
+    "value": "0000100143",
+    "label": "RECURSO EM SENTIDO ESTRITO/RECURSO EX OFFICIO"
+  },
+  {
+    "value": "0000000176",
+    "label": "RECURSO INOMINADO CÍVEL"
+  },
+  {
+    "value": "0000100235",
+    "label": "REGIME CENTRALIZADO DE EXECUÇÕES"
+  },
+  {
+    "value": "0000100048",
+    "label": "REGISTRO DE CASAMENTO NUNCUPATIVO"
+  },
+  {
+    "value": "0000100049",
+    "label": "REGISTRO TORRENS"
+  },
+  {
+    "value": "0000014553",
+    "label": "REGULAÇÃO DE AVARIA GROSSA"
+  },
+  {
+    "value": "0000100021",
+    "label": "REGULAMENTAÇÃO DA CONVIÊNCIA FAMILIAR"
+  },
+  {
+    "value": "0000100089",
+    "label": "REGULARIZAÇÃO DE REGISTRO CIVIL"
+  },
+  {
+    "value": "0000000224",
+    "label": "REINTEGRAÇÃO / MANUTENÇÃO DE POSSE"
+  },
+  {
+    "value": "0000100120",
+    "label": "RELATÓRIO DE INVESTIGAÇÕES"
+  },
+  {
+    "value": "0000100052",
+    "label": "RELATÓRIO FALIMENTAR"
+  },
+  {
+    "value": "0000100240",
+    "label": "RELAXAMENTO DE PRISÃO"
+  },
+  {
+    "value": "0000100246",
+    "label": "REMESSA NECESSÁRIA CRIMINAL"
+  },
+  {
+    "value": "0000000222",
+    "label": "REMIÇÃO DO IMÓVEL HIPOTECADO"
+  },
+  {
+    "value": "0000100033",
+    "label": "REMOÇÃO DE INVENTARIANTE"
+  },
+  {
+    "value": "0000100104",
+    "label": "REMOÇÃO, MODIFICAÇÃO E DISPENSA DE TUTOR OU CURADOR"
+  },
+  {
+    "value": "0000000033",
+    "label": "RENOVATÓRIA DE LOCAÇÃO"
+  },
+  {
+    "value": "0000000186",
+    "label": "REPRESENTAÇÃO CRIMINAL/NOTÍCIA DE CRIME"
+  },
+  {
+    "value": "0000100233",
+    "label": "REQUERIMENTO DE APREENSÃO DE VEÍCULO"
+  },
+  {
+    "value": "0000100236",
+    "label": "REQUERIMENTO DE REINTEGRAÇÃO DE POSSE"
+  },
+  {
+    "value": "0000100107",
+    "label": "RESTABELECIMENTO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000000190",
+    "label": "RESTAURAÇÃO DE AUTOS CÍVEL"
+  },
+  {
+    "value": "0000100150",
+    "label": "RESTAURAÇÃO DE AUTOS CÍVEL TR"
+  },
+  {
+    "value": "0000000442",
+    "label": "RESTAURAÇÃO DE AUTOS CRIMINAL"
+  },
+  {
+    "value": "0000100050",
+    "label": "RESTITUIÇÃO DE COISA OU DINHEIRO NA FALÊNCIA DO DEVEDOR EMPRESÁRIO"
+  },
+  {
+    "value": "0000000109",
+    "label": "RESTITUIÇÃO DE COISAS APREENDIDAS"
+  },
+  {
+    "value": "0000100122",
+    "label": "RESTITUIÇÃO DE COISAS APREENDIDAS INFRACIONAL"
+  },
+  {
+    "value": "0000000191",
+    "label": "RETIFICAÇÃO DE REGISTRO DE IMÓVEL"
+  },
+  {
+    "value": "0000100051",
+    "label": "RETIFICAÇÃO OU SUPRIMENTO OU RESTAURAÇÃO DE REGISTRO CIVIL"
+  },
+  {
+    "value": "0000100135",
+    "label": "REVISÃO CRIMINAL"
+  },
+  {
+    "value": "0000100084",
+    "label": "REVISÃO JUDICIAL DE DECISÃO DO CONSELHO TUTELAR"
+  },
+  {
+    "value": "0000000035",
+    "label": "REVISIONAL DE ALUGUEL"
+  },
+  {
+    "value": "0000100022",
+    "label": "SEPARAÇÃO CONSENSUAL"
+  },
+  {
+    "value": "0000100144",
+    "label": "SEPARAÇÃO CONTENCIOSA"
+  },
+  {
+    "value": "0000000215",
+    "label": "SEQUESTRO"
+  },
+  {
+    "value": "0000100025",
+    "label": "SOBREPARTILHA"
+  },
+  {
+    "value": "0000100026",
+    "label": "SONEGADOS"
+  },
+  {
+    "value": "0000100087",
+    "label": "SUPRIMENTO DE CAPACIDADE OU DE CONSENTIMENTO PARA CASAR"
+  },
+  {
+    "value": "0000100027",
+    "label": "SUPRIMENTO DE IDADE E/OU CONSENTIMENTO"
+  },
+  {
+    "value": "0000100251",
+    "label": "SUSPENSÃO DE SEGURANÇA CÍVEL"
+  },
+  {
+    "value": "0000100253",
+    "label": "SUSPENSÃO DE SEGURANÇA CÍVEL TR"
+  },
+  {
+    "value": "0000100230",
+    "label": "SUSPENSÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000000195",
+    "label": "TERMO CIRCUNSTANCIADO"
+  },
+  {
+    "value": "0000100145",
+    "label": "TOMADA DE DECISÃO APOIADA"
+  },
+  {
+    "value": "0000014552",
+    "label": "TUTELA ANTECIPADA ANTECEDENTE"
+  },
+  {
+    "value": "0000100097",
+    "label": "TUTELA C/C DESTITUIÇÃO DO PODER FAMILIAR"
+  },
+  {
+    "value": "0000014551",
+    "label": "TUTELA CAUTELAR ANTECEDENTE"
+  },
+  {
+    "value": "0000100038",
+    "label": "TUTELA CÍVEL"
+  },
+  {
+    "value": "0000100096",
+    "label": "TUTELA INFÂNCIA E JUVENTUDE"
+  },
+  {
+    "value": "0000100030",
+    "label": "TUTELA PROVISÓRIA"
+  },
+  {
+    "value": "0000000025",
+    "label": "USUCAPIÃO"
+  }
+]

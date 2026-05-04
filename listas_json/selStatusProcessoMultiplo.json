@@ -1,0 +1,602 @@
+[
+  {
+    "value": "T",
+    "label": "Todas (exceto baixados e eliminados)"
+  },
+  {
+    "value": "B",
+    "label": "BAIXADO (Todas as situações do grupo)"
+  },
+  {
+    "value": "B|02|B",
+    "label": "ANISTIA-BAIXADO"
+  },
+  {
+    "value": "B|19|B",
+    "label": "BAIXA - Digitalizado"
+  },
+  {
+    "value": "B|16|B",
+    "label": "BAIXA - ERRO DE DISTRIBUIÇÃO"
+  },
+  {
+    "value": "B|18|B",
+    "label": "BAIXA - Gestão Documental"
+  },
+  {
+    "value": "B|20|B",
+    "label": "BAIXA - Oferecida denúncia"
+  },
+  {
+    "value": "B|24|B",
+    "label": "BAIXA - Oferecida representação"
+  },
+  {
+    "value": "B|08|B",
+    "label": "BAIXA - ORDENADO P/ DEPRECANTE"
+  },
+  {
+    "value": "B|23|B",
+    "label": "BAIXA - Pré-cad descartado"
+  },
+  {
+    "value": "B|17|B",
+    "label": "BAIXADO - Reunido/Apensado"
+  },
+  {
+    "value": "B|03|B",
+    "label": "DESISTENCIA-BAIXADO"
+  },
+  {
+    "value": "B|06|B",
+    "label": "DEVOLVIDO-BAIXADO"
+  },
+  {
+    "value": "B|09|B",
+    "label": "ENTREGUE-BAIXADO"
+  },
+  {
+    "value": "B|04|B",
+    "label": "FINDO-BAIXADO"
+  },
+  {
+    "value": "B|05|B",
+    "label": "INCOMPETENCIA-BAIXA"
+  },
+  {
+    "value": "B|01|B",
+    "label": "PAGAMENTO-BAIXADO"
+  },
+  {
+    "value": "B|07|B",
+    "label": "SEM PREPARO-BAIXADO"
+  },
+  {
+    "value": "C",
+    "label": "CONCLUSÃO (Todas as situações do grupo)"
+  },
+  {
+    "value": "M|22|C",
+    "label": "MOVIMENTO-AGUARDA DESPACHO"
+  },
+  {
+    "value": "M|21|C",
+    "label": "MOVIMENTO-AGUARDA SENTENÇA"
+  },
+  {
+    "value": "I",
+    "label": "INQUÉRITO (Todas as situações do grupo)"
+  },
+  {
+    "value": "I|00|I",
+    "label": "RES 63/2009 CJF"
+  },
+  {
+    "value": "L",
+    "label": "SOMENTE SIAPRO (Todas as situações do grupo)"
+  },
+  {
+    "value": "Q|00|L",
+    "label": "ARQUIVADO"
+  },
+  {
+    "value": "L|00|L",
+    "label": "ELIMINADO"
+  },
+  {
+    "value": "M",
+    "label": "MOVIMENTO (Todas as situações do grupo)"
+  },
+  {
+    "value": "A|00|M",
+    "label": "AUTUADO"
+  },
+  {
+    "value": "C|00|M",
+    "label": "CONTABILIZADO"
+  },
+  {
+    "value": "M|00|M",
+    "label": "MOVIMENTO"
+  },
+  {
+    "value": "M|71|M",
+    "label": "MOVIMENTO - ART. 28 LEF"
+  },
+  {
+    "value": "M|77|M",
+    "label": "MOVIMENTO-AG DIGITALIZAÇÃO"
+  },
+  {
+    "value": "M|79|M",
+    "label": "MOVIMENTO-AG MIGRAÇÃO"
+  },
+  {
+    "value": "M|74|M",
+    "label": "MOVIMENTO-REMETIDO À TNU"
+  },
+  {
+    "value": "M|75|M",
+    "label": "MOVIMENTO-REMETIDO À TRU"
+  },
+  {
+    "value": "M|72|M",
+    "label": "MOVIMENTO-REMETIDO AO STF"
+  },
+  {
+    "value": "M|73|M",
+    "label": "MOVIMENTO-REMETIDO AO STJ"
+  },
+  {
+    "value": "M|70|M",
+    "label": "MOVIMENTO-REMETIDO AO TJ"
+  },
+  {
+    "value": "M|76|M",
+    "label": "MOVIMENTO-REMETIDO AO TRF"
+  },
+  {
+    "value": "V|00|M",
+    "label": "VERIFICAÇÃO DE PREVENÇÃO"
+  },
+  {
+    "value": "S",
+    "label": "SUSPENSÃO (Todas as situações do grupo)"
+  },
+  {
+    "value": "M|02|S",
+    "label": "MOVIMENTO-SOBRESTADO"
+  },
+  {
+    "value": "M|67|S",
+    "label": "SUSP/SOBR-Ag.Inst.Sup.A.Digit."
+  },
+  {
+    "value": "M|59|S",
+    "label": "SUSP/SOBR-Agravo remetido"
+  },
+  {
+    "value": "M|66|S",
+    "label": "SUSP/SOBR-Aguarda dec.Inst.Sup"
+  },
+  {
+    "value": "M|45|S",
+    "label": "SUSP/SOBR-Aguarda Dec.T.Sup."
+  },
+  {
+    "value": "M|61|S",
+    "label": "SUSP/SOBR-Aguarda Julg.Agravo."
+  },
+  {
+    "value": "M|46|S",
+    "label": "SUSP/SOBR-Aguarda Julg.Embg."
+  },
+  {
+    "value": "M|63|S",
+    "label": "SUSP/SOBR-Aguarda Pagamento"
+  },
+  {
+    "value": "M|62|S",
+    "label": "SUSP/SOBR-Arquiv.em Secret."
+  },
+  {
+    "value": "M|47|S",
+    "label": "SUSP/SOBR-Art. 265 CPC"
+  },
+  {
+    "value": "M|56|S",
+    "label": "SUSP/SOBR-Autos em restauração"
+  },
+  {
+    "value": "M|40|S",
+    "label": "SUSP/SOBR-Confl.Competência"
+  },
+  {
+    "value": "M|41|S",
+    "label": "SUSP/SOBR-Contin./Conexão"
+  },
+  {
+    "value": "M|48|S",
+    "label": "SUSP/SOBR-Cumpr.Cond.p"
+  },
+  {
+    "value": "M|64|S",
+    "label": "SUSP/SOBR-Déb.Inf.limite."
+  },
+  {
+    "value": "M|49|S",
+    "label": "SUSP/SOBR-Dev./Bens não Loc."
+  },
+  {
+    "value": "M|50|S",
+    "label": "SUSP/SOBR-Diligência Dprcda."
+  },
+  {
+    "value": "M|51|S",
+    "label": "SUSP/SOBR-Incid.Falsidade"
+  },
+  {
+    "value": "M|52|S",
+    "label": "SUSP/SOBR-Incid.Insan.Mental"
+  },
+  {
+    "value": "M|53|S",
+    "label": "SUSP/SOBR-Interv.Terceiros"
+  },
+  {
+    "value": "M|54|S",
+    "label": "SUSP/SOBR-M.Caut.Atentado"
+  },
+  {
+    "value": "M|42|S",
+    "label": "SUSP/SOBR-Oposição"
+  },
+  {
+    "value": "M|60|S",
+    "label": "SUSP/SOBR-P.Dec.Jud.Inc.Unif."
+  },
+  {
+    "value": "M|58|S",
+    "label": "SUSP/SOBR-P.Dec.Jud.Parc.Trib."
+  },
+  {
+    "value": "M|57|S",
+    "label": "SUSP/SOBR-P.Decisão Judicial"
+  },
+  {
+    "value": "M|65|S",
+    "label": "SUSP/SOBR-Parcel.Débito."
+  },
+  {
+    "value": "M|43|S",
+    "label": "SUSP/SOBR-Pedido Uniform."
+  },
+  {
+    "value": "M|55|S",
+    "label": "SUSP/SOBR-Q.Cível Prejudic."
+  },
+  {
+    "value": "M|44|S",
+    "label": "SUSP/SOBR-Q.Prejudic.Penal"
+  },
+  {
+    "value": "M|07|S",
+    "label": "SUSPENSAO"
+  },
+  {
+    "value": "M|78|S",
+    "label": "SUSPENSÃO - ACORDO DE DELAÇÃO PREMIADA"
+  },
+  {
+    "value": "M|05|S",
+    "label": "SUSPENSÃO ART 366"
+  },
+  {
+    "value": "M|03|S",
+    "label": "SUSPENSÃO L 6830/80"
+  },
+  {
+    "value": "M|04|S",
+    "label": "SUSPENSÃO L 9099/95"
+  },
+  {
+    "value": "T",
+    "label": "Todas (exceto baixados e eliminados)"
+  },
+  {
+    "value": "B",
+    "label": "BAIXADO (Todas as situações do grupo)"
+  },
+  {
+    "value": "B|02|B",
+    "label": "ANISTIA-BAIXADO"
+  },
+  {
+    "value": "B|19|B",
+    "label": "BAIXA - Digitalizado"
+  },
+  {
+    "value": "B|16|B",
+    "label": "BAIXA - ERRO DE DISTRIBUIÇÃO"
+  },
+  {
+    "value": "B|18|B",
+    "label": "BAIXA - Gestão Documental"
+  },
+  {
+    "value": "B|20|B",
+    "label": "BAIXA - Oferecida denúncia"
+  },
+  {
+    "value": "B|24|B",
+    "label": "BAIXA - Oferecida representação"
+  },
+  {
+    "value": "B|08|B",
+    "label": "BAIXA - ORDENADO P/ DEPRECANTE"
+  },
+  {
+    "value": "B|23|B",
+    "label": "BAIXA - Pré-cad descartado"
+  },
+  {
+    "value": "B|17|B",
+    "label": "BAIXADO - Reunido/Apensado"
+  },
+  {
+    "value": "B|03|B",
+    "label": "DESISTENCIA-BAIXADO"
+  },
+  {
+    "value": "B|06|B",
+    "label": "DEVOLVIDO-BAIXADO"
+  },
+  {
+    "value": "B|09|B",
+    "label": "ENTREGUE-BAIXADO"
+  },
+  {
+    "value": "B|04|B",
+    "label": "FINDO-BAIXADO"
+  },
+  {
+    "value": "B|05|B",
+    "label": "INCOMPETENCIA-BAIXA"
+  },
+  {
+    "value": "B|01|B",
+    "label": "PAGAMENTO-BAIXADO"
+  },
+  {
+    "value": "B|07|B",
+    "label": "SEM PREPARO-BAIXADO"
+  },
+  {
+    "value": "C",
+    "label": "CONCLUSÃO (Todas as situações do grupo)"
+  },
+  {
+    "value": "M|22|C",
+    "label": "MOVIMENTO-AGUARDA DESPACHO"
+  },
+  {
+    "value": "M|21|C",
+    "label": "MOVIMENTO-AGUARDA SENTENÇA"
+  },
+  {
+    "value": "I",
+    "label": "INQUÉRITO (Todas as situações do grupo)"
+  },
+  {
+    "value": "I|00|I",
+    "label": "RES 63/2009 CJF"
+  },
+  {
+    "value": "L",
+    "label": "SOMENTE SIAPRO (Todas as situações do grupo)"
+  },
+  {
+    "value": "Q|00|L",
+    "label": "ARQUIVADO"
+  },
+  {
+    "value": "L|00|L",
+    "label": "ELIMINADO"
+  },
+  {
+    "value": "M",
+    "label": "MOVIMENTO (Todas as situações do grupo)"
+  },
+  {
+    "value": "A|00|M",
+    "label": "AUTUADO"
+  },
+  {
+    "value": "C|00|M",
+    "label": "CONTABILIZADO"
+  },
+  {
+    "value": "M|00|M",
+    "label": "MOVIMENTO"
+  },
+  {
+    "value": "M|71|M",
+    "label": "MOVIMENTO - ART. 28 LEF"
+  },
+  {
+    "value": "M|77|M",
+    "label": "MOVIMENTO-AG DIGITALIZAÇÃO"
+  },
+  {
+    "value": "M|79|M",
+    "label": "MOVIMENTO-AG MIGRAÇÃO"
+  },
+  {
+    "value": "M|74|M",
+    "label": "MOVIMENTO-REMETIDO À TNU"
+  },
+  {
+    "value": "M|75|M",
+    "label": "MOVIMENTO-REMETIDO À TRU"
+  },
+  {
+    "value": "M|72|M",
+    "label": "MOVIMENTO-REMETIDO AO STF"
+  },
+  {
+    "value": "M|73|M",
+    "label": "MOVIMENTO-REMETIDO AO STJ"
+  },
+  {
+    "value": "M|70|M",
+    "label": "MOVIMENTO-REMETIDO AO TJ"
+  },
+  {
+    "value": "M|76|M",
+    "label": "MOVIMENTO-REMETIDO AO TRF"
+  },
+  {
+    "value": "V|00|M",
+    "label": "VERIFICAÇÃO DE PREVENÇÃO"
+  },
+  {
+    "value": "S",
+    "label": "SUSPENSÃO (Todas as situações do grupo)"
+  },
+  {
+    "value": "M|02|S",
+    "label": "MOVIMENTO-SOBRESTADO"
+  },
+  {
+    "value": "M|67|S",
+    "label": "SUSP/SOBR-Ag.Inst.Sup.A.Digit."
+  },
+  {
+    "value": "M|59|S",
+    "label": "SUSP/SOBR-Agravo remetido"
+  },
+  {
+    "value": "M|66|S",
+    "label": "SUSP/SOBR-Aguarda dec.Inst.Sup"
+  },
+  {
+    "value": "M|45|S",
+    "label": "SUSP/SOBR-Aguarda Dec.T.Sup."
+  },
+  {
+    "value": "M|61|S",
+    "label": "SUSP/SOBR-Aguarda Julg.Agravo."
+  },
+  {
+    "value": "M|46|S",
+    "label": "SUSP/SOBR-Aguarda Julg.Embg."
+  },
+  {
+    "value": "M|63|S",
+    "label": "SUSP/SOBR-Aguarda Pagamento"
+  },
+  {
+    "value": "M|62|S",
+    "label": "SUSP/SOBR-Arquiv.em Secret."
+  },
+  {
+    "value": "M|47|S",
+    "label": "SUSP/SOBR-Art. 265 CPC"
+  },
+  {
+    "value": "M|56|S",
+    "label": "SUSP/SOBR-Autos em restauração"
+  },
+  {
+    "value": "M|40|S",
+    "label": "SUSP/SOBR-Confl.Competência"
+  },
+  {
+    "value": "M|41|S",
+    "label": "SUSP/SOBR-Contin./Conexão"
+  },
+  {
+    "value": "M|48|S",
+    "label": "SUSP/SOBR-Cumpr.Cond.p"
+  },
+  {
+    "value": "M|64|S",
+    "label": "SUSP/SOBR-Déb.Inf.limite."
+  },
+  {
+    "value": "M|49|S",
+    "label": "SUSP/SOBR-Dev./Bens não Loc."
+  },
+  {
+    "value": "M|50|S",
+    "label": "SUSP/SOBR-Diligência Dprcda."
+  },
+  {
+    "value": "M|51|S",
+    "label": "SUSP/SOBR-Incid.Falsidade"
+  },
+  {
+    "value": "M|52|S",
+    "label": "SUSP/SOBR-Incid.Insan.Mental"
+  },
+  {
+    "value": "M|53|S",
+    "label": "SUSP/SOBR-Interv.Terceiros"
+  },
+  {
+    "value": "M|54|S",
+    "label": "SUSP/SOBR-M.Caut.Atentado"
+  },
+  {
+    "value": "M|42|S",
+    "label": "SUSP/SOBR-Oposição"
+  },
+  {
+    "value": "M|60|S",
+    "label": "SUSP/SOBR-P.Dec.Jud.Inc.Unif."
+  },
+  {
+    "value": "M|58|S",
+    "label": "SUSP/SOBR-P.Dec.Jud.Parc.Trib."
+  },
+  {
+    "value": "M|57|S",
+    "label": "SUSP/SOBR-P.Decisão Judicial"
+  },
+  {
+    "value": "M|65|S",
+    "label": "SUSP/SOBR-Parcel.Débito."
+  },
+  {
+    "value": "M|43|S",
+    "label": "SUSP/SOBR-Pedido Uniform."
+  },
+  {
+    "value": "M|55|S",
+    "label": "SUSP/SOBR-Q.Cível Prejudic."
+  },
+  {
+    "value": "M|44|S",
+    "label": "SUSP/SOBR-Q.Prejudic.Penal"
+  },
+  {
+    "value": "M|07|S",
+    "label": "SUSPENSAO"
+  },
+  {
+    "value": "M|78|S",
+    "label": "SUSPENSÃO - ACORDO DE DELAÇÃO PREMIADA"
+  },
+  {
+    "value": "M|05|S",
+    "label": "SUSPENSÃO ART 366"
+  },
+  {
+    "value": "M|03|S",
+    "label": "SUSPENSÃO L 6830/80"
+  },
+  {
+    "value": "M|04|S",
+    "label": "SUSPENSÃO L 9099/95"
+  }
+]

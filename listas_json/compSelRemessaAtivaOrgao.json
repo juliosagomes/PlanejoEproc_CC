@@ -1,0 +1,1282 @@
+[
+  {
+    "value": "N",
+    "label": "Nenhuma Remessa Ativa"
+  },
+  {
+    "value": "P",
+    "label": "Possui Remessa Ativa"
+  },
+  {
+    "value": "3116",
+    "label": "ABN CONTES - Contadoria/Tesouraria de ABRE CAMPO"
+  },
+  {
+    "value": "1695",
+    "label": "ACN CONTES - Contadoria/Tesouraria de AÇUCENA"
+  },
+  {
+    "value": "3805",
+    "label": "ACS CONTES - Contadoria/Tesouraria de ARCOS"
+  },
+  {
+    "value": "1697",
+    "label": "ADC CONTES - Contadoria/Tesouraria de ALTO RIO DOCE"
+  },
+  {
+    "value": "1699",
+    "label": "ADL CONTES - Contadoria/Tesouraria de ANDRELÂNDIA"
+  },
+  {
+    "value": "2482",
+    "label": "ADO CONTES - Contadoria/Tesouraria de AREADO"
+  },
+  {
+    "value": "3114",
+    "label": "AET CONTES - Contadoria/Tesouraria de ABAETÉ"
+  },
+  {
+    "value": "2474",
+    "label": "AFN CONTES - Contadoria/Tesouraria de ALFENAS"
+  },
+  {
+    "value": "3118",
+    "label": "AGF CONTES - Contadoria/Tesouraria de ÁGUAS FORMOSAS"
+  },
+  {
+    "value": "3124",
+    "label": "ALL CONTES - Contadoria/Tesouraria de ALVINÓPOLIS"
+  },
+  {
+    "value": "2476",
+    "label": "ALS CONTES - Contadoria/Tesouraria de ALPINÓPOLIS"
+  },
+  {
+    "value": "3122",
+    "label": "AMN CONTES - Contadoria/Tesouraria de ALMENARA"
+  },
+  {
+    "value": "3801",
+    "label": "ANA CONTES - Contadoria/Tesouraria de ANDRADAS"
+  },
+  {
+    "value": "3120",
+    "label": "AOR CONTES - Contadoria/Tesouraria de AIMORÉS"
+  },
+  {
+    "value": "3799",
+    "label": "API CONTES - Contadoria/Tesouraria de ALÉM PARAÍBA"
+  },
+  {
+    "value": "3803",
+    "label": "ARI CONTES - Contadoria/Tesouraria de ARAGUARI"
+  },
+  {
+    "value": "2472",
+    "label": "AUD CONTES - Contadoria/Tesouraria de AIURUOCA"
+  },
+  {
+    "value": "2478",
+    "label": "AUI CONTES - Contadoria/Tesouraria de ARAÇUAÍ"
+  },
+  {
+    "value": "2480",
+    "label": "AXA CONTES - Contadoria/Tesouraria de ARAXÁ"
+  },
+  {
+    "value": "3807",
+    "label": "AYN CONTES - Contadoria/Tesouraria de ARINOS"
+  },
+  {
+    "value": "2484",
+    "label": "BAD CONTES - Contadoria/Tesouraria de BAEPENDI"
+  },
+  {
+    "value": "3821",
+    "label": "BBD CONTES - Contadoria/Tesouraria de BUENO BRANDÃO"
+  },
+  {
+    "value": "3809",
+    "label": "BBI CONTES - Contadoria/Tesouraria de BAMBUÍ"
+  },
+  {
+    "value": "1701",
+    "label": "BCA CONTES - Contadoria/Tesouraria de BARBACENA"
+  },
+  {
+    "value": "3126",
+    "label": "BCS CONTES - Contadoria/Tesouraria de BARÃO DE COCAIS"
+  },
+  {
+    "value": "3813",
+    "label": "BCV CONTES - Contadoria/Tesouraria de BOCAIÚVA"
+  },
+  {
+    "value": "3130",
+    "label": "BDP CONTES - Contadoria/Tesouraria de BOM DESPACHO"
+  },
+  {
+    "value": "791",
+    "label": "BET CESOP - Central de Serviço Social e Psicologia de Betim"
+  },
+  {
+    "value": "752",
+    "label": "BET CONTES - Contadoria/Tesouraria de BETIM"
+  },
+  {
+    "value": "1705",
+    "label": "BFM CONTES - Contadoria/Tesouraria de BONFIM"
+  },
+  {
+    "value": "2488",
+    "label": "BFS CONTES - Contadoria/Tesouraria de BONFINÓPOLIS DE MINAS"
+  },
+  {
+    "value": "194",
+    "label": "BHE CCIJ - Comissariado Cível da Infância e da Juventude da Comarca de Belo Horizonte"
+  },
+  {
+    "value": "30",
+    "label": "BHE CONTES - Contadoria/Tesouraria BELO HORIZONTE - Justiça Comum"
+  },
+  {
+    "value": "62",
+    "label": "BHE CONTES JESP - Contadoria/Tesouraria BELO HORIZONTE - Juizado Especial"
+  },
+  {
+    "value": "193",
+    "label": "BHE NAFI - Núcleo de Acompanhamento ao Acolhimento Familiar e Institucional da Comarca de Belo Horizonte"
+  },
+  {
+    "value": "192",
+    "label": "BHE NEFA - Núcleo de Estudos Familiares e Adoção da Comarca de Belo Horizonte"
+  },
+  {
+    "value": "753",
+    "label": "BHS CONTES - Contadoria/Tesouraria de BOTELHOS"
+  },
+  {
+    "value": "3823",
+    "label": "BII CONTES - Contadoria/Tesouraria de BURITIS"
+  },
+  {
+    "value": "3128",
+    "label": "BIS CONTES - Contadoria/Tesouraria de BICAS"
+  },
+  {
+    "value": "751",
+    "label": "BLL CONTES - Contadoria/Tesouraria de BELO VALE"
+  },
+  {
+    "value": "3817",
+    "label": "BMN CONTES - Contadoria/Tesouraria de BRASÍLIA DE MINAS"
+  },
+  {
+    "value": "1707",
+    "label": "BMO CONTES - Contadoria/Tesouraria da Comarca de BRUMADINHO"
+  },
+  {
+    "value": "2486",
+    "label": "BMS CONTES - Contadoria/Tesouraria de BOM SUCESSO"
+  },
+  {
+    "value": "3811",
+    "label": "BOE CONTES - Contadoria/Tesouraria de BOA ESPERANÇA"
+  },
+  {
+    "value": "3815",
+    "label": "BOM CONTES - Contadoria/Tesouraria de BORDA DA MATA"
+  },
+  {
+    "value": "3819",
+    "label": "BPS CONTES - Contadoria/Tesouraria de BRAZÓPOLIS"
+  },
+  {
+    "value": "1703",
+    "label": "BSO CONTES - Contadoria/Tesouraria de BARROSO"
+  },
+  {
+    "value": "2490",
+    "label": "BUS CONTES - Contadoria/Tesouraria de BUENÓPOLIS"
+  },
+  {
+    "value": "755",
+    "label": "CAD CONTES - Contadoria/Tesouraria de Caldas"
+  },
+  {
+    "value": "2504",
+    "label": "CAE CONTES - Contadoria/Tesouraria de CARMO DE MINAS"
+  },
+  {
+    "value": "42",
+    "label": "CAIE - Central de Apoio a Integrações Eletrônicas"
+  },
+  {
+    "value": "2492",
+    "label": "CAQ CONTES - Contadoria/Tesouraria de CAMBUQUIRA"
+  },
+  {
+    "value": "2512",
+    "label": "CAX CONTES - Contadoria/Tesouraria de CAXAMBU"
+  },
+  {
+    "value": "1713",
+    "label": "CBI CONTES - Contadoria/Tesouraria da Comarca de Cambuí"
+  },
+  {
+    "value": "754",
+    "label": "CBV CONTES - Contadoria/Tesouraria de CABO VERDE"
+  },
+  {
+    "value": "2502",
+    "label": "CCH CONTES - Contadoria/Tesouraria de CARLOS CHAGAS"
+  },
+  {
+    "value": "3835",
+    "label": "CCU CONTES - Contadoria/Tesouraria de CARMO DO CAJURU"
+  },
+  {
+    "value": "1711",
+    "label": "CDU CONTES - Contadoria/Tesouraria da Comarca de Camanducaia"
+  },
+  {
+    "value": "2520",
+    "label": "CEL CONTES - Contadoria/Tesouraria de COROMANDEL"
+  },
+  {
+    "value": "798",
+    "label": "CEM CESOP - Central de Serviço Social e Psicologia de Contagem"
+  },
+  {
+    "value": "759",
+    "label": "CEM CONTES - Contadoria/Tesouraria de CONTAGEM"
+  },
+  {
+    "value": "1816",
+    "label": "CEMED - Central de Perícias Médicas da Comarca de Belo Horizonte"
+  },
+  {
+    "value": "31",
+    "label": "CESOP - Central de Serviço Social e Psicologia BELO HORIZONTE"
+  },
+  {
+    "value": "1709",
+    "label": "CET CONTES - Contadoria/Tesouraria de CAETÉ"
+  },
+  {
+    "value": "1717",
+    "label": "CGA CONTES - Contadoria/Tesouraria da Comarca de Caratinga"
+  },
+  {
+    "value": "2510",
+    "label": "CGS CONTES - Contadoria/Tesouraria de CATAGUASES"
+  },
+  {
+    "value": "3132",
+    "label": "CHS CONTES - Contadoria/Tesouraria de CACHOEIRA DE MINAS"
+  },
+  {
+    "value": "2518",
+    "label": "CIT CONTES - Contadoria/Tesouraria de CORINTO"
+  },
+  {
+    "value": "3136",
+    "label": "CLH CONTES - Contadoria/Tesouraria de CAPELINHA"
+  },
+  {
+    "value": "1719",
+    "label": "CLS CONTES - Contadoria/Tesouraria de CONCEIÇÃO DAS ALAGOAS"
+  },
+  {
+    "value": "3841",
+    "label": "CLU CONTES - Contadoria/Tesouraria de CLÁUDIO"
+  },
+  {
+    "value": "3138",
+    "label": "CMD CONTES - Contadoria/Tesouraria de CONCEIÇÃO DO MATO DENTRO"
+  },
+  {
+    "value": "3837",
+    "label": "CMI CONTES - Contadoria/Tesouraria de CARMO DO PARANAÍBA"
+  },
+  {
+    "value": "3827",
+    "label": "CMT CONTES - Contadoria/Tesouraria de CAMPOS ALTOS"
+  },
+  {
+    "value": "757",
+    "label": "CNG CONTES - Contadoria/Tesouraria de CONGONHAS"
+  },
+  {
+    "value": "758",
+    "label": "CNL CONTES - Contadoria/Tesouraria de CONSELHEIRO LAFAIETE"
+  },
+  {
+    "value": "2498",
+    "label": "CNS CONTES - Contadoria/Tesouraria de CAPINÓPOLIS"
+  },
+  {
+    "value": "2496",
+    "label": "COI CONTES - Contadoria/Tesouraria de CANÁPOLIS"
+  },
+  {
+    "value": "3843",
+    "label": "COJ CONTES - Contadoria/Tesouraria de CORAÇÃO DE JESUS"
+  },
+  {
+    "value": "3833",
+    "label": "COM CONTES - Contadoria/Tesouraria de CARMO DA MATA"
+  },
+  {
+    "value": "3829",
+    "label": "CPG CONTES - Contadoria/Tesouraria de CAMPOS GERAIS"
+  },
+  {
+    "value": "2494",
+    "label": "CPH CONTES - Contadoria/Tesouraria de CAMPANHA"
+  },
+  {
+    "value": "3825",
+    "label": "CPO CONTES - Contadoria/Tesouraria de CAMPO BELO"
+  },
+  {
+    "value": "2516",
+    "label": "CQT CONTES - Contadoria/Tesouraria de CONQUISTA"
+  },
+  {
+    "value": "2506",
+    "label": "CRC CONTES - Contadoria/Tesouraria de CARMO DO RIO CLARO"
+  },
+  {
+    "value": "1715",
+    "label": "CRD CONTES - Contadoria/Tesouraria da Comarca de Carandaí"
+  },
+  {
+    "value": "760",
+    "label": "CRF CONTES - Contadoria/Tesouraria CORONEL FABRICIANO"
+  },
+  {
+    "value": "2500",
+    "label": "CRL CONTES - Contadoria/Tesouraria de CARANGOLA"
+  },
+  {
+    "value": "3839",
+    "label": "CRM CONTES - Contadoria/Tesouraria de CARMÓPOLIS DE MINAS"
+  },
+  {
+    "value": "2508",
+    "label": "CSA CONTES - Contadoria/Tesouraria de CÁSSIA"
+  },
+  {
+    "value": "3845",
+    "label": "CSI CONTES - Contadoria/Tesouraria de CRISTINA"
+  },
+  {
+    "value": "3140",
+    "label": "CSN CONTES - Contadoria/Tesouraria de CONSELHEIRO PENA"
+  },
+  {
+    "value": "756",
+    "label": "CST CONTES - Contadoria/Tesouraria de Campestre"
+  },
+  {
+    "value": "2524",
+    "label": "CUV CONTES - Contadoria/Tesouraria CURVELO"
+  },
+  {
+    "value": "3134",
+    "label": "CVE CONTES - Contadoria/Tesouraria de CAMPINA VERDE"
+  },
+  {
+    "value": "2514",
+    "label": "CVR CONTES - Contadoria/Tesouraria de CONCEIÇÃO DO RIO VERDE"
+  },
+  {
+    "value": "3831",
+    "label": "CWA CONTES - Contadoria/Tesouraria de CANDEIAS"
+  },
+  {
+    "value": "2522",
+    "label": "CZL CONTES - Contadoria/Tesouraria de CRUZÍLIA"
+  },
+  {
+    "value": "3144",
+    "label": "DDI CONTES - Contadoria/Tesouraria de DORES DO INDAIÁ"
+  },
+  {
+    "value": "3142",
+    "label": "DMT CONTES - Contadoria/Tesouraria DIAMANTINA"
+  },
+  {
+    "value": "800",
+    "label": "DVL CESOP - Central de Serviço Social e Psicologia de Divinópolis"
+  },
+  {
+    "value": "761",
+    "label": "DVL CONTES - Contadoria/Tesouraria de DIVINÓPOLIS"
+  },
+  {
+    "value": "2526",
+    "label": "DVO CONTES - Contadoria/Tesouraria DIVINO"
+  },
+  {
+    "value": "2532",
+    "label": "EEL CONTES - Contadoria/Tesouraria de ESTRELA DO SUL"
+  },
+  {
+    "value": "2528",
+    "label": "EEP CONTES - Contadoria/Tesouraria de ESPERA FELIZ"
+  },
+  {
+    "value": "763",
+    "label": "EES CONTES - Contadoria/Tesouraria de ESMERALDAS"
+  },
+  {
+    "value": "3847",
+    "label": "ELM CONTES - Contadoria/Tesouraria de ELÓI MENDES"
+  },
+  {
+    "value": "3148",
+    "label": "EOS CONTES - Contadoria/Tesouraria de EUGENÓPOLIS"
+  },
+  {
+    "value": "2530",
+    "label": "EPS CONTES - Contadoria/Tesouraria de ESPINOSA"
+  },
+  {
+    "value": "801",
+    "label": "ERM CESOP - Central de Serviço Social e Psicologia de Entre Rios de Minas"
+  },
+  {
+    "value": "762",
+    "label": "ERM CONTES - Contadoria/Tesouraria de ENTRE RIOS DE MINAS"
+  },
+  {
+    "value": "3146",
+    "label": "ERV CONTES - Contadoria/Tesouraria de ERVÁLIA"
+  },
+  {
+    "value": "1721",
+    "label": "EXM CONTES - Contadoria/Tesouraria da Comarca de EXTREMA"
+  },
+  {
+    "value": "3851",
+    "label": "FCS CONTES - Contadoria/Tesouraria de FRANCISCO SÁ"
+  },
+  {
+    "value": "1723",
+    "label": "FES CONTES - Contadoria/Tesouraria de FERROS"
+  },
+  {
+    "value": "3849",
+    "label": "FMA CONTES - Contadoria/Tesouraria de FORMIGA"
+  },
+  {
+    "value": "3150",
+    "label": "FRU CONTES - Contadoria/Tesouraria de FRUTAL"
+  },
+  {
+    "value": "3853",
+    "label": "GGL CONTES - Contadoria/Tesouraria de GRÃO MOGOL"
+  },
+  {
+    "value": "3154",
+    "label": "GHE CONTES - Contadoria/Tesouraria de GUANHÃES"
+  },
+  {
+    "value": "3152",
+    "label": "GLL CONTES - Contadoria/Tesouraria de GALILÉIA"
+  },
+  {
+    "value": "3156",
+    "label": "GNI CONTES - Contadoria/Tesouraria de GUARANI"
+  },
+  {
+    "value": "2536",
+    "label": "GPE CONTES - Contadoria/Tesouraria de GUAXUPÉ"
+  },
+  {
+    "value": "2534",
+    "label": "GSA CONTES - Contadoria/Tesouraria de GUARANÉSIA"
+  },
+  {
+    "value": "3855",
+    "label": "GUE CONTES - Contadoria/Tesouraria de GUAPÉ"
+  },
+  {
+    "value": "1725",
+    "label": "GVS CONTES - Contadoria/Tesouraria da Comarca de GOVERNADOR VALADARES"
+  },
+  {
+    "value": "3871",
+    "label": "IAN CONTES - Contadoria/Tesouraria de ITAÚNA"
+  },
+  {
+    "value": "1737",
+    "label": "IBA CONTES - Contadoria/Tesouraria de ITABIRA"
+  },
+  {
+    "value": "3857",
+    "label": "IBY CONTES - Contadoria/Tesouraria de IBIÁ"
+  },
+  {
+    "value": "3861",
+    "label": "IGR CONTES - Contadoria/Tesouraria de ITAGUARA"
+  },
+  {
+    "value": "3160",
+    "label": "IGY CONTES - Contadoria/Tesouraria de ITAPAGIPE"
+  },
+  {
+    "value": "1727",
+    "label": "IIB CONTES - Contadoria/Tesouraria de IBIRITÉ"
+  },
+  {
+    "value": "1735",
+    "label": "IIG CONTES - Contadoria/Tesouraria de IPATINGA"
+  },
+  {
+    "value": "2538",
+    "label": "III CONTES - Contadoria/Tesouraria de IBIRACI"
+  },
+  {
+    "value": "3863",
+    "label": "IJA CONTES - Contadoria/Tesouraria de ITAJUBÁ"
+  },
+  {
+    "value": "3865",
+    "label": "IMO CONTES - Contadoria/Tesouraria de ITAMONTE"
+  },
+  {
+    "value": "3158",
+    "label": "IMR CONTES - Contadoria/Tesouraria de ITAMARANDIBA"
+  },
+  {
+    "value": "1739",
+    "label": "INH CONTES - Contadoria/Tesouraria de ITANHOMI"
+  },
+  {
+    "value": "1731",
+    "label": "INP CONTES - Contadoria/Tesouraria de INHAPIM"
+  },
+  {
+    "value": "2544",
+    "label": "IOG CONTES - Contadoria/Tesouraria de ITAMOGI"
+  },
+  {
+    "value": "3869",
+    "label": "IPC CONTES - Contadoria/Tesouraria de ITAPECERICA"
+  },
+  {
+    "value": "2540",
+    "label": "IRO CONTES - Contadoria/Tesouraria de ITABIRITO"
+  },
+  {
+    "value": "1729",
+    "label": "IRP CONTES - Contadoria/Tesouraria de IGARAPÉ"
+  },
+  {
+    "value": "2542",
+    "label": "ITC CONTES - Contadoria/Tesouraria de ITAMBACURI"
+  },
+  {
+    "value": "3867",
+    "label": "ITD CONTES - Contadoria/Tesouraria de ITANHANDU"
+  },
+  {
+    "value": "3162",
+    "label": "ITM CONTES - Contadoria/Tesouraria de ITURAMA"
+  },
+  {
+    "value": "2546",
+    "label": "IUA CONTES - Contadoria/Tesouraria de ITUIUTABA"
+  },
+  {
+    "value": "3859",
+    "label": "IUM CONTES - Contadoria/Tesouraria de IGUATAMA"
+  },
+  {
+    "value": "2548",
+    "label": "IYM CONTES - Contadoria/Tesouraria de ITUMIRIM"
+  },
+  {
+    "value": "3875",
+    "label": "JAB CONTES - Contadoria/Tesouraria de JAÍBA"
+  },
+  {
+    "value": "764",
+    "label": "JBU CONTES - Contadoria/Tesouraria de JABOTICATUBAS"
+  },
+  {
+    "value": "2550",
+    "label": "JCU CONTES - Contadoria/Tesouraria de JACUÍ"
+  },
+  {
+    "value": "804",
+    "label": "JFA CESOP - Central de Serviço Social e Psicologia de Juiz de Fora"
+  },
+  {
+    "value": "765",
+    "label": "JFA CONTES - Contadoria/Tesouraria de Juiz de Fora"
+  },
+  {
+    "value": "3170",
+    "label": "JML CONTES - Contadoria/Tesouraria de JOÃO MONLEVADE"
+  },
+  {
+    "value": "3164",
+    "label": "JNT CONTES - Contadoria/Tesouraria de JACINTO"
+  },
+  {
+    "value": "3879",
+    "label": "JNU CONTES - Contadoria/Tesouraria de JANUÁRIA"
+  },
+  {
+    "value": "2552",
+    "label": "JPI CONTES - Contadoria/Tesouraria de JOÃO PINHEIRO"
+  },
+  {
+    "value": "3166",
+    "label": "JQI CONTES - Contadoria/Tesouraria de JEQUERI"
+  },
+  {
+    "value": "3168",
+    "label": "JQT CONTES - Contadoria/Tesouraria de JEQUITINHONHA"
+  },
+  {
+    "value": "3873",
+    "label": "JTA CONTES - Contadoria/Tesouraria de JACUTINGA"
+  },
+  {
+    "value": "3881",
+    "label": "JTB CONTES - Contadoria/Tesouraria de JUATUBA"
+  },
+  {
+    "value": "3877",
+    "label": "JUA CONTES - Contadoria/Tesouraria de JANAÚBA"
+  },
+  {
+    "value": "1741",
+    "label": "LAD CONTES - Contadoria/Tesouraria de LIMA DUARTE"
+  },
+  {
+    "value": "2554",
+    "label": "LAM CONTES - Contadoria/Tesouraria de LAMBARI"
+  },
+  {
+    "value": "2556",
+    "label": "LAV CONTES - Contadoria/Tesouraria de LAVRAS"
+  },
+  {
+    "value": "766",
+    "label": "LGT CONTES - Contadoria/Tesouraria de LAGOA SANTA"
+  },
+  {
+    "value": "767",
+    "label": "LJA CONTES - Contadoria/Tesouraria de LAJINHA"
+  },
+  {
+    "value": "3885",
+    "label": "LPD CONTES - Contadoria/Tesouraria de LEOPOLDINA"
+  },
+  {
+    "value": "3883",
+    "label": "LPT CONTES - Contadoria/Tesouraria de LAGOA DA PRATA"
+  },
+  {
+    "value": "3172",
+    "label": "LUZ CONTES - Contadoria/Tesouraria de LUZ"
+  },
+  {
+    "value": "3889",
+    "label": "MAG CONTES - Contadoria/Tesouraria de MANGA"
+  },
+  {
+    "value": "3891",
+    "label": "MAL CONTES - Contadoria/Tesouraria de MATEUS LEME"
+  },
+  {
+    "value": "2568",
+    "label": "MAM CONTES - Contadoria/Tesouraria de MONTE ALEGRE DE MINAS"
+  },
+  {
+    "value": "3178",
+    "label": "MBB CONTES - Contadoria/Tesouraria de MATIAS BARBOSA"
+  },
+  {
+    "value": "2572",
+    "label": "MBE CONTES - Contadoria/Tesouraria de MONTE BELO"
+  },
+  {
+    "value": "3887",
+    "label": "MCD CONTES - Contadoria/Tesouraria de MACHADO"
+  },
+  {
+    "value": "2558",
+    "label": "MCH CONTES - Contadoria/Tesouraria de MALACACHETA"
+  },
+  {
+    "value": "772",
+    "label": "MCL CONTES - Contadoria/Tesouraria de MONTES CLAROS"
+  },
+  {
+    "value": "3180",
+    "label": "MDA CONTES - Contadoria/Tesouraria de MEDINA"
+  },
+  {
+    "value": "2564",
+    "label": "MDO CONTES - Contadoria/Tesouraria de MIRADOURO"
+  },
+  {
+    "value": "771",
+    "label": "MEE CONTES - Contadoria/Tesouraria de MERCÊS"
+  },
+  {
+    "value": "3176",
+    "label": "MEH CONTES - Contadoria/Tesouraria de MAR DE ESPANHA"
+  },
+  {
+    "value": "1743",
+    "label": "MHC CONTES - Contadoria/Tesouraria de MARTINHO CAMPOS"
+  },
+  {
+    "value": "2566",
+    "label": "MII CONTES - Contadoria/Tesouraria de MIRAÍ"
+  },
+  {
+    "value": "769",
+    "label": "MIM CONTES - Contadoria/Tesouraria de MANHUMIRIM"
+  },
+  {
+    "value": "768",
+    "label": "MNC CONTES - Contadoria/Tesouraria de MANHUAÇU"
+  },
+  {
+    "value": "3182",
+    "label": "MNM CONTES - Contadoria/Tesouraria de MORADA NOVA DE MINAS"
+  },
+  {
+    "value": "3174",
+    "label": "MNN CONTES - Contadoria/Tesouraria de MANTENA"
+  },
+  {
+    "value": "2562",
+    "label": "MNV CONTES - Contadoria/Tesouraria de MINAS NOVAS"
+  },
+  {
+    "value": "2574",
+    "label": "MOO CONTES - Contadoria/Tesouraria de MONTE CARMELO"
+  },
+  {
+    "value": "1745",
+    "label": "MQI CONTES - Contadoria/Tesouraria de MESQUITA"
+  },
+  {
+    "value": "3184",
+    "label": "MRE CONTES - Contadoria/Tesouraria de MURIAÉ"
+  },
+  {
+    "value": "2560",
+    "label": "MRN CONTES - Contadoria/Tesouraria de MARIANA"
+  },
+  {
+    "value": "3895",
+    "label": "MSI CONTES - Contadoria/Tesouraria de MONTE SIÃO"
+  },
+  {
+    "value": "2576",
+    "label": "MSM CONTES - Contadoria/Tesouraria de MONTE SANTO DE MINAS"
+  },
+  {
+    "value": "773",
+    "label": "MTM CONTES - Contadoria/Tesouraria de MUTUM"
+  },
+  {
+    "value": "3893",
+    "label": "MTV CONTES - Contadoria/Tesouraria de MONTALVÂNIA"
+  },
+  {
+    "value": "770",
+    "label": "MTZ CONTES - Contadoria/Tesouraria de MATOZINHOS"
+  },
+  {
+    "value": "2578",
+    "label": "MUZ CONTES - Contadoria/Tesouraria de MUZAMBINHO"
+  },
+  {
+    "value": "2570",
+    "label": "MZL CONTES - Contadoria/Tesouraria de MONTE AZUL"
+  },
+  {
+    "value": "3186",
+    "label": "NAR CONTES - Contadoria/Tesouraria de NATÉRCIA"
+  },
+  {
+    "value": "1747",
+    "label": "NER CONTES - Contadoria/Tesouraria de NOVA ERA"
+  },
+  {
+    "value": "2588",
+    "label": "NES CONTES - Contadoria/Tesouraria de NOVA RESENDE"
+  },
+  {
+    "value": "2584",
+    "label": "NLA CONTES - Contadoria/Tesouraria de NOVA LIMA"
+  },
+  {
+    "value": "2580",
+    "label": "NNE CONTES - Contadoria/Tesouraria de NANUQUE"
+  },
+  {
+    "value": "2582",
+    "label": "NPO CONTES - Contadoria/Tesouraria de NEPOMUCENO"
+  },
+  {
+    "value": "2586",
+    "label": "NVN CONTES - Contadoria/Tesouraria de NOVA PONTE"
+  },
+  {
+    "value": "3188",
+    "label": "NVS CONTES - Contadoria/Tesouraria de NOVA SERRANA"
+  },
+  {
+    "value": "1749",
+    "label": "NZO CONTES - Contadoria/Tesouraria de NOVO CRUZEIRO"
+  },
+  {
+    "value": "3897",
+    "label": "OLV CONTES - Contadoria/Tesouraria de OLIVEIRA"
+  },
+  {
+    "value": "2590",
+    "label": "ORP CONTES - Contadoria/Tesouraria de OURO PRETO"
+  },
+  {
+    "value": "3899",
+    "label": "OUF CONTES - Contadoria/Tesouraria de OURO FINO"
+  },
+  {
+    "value": "774",
+    "label": "OUO CONTES - Contadoria/Tesouraria de OURO BRANCO"
+  },
+  {
+    "value": "1761",
+    "label": "PAD CONTES - Contadoria/Tesouraria de PRADOS"
+  },
+  {
+    "value": "3901",
+    "label": "PAL CONTES - Contadoria/Tesouraria de PALMA"
+  },
+  {
+    "value": "818",
+    "label": "PCS CESOP - Central de Serviço Social e Psicologia de Poços de Caldas"
+  },
+  {
+    "value": "779",
+    "label": "PCS CONTES - Contadoria/Tesouraria de POÇOS DE CALDAS"
+  },
+  {
+    "value": "2600",
+    "label": "PDS CONTES - Contadoria/Tesouraria de PERDÕES"
+  },
+  {
+    "value": "3909",
+    "label": "PDV CONTES - Contadoria/Tesouraria de PEDRALVA"
+  },
+  {
+    "value": "775",
+    "label": "PEB CONTES - Contadoria/Tesouraria de PARAOPEBA"
+  },
+  {
+    "value": "780",
+    "label": "PEE CONTES - Contadoria/Tesouraria de PRESIDENTE OLEGÁRIO"
+  },
+  {
+    "value": "2598",
+    "label": "PEZ CONTES - Contadoria/Tesouraria de PERDIZES"
+  },
+  {
+    "value": "3903",
+    "label": "PGC CONTES - Contadoria/Tesouraria de PARAGUAÇU"
+  },
+  {
+    "value": "3913",
+    "label": "PIU CONTES - Contadoria/Tesouraria de PIUMHI"
+  },
+  {
+    "value": "28",
+    "label": "PLANTAO - Vara Plantonista do Tribunal de Justiça de Minas Gerais"
+  },
+  {
+    "value": "816",
+    "label": "PLO CESOP - Central de Serviço Social e Psicologia de Pedro Leopoldo"
+  },
+  {
+    "value": "777",
+    "label": "PLO CONTES - Contadoria/Tesouraria de PEDRO LEOPOLDO"
+  },
+  {
+    "value": "776",
+    "label": "PMS CONTES - Contadoria/Tesouraria de PATOS DE MINAS"
+  },
+  {
+    "value": "3190",
+    "label": "PNH CONTES - Contadoria/Tesouraria de PEÇANHA"
+  },
+  {
+    "value": "3196",
+    "label": "PNV CONTES - Contadoria/Tesouraria de PONTE NOVA"
+  },
+  {
+    "value": "3915",
+    "label": "POF CONTES - Contadoria/Tesouraria de POÇO FUNDO"
+  },
+  {
+    "value": "1757",
+    "label": "PPE CONTES - Contadoria/Tesouraria de POMPÉU"
+  },
+  {
+    "value": "3911",
+    "label": "PPN CONTES - Contadoria/Tesouraria de PIRAPETINGA"
+  },
+  {
+    "value": "3905",
+    "label": "PQO CONTES - Contadoria/Tesouraria de PASSA QUATRO"
+  },
+  {
+    "value": "778",
+    "label": "PRG CONTES - Contadoria/Tesouraria de PIRANGA"
+  },
+  {
+    "value": "2604",
+    "label": "PRO CONTES - Contadoria/Tesouraria de PRATÁPOLIS"
+  },
+  {
+    "value": "3194",
+    "label": "PRR CONTES - Contadoria/Tesouraria de PIRAPORA"
+  },
+  {
+    "value": "1751",
+    "label": "PRS CONTES - Contadoria/Tesouraria de PARÁ DE MINAS"
+  },
+  {
+    "value": "3198",
+    "label": "PRT CONTES - Contadoria/Tesouraria de PRATA"
+  },
+  {
+    "value": "1759",
+    "label": "PSO CONTES - Contadoria/Tesouraria de POUSO ALEGRE"
+  },
+  {
+    "value": "1753",
+    "label": "PSP CONTES - Contadoria/Tesouraria de PARAISÓPOLIS"
+  },
+  {
+    "value": "2594",
+    "label": "PSS CONTES - Contadoria/Tesouraria de PASSOS"
+  },
+  {
+    "value": "3907",
+    "label": "PST CONTES - Contadoria/Tesouraria de PASSA TEMPO"
+  },
+  {
+    "value": "2596",
+    "label": "PTC CONTES - Contadoria/Tesouraria de PATROCÍNIO"
+  },
+  {
+    "value": "2602",
+    "label": "PTH CONTES - Contadoria/Tesouraria de PORTEIRINHA"
+  },
+  {
+    "value": "1755",
+    "label": "PTI CONTES - Contadoria/Tesouraria de PITANGUI"
+  },
+  {
+    "value": "2592",
+    "label": "PTU CONTES - Contadoria/Tesouraria de PARACATU"
+  },
+  {
+    "value": "3192",
+    "label": "PZL CONTES - Contadoria/Tesouraria de PEDRA AZUL"
+  },
+  {
+    "value": "3204",
+    "label": "RCS CONTES - Contadoria/Tesouraria de RIO CASCA"
+  },
+  {
+    "value": "1763",
+    "label": "RED CONTES - Contadoria/Tesouraria de RESENDE COSTA"
+  },
+  {
+    "value": "3210",
+    "label": "RLV CONTES - Contadoria/Tesouraria de RIO VERMELHO"
+  },
+  {
+    "value": "781",
+    "label": "RNS CONTES - Contadoria/Tesouraria de RIBEIRÃO DAS NEVES"
+  },
+  {
+    "value": "3206",
+    "label": "RNV CONTES - Contadoria/Tesouraria de RIO NOVO"
+  },
+  {
+    "value": "3917",
+    "label": "RPA CONTES - Contadoria/Tesouraria de RIO PARANAÍBA"
+  },
+  {
+    "value": "821",
+    "label": "RPB CESOP - Central de Serviço Social e Psicologia de Rio Pomba"
+  },
+  {
+    "value": "782",
+    "label": "RPB CONTES - Contadoria/Tesouraria de RIO POMBA"
+  },
+  {
+    "value": "3208",
+    "label": "RPC CONTES - Contadoria/Tesouraria de RIO PIRACICABA"
+  },
+  {
+    "value": "1765",
+    "label": "RRE CONTES - Contadoria/Tesouraria de RIO PRETO"
+  },
+  {
+    "value": "3202",
+    "label": "RSP CONTES - Contadoria/Tesouraria de RESPLENDOR"
+  },
+  {
+    "value": "3200",
+    "label": "RSS CONTES - Contadoria/Tesouraria de RAUL SOARES"
+  },
+  {
+    "value": "3927",
+    "label": "SAL CONTES - Contadoria/Tesouraria de SÃO LOURENÇO"
+  },
+  {
+    "value": "1767",
+    "label": "SBA CONTES - Contadoria/Tesouraria de SABARÁ"
+  },
+  {
+    "value": "3214",
+    "label": "SBB CONTES - Contadoria/Tesouraria de SANTA BÁRBARA"
+  },
+  {
+    "value": "784",
+    "label": "SDF CONTES - Contadoria/Tesouraria de Senador Firmino"
+  },
+  {
+    "value": "3220",
+    "label": "SDG CONTES - Contadoria/Tesouraria de SÃO DOMINGOS DO PRATA"
+  },
+  {
+    "value": "3919",
+    "label": "SDT CONTES - Contadoria/Tesouraria de SANTO ANTÔNIO DO MONTE"
+  },
+  {
+    "value": "3224",
+    "label": "SEG CONTES - Contadoria/Tesouraria de SÃO JOÃO EVANGELISTA"
+  },
+  {
+    "value": "3228",
+    "label": "SER CONTES - Contadoria/Tesouraria de SERRO"
+  },
+  {
+    "value": "3921",
+    "label": "SFI CONTES - Contadoria/Tesouraria de SÃO FRANCISCO"
+  },
+  {
+    "value": "3222",
+    "label": "SGS CONTES - Contadoria/Tesouraria de SÃO GONÇALO DO SAPUCAÍ"
+  },
+  {
+    "value": "3923",
+    "label": "SGT CONTES - Contadoria/Tesouraria de SÃO GOTARDO"
+  },
+  {
+    "value": "33",
+    "label": "SISCON - Central de Atendimento ao Processo Eletrônico do EPROC de Belo Horizonte"
+  },
+  {
+    "value": "3226",
+    "label": "SJN CONTES - Contadoria/Tesouraria de SÃO JOÃO NEPOMUCENO"
+  },
+  {
+    "value": "824",
+    "label": "SLA CESOP - Central de Serviço Social e Psicologia de Sete Lagoas"
+  },
+  {
+    "value": "785",
+    "label": "SLA CONTES - Contadoria/Tesouraria de SETE LAGOAS"
+  },
+  {
+    "value": "2610",
+    "label": "SLN CONTES - Contadoria/Tesouraria de SALINAS"
+  },
+  {
+    "value": "3230",
+    "label": "SLP CONTES - Contadoria/Tesouraria de SILVIANÓPOLIS"
+  },
+  {
+    "value": "1769",
+    "label": "SLU CONTES - Contadoria/Tesouraria de SANTA LUZIA"
+  },
+  {
+    "value": "1771",
+    "label": "SND CONTES - Contadoria/Tesouraria de SANTOS DUMONT"
+  },
+  {
+    "value": "3212",
+    "label": "SNS CONTES - Contadoria/Tesouraria de SABINÓPOLIS"
+  },
+  {
+    "value": "1773",
+    "label": "SOE CONTES - Contadoria/Tesouraria de SÃO JOÃO DEL-REI"
+  },
+  {
+    "value": "2608",
+    "label": "SQN CONTES - Contadoria/Tesouraria de SACRAMENTO"
+  },
+  {
+    "value": "3931",
+    "label": "SQS CONTES - Contadoria/Tesouraria de SÃO ROQUE DE MINAS"
+  },
+  {
+    "value": "3218",
+    "label": "SRS CONTES - Contadoria/Tesouraria de SANTA RITA DO SAPUCAÍ"
+  },
+  {
+    "value": "783",
+    "label": "SRT CONTES - Contadoria/Tesouraria de SANTA RITA DE CALDAS"
+  },
+  {
+    "value": "3929",
+    "label": "SRW CONTES - Contadoria/Tesouraria de SÃO ROMÃO"
+  },
+  {
+    "value": "2614",
+    "label": "SSK CONTES - Contadoria/Tesouraria de SÃO JOÃO DO PARAÍSO"
+  },
+  {
+    "value": "2616",
+    "label": "SSP CONTES - Contadoria/Tesouraria de SÃO SEBASTIÃO DO PARAÍSO"
+  },
+  {
+    "value": "3925",
+    "label": "STJ CONTES - Contadoria/Tesouraria de SÃO JOÃO DA PONTE"
+  },
+  {
+    "value": "2612",
+    "label": "STV CONTES - Contadoria/Tesouraria de SANTA VITÓRIA"
+  },
+  {
+    "value": "3216",
+    "label": "SUI CONTES - Contadoria/Tesouraria de SANTA MARIA DO SUAÇUÍ"
+  },
+  {
+    "value": "2622",
+    "label": "TCS CONTES - Contadoria/Tesouraria de TRÊS CORAÇÕES"
+  },
+  {
+    "value": "3234",
+    "label": "TMS CONTES - Contadoria/Tesouraria de TRÊS MARIAS"
+  },
+  {
+    "value": "2618",
+    "label": "TOE CONTES - Contadoria/Tesouraria de TAIOBEIRAS"
+  },
+  {
+    "value": "2620",
+    "label": "TOS CONTES - Contadoria/Tesouraria de TOMBOS"
+  },
+  {
+    "value": "1777",
+    "label": "TOT CONTES - Contadoria/Tesouraria de TEÓFILO OTONI"
+  },
+  {
+    "value": "3937",
+    "label": "TPC CONTES - Contadoria/Tesouraria de TUPACIGUARA"
+  },
+  {
+    "value": "1775",
+    "label": "TRM CONTES - Contadoria/Tesouraria de TARUMIRIM"
+  },
+  {
+    "value": "3933",
+    "label": "TRZ CONTES - Contadoria/Tesouraria de TIROS"
+  },
+  {
+    "value": "3935",
+    "label": "TSP CONTES - Contadoria/Tesouraria de TRÊS PONTAS"
+  },
+  {
+    "value": "786",
+    "label": "TTO CONTES - Contadoria/Tesouraria de TIMÓTEO"
+  },
+  {
+    "value": "2624",
+    "label": "TUR CONTES - Contadoria/Tesouraria de TURMALINA"
+  },
+  {
+    "value": "3232",
+    "label": "TXS CONTES - Contadoria/Tesouraria de TEIXEIRAS"
+  },
+  {
+    "value": "826",
+    "label": "UBA CESOP - Central de Serviço Social e Psicologia de Ubá"
+  },
+  {
+    "value": "787",
+    "label": "UBA CONTES - Contadoria/Tesouraria de UBÁ"
+  },
+  {
+    "value": "403000094",
+    "label": "ULA CEMAN - Central de Mandados da Comarca de Uberlândia"
+  },
+  {
+    "value": "1781",
+    "label": "ULA CONTES - Contadoria/Tesouraria de UBERLÂNDIA"
+  },
+  {
+    "value": "1780",
+    "label": "ULA DISTR - Central de Distribuição da Comarca de UBERLÂNDIA"
+  },
+  {
+    "value": "3939",
+    "label": "UNI CONTES - Contadoria/Tesouraria de UNAÍ"
+  },
+  {
+    "value": "1779",
+    "label": "URA CONTES - Contadoria/Tesouraria de UBERABA"
+  },
+  {
+    "value": "3238",
+    "label": "VCS CONTES - Contadoria/Tesouraria de VIÇOSA"
+  },
+  {
+    "value": "1783",
+    "label": "VGA CONTES - Contadoria/Tesouraria de VARGINHA"
+  },
+  {
+    "value": "3240",
+    "label": "VGP CONTES - Contadoria/Tesouraria de VIRGINÓPOLIS"
+  },
+  {
+    "value": "789",
+    "label": "VPN CONTES - Contadoria/Tesouraria de VESPASIANO"
+  },
+  {
+    "value": "2626",
+    "label": "VRB CONTES - Contadoria/Tesouraria de VISCONDE DO RIO BRANCO"
+  },
+  {
+    "value": "788",
+    "label": "VZE CONTES - Contadoria/Tesouraria de VAZANTE"
+  },
+  {
+    "value": "3236",
+    "label": "VZP CONTES - Contadoria/Tesouraria de VÁRZEA DA PALMA"
+  },
+  {
+    "value": "1733",
+    "label": "YAN CONTES - Contadoria/Tesouraria de IPANEMA"
+  }
+]

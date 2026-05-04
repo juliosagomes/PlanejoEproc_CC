@@ -1,0 +1,26 @@
+[
+  {
+    "value": "0",
+    "label": "Somente Processos Sem Sigilo"
+  },
+  {
+    "value": "1",
+    "label": "Segredo de Justica (Nivel 1)"
+  },
+  {
+    "value": "2",
+    "label": "Sigiloso (Nível 2)"
+  },
+  {
+    "value": "3",
+    "label": "Sigiloso (Nível 3)"
+  },
+  {
+    "value": "4",
+    "label": "Sigiloso (Nível 4)"
+  },
+  {
+    "value": "5",
+    "label": "Sigiloso (Nível 5)"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "value": "IGUAL",
+    "label": "igual a"
+  },
+  {
+    "value": "MENOR",
+    "label": "anterior a"
+  },
+  {
+    "value": "MAIOR",
+    "label": "posterior a"
+  },
+  {
+    "value": "ENTRE",
+    "label": "entre datas"
+  }
+]
