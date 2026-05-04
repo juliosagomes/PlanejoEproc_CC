@@ -2,8 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+ * TOKENS VISUAIS — portados do :root do PlanejoEproc__BETA_2.html
+ *
+ * Nomes em PT-BR para casar com a UI do produto. Cada variável é exposta como
+ * cor/fonte do Tailwind em `tailwind.config.ts`, então `bg-fundo`, `text-texto`,
+ * `border-borda` e similares funcionam como utilitárias.
+ *
+ * Source-of-truth: este arquivo. Tailwind apenas referencia via `var(--…)`.
+ * Isso permite trocar valores em runtime (ex.: tema escuro) no futuro sem
+ * mexer na config do Tailwind.
+ * ========================================================================== */
+
+:root {
+  /* Estrutura */
+  --fundo: #fafafa;
+  --superficie: #ffffff;
+  --superficie-2: #f4f5f7;
+
+  /* Bordas */
+  --borda: #e6e7eb;
+  --borda-forte: #d4d6dc;
+
+  /* Texto */
+  --texto: #16181d;
+  --texto-2: #4a4d55;
+  --texto-3: #80848e;
+
+  /* Destaque (acento principal — azul) */
+  --destaque: oklch(0.55 0.15 265);
+  --destaque-suave: oklch(0.96 0.025 265);
+  --destaque-borda: oklch(0.86 0.06 265);
+
+  /* Sucesso (verde) */
+  --ok: oklch(0.55 0.14 155);
+  --ok-suave: oklch(0.96 0.03 155);
+  --ok-borda: oklch(0.84 0.08 155);
+
+  /* Aviso (âmbar) */
+  --aviso: oklch(0.65 0.13 75);
+  --aviso-suave: oklch(0.97 0.045 85);
+
+  /* Tipos de aresta (transição) */
+  --aresta-atp: oklch(0.55 0.15 265);
+  --aresta-pref: oklch(0.55 0.14 155);
+  --aresta-manual: oklch(0.65 0.01 270);
+
+  /* Grade do canvas */
+  --grade-ponto: #e6e7eb;
+}
+
 html,
 body,
 #root {
   height: 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  color: var(--texto);
+  background: var(--fundo);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+
+/* JetBrains Mono não é embutido — fallbacks de sistema (ui-monospace) cobrem
+ * o uso restrito a chips/labels. Se virar requisito, embutir via @fontsource. */
+.mono {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }

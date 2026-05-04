@@ -148,3 +148,6 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 2. JSON exportado reabre sem perda (round-trip testado).
 3. `npm run build` gera ZIP funcional offline em máquina sem Node nem internet.
 4. `npm test` passa limpo.
+5. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist/` retorna **zero** matches (proibido CDN em runtime).
+6. Para o alvo singlefile, `vite-plugin-singlefile` precisa estar configurado
+   para inlinar assets binários (WOFF2 viram base64 dentro do CSS).
