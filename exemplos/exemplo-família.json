@@ -11,7 +11,7 @@
       },
       "data": {
         "nome": "[FAMÍLIA] Ag. Contestação",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
@@ -23,19 +23,20 @@
       },
       "data": {
         "nome": "[FAMÍLIA] Ag. Réplica",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
     {
       "id": "n-mozjgfnj",
       "position": {
-        "x": 1181.5488969957173,
-        "y": 327.02395237380074
+        "x": 1165.105164133457,
+        "y": 374.4205941532564
       },
       "data": {
         "nome": "[FAMÍLIA] Decorrido o prazo da contestação",
-        "ja_criado": true,
+        "descricao": "Localizador intermediário para não disparo imediato da regra",
+        "ja_criado": false,
         "flags": {}
       }
     },
@@ -47,7 +48,7 @@
       },
       "data": {
         "nome": "🔵 Conclusos - Pedido Reconvencional",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
@@ -59,6 +60,7 @@
       },
       "data": {
         "nome": "Analisar Reconvenção/Liminar em Contestação",
+        "descricao": "Quando adv. peticiona como \"RECONVENÇÃO\" ou \"PETIÇÃO URGENTE\"",
         "ja_criado": false,
         "flags": {}
       }
@@ -66,36 +68,24 @@
     {
       "id": "n-mozjgfnr",
       "position": {
-        "x": 1245.4318891374623,
-        "y": 200.42417208509198
+        "x": 1283.5677994040357,
+        "y": 185.08740647364772
       },
       "data": {
         "nome": "[FAMÍLIA] Decorrido o prazo da réplica",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
     {
       "id": "n-mozjgfnu",
       "position": {
-        "x": 1299.3060722516109,
-        "y": 25.893675639653097
+        "x": 1293.7297292752849,
+        "y": 48.39794318655021
       },
       "data": {
         "nome": "[FAMÍLIA] Ag. Parecer do MP",
-        "ja_criado": true,
-        "flags": {}
-      }
-    },
-    {
-      "id": "n-mozjgfnw",
-      "position": {
-        "x": 1631.2034745082576,
-        "y": 25.893675639653125
-      },
-      "data": {
-        "nome": "[FAMÍLIA] Juntado Parecer do MP",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
@@ -107,7 +97,7 @@
       },
       "data": {
         "nome": "🔵Conclusos - Esp. de Provas",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
@@ -119,19 +109,20 @@
       },
       "data": {
         "nome": "[FAMÍLIA] Ag. Especificação de Provas",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     },
     {
       "id": "n-mozjgfo7",
       "position": {
-        "x": 720.8550816224883,
-        "y": 381.0274359811569
+        "x": 642.6252192237312,
+        "y": 431.8661199198464
       },
       "data": {
         "nome": "[FAMÍLIA] Analisar Contestação 👀",
-        "ja_criado": true,
+        "descricao": "Processos que contém mais de um réu",
+        "ja_criado": false,
         "flags": {}
       }
     },
@@ -143,7 +134,7 @@
       },
       "data": {
         "nome": "🔵 Conclusos",
-        "ja_criado": true,
+        "ja_criado": false,
         "flags": {}
       }
     }
@@ -157,9 +148,24 @@
       "targetHandle": null,
       "data": {
         "kind": "atp",
-        "resumo": "",
+        "resumo": "Se peticionado apenas contestação",
         "observacao": "",
-        "subitems": [],
+        "subitems": [
+          {
+            "id": "si-mozl0ub9",
+            "categoria": "Preferência",
+            "nome": "Intimação para Réplica",
+            "descricao": "Preferência para disparo do texto padrão",
+            "ja_criado": false
+          },
+          {
+            "id": "si-mozl0uba",
+            "categoria": "Texto padrão",
+            "nome": "Intimação para Réplica",
+            "descricao": "\"Vista ao autor para, querendo, impugnar contestação\"",
+            "ja_criado": false
+          }
+        ],
         "atp": {
           "implantar": true,
           "ja_criado": false,
@@ -181,10 +187,15 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Se decorrido o prazo",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Após decurso de prazo"
+        }
       }
     },
     {
@@ -194,10 +205,19 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Se peticionada reconvenção/pedido liminar",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Após adv. peticionar \"Reconvenção\"",
+          "trigger": {
+            "tipo": "P"
+          },
+          "acao": "Movimento entre localizadores (apenas)"
+        }
       }
     },
     {
@@ -207,10 +227,17 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "pref",
+        "resumo": "Verificado: é reconvenção/liminar",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "pref": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Concluso para Análise de Pedido Reconvencional",
+          "tipo": "Movimentação",
+          "acao": "Evento: Concluso para despacho"
+        }
       }
     },
     {
@@ -220,10 +247,25 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "pref",
+        "resumo": "Não é reconvenção/liminar",
         "observacao": "",
-        "subitems": []
+        "subitems": [
+          {
+            "id": "si-mozl0ubc",
+            "categoria": "Texto padrão",
+            "nome": "Intimação para réplica",
+            "ja_criado": false
+          }
+        ],
+        "pref": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Intimar Autor para Impugnar",
+          "tipo": "Intimação",
+          "minutaModo": "texto_padrao",
+          "minutaConteudo": "\"Vista ao autor para, querendo, impugnar a contestação\""
+        }
       }
     },
     {
@@ -233,10 +275,21 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Se decorrido o prazo",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": " ",
+          "trigger": {
+            "tipo": "E",
+            "eventoIds": [
+              "40400449"
+            ]
+          }
+        }
       }
     },
     {
@@ -246,10 +299,21 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "pref",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "MP intervém",
         "observacao": "",
         "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Réplica Apresentada",
+          "trigger": {
+            "tipo": "P"
+          },
+          "condicoes": "Vista MP - Sim",
+          "acaoTipo": "E",
+          "acao": "Intimação Vista MP"
+        },
         "pref": {
           "implantar": true,
           "ja_criado": false,
@@ -261,42 +325,27 @@
       }
     },
     {
-      "id": "e-mozjgfnx",
-      "source": "n-mozjgfnu",
-      "target": "n-mozjgfnw",
-      "sourceHandle": null,
-      "targetHandle": null,
-      "data": {
-        "kind": "manual",
-        "resumo": "",
-        "observacao": "",
-        "subitems": []
-      }
-    },
-    {
-      "id": "e-mozjgfnz",
-      "source": "n-mozjgfnw",
-      "target": "n-mozjgfny",
-      "sourceHandle": null,
-      "targetHandle": null,
-      "data": {
-        "kind": "manual",
-        "resumo": "",
-        "observacao": "",
-        "subitems": []
-      }
-    },
-    {
       "id": "e-mozjgfo0",
       "source": "n-mozb9sv5",
       "target": "n-mozjgfny",
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "MP não intervém",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": false,
+          "ja_criado": false,
+          "nome": "Réplica apresentada",
+          "trigger": {
+            "tipo": "P"
+          },
+          "condicoes": "Vista MP - Não",
+          "acaoTipo": "E",
+          "acao": "Concluso para despacho"
+        }
       }
     },
     {
@@ -306,10 +355,21 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Encaminhamento diário",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "",
+          "trigger": {
+            "tipo": "D",
+            "periodicidadeDias": 1
+          },
+          "acaoTipo": "E",
+          "acao": "Concluso para despacho"
+        }
       }
     },
     {
@@ -319,10 +379,19 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Encaminhamento diário",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "",
+          "trigger": {
+            "tipo": "D",
+            "periodicidadeDias": 1
+          }
+        }
       }
     },
     {
@@ -333,7 +402,7 @@
       "targetHandle": null,
       "data": {
         "kind": "manual",
-        "resumo": "",
+        "resumo": "Devolução do Gabinete",
         "observacao": "",
         "subitems": []
       }
@@ -345,10 +414,19 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Se réu é litisconsórcio",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Após petição apresentada em processo com mais de um réu",
+          "trigger": {
+            "tipo": "E"
+          },
+          "acao": "Apenas movimentação entre localizadores"
+        }
       }
     },
     {
@@ -358,10 +436,19 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "pref",
+        "resumo": "Não há réus pendentes de citação",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "pref": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "",
+          "tipo": "Minuta",
+          "acao": "Ato ordinatório praticado -> Intima autor (15 dias)",
+          "minutaModo": "texto_padrao",
+          "minutaConteudo": "Vista ao autor para, querendo, impugnar a contestação"
+        }
       }
     },
     {
@@ -371,12 +458,40 @@
       "sourceHandle": null,
       "targetHandle": null,
       "data": {
-        "kind": "manual",
-        "resumo": "",
+        "kind": "atp",
+        "resumo": "Após partes manifestarem",
         "observacao": "",
-        "subitems": []
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Após partes manifestarem"
+        }
+      }
+    },
+    {
+      "id": "e-mozl0ubb",
+      "source": "n-mozjgfnu",
+      "target": "n-mozjgfny",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "atp",
+        "resumo": "Após MP manifestar",
+        "observacao": "",
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Após parecer MP juntado",
+          "trigger": {
+            "tipo": "P"
+          },
+          "acaoTipo": "E",
+          "acao": "Concluso para despacho"
+        }
       }
     }
   ],
-  "exportedAt": "2026-05-10T09:19:43.147Z"
+  "exportedAt": "2026-05-10T18:58:43.849Z"
 }
