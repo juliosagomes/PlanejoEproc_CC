@@ -58,6 +58,30 @@
 
 ---
 
+---
+
+## D-6 · Parser de XLS via SheetJS embutido
+
+**Decisão.** O catálogo de localizadores do órgão é importado a partir do XLS exportado pelo Eproc, lido em runtime no browser via `xlsx` (SheetJS). A biblioteca é embutida no singlefile (~700 KB minificada).
+
+**Por que.** O export oficial do Eproc é XLS binário (OLE2/BIFF8) — não HTML disfarçado nem CSV. As alternativas eram (a) pedir ao usuário converter para CSV no Excel antes de importar (atrito desnecessário num app que já promete ser "abrir e usar"), (b) ter uma página HTML companion só de conversão (UX de duas etapas), ou (c) embutir um parser XLS. Embutir é o caminho mais limpo: a importação acontece num clique. O custo de bundle é amortizado sobre uma feature que o usuário usa frequentemente. SheetJS é a única lib madura que lê BIFF8 em JS puro (sem WASM), é totalmente bundlável pelo Vite, e funciona em `file://`.
+
+**Risco aceito.** SheetJS 0.18.5 (versão pública do npm) tem alertas de prototype pollution / ReDoS. Mitigação: o XLS importado é exclusivamente do próprio órgão do usuário, processado localmente, sem trânsito por servidor. Sem superfície de ataque externa em beta. Atualizar para 0.20.x (CDN oficial) quando a feature exigir.
+
+**O que precisaria mudar para evoluir.** Para outros formatos (XLSX, ODS), o mesmo `XLSX.read()` já cobre — basta o parser não fixar `.xls`. Para suporte a outros sistemas (PJe, etc.), parser específico por origem; estrutura atual de `infra/catalogo/` acomoda.
+
+---
+
+## D-7 · Catálogo do órgão é global por navegador, fora do plano
+
+**Decisão.** O catálogo de localizadores do órgão é persistido em chave própria do `localStorage` (`planejoeproc:catalogo:orgao`), independente dos planos. **Não** entra no JSON exportado de plano. Itens com `Localizador Sistema = Sim` são filtrados no parser e nunca chegam ao storage.
+
+**Por que.** O catálogo é uma propriedade do **usuário/órgão**, não do plano específico. Carregar uma vez deve valer para todos os planos. Se viajasse junto do JSON, planos antigos ficariam com catálogos desatualizados ao abrir noutra máquina, e duplicaríamos centenas de KB no payload de cada export. Filtrar Sistema=Sim no parser é alinhado ao propósito do app: incentivar o usuário a desenhar fluxos próprios; localizadores de sistema do Eproc são padrão e sugeri-los seria contraproducente.
+
+**O que precisaria mudar para evoluir.** Se virar requisito "compartilhar plano + catálogo de uma máquina para outra", adicionar export/import específico do catálogo (botão dedicado), nunca incluí-lo no JSON do plano. Se um dia o usuário quiser ver localizadores de sistema como referência, expor uma toggle no parser (mas continuar sugerindo só os customizados na autocomplete).
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

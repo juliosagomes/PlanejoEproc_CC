@@ -17,7 +17,7 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 - App **funciona 100% offline** após download.
 - **Sem CDN em runtime.** Nada de `unpkg.com`, `cdn.jsdelivr.net`, `fonts.googleapis.com` no produto final. Tudo embutido no build.
 - **Sem instalação.** Abrir o `index.html` por duplo clique numa máquina sem Node, sem internet e sem privilégio de admin tem que funcionar.
-- **Distribuição: híbrida.** Pasta `PlanejoEproc/` (gerada por `npm run pack`) contendo: `index.html` singlefile (todo o app inline), `planos/` para o usuário guardar exports manuais, e `LEIA-ME.txt`. Modelo escolhido porque Chromium bloqueia ES modules carregados via `file://` (cada `import` dispara CORS sem origem HTTP), então qualquer alvo que emita `<script type="module">` separado dá tela branca em duplo clique. Singlefile contorna inlinando tudo; a pasta companion serve para arquivos auxiliares que o usuário consulta/edita externamente.
+- **Distribuição: híbrida.** Pasta `PlanejoEproc/` (gerada por `npm run pack`) contendo: `index.html` singlefile (todo o app inline), `planos/` para o usuário guardar exports manuais de plano, `localizadores/` para o usuário guardar o XLS de localizadores do órgão exportado do Eproc, e `LEIA-ME.txt`. Modelo escolhido porque Chromium bloqueia ES modules carregados via `file://` (cada `import` dispara CORS sem origem HTTP), então qualquer alvo que emita `<script type="module">` separado dá tela branca em duplo clique. Singlefile contorna inlinando tudo; a pasta companion serve para arquivos auxiliares que o usuário consulta/edita externamente. Pelo mesmo motivo de CORS, o app **não consegue** ler `./localizadores/*.xls` sozinho — a pasta é só local de armazenamento; a importação é via botão "Catálogo órgão" no header (file picker).
 
 ## Stack obrigatória
 
@@ -30,6 +30,7 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 | Canvas/grafo | ReactFlow 11 |
 | Estado canvas | Zustand |
 | Validação | Zod (apenas nas bordas) |
+| Parser XLS | `xlsx` (SheetJS) — só para importar catálogo do órgão (decisoes.md#D-6) |
 | Persistência | localStorage atrás de `infra/storage/` (trocável por IndexedDB depois) |
 | Testes | Vitest + jsdom (lógica pura prioridade; UI opcional) |
 | Distribuição | `vite build --mode singlefile` + `npm run pack` → `dist-pack/PlanejoEproc/` (singlefile + companion). |
@@ -43,6 +44,8 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 src/
   domain/          ← tipos puros e regras. NÃO importa React, ReactFlow, Zod.
   infra/           ← adapter para mundo externo (storage, parsing, futuro fetch).
+    storage/       ← localStorage de planos e do catálogo do órgão.
+    catalogo/      ← parser do XLS de localizadores do órgão (SheetJS).
   features/        ← organização por feature (canvas, checklist, etc.).
   data/            ← JSONs do Eproc embutidos no build (subset).
   components/      ← componentes genéricos (Header, Sidebar, PanelHeader).

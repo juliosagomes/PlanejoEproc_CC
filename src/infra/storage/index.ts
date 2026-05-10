@@ -27,4 +27,15 @@ export {
   type PlanIndexEntry,
   type PlansIndex,
 } from './storage';
-export { PlanoSchema, PlanIndexEntrySchema, PlansIndexSchema } from './schema';
+export {
+  CATALOGO_KEY,
+  loadCatalogoOrgao,
+  saveCatalogoOrgao,
+  clearCatalogoOrgao,
+} from './catalogo';
+export {
+  PlanoSchema,
+  PlanIndexEntrySchema,
+  PlansIndexSchema,
+  CatalogoOrgaoSchema,
+} from './schema';

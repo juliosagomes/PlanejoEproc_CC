@@ -1,11 +1,14 @@
 import { z } from 'zod';
 import {
+  CATALOGO_ORGAO_VERSION,
   PREF_TIPOS,
   SCHEMA_VERSION,
   SUBITEM_CATS,
   TIPO_CONTROLE_VALUES,
+  type CatalogoOrgao,
   type Edge,
   type Localizador,
+  type LocalizadorOrgao,
   type Plano,
   type Subitem,
 } from '@/domain';
@@ -178,3 +181,23 @@ export const PlanIndexEntrySchema = z.object({
 });
 
 export const PlansIndexSchema = z.array(PlanIndexEntrySchema);
+
+/* ============================================================================
+ * Catálogo do órgão (decisoes.md#D-7)
+ *
+ * Persistido global por navegador, não viaja dentro do JSON do plano. Mesmo
+ * padrão dos planos: schema versionado, satisfies para garantir alinhamento
+ * com o tipo do domain.
+ * ========================================================================== */
+
+const LocalizadorOrgaoSchema = z.object({
+  id: z.string(),
+  nome: z.string(),
+  descricao: z.string().optional(),
+}) satisfies z.ZodType<LocalizadorOrgao>;
+
+export const CatalogoOrgaoSchema = z.object({
+  version: z.literal(CATALOGO_ORGAO_VERSION),
+  importadoEm: z.string(),
+  itens: z.array(LocalizadorOrgaoSchema),
+}) satisfies z.ZodType<CatalogoOrgao>;
