@@ -96,11 +96,92 @@ describe('deriveChecklist', () => {
     if (rule?.kind !== 'rule') throw new Error('esperava rule');
     expect(rule.nome).toBe('ATP citação');
     expect(rule.contexto).toBe('A → B');
-    expect(rule.descricao).toBe('mover para conclusão');
+    // `descricao` saiu — `acao` aparece em `detalhes` rotulado.
+    expect(rule.descricao).toBeUndefined();
+    expect(rule.detalhes).toEqual([
+      { label: 'Detalhes da ação', valor: 'mover para conclusão' },
+    ]);
     expect(rule.children).toHaveLength(1);
     expect(rule.children[0]?.categoria).toBe('Modelo');
     // Subitens aninhados não devem aparecer também em Modelo:
     expect(g['Modelo']).toEqual([]);
+  });
+
+  it('detalhes ATP resolvem códigos de gatilho/ação e listam IDs de filtros', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'atp',
+          resumo: '',
+          observacao: '',
+          subitems: [],
+          atp: {
+            implantar: true,
+            ja_criado: false,
+            nome: 'R',
+            trigger: { tipo: 'L', diasNoLocalizador: 5 },
+            acaoTipo: 'CMA',
+            condicoes: 'condição livre',
+            filtros: { competenciaIds: ['__cod_inexistente__'] },
+            observacoes: 'obs',
+          },
+        },
+      },
+    ];
+    const rule = deriveChecklist(nodes, edges)['Regra de ATP'][0];
+    if (rule?.kind !== 'rule') throw new Error('esperava rule');
+    const labels = rule.detalhes.map((d) => d.label);
+    expect(labels).toEqual([
+      'Gatilho',
+      'Dias no localizador',
+      'Ação programada',
+      'Condições',
+      'Competência',
+      'Observações',
+    ]);
+    // Gatilho começa com o código L; resolução do label (se o catálogo
+    // contiver) acrescenta " — <rótulo>", senão fica só "L".
+    expect(rule.detalhes[0]?.valor.startsWith('L')).toBe(true);
+    expect(rule.detalhes[1]?.valor).toBe('5');
+    // Código inexistente vira fallback para o próprio ID.
+    expect(rule.detalhes[4]?.valor).toBe('__cod_inexistente__');
+  });
+
+  it('detalhes Pref expõem Minuta + conteúdo do Texto padrão', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'pref',
+          resumo: '',
+          observacao: '',
+          subitems: [],
+          pref: {
+            implantar: true,
+            ja_criado: false,
+            nome: 'P',
+            tipo: 'Minuta',
+            minutaModo: 'texto_padrao',
+            minutaConteudo: 'linha 1\nlinha 2',
+            acao: 'conclusão p/ despacho',
+          },
+        },
+      },
+    ];
+    const rule = deriveChecklist(nodes, edges)['Preferência'][0];
+    if (rule?.kind !== 'rule') throw new Error('esperava rule');
+    expect(rule.detalhes).toEqual([
+      { label: 'Tipo', valor: 'Minuta' },
+      { label: 'Texto padrão', valor: 'linha 1\nlinha 2' },
+      { label: 'Efeito', valor: 'conclusão p/ despacho' },
+    ]);
   });
 
   it('regra Pref com implantar=true vai para "Preferência"', () => {
@@ -208,5 +289,34 @@ describe('checklistToMarkdown', () => {
     expect(md).toContain('## Regra de ATP (0/2)');
     expect(md).toContain('- [ ] R1 _(A → A)_');
     expect(md).toContain('  - [ ] m1 _[Modelo]_');
+  });
+
+  it('inclui detalhes rotulados sob a regra (multi-linha indentado)', () => {
+    const nodes = [noLocalizador('n1', 'A')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n1',
+        data: {
+          kind: 'pref',
+          resumo: '',
+          observacao: '',
+          subitems: [],
+          pref: {
+            implantar: true,
+            ja_criado: false,
+            nome: 'P',
+            tipo: 'Minuta',
+            minutaModo: 'modelo',
+            minutaConteudo: 'L1\nL2',
+          },
+        },
+      },
+    ];
+    const md = checklistToMarkdown('X', deriveChecklist(nodes, edges));
+    expect(md).toContain('  - **Tipo:** Minuta');
+    expect(md).toContain('  - **Modelo:** L1');
+    expect(md).toContain('    L2');
   });
 });

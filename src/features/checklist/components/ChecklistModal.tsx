@@ -218,6 +218,45 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                                 {it.descricao}
                               </div>
                             )}
+                            {it.kind === 'rule' && it.detalhes.length > 0 && (
+                              <div className="mt-1.5 flex flex-col gap-1">
+                                {it.detalhes.map((d, di) => {
+                                  const multilinha = d.valor.includes('\n');
+                                  return (
+                                    <div
+                                      key={di}
+                                      style={{ fontSize: 11.5, lineHeight: 1.45 }}
+                                    >
+                                      <span
+                                        className="text-texto-2 font-semibold"
+                                        style={{ fontSize: 11 }}
+                                      >
+                                        {d.label}:
+                                      </span>{' '}
+                                      {multilinha ? (
+                                        <div
+                                          className="text-texto mt-1"
+                                          style={{
+                                            whiteSpace: 'pre-wrap',
+                                            background: 'var(--superficie)',
+                                            border: '1px solid var(--borda)',
+                                            borderRadius: 6,
+                                            padding: '6px 8px',
+                                            fontFamily:
+                                              'JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+                                            fontSize: 11,
+                                          }}
+                                        >
+                                          {d.valor}
+                                        </div>
+                                      ) : (
+                                        <span className="text-texto">{d.valor}</span>
+                                      )}
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            )}
                           </div>
                         </label>
                         {isRule && childCount > 0 && (
