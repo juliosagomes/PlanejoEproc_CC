@@ -10,6 +10,8 @@ import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/s
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
 import {
+  PLANO_BUNDLE_VERSION,
+  PlanoBundleSchema,
   PlanoSchema,
   type PlanIndexEntry,
   criarPlano,
@@ -17,6 +19,7 @@ import {
   excluirPlano,
   getAtivoId,
   importarPlano,
+  importarPlanos,
   listPlanos,
   loadPlano,
   planoVazio,
@@ -205,18 +208,38 @@ export default function App() {
       try {
         const text = await f.text();
         const parsed: unknown = JSON.parse(text);
-        const result = PlanoSchema.safeParse(parsed);
-        if (!result.success) {
-          window.alert(
-            'JSON inválido: o arquivo não tem o formato esperado do PlanejoEproc v1.\n\n' +
-              (result.error.issues[0]?.message ?? ''),
+
+        // Tenta bundle antes do plano único: o discriminador `kind` evita
+        // ambiguidade (planos individuais não têm esse campo).
+        const bundleResult = PlanoBundleSchema.safeParse(parsed);
+        if (bundleResult.success) {
+          if (bundleResult.data.plans.length === 0) {
+            window.alert('O bundle está vazio — nenhum plano para importar.');
+            return;
+          }
+          flushPersist();
+          importarPlanos(bundleResult.data.plans);
+          const novoAtivoId = getAtivoId();
+          loadPlanoAcao(
+            novoAtivoId !== null ? loadPlano(novoAtivoId) : planoVazio(),
           );
+          refreshPlanos();
           return;
         }
-        flushPersist();
-        importarPlano(result.data);
-        loadPlanoAcao(result.data);
-        refreshPlanos();
+
+        const planoResult = PlanoSchema.safeParse(parsed);
+        if (planoResult.success) {
+          flushPersist();
+          importarPlano(planoResult.data);
+          loadPlanoAcao(planoResult.data);
+          refreshPlanos();
+          return;
+        }
+
+        window.alert(
+          'JSON inválido: o arquivo não tem o formato esperado do PlanejoEproc v1 (plano único nem bundle).\n\n' +
+            (planoResult.error.issues[0]?.message ?? ''),
+        );
       } catch (e) {
         window.alert('Falha ao importar: ' + (e as Error).message);
       }
@@ -224,30 +247,61 @@ export default function App() {
     input.click();
   };
 
-  const onSalvarCopia = () => {
-    const plano = {
-      ...useCanvasStore.getState().getPlano(),
-      exportedAt: new Date().toISOString(),
-    };
-    const blob = new Blob([JSON.stringify(plano, null, 2)], {
+  // Helpers de download — extraídos para evitar duplicação entre o caminho
+  // de plano único e o de bundle. `safeFileName` produz um slug ASCII que
+  // sobrevive a sistemas de arquivo restritivos.
+  const safeFileName = (raw: string, fallback: string): string => {
+    const slug = raw
+      .replace(/[^\p{L}\p{N}_-]+/gu, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+    return slug || fallback;
+  };
+
+  const downloadJson = (filename: string, payload: unknown) => {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: 'application/json',
     });
     const url = URL.createObjectURL(blob);
-    const safeName =
-      (plano.planoNome || 'plano')
-        .replace(/[^\p{L}\p{N}_-]+/gu, '-')
-        .replace(/^-+|-+$/g, '')
-        .toLowerCase() || 'plano';
-    const today = new Date().toISOString().slice(0, 10);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${safeName}-${today}.json`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
       URL.revokeObjectURL(url);
       a.remove();
     }, 0);
+  };
+
+  const onSalvarCopiaAtivo = () => {
+    const plano = {
+      ...useCanvasStore.getState().getPlano(),
+      exportedAt: new Date().toISOString(),
+    };
+    const today = new Date().toISOString().slice(0, 10);
+    const nome = safeFileName(plano.planoNome || 'plano', 'plano');
+    downloadJson(`${nome}-${today}.json`, plano);
+  };
+
+  const onSalvarTodos = () => {
+    // flushPersist garante que o ativo, que pode ter saves pendentes, esteja
+    // gravado antes de lermos do storage.
+    flushPersist();
+    const entries = listPlanos();
+    if (entries.length === 0) {
+      window.alert('Nenhum plano salvo no navegador.');
+      return;
+    }
+    const plans = entries.map((e) => loadPlano(e.id));
+    const bundle = {
+      kind: 'planejoeproc-bundle' as const,
+      version: PLANO_BUNDLE_VERSION,
+      exportedAt: new Date().toISOString(),
+      plans,
+    };
+    const today = new Date().toISOString().slice(0, 10);
+    downloadJson(`planejoeproc-bundle-${today}.json`, bundle);
   };
 
   const criarNoCentro = () => {
@@ -272,7 +326,8 @@ export default function App() {
         onExcluirPlano={onExcluirPlano}
         onNovo={onNovo}
         onAbrirArquivo={onAbrirArquivo}
-        onSalvarCopia={onSalvarCopia}
+        onSalvarCopiaAtivo={onSalvarCopiaAtivo}
+        onSalvarTodos={onSalvarTodos}
         onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
         onChecklist={() => setShowChecklist(true)}
         flowMode={flowMode}

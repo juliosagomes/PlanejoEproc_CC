@@ -353,6 +353,56 @@ export function importarPlano(plano: Plano): { id: string } {
 }
 
 /**
+ * Importa em lote uma lista de planos já validados (típico fluxo "Abrir
+ * bundle…"). Cada plano recebe id novo e entra no índice; o último da lista
+ * é marcado como ativo (espelha a ordem do bundle, que costuma vir mais
+ * recente por último).
+ *
+ * Lista vazia é no-op — devolve `{ ids: [], ativoId: null }` sem tocar no
+ * ativo atual. O caller é responsável por validar o shape antes de chamar.
+ */
+export function importarPlanos(plans: Plano[]): {
+  ids: string[];
+  ativoId: string | null;
+} {
+  if (plans.length === 0) return { ids: [], ativoId: null };
+  const storage = getStorage();
+  if (!storage) return { ids: [], ativoId: null };
+
+  const index = readIndex(storage);
+  const novasEntries: PlanIndexEntry[] = [];
+  const ids: string[] = [];
+
+  for (const plano of plans) {
+    const id = newId();
+    ids.push(id);
+    novasEntries.push({
+      id,
+      nome: plano.planoNome.trim() || 'Plano importado',
+      atualizadoEm: nowIso(),
+    });
+    try {
+      storage.setItem(getPlanKey(id), JSON.stringify(plano));
+    } catch (err) {
+      console.warn('[storage] Falha ao gravar plano importado.', err);
+    }
+  }
+
+  writeIndex(storage, [...index, ...novasEntries]);
+
+  const ultimoId = ids[ids.length - 1] ?? null;
+  if (ultimoId !== null) {
+    try {
+      storage.setItem(ACTIVE_KEY, ultimoId);
+    } catch (err) {
+      console.warn('[storage] Falha ao gravar ativo após importação em lote.', err);
+    }
+  }
+
+  return { ids, ativoId: ultimoId };
+}
+
+/**
  * Duplica um plano existente: copia o payload, renomeia para "Cópia de…",
  * registra com novo id e ativa. Retorna null se o id de origem não existe.
  */

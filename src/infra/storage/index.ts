@@ -18,6 +18,7 @@ export {
   setAtivo,
   criarPlano,
   importarPlano,
+  importarPlanos,
   duplicarPlano,
   renomearPlano,
   excluirPlano,
@@ -35,7 +36,10 @@ export {
 } from './catalogo';
 export {
   PlanoSchema,
+  PlanoBundleSchema,
+  PLANO_BUNDLE_VERSION,
   PlanIndexEntrySchema,
   PlansIndexSchema,
   CatalogoOrgaoSchema,
+  type PlanoBundle,
 } from './schema';

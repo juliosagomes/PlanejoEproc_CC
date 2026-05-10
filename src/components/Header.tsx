@@ -1,6 +1,7 @@
 import type { FlowMode } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PlanSwitcher } from '@/features/plans/PlanSwitcher';
+import { SalvarCopiaButton } from '@/features/plans/SalvarCopiaButton';
 import type { PlanIndexEntry } from '@/infra/storage';
 import { cn } from '@/utils/cn';
 
@@ -24,7 +25,8 @@ export interface HeaderProps {
   // Ações de fluxo
   onNovo: () => void;
   onAbrirArquivo: () => void;
-  onSalvarCopia: () => void;
+  onSalvarCopiaAtivo: () => void;
+  onSalvarTodos: () => void;
   onCatalogoOrgao: () => void;
   onChecklist: () => void;
   flowMode: FlowMode;
@@ -57,7 +59,8 @@ export function Header({
   onExcluirPlano,
   onNovo,
   onAbrirArquivo,
-  onSalvarCopia,
+  onSalvarCopiaAtivo,
+  onSalvarTodos,
   onCatalogoOrgao,
   onChecklist,
   flowMode,
@@ -154,14 +157,11 @@ export function Header({
       >
         <Icon.Upload /> Abrir arquivo
       </button>
-      <button
-        type="button"
-        className="btn btn-sm"
-        onClick={onSalvarCopia}
-        title="Baixa o plano ativo como JSON (sugerido: salvar em /planos)"
-      >
-        <Icon.Download /> Salvar cópia
-      </button>
+      <SalvarCopiaButton
+        totalPlanos={planos.length}
+        onSalvarAtivo={onSalvarCopiaAtivo}
+        onSalvarTodos={onSalvarTodos}
+      />
       <button
         type="button"
         className="btn btn-sm"

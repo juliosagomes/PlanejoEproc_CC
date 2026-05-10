@@ -170,6 +170,24 @@ export const PlanoSchema = z.object({
 }) satisfies z.ZodType<Plano>;
 
 /**
+ * Bundle de exportação contendo múltiplos planos. O `kind` literal serve de
+ * discriminador na hora de importar arquivo: o caller tenta `PlanoBundleSchema`
+ * antes de `PlanoSchema` para diferenciar bundle de plano único. A `version`
+ * aqui versiona o formato do invólucro, não os planos internos (que carregam
+ * sua própria SCHEMA_VERSION).
+ */
+export const PLANO_BUNDLE_VERSION = 1 as const;
+
+export const PlanoBundleSchema = z.object({
+  kind: z.literal('planejoeproc-bundle'),
+  version: z.literal(PLANO_BUNDLE_VERSION),
+  exportedAt: z.string().optional(),
+  plans: z.array(PlanoSchema),
+});
+
+export type PlanoBundle = z.infer<typeof PlanoBundleSchema>;
+
+/**
  * Índice de planos (multi-plano). Cada entrada é leve — só metadados — e o
  * payload completo fica numa chave separada `planejoeproc:plan:{id}`.
  * `atualizadoEm` é ISO 8601; usado para ordenar a lista por uso recente na UI.

@@ -13,6 +13,7 @@ import {
   getAtivoId,
   getPlanKey,
   importarPlano,
+  importarPlanos,
   listPlanos,
   loadPlano,
   planoVazio,
@@ -210,6 +211,33 @@ describe('CRUD do índice', () => {
     const lista = listPlanos();
     expect(lista).toHaveLength(2);
     expect(lista.some((e) => e.id === id && e.nome === 'Importado')).toBe(true);
+  });
+
+  it('importarPlanos registra cada plano e ativa o último', () => {
+    const a = criarPlano('Existente').id;
+    const { ids, ativoId } = importarPlanos([
+      planoExemplo('Bundle 1'),
+      planoExemplo('Bundle 2'),
+      planoExemplo('Bundle 3'),
+    ]);
+    expect(ids).toHaveLength(3);
+    expect(ativoId).toBe(ids[2]);
+    expect(getAtivoId()).toBe(ids[2]);
+
+    const lista = listPlanos();
+    expect(lista).toHaveLength(4);
+    expect(lista.some((e) => e.id === a)).toBe(true);
+    expect(loadPlano(ids[0]!).planoNome).toBe('Bundle 1');
+    expect(loadPlano(ids[2]!).planoNome).toBe('Bundle 3');
+  });
+
+  it('importarPlanos com lista vazia é no-op e preserva o ativo', () => {
+    const a = criarPlano('A').id;
+    const { ids, ativoId } = importarPlanos([]);
+    expect(ids).toEqual([]);
+    expect(ativoId).toBeNull();
+    expect(getAtivoId()).toBe(a);
+    expect(listPlanos()).toHaveLength(1);
   });
 
   it('duplicarPlano copia o payload com novo id e nome "Cópia de…"', () => {
