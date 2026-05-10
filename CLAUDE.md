@@ -17,6 +17,7 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 - App **funciona 100% offline** após download.
 - **Sem CDN em runtime.** Nada de `unpkg.com`, `cdn.jsdelivr.net`, `fonts.googleapis.com` no produto final. Tudo embutido no build.
 - **Sem instalação.** Abrir o `index.html` por duplo clique numa máquina sem Node, sem internet e sem privilégio de admin tem que funcionar.
+- **Sem ES modules em runtime no alvo de pasta.** Chromium bloqueia `<script type="module">` carregado via `file://` (cada `import` dispara CORS sem origem HTTP), o que dá tela branca. O alvo padrão usa IIFE com dynamic imports inlinados (configurado em `vite.config.ts`). O singlefile contorna naturalmente porque o JS já é injetado inline. Não reverta para `format: 'es'` sem revisitar.
 - **Distribuição (principal):** pasta `PlanejoEproc/` com `index.html`, `assets/` e `planos/` (gerada por `npm run pack`). O usuário compacta manualmente para enviar ou copia por rede compartilhada.
 - **Distribuição (alvo opcional):** HTML único standalone via `npm run build:singlefile` para casos em que distribuir uma pasta inteira atrapalha.
 
