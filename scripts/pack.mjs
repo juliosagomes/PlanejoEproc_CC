@@ -1,31 +1,36 @@
 #!/usr/bin/env node
 /**
- * Empacotador da distribuição em pasta.
+ * Empacotador da distribuição.
  *
- * Lê `dist/` (saída do `vite build`) e produz `dist-pack/PlanejoEproc/` com
- * a estrutura final que o usuário recebe:
+ * Lê `dist-singlefile/index.html` (saída do `vite build --mode singlefile`)
+ * e produz `dist-pack/PlanejoEproc/` com a estrutura final que o usuário
+ * recebe:
  *
  *   PlanejoEproc/
- *     index.html
- *     assets/
+ *     index.html          ← singlefile (tudo inline — JS, CSS, fontes)
  *     planos/
  *       README.txt
  *     LEIA-ME.txt
  *
- * Não zipa — o usuário pode compactar manualmente (clique direito → Enviar
- * para → Pasta compactada) ou copiar a pasta por rede compartilhada. Manter
- * fora do script evita uma dependência (archiver/jszip) só para isso.
+ * O index.html é autossuficiente; a pasta companion existe só para o usuário
+ * guardar/consultar arquivos de apoio (planos exportados manualmente, e no
+ * futuro JSONs de catálogos de consulta). Modelo híbrido escolhido porque
+ * Chromium bloqueia ES modules carregados via file:// — singlefile contorna
+ * o problema inlinando tudo, e a pasta resolve a necessidade de espaço para
+ * arquivos auxiliares.
  *
- * Sem dependências externas: usa só `node:fs/promises` e `node:path`.
+ * Sem dependências externas: usa só `node:fs/promises` e `node:path`. O
+ * usuário pode compactar `PlanejoEproc/` manualmente (clique direito →
+ * Enviar para → Pasta compactada) ou copiar por rede.
  */
 
-import { readFile, rm, mkdir, cp, writeFile, stat } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, resolve } from 'node:path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
-const DIST = join(ROOT, 'dist');
+const SRC_HTML = join(ROOT, 'dist-singlefile', 'index.html');
 const OUT_BASE = join(ROOT, 'dist-pack');
 const OUT = join(OUT_BASE, 'PlanejoEproc');
 
@@ -51,8 +56,6 @@ const LEIA_ME = `PlanejoEproc — instruções de uso
    Firefox também funciona.
 
 5. PROBLEMAS COMUNS
-   - Página em branco ao abrir? Tente outro navegador. Algumas configurações
-     restritivas bloqueiam módulos JavaScript carregados de file://.
    - Plano "sumiu" ao mover a pasta? O localStorage está vinculado ao
      navegador e ao caminho onde está o index.html. Reabra do mesmo local
      ou use "Abrir arquivo" para recuperar a partir de um JSON salvo.
@@ -88,22 +91,6 @@ async function getPkgVersion() {
   return pkg.version ?? '0.0.0';
 }
 
-async function dirSizeBytes(dir) {
-  const { readdir } = await import('node:fs/promises');
-  let total = 0;
-  const entries = await readdir(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      total += await dirSizeBytes(full);
-    } else if (entry.isFile()) {
-      const s = await stat(full);
-      total += s.size;
-    }
-  }
-  return total;
-}
-
 function fmtBytes(n) {
   if (n < 1024) return `${n} B`;
   if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
@@ -111,9 +98,9 @@ function fmtBytes(n) {
 }
 
 async function main() {
-  if (!(await exists(DIST))) {
+  if (!(await exists(SRC_HTML))) {
     console.error(
-      `[pack] Não encontrei ${relative(ROOT, DIST)}. Rode "npm run build" antes.`,
+      `[pack] Não encontrei ${relative(ROOT, SRC_HTML)}. Rode "npm run build:singlefile" antes.`,
     );
     process.exit(1);
   }
@@ -122,19 +109,19 @@ async function main() {
   await rm(OUT_BASE, { recursive: true, force: true });
   await mkdir(OUT, { recursive: true });
 
-  console.log(`[pack] Copiando dist/ → ${relative(ROOT, OUT)}/`);
-  await cp(DIST, OUT, { recursive: true });
+  console.log(`[pack] Copiando singlefile → ${relative(ROOT, OUT)}/index.html`);
+  await copyFile(SRC_HTML, join(OUT, 'index.html'));
 
   console.log(`[pack] Criando planos/README.txt e LEIA-ME.txt`);
   await mkdir(join(OUT, 'planos'), { recursive: true });
   await writeFile(join(OUT, 'planos', 'README.txt'), PLANOS_README, 'utf8');
   await writeFile(join(OUT, 'LEIA-ME.txt'), LEIA_ME, 'utf8');
 
-  const totalSize = await dirSizeBytes(OUT);
+  const htmlSize = (await stat(join(OUT, 'index.html'))).size;
   const version = await getPkgVersion();
 
   console.log('');
-  console.log(`[pack] Pronto. Versão ${version}, tamanho ${fmtBytes(totalSize)}`);
+  console.log(`[pack] Pronto. Versão ${version}, index.html ${fmtBytes(htmlSize)}`);
   console.log(`[pack] Pasta: ${OUT}`);
   console.log('');
   console.log('Próximos passos:');

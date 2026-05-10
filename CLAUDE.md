@@ -17,9 +17,7 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 - App **funciona 100% offline** após download.
 - **Sem CDN em runtime.** Nada de `unpkg.com`, `cdn.jsdelivr.net`, `fonts.googleapis.com` no produto final. Tudo embutido no build.
 - **Sem instalação.** Abrir o `index.html` por duplo clique numa máquina sem Node, sem internet e sem privilégio de admin tem que funcionar.
-- **Sem ES modules em runtime no alvo de pasta.** Chromium bloqueia `<script type="module">` carregado via `file://` (cada `import` dispara CORS sem origem HTTP), o que dá tela branca. O alvo padrão usa IIFE com dynamic imports inlinados (configurado em `vite.config.ts`). O singlefile contorna naturalmente porque o JS já é injetado inline. Não reverta para `format: 'es'` sem revisitar.
-- **Distribuição (principal):** pasta `PlanejoEproc/` com `index.html`, `assets/` e `planos/` (gerada por `npm run pack`). O usuário compacta manualmente para enviar ou copia por rede compartilhada.
-- **Distribuição (alvo opcional):** HTML único standalone via `npm run build:singlefile` para casos em que distribuir uma pasta inteira atrapalha.
+- **Distribuição: híbrida.** Pasta `PlanejoEproc/` (gerada por `npm run pack`) contendo: `index.html` singlefile (todo o app inline), `planos/` para o usuário guardar exports manuais, e `LEIA-ME.txt`. Modelo escolhido porque Chromium bloqueia ES modules carregados via `file://` (cada `import` dispara CORS sem origem HTTP), então qualquer alvo que emita `<script type="module">` separado dá tela branca em duplo clique. Singlefile contorna inlinando tudo; a pasta companion serve para arquivos auxiliares que o usuário consulta/edita externamente.
 
 ## Stack obrigatória
 
@@ -34,7 +32,7 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 | Validação | Zod (apenas nas bordas) |
 | Persistência | localStorage atrás de `infra/storage/` (trocável por IndexedDB depois) |
 | Testes | Vitest + jsdom (lógica pura prioridade; UI opcional) |
-| Distribuição | `vite build` (HTML + assets em pasta) + `npm run pack`. Singlefile via `vite-plugin-singlefile` é alvo opcional. |
+| Distribuição | `vite build --mode singlefile` + `npm run pack` → `dist-pack/PlanejoEproc/` (singlefile + companion). |
 | Pacotes | npm |
 
 **Não troque sem justificar por escrito antes de implementar.**
@@ -148,7 +146,7 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 
 1. Todos os fluxos do `BETA_2.html` funcionam idênticos.
 2. JSON exportado reabre sem perda (round-trip testado).
-3. `npm run pack` gera `dist-pack/PlanejoEproc/` (com `index.html`, `assets/`, `planos/`, `LEIA-ME.txt`) que abre por duplo clique offline em máquina sem Node nem internet.
+3. `npm run pack` gera `dist-pack/PlanejoEproc/` (com `index.html` singlefile, `planos/`, `LEIA-ME.txt`) que abre por duplo clique offline em máquina sem Node nem internet.
 4. `npm test` passa limpo.
-5. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist/` retorna **zero** matches (proibido CDN em runtime).
-6. Alvo singlefile (`npm run build:singlefile`) é opcional — quando usado, `vite-plugin-singlefile` precisa estar configurado para inlinar assets binários (WOFF2 viram base64 dentro do CSS).
+5. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist-singlefile/` retorna **zero** matches (proibido CDN em runtime).
+6. `vite-plugin-singlefile` precisa estar configurado para inlinar assets binários (WOFF2 viram base64 dentro do CSS).
