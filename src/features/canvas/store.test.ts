@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SCHEMA_VERSION, type Plano } from '@/domain';
-import { STORAGE_KEY } from '@/infra/storage';
+import { getActivePlanKey } from '@/infra/storage';
 import {
   cancelPersist,
   defaultEdgeData,
@@ -299,17 +299,20 @@ describe('loadPlano / getPlano', () => {
 });
 
 describe('persistência reativa', () => {
-  it('mutações disparam debounced save em STORAGE_KEY após o delay', () => {
+  it('mutações disparam debounced save após o delay (no plano ativo)', () => {
     vi.useFakeTimers();
 
     useCanvasStore.getState().createNode({ x: 1, y: 2 });
     useCanvasStore.getState().setPlanoNome('Plano persistido');
 
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    // Antes do debounce não há ativo (lazy-create acontece na primeira gravação).
+    expect(getActivePlanKey()).toBeNull();
 
     vi.advanceTimersByTime(300);
 
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const key = getActivePlanKey();
+    expect(key).not.toBeNull();
+    const raw = localStorage.getItem(key!);
     expect(raw).not.toBeNull();
     const persistido = JSON.parse(raw ?? '{}');
     expect(persistido.planoNome).toBe('Plano persistido');
@@ -322,14 +325,16 @@ describe('persistência reativa', () => {
     useCanvasStore.getState().setSelectedId('abc');
 
     vi.advanceTimersByTime(1000);
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(getActivePlanKey()).toBeNull();
   });
 
   it('flushPersist força gravação imediata sem esperar o debounce', () => {
     useCanvasStore.getState().createNode({ x: 1, y: 2 });
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    expect(getActivePlanKey()).toBeNull();
 
     flushPersist();
-    expect(localStorage.getItem(STORAGE_KEY)).not.toBeNull();
+    const key = getActivePlanKey();
+    expect(key).not.toBeNull();
+    expect(localStorage.getItem(key!)).not.toBeNull();
   });
 });

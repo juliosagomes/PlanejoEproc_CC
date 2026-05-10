@@ -165,3 +165,16 @@ export const PlanoSchema = z.object({
   edges: z.array(EdgeSchema),
   exportedAt: z.string().optional(),
 }) satisfies z.ZodType<Plano>;
+
+/**
+ * Índice de planos (multi-plano). Cada entrada é leve — só metadados — e o
+ * payload completo fica numa chave separada `planejoeproc:plan:{id}`.
+ * `atualizadoEm` é ISO 8601; usado para ordenar a lista por uso recente na UI.
+ */
+export const PlanIndexEntrySchema = z.object({
+  id: z.string(),
+  nome: z.string(),
+  atualizadoEm: z.string(),
+});
+
+export const PlansIndexSchema = z.array(PlanIndexEntrySchema);
