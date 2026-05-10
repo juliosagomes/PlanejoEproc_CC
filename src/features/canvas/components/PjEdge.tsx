@@ -1,4 +1,6 @@
-import { getBezierPath, getSmoothStepPath, type EdgeProps } from 'reactflow';
+import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import { getBezierPath, getSmoothStepPath, useReactFlow, type EdgeProps } from 'reactflow';
 import type { EdgeData, EdgeKind, FlowMode } from '@/domain';
 import { cn } from '@/utils/cn';
 
@@ -56,6 +58,11 @@ export function PjEdge({
   const subitems = data?.subitems ?? [];
   const total = subitems.length;
   const concluidos = subitems.filter((s) => s.ja_criado).length;
+  const resumo = data?.resumo?.trim() ?? '';
+
+  const [hovered, setHovered] = useState(false);
+  const showTooltip = hovered && resumo.length > 0;
+  const { flowToScreenPosition } = useReactFlow();
 
   const mode = lerFlowMode();
   const args = { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition };
@@ -88,7 +95,15 @@ export function PjEdge({
       </path>
 
       {/* Hit area transparente — facilita o clique sobre a aresta. */}
-      <path d={path} fill="none" stroke="transparent" strokeWidth={18} className="cursor-pointer" />
+      <path
+        d={path}
+        fill="none"
+        stroke="transparent"
+        strokeWidth={18}
+        className="cursor-pointer"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      />
 
       <foreignObject
         x={labelX - 60}
@@ -101,6 +116,8 @@ export function PjEdge({
           <div
             className="edge-label"
             style={{ border: `1px solid ${style.stroke}`, color: style.stroke }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
           >
             {KIND_LABEL_CURTO[kind]}
             {total > 0 && (
@@ -111,6 +128,20 @@ export function PjEdge({
           </div>
         </div>
       </foreignObject>
+
+      {showTooltip &&
+        (() => {
+          const screen = flowToScreenPosition({ x: labelX, y: labelY });
+          return createPortal(
+            <div
+              className="edge-tooltip"
+              style={{ left: screen.x, top: screen.y - 22 }}
+            >
+              {resumo}
+            </div>,
+            document.body,
+          );
+        })()}
     </>
   );
 }
