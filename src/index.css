@@ -48,6 +48,13 @@
   --aresta-pref: oklch(0.55 0.14 155);
   --aresta-manual: oklch(0.65 0.01 270);
 
+  /* Tipos de preferência (botões do EdgeDetailModal). Hue fixa por tipo:
+     azul/verde/vermelho/roxo conforme convenção da UI. */
+  --pref-minuta: oklch(0.55 0.15 265);
+  --pref-mov:    oklch(0.55 0.14 155);
+  --pref-int:    oklch(0.58 0.20 25);
+  --pref-aut:    oklch(0.55 0.18 305);
+
   /* Grade do canvas */
   --grade-ponto: #e6e7eb;
 }
@@ -430,6 +437,27 @@ body {
   .edge-swatch.manual .line {
     background: transparent;
     border-top: 2px dashed var(--aresta-manual);
+  }
+
+  /* ---------- Botões de tipo de preferência (EdgeDetailModal) ----------
+     Cada botão recebe `--pref-cor` inline com a hue do seu tipo. Inativo:
+     borda + texto colorido sobre branco. Ativo: cor cheia no fundo. */
+  .pref-tipo-btn {
+    border-color: var(--pref-cor);
+    color: var(--pref-cor);
+    background: var(--superficie);
+  }
+  .pref-tipo-btn:hover {
+    background: color-mix(in oklch, var(--pref-cor) 8%, var(--superficie));
+  }
+  .pref-tipo-btn.active {
+    background: var(--pref-cor);
+    color: var(--superficie);
+    border-color: var(--pref-cor);
+  }
+  .pref-tipo-btn.active:hover {
+    background: var(--pref-cor);
+    filter: brightness(1.08);
   }
 
   /* ---------- Linha de subitem ---------- */

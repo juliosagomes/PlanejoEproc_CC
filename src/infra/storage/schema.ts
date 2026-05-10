@@ -117,6 +117,8 @@ const PrefRuleSchema = z.object({
   tipo: z.enum(PREF_TIPOS).optional(),
   acao: z.string().optional(),
   observacoes: z.string().optional(),
+  minutaModo: z.enum(['modelo', 'texto_padrao']).optional(),
+  minutaConteudo: z.string().optional(),
 });
 
 const EdgeKindSchema = z.enum(['atp', 'pref', 'manual']);

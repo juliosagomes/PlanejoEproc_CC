@@ -114,6 +114,16 @@ export interface AtpRule {
 export const PREF_TIPOS = ['Minuta', 'Movimentação', 'Intimação', 'Automatização'] as const;
 export type PrefTipo = (typeof PREF_TIPOS)[number];
 
+/**
+ * Quando `tipo === 'Minuta'`, a preferência pode usar **um** Modelo ou **um**
+ * Texto padrão como conteúdo (mutuamente exclusivos — ver glossário em
+ * CLAUDE.md). Para os demais tipos esses campos são ignorados na UI; o dado
+ * permanece em memória/storage para que o usuário não perca o que digitou ao
+ * alternar `tipo` por engano (mesmo princípio de manter `atp` e `pref`
+ * separados em `EdgeData`).
+ */
+export type PrefMinutaModo = 'modelo' | 'texto_padrao';
+
 export interface PrefRule {
   implantar: boolean;
   ja_criado: boolean;
@@ -122,6 +132,10 @@ export interface PrefRule {
   /** Efeito da preferência (texto livre). */
   acao?: string;
   observacoes?: string;
+  /** Só relevante quando `tipo === 'Minuta'`. */
+  minutaModo?: PrefMinutaModo;
+  /** Conteúdo do Modelo ou Texto padrão (livre). */
+  minutaConteudo?: string;
 }
 
 /**

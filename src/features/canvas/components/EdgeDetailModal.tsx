@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import {
   PREF_TIPOS,
   TIPO_CONTROLE_VALUES,
@@ -5,6 +6,7 @@ import {
   type AtpRule,
   type AtpTrigger,
   type EdgeData,
+  type PrefMinutaModo,
   type PrefRule,
   type PrefTipo,
   type TipoControle,
@@ -72,9 +74,30 @@ interface PrefModalProps {
   onChange: (rule: PrefRule) => void;
 }
 
+/** Mapeia cada tipo à variável CSS de cor (definida em index.css). */
+const PREF_TIPO_COR: Record<PrefTipo, string> = {
+  Minuta: 'var(--pref-minuta)',
+  'Movimentação': 'var(--pref-mov)',
+  'Intimação': 'var(--pref-int)',
+  'Automatização': 'var(--pref-aut)',
+};
+
+const MINUTA_MODO_LABEL: Record<PrefMinutaModo, string> = {
+  modelo: 'Modelo',
+  texto_padrao: 'Texto padrão',
+};
+
 function PrefModal({ rule, resumo, subitemsCount, onClose, onChange }: PrefModalProps) {
   const r: PrefRule = rule ?? { implantar: false, ja_criado: false, nome: '' };
   const setR = (patch: Partial<PrefRule>) => onChange({ ...r, ...patch });
+
+  // Toggle do modo: clicar no já ativo desmarca; clicar no outro troca.
+  // Manter `minutaConteudo` ao trocar — o texto digitado em "Modelo" pode
+  // valer também como "Texto padrão" se o usuário só errou a categoria.
+  const setMinutaModo = (modo: PrefMinutaModo) => {
+    setR({ minutaModo: r.minutaModo === modo ? undefined : modo });
+  };
+
   return (
     <ModalShell
       titulo={r.nome || resumo || 'Preferência'}
@@ -98,14 +121,53 @@ function PrefModal({ rule, resumo, subitemsCount, onClose, onChange }: PrefModal
             <button
               key={opt}
               type="button"
-              className={cn('btn btn-sm justify-center', r.tipo === opt && 'btn-primary')}
+              className={cn(
+                'btn btn-sm justify-center pref-tipo-btn',
+                r.tipo === opt && 'active',
+              )}
+              style={{ ['--pref-cor' as string]: PREF_TIPO_COR[opt] } as CSSProperties}
               onClick={() => setR({ tipo: opt as PrefTipo })}
+              aria-pressed={r.tipo === opt}
             >
               {opt}
             </button>
           ))}
         </div>
       </Field>
+
+      {r.tipo === 'Minuta' && (
+        <Field label="Conteúdo da minuta">
+          <div className="grid grid-cols-2 gap-1.5 mb-2">
+            {(['modelo', 'texto_padrao'] as const).map((modo) => (
+              <button
+                key={modo}
+                type="button"
+                className={cn(
+                  'btn btn-sm justify-center',
+                  r.minutaModo === modo && 'btn-primary',
+                )}
+                onClick={() => setMinutaModo(modo)}
+                aria-pressed={r.minutaModo === modo}
+              >
+                {MINUTA_MODO_LABEL[modo]}
+              </button>
+            ))}
+          </div>
+          {r.minutaModo && (
+            <textarea
+              className="textarea"
+              rows={4}
+              placeholder={
+                r.minutaModo === 'modelo'
+                  ? 'Conteúdo do modelo (minuta/template)…'
+                  : 'Texto padrão (trecho reutilizável)…'
+              }
+              value={r.minutaConteudo ?? ''}
+              onChange={(e) => setR({ minutaConteudo: e.target.value })}
+            />
+          )}
+        </Field>
+      )}
 
       <Field label="Efeito da preferência">
         <textarea
