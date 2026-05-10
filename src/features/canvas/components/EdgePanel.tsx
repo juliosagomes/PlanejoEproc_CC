@@ -2,6 +2,8 @@ import { useState } from 'react';
 import {
   KIND_LABELS,
   SUBITEM_CATS,
+  hasAtpDetail,
+  hasPrefDetail,
   type EdgeData,
   type EdgeKind,
   type Subitem,
@@ -102,16 +104,27 @@ export function EdgePanel({ edge }: EdgePanelProps) {
             </div>
           </div>
 
-          {kind !== 'manual' && (
-            <button
-              type="button"
-              className="btn btn-sm w-full justify-center"
-              onClick={() => setDetalheAberto(true)}
-              title={`Abrir detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`}
-            >
-              <Icon.Bolt /> Detalhar {kind === 'pref' ? 'Preferência' : 'ATP'}
-            </button>
-          )}
+          {kind !== 'manual' && (() => {
+            const preenchido =
+              kind === 'atp' ? hasAtpDetail(data.atp) : hasPrefDetail(data.pref);
+            return (
+              <button
+                type="button"
+                className={cn(
+                  'btn btn-sm w-full justify-center',
+                  preenchido && 'btn-primary',
+                )}
+                onClick={() => setDetalheAberto(true)}
+                title={
+                  preenchido
+                    ? `Detalhamento preenchido — clique para editar`
+                    : `Abrir detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`
+                }
+              >
+                <Icon.Bolt /> Detalhar {kind === 'pref' ? 'Preferência' : 'ATP'}
+              </button>
+            );
+          })()}
 
           <div>
             <label className="label">Resumo</label>

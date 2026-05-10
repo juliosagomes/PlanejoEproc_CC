@@ -139,6 +139,43 @@ export interface PrefRule {
 }
 
 /**
+ * Predicados "tem detalhamento" usados pela UI pra destacar o botão "Detalhar"
+ * quando o usuário já preencheu algo. Conta qualquer campo significativo:
+ * texto não-vazio (após `trim`), `tipo`/`trigger` escolhidos, listas de
+ * filtros não-vazias, ou as flags `implantar`/`ja_criado` ativadas. Pura,
+ * sem dependência de UI — vive aqui pra ficar perto da definição do tipo.
+ */
+export function hasAtpDetail(rule: AtpRule | undefined): boolean {
+  if (!rule) return false;
+  if (rule.implantar || rule.ja_criado) return true;
+  if (rule.nome.trim()) return true;
+  if (rule.trigger) return true;
+  if (rule.acaoTipo) return true;
+  if (rule.acao?.trim()) return true;
+  if (rule.condicoes?.trim()) return true;
+  if (rule.observacoes?.trim()) return true;
+  const f = rule.filtros;
+  if (f) {
+    if ((f.classesJudiciaisIds?.length ?? 0) > 0) return true;
+    if ((f.competenciaIds?.length ?? 0) > 0) return true;
+    if ((f.statusProcessoIds?.length ?? 0) > 0) return true;
+  }
+  return false;
+}
+
+export function hasPrefDetail(rule: PrefRule | undefined): boolean {
+  if (!rule) return false;
+  if (rule.implantar || rule.ja_criado) return true;
+  if (rule.nome.trim()) return true;
+  if (rule.tipo) return true;
+  if (rule.acao?.trim()) return true;
+  if (rule.observacoes?.trim()) return true;
+  if (rule.minutaModo) return true;
+  if (rule.minutaConteudo?.trim()) return true;
+  return false;
+}
+
+/**
  * União das regras possíveis. Usada onde for útil tratar uma regra de modo
  * polimórfico; consumidores específicos preferem a propriedade nomeada
  * (`atp`/`pref`) em `EdgeData`.
