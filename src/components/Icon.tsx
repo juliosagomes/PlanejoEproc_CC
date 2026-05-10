@@ -168,6 +168,39 @@ export const Icon = {
       />
     </svg>
   ),
+  /** Lombadas de livros enfileiradas — usado para o catálogo do órgão. */
+  Library: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <rect
+        x="2"
+        y="2"
+        width="2.4"
+        height="10"
+        rx="0.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <rect
+        x="5.4"
+        y="2"
+        width="2.4"
+        height="10"
+        rx="0.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <rect
+        x="8.8"
+        y="3"
+        width="2.4"
+        height="9"
+        rx="0.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        transform="rotate(-10 10 7.5)"
+      />
+    </svg>
+  ),
   /** Check do canto direito superior do nó "já criado". 10×10. */
   CheckCorner: (p: IconProps) => (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden {...p}>

@@ -25,6 +25,7 @@ export interface HeaderProps {
   onNovo: () => void;
   onAbrirArquivo: () => void;
   onSalvarCopia: () => void;
+  onCatalogoOrgao: () => void;
   onChecklist: () => void;
   flowMode: FlowMode;
   onFlowModeChange: (mode: FlowMode) => void;
@@ -57,6 +58,7 @@ export function Header({
   onNovo,
   onAbrirArquivo,
   onSalvarCopia,
+  onCatalogoOrgao,
   onChecklist,
   flowMode,
   onFlowModeChange,
@@ -159,6 +161,14 @@ export function Header({
         title="Baixa o plano ativo como JSON (sugerido: salvar em /planos)"
       >
         <Icon.Download /> Salvar cópia
+      </button>
+      <button
+        type="button"
+        className="btn btn-sm"
+        onClick={onCatalogoOrgao}
+        title="Importa os localizadores do órgão para usar como sugestão"
+      >
+        <Icon.Library /> Catálogo órgão
       </button>
       <button type="button" className="btn btn-sm btn-accent" onClick={onChecklist}>
         <Icon.Bolt /> Gerar Checklist

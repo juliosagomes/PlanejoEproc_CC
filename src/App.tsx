@@ -7,6 +7,7 @@ import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
+import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
 import {
   PlanoSchema,
@@ -43,6 +44,7 @@ export default function App() {
   const createNode = useCanvasStore((s) => s.createNode);
 
   const [showChecklist, setShowChecklist] = useState(false);
+  const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
 
   // Espelha o índice de planos do storage. Atualizamos via refreshPlanos()
   // após cada operação de criar/abrir/duplicar/renomear/excluir/switch.
@@ -271,6 +273,7 @@ export default function App() {
         onNovo={onNovo}
         onAbrirArquivo={onAbrirArquivo}
         onSalvarCopia={onSalvarCopia}
+        onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
         onChecklist={() => setShowChecklist(true)}
         flowMode={flowMode}
         onFlowModeChange={setFlowMode}
@@ -297,6 +300,10 @@ export default function App() {
         </aside>
       </div>
 
+      <CatalogoOrgaoModal
+        open={showCatalogoOrgao}
+        onClose={() => setShowCatalogoOrgao(false)}
+      />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
     </div>
   );
