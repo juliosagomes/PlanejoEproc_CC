@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 
 import { Header, type HeaderStats } from '@/components/Header';
@@ -6,15 +6,29 @@ import { Sidebar } from '@/components/Sidebar';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
-import { flushPersist, useCanvasStore } from '@/features/canvas/store';
+import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
-import { PlanoSchema, planoVazio } from '@/infra/storage';
+import {
+  PlanoSchema,
+  type PlanIndexEntry,
+  criarPlano,
+  duplicarPlano,
+  excluirPlano,
+  getAtivoId,
+  importarPlano,
+  listPlanos,
+  loadPlano,
+  planoVazio,
+  renomearPlano,
+  setAtivo,
+} from '@/infra/storage';
 
 /**
  * Composição principal do app — Header + Sidebar + canvas + painel direito
- * condicional + modal de checklist. Conecta todos os handlers à store e
- * implementa import/export JSON, atalho Delete e flush de persistência no
- * unload.
+ * condicional + modal de checklist. Conecta todos os handlers à store, gerencia
+ * o universo multi-plano (lista, ativo, criação, switch, renomear, duplicar,
+ * excluir, importar/exportar via arquivo) e implementa atalho Delete e flush
+ * de persistência no unload.
  */
 export default function App() {
   const planoNome = useCanvasStore((s) => s.planoNome);
@@ -29,6 +43,22 @@ export default function App() {
   const createNode = useCanvasStore((s) => s.createNode);
 
   const [showChecklist, setShowChecklist] = useState(false);
+
+  // Espelha o índice de planos do storage. Atualizamos via refreshPlanos()
+  // após cada operação de criar/abrir/duplicar/renomear/excluir/switch.
+  // O nome do ativo pode estar 300ms defasado (debounce), mas o switcher
+  // exibe `planoNome` (ao vivo) para o ativo e o nome do índice para o resto.
+  const [planos, setPlanos] = useState<PlanIndexEntry[]>([]);
+  const [ativoId, setAtivoId] = useState<string | null>(null);
+
+  const refreshPlanos = useCallback(() => {
+    setPlanos(listPlanos());
+    setAtivoId(getAtivoId());
+  }, []);
+
+  useEffect(() => {
+    refreshPlanos();
+  }, [refreshPlanos]);
 
   const selectedNode = useMemo(
     () => (selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null),
@@ -86,16 +116,84 @@ export default function App() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  /* ============================================================================
+   * Ações de plano
+   *
+   * Padrão: flushPersist() antes de qualquer operação que troque o ativo, para
+   * garantir que o estado do plano que está saindo de cena seja gravado no
+   * slot certo. Para excluir o ativo, usamos cancelPersist() — não queremos
+   * gravar lixo no slot recém-criado pela troca de ACTIVE.
+   * ========================================================================== */
+
   const onNovo = () => {
-    const ok = window.confirm(
-      'Limpar tudo e começar um novo plano?\n\nEsta ação não pode ser desfeita ' +
-        '(mas você pode exportar antes).',
-    );
-    if (!ok) return;
-    loadPlanoAcao(planoVazio());
+    flushPersist();
+    const { plano } = criarPlano();
+    loadPlanoAcao(plano);
+    refreshPlanos();
   };
 
-  const onImportar = () => {
+  const onSwitchPlano = (id: string) => {
+    if (id === ativoId) return;
+    flushPersist();
+    setAtivo(id);
+    loadPlanoAcao(loadPlano(id));
+    refreshPlanos();
+  };
+
+  const onRenomearPlano = (id: string) => {
+    const entry = planos.find((p) => p.id === id);
+    if (!entry) return;
+    const nomeAtual = id === ativoId ? planoNome : entry.nome;
+    const novo = window.prompt('Renomear plano:', nomeAtual);
+    if (novo === null) return;
+    const nomeFinal = novo.trim();
+    if (!nomeFinal || nomeFinal === nomeAtual) return;
+
+    if (id === ativoId) {
+      // Para o ativo, a fonte da verdade do nome é a store; flushPersist
+      // garante que o índice reflita imediatamente para o switcher.
+      setPlanoNome(nomeFinal);
+      flushPersist();
+    } else {
+      renomearPlano(id, nomeFinal);
+    }
+    refreshPlanos();
+  };
+
+  const onDuplicarPlano = (id: string) => {
+    flushPersist();
+    const result = duplicarPlano(id);
+    if (!result) return;
+    loadPlanoAcao(loadPlano(result.id));
+    refreshPlanos();
+  };
+
+  const onExcluirPlano = (id: string) => {
+    const entry = planos.find((p) => p.id === id);
+    if (!entry) return;
+    const nome = id === ativoId ? planoNome : entry.nome;
+    const ok = window.confirm(
+      `Excluir o plano "${nome}"?\n\nEsta ação não pode ser desfeita.`,
+    );
+    if (!ok) return;
+
+    const eraAtivo = id === ativoId;
+    // Quando excluímos o ativo, descartamos qualquer save pendente — caso
+    // contrário ele seria gravado no slot do próximo ativo (corrupção).
+    if (eraAtivo) cancelPersist();
+
+    excluirPlano(id);
+
+    if (eraAtivo) {
+      const novoAtivoId = getAtivoId();
+      loadPlanoAcao(
+        novoAtivoId !== null ? loadPlano(novoAtivoId) : planoVazio(),
+      );
+    }
+    refreshPlanos();
+  };
+
+  const onAbrirArquivo = () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'application/json,.json';
@@ -113,14 +211,10 @@ export default function App() {
           );
           return;
         }
-        const store = useCanvasStore.getState();
-        const naoVazio = store.nodes.length > 0 || store.edges.length > 0;
-        if (
-          naoVazio &&
-          !window.confirm('Importar substituirá o plano atual. Continuar?')
-        )
-          return;
-        store.loadPlano(result.data);
+        flushPersist();
+        importarPlano(result.data);
+        loadPlanoAcao(result.data);
+        refreshPlanos();
       } catch (e) {
         window.alert('Falha ao importar: ' + (e as Error).message);
       }
@@ -128,7 +222,7 @@ export default function App() {
     input.click();
   };
 
-  const onExportar = () => {
+  const onSalvarCopia = () => {
     const plano = {
       ...useCanvasStore.getState().getPlano(),
       exportedAt: new Date().toISOString(),
@@ -142,9 +236,10 @@ export default function App() {
         .replace(/[^\p{L}\p{N}_-]+/gu, '-')
         .replace(/^-+|-+$/g, '')
         .toLowerCase() || 'plano';
+    const today = new Date().toISOString().slice(0, 10);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${safeName}.json`;
+    a.download = `${safeName}-${today}.json`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => {
@@ -167,9 +262,15 @@ export default function App() {
       <Header
         planoNome={planoNome}
         onPlanoNomeChange={setPlanoNome}
+        planos={planos}
+        ativoId={ativoId}
+        onSwitchPlano={onSwitchPlano}
+        onRenomearPlano={onRenomearPlano}
+        onDuplicarPlano={onDuplicarPlano}
+        onExcluirPlano={onExcluirPlano}
         onNovo={onNovo}
-        onImportar={onImportar}
-        onExportar={onExportar}
+        onAbrirArquivo={onAbrirArquivo}
+        onSalvarCopia={onSalvarCopia}
         onChecklist={() => setShowChecklist(true)}
         flowMode={flowMode}
         onFlowModeChange={setFlowMode}

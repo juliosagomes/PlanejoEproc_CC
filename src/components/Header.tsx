@@ -1,5 +1,7 @@
 import type { FlowMode } from '@/domain';
 import { Icon } from '@/components/Icon';
+import { PlanSwitcher } from '@/features/plans/PlanSwitcher';
+import type { PlanIndexEntry } from '@/infra/storage';
 import { cn } from '@/utils/cn';
 
 export interface HeaderStats {
@@ -12,9 +14,17 @@ export interface HeaderStats {
 export interface HeaderProps {
   planoNome: string;
   onPlanoNomeChange: (nome: string) => void;
+  // Multi-plano
+  planos: PlanIndexEntry[];
+  ativoId: string | null;
+  onSwitchPlano: (id: string) => void;
+  onRenomearPlano: (id: string) => void;
+  onDuplicarPlano: (id: string) => void;
+  onExcluirPlano: (id: string) => void;
+  // Ações de fluxo
   onNovo: () => void;
-  onImportar: () => void;
-  onExportar: () => void;
+  onAbrirArquivo: () => void;
+  onSalvarCopia: () => void;
   onChecklist: () => void;
   flowMode: FlowMode;
   onFlowModeChange: (mode: FlowMode) => void;
@@ -27,19 +37,26 @@ const FLOW_MODE_OPTIONS: ReadonlyArray<{ id: FlowMode; label: string }> = [
 ];
 
 /**
- * Cabeçalho do app: marca + nome do plano editável + toggle de modo de fluxo +
- * estatísticas + ações (novo, importar, exportar, checklist).
+ * Cabeçalho do app: marca + switcher de plano + nome editável do ativo + toggle
+ * de modo de fluxo + estatísticas + ações (novo, abrir arquivo, salvar cópia,
+ * checklist).
  *
- * Os handlers são obrigatórios por design — o consumidor (App.tsx) precisa
- * decidir explicitamente o que faz em cada ação. `noop` só é aceito como
- * stub temporário em telas de desenvolvimento.
+ * O switcher aparece à esquerda do input de nome porque ele responde "qual
+ * plano estou editando"; o input edita o nome do ativo inline (renomeação
+ * por debounce).
  */
 export function Header({
   planoNome,
   onPlanoNomeChange,
+  planos,
+  ativoId,
+  onSwitchPlano,
+  onRenomearPlano,
+  onDuplicarPlano,
+  onExcluirPlano,
   onNovo,
-  onImportar,
-  onExportar,
+  onAbrirArquivo,
+  onSalvarCopia,
   onChecklist,
   flowMode,
   onFlowModeChange,
@@ -55,13 +72,23 @@ export function Header({
         <span className="font-semibold text-[13px]">PlanejoEproc</span>
       </div>
 
+      <PlanSwitcher
+        planos={planos}
+        ativoId={ativoId}
+        ativoNomeLive={planoNome}
+        onSwitch={onSwitchPlano}
+        onRenomear={onRenomearPlano}
+        onDuplicar={onDuplicarPlano}
+        onExcluir={onExcluirPlano}
+      />
+
       <input
         className="input"
-        style={{ width: 320, height: 28, padding: '4px 10px', fontWeight: 500 }}
+        style={{ width: 240, height: 28, padding: '4px 10px', fontWeight: 500 }}
         value={planoNome}
         onChange={(e) => onPlanoNomeChange(e.target.value)}
         placeholder="Nome do plano"
-        aria-label="Nome do plano"
+        aria-label="Nome do plano ativo"
       />
 
       <div className="flex-1" />
@@ -111,17 +138,27 @@ export function Header({
 
       <button
         type="button"
-        className="btn btn-sm btn-danger"
+        className="btn btn-sm"
         onClick={onNovo}
-        title="Limpa o quadro atual"
+        title="Cria um plano em branco e troca para ele (não apaga o atual)"
       >
         <Icon.File /> Novo plano
       </button>
-      <button type="button" className="btn btn-sm" onClick={onImportar}>
-        <Icon.Upload /> Importar
+      <button
+        type="button"
+        className="btn btn-sm"
+        onClick={onAbrirArquivo}
+        title="Abre um JSON de plano salvo (cria nova entrada no switcher)"
+      >
+        <Icon.Upload /> Abrir arquivo
       </button>
-      <button type="button" className="btn btn-sm" onClick={onExportar}>
-        <Icon.Download /> Exportar
+      <button
+        type="button"
+        className="btn btn-sm"
+        onClick={onSalvarCopia}
+        title="Baixa o plano ativo como JSON (sugerido: salvar em /planos)"
+      >
+        <Icon.Download /> Salvar cópia
       </button>
       <button type="button" className="btn btn-sm btn-accent" onClick={onChecklist}>
         <Icon.Bolt /> Gerar Checklist

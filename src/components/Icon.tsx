@@ -131,6 +131,43 @@ export const Icon = {
       />
     </svg>
   ),
+  Pencil: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M2 12 1.5 12.5 2 10l7-7 2 2-7 7L2 12Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m8.5 3.5 2 2"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  ChevronDown: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="m3.5 5.5 3.5 3.5 3.5-3.5"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  Folder: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M1.5 3.5h4l1.2 1.2h5.8v7.3a.5.5 0 0 1-.5.5H2a.5.5 0 0 1-.5-.5v-8.5Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   /** Check do canto direito superior do nó "já criado". 10×10. */
   CheckCorner: (p: IconProps) => (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden {...p}>
