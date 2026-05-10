@@ -1,6 +1,8 @@
-import { TIPO_FLAGS, type FlagKey } from '@/domain';
+import { TIPO_FLAGS, type FlagKey, type LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
+import { LocalizadorNomeInput } from '@/features/catalogo/components/LocalizadorNomeInput';
+import { selectItens, useCatalogoStore } from '@/features/catalogo/store';
 import { cn } from '@/utils/cn';
 import { useCanvasStore, type FlowNode } from '../store';
 
@@ -11,10 +13,14 @@ interface NodePanelProps {
 export function NodePanel({ node }: NodePanelProps) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
+  const itensCatalogo = useCatalogoStore(selectItens);
   const data = node.data;
 
   const setFlag = (key: FlagKey, valor: boolean) =>
     updateNode(node.id, { flags: { ...data.flags, [key]: valor } });
+
+  const onPickFromCatalogo = (item: LocalizadorOrgao) =>
+    updateNode(node.id, { nome: item.nome, ja_criado: true });
 
   return (
     <div className="flex flex-col h-full">
@@ -34,20 +40,13 @@ export function NodePanel({ node }: NodePanelProps) {
       <div className="flex-1 overflow-auto scroll p-4 flex flex-col gap-3.5">
         <div>
           <label className="label">Nome do localizador</label>
-          <input
-            className="input"
-            autoFocus
+          <LocalizadorNomeInput
             value={data.nome}
-            onChange={(e) => updateNode(node.id, { nome: e.target.value })}
-            onKeyDown={(e) => {
-              // Permite cancelar um nó criado por engano (autoFocus rouba o
-              // Delete global do ReactFlow): com o campo vazio, Delete remove.
-              if (e.key === 'Delete' && data.nome.length === 0) {
-                e.preventDefault();
-                deleteNode(node.id);
-              }
-            }}
-            placeholder="Ex: Aguardando despacho"
+            itens={itensCatalogo}
+            autoFocus
+            onChangeNome={(nome) => updateNode(node.id, { nome })}
+            onPickFromCatalogo={onPickFromCatalogo}
+            onDeleteEmpty={() => deleteNode(node.id)}
           />
         </div>
 
