@@ -10,6 +10,7 @@
  *     index.html          ← singlefile (tudo inline — JS, CSS, fontes)
  *     planos/
  *       README.txt
+ *       <exemplos>.json   ← copiados de ./exemplos/ no repo
  *     localizadores/
  *       README.txt
  *     LEIA-ME.txt
@@ -24,18 +25,23 @@
  * sozinho — a pasta é só local de armazenamento; a importação é via botão
  * "Catálogo órgão" no header.
  *
+ * Os JSONs em `./exemplos/` (no repo) viajam pré-instalados em `planos/`
+ * para que o usuário tenha algo concreto pra abrir via "Abrir arquivo" logo
+ * de cara — útil pra demo e pra testes manuais.
+ *
  * Sem dependências externas: usa só `node:fs/promises` e `node:path`. O
  * usuário pode compactar `PlanejoEproc/` manualmente (clique direito →
  * Enviar para → Pasta compactada) ou copiar por rede.
  */
 
-import { copyFile, mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative, resolve } from 'node:path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(HERE, '..');
 const SRC_HTML = join(ROOT, 'dist-singlefile', 'index.html');
+const SRC_EXEMPLOS = join(ROOT, 'exemplos');
 const OUT_BASE = join(ROOT, 'dist-pack');
 const OUT = join(OUT_BASE, 'PlanejoEproc');
 
@@ -162,6 +168,16 @@ async function main() {
     'utf8',
   );
   await writeFile(join(OUT, 'LEIA-ME.txt'), LEIA_ME, 'utf8');
+
+  const exemplos = (await exists(SRC_EXEMPLOS))
+    ? (await readdir(SRC_EXEMPLOS)).filter((f) => f.toLowerCase().endsWith('.json'))
+    : [];
+  if (exemplos.length > 0) {
+    console.log(`[pack] Copiando ${exemplos.length} exemplo(s) → planos/`);
+    for (const f of exemplos) {
+      await copyFile(join(SRC_EXEMPLOS, f), join(OUT, 'planos', f));
+    }
+  }
 
   const htmlSize = (await stat(join(OUT, 'index.html'))).size;
   const version = await getPkgVersion();

@@ -1,0 +1,382 @@
+{
+  "version": 1,
+  "planoNome": "(Exemplo) Família",
+  "flowMode": "organic",
+  "nodes": [
+    {
+      "id": "n-mozb9sv4",
+      "position": {
+        "x": 271.5033144014155,
+        "y": 124.5325864865446
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Ag. Contestação",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozb9sv5",
+      "position": {
+        "x": 1032.2271638947811,
+        "y": 126.675657933917
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Ag. Réplica",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfnj",
+      "position": {
+        "x": 1181.5488969957173,
+        "y": 327.02395237380074
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Decorrido o prazo da contestação",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfnl",
+      "position": {
+        "x": 1044.2753046070904,
+        "y": -129.77327375574868
+      },
+      "data": {
+        "nome": "🔵 Conclusos - Pedido Reconvencional",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfnm",
+      "position": {
+        "x": 721.2444368818547,
+        "y": -31.21933419411458
+      },
+      "data": {
+        "nome": "Analisar Reconvenção/Liminar em Contestação",
+        "ja_criado": false,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfnr",
+      "position": {
+        "x": 1245.4318891374623,
+        "y": 200.42417208509198
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Decorrido o prazo da réplica",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfnu",
+      "position": {
+        "x": 1299.3060722516109,
+        "y": 25.893675639653097
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Ag. Parecer do MP",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfnw",
+      "position": {
+        "x": 1631.2034745082576,
+        "y": 25.893675639653125
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Juntado Parecer do MP",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfny",
+      "position": {
+        "x": 1927.160914899949,
+        "y": 117.42428980384312
+      },
+      "data": {
+        "nome": "🔵Conclusos - Esp. de Provas",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfo4",
+      "position": {
+        "x": 2269.6502474616213,
+        "y": 109.25078204659621
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Ag. Especificação de Provas",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfo7",
+      "position": {
+        "x": 720.8550816224883,
+        "y": 381.0274359811569
+      },
+      "data": {
+        "nome": "[FAMÍLIA] Analisar Contestação 👀",
+        "ja_criado": true,
+        "flags": {}
+      }
+    },
+    {
+      "id": "n-mozjgfoa",
+      "position": {
+        "x": 2622.489456005613,
+        "y": 115.26821762930757
+      },
+      "data": {
+        "nome": "🔵 Conclusos",
+        "ja_criado": true,
+        "flags": {}
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-mozb9sv6",
+      "source": "n-mozb9sv4",
+      "target": "n-mozb9sv5",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "atp",
+        "resumo": "",
+        "observacao": "",
+        "subitems": [],
+        "atp": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "Após Contestação",
+          "trigger": {
+            "tipo": "P"
+          },
+          "filtros": {
+            "classesJudiciaisIds": []
+          },
+          "acaoTipo": "EDP"
+        }
+      }
+    },
+    {
+      "id": "e-mozjgfnk",
+      "source": "n-mozb9sv4",
+      "target": "n-mozjgfnj",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfnn",
+      "source": "n-mozb9sv4",
+      "target": "n-mozjgfnm",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfno",
+      "source": "n-mozjgfnm",
+      "target": "n-mozjgfnl",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfnp",
+      "source": "n-mozjgfnm",
+      "target": "n-mozb9sv5",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfns",
+      "source": "n-mozb9sv5",
+      "target": "n-mozjgfnr",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfnv",
+      "source": "n-mozb9sv5",
+      "target": "n-mozjgfnu",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "pref",
+        "resumo": "",
+        "observacao": "",
+        "subitems": [],
+        "pref": {
+          "implantar": true,
+          "ja_criado": false,
+          "nome": "",
+          "tipo": "Minuta",
+          "minutaModo": "modelo",
+          "minutaConteudo": "\"Vista acerca de blablabla\""
+        }
+      }
+    },
+    {
+      "id": "e-mozjgfnx",
+      "source": "n-mozjgfnu",
+      "target": "n-mozjgfnw",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfnz",
+      "source": "n-mozjgfnw",
+      "target": "n-mozjgfny",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfo0",
+      "source": "n-mozb9sv5",
+      "target": "n-mozjgfny",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfo1",
+      "source": "n-mozjgfnj",
+      "target": "n-mozjgfny",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfo3",
+      "source": "n-mozjgfnr",
+      "target": "n-mozjgfny",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfo5",
+      "source": "n-mozjgfny",
+      "target": "n-mozjgfo4",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfo8",
+      "source": "n-mozb9sv4",
+      "target": "n-mozjgfo7",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfo9",
+      "source": "n-mozjgfo7",
+      "target": "n-mozb9sv5",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    },
+    {
+      "id": "e-mozjgfob",
+      "source": "n-mozjgfo4",
+      "target": "n-mozjgfoa",
+      "sourceHandle": null,
+      "targetHandle": null,
+      "data": {
+        "kind": "manual",
+        "resumo": "",
+        "observacao": "",
+        "subitems": []
+      }
+    }
+  ],
+  "exportedAt": "2026-05-10T09:19:43.147Z"
+}
