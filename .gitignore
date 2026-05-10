@@ -4,8 +4,10 @@ node_modules
 # Build output
 dist
 dist-singlefile
+dist-pack
 dist-ssr
 *.local
+outros_arquivos
 
 # Editor / OS
 .vscode/*

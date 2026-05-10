@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:singlefile": "tsc -b && vite build --mode singlefile",
+    "pack": "npm run build && node scripts/pack.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
