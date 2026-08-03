@@ -1,7 +1,8 @@
-import type { FlowMode } from '@/domain';
+import type { FlowMode, Sessao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PlanSwitcher } from '@/features/plans/PlanSwitcher';
 import { SalvarCopiaButton } from '@/features/plans/SalvarCopiaButton';
+import { SessaoBadge } from '@/features/sessao/components/SessaoBadge';
 import type { PlanIndexEntry } from '@/infra/storage';
 import { cn } from '@/utils/cn';
 
@@ -15,6 +16,13 @@ export interface HeaderStats {
 export interface HeaderProps {
   planoNome: string;
   onPlanoNomeChange: (nome: string) => void;
+  // Sessão (modo local ou lotação)
+  sessao: Sessao;
+  onTrocarSessao: () => void;
+  onPull: () => void;
+  onPush: () => void;
+  sincronizando: boolean;
+  publicando: boolean;
   // Multi-plano
   planos: PlanIndexEntry[];
   ativoId: string | null;
@@ -40,17 +48,23 @@ const FLOW_MODE_OPTIONS: ReadonlyArray<{ id: FlowMode; label: string }> = [
 ];
 
 /**
- * Cabeçalho do app: marca + switcher de plano + nome editável do ativo + toggle
- * de modo de fluxo + estatísticas + ações (novo, abrir arquivo, salvar cópia,
- * checklist).
+ * Cabeçalho do app: marca + indicador de sessão + switcher de plano + nome
+ * editável do ativo + toggle de modo de fluxo + estatísticas + ações.
  *
- * O switcher aparece à esquerda do input de nome porque ele responde "qual
- * plano estou editando"; o input edita o nome do ativo inline (renomeação
- * por debounce).
+ * A ordem à esquerda responde perguntas cada vez mais específicas: o
+ * `SessaoBadge` diz "de quem são estes planos", o switcher diz "qual deles
+ * estou editando", e o input edita o nome do ativo inline (renomeação por
+ * debounce).
  */
 export function Header({
   planoNome,
   onPlanoNomeChange,
+  sessao,
+  onTrocarSessao,
+  onPull,
+  onPush,
+  sincronizando,
+  publicando,
   planos,
   ativoId,
   onSwitchPlano,
@@ -67,6 +81,8 @@ export function Header({
   onFlowModeChange,
   stats,
 }: HeaderProps) {
+  const emLotacao = sessao.tipo === 'lotacao';
+  const podeEnviar = emLotacao && sessao.permissao === 'edicao';
   return (
     <header
       className="flex items-center gap-3 px-4 no-print bg-superficie border-b border-borda flex-shrink-0"
@@ -76,6 +92,8 @@ export function Header({
         <span className="brand-mark">eP</span>
         <span className="font-semibold text-[13px]">PlanejoEproc</span>
       </div>
+
+      <SessaoBadge sessao={sessao} onTrocar={onTrocarSessao} />
 
       <PlanSwitcher
         planos={planos}
@@ -162,6 +180,28 @@ export function Header({
         onSalvarAtivo={onSalvarCopiaAtivo}
         onSalvarTodos={onSalvarTodos}
       />
+      {emLotacao && (
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={onPull}
+          disabled={sincronizando || publicando}
+          title="Substitui os planos desta lotação pela versão do servidor"
+        >
+          <Icon.CloudDown /> {sincronizando ? 'Baixando…' : 'Baixar do servidor'}
+        </button>
+      )}
+      {podeEnviar && (
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={onPush}
+          disabled={sincronizando || publicando}
+          title="Envia todos os planos desta lotação e propaga as exclusões"
+        >
+          <Icon.CloudUp /> {publicando ? 'Enviando…' : 'Enviar ao servidor'}
+        </button>
+      )}
       <button
         type="button"
         className="btn btn-sm"

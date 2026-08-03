@@ -84,6 +84,10 @@ src/
   features/
     canvas/        ← store, ReactFlow, NodePanel, EdgePanel, modal de detalhamento.
     checklist/     ← derive (função pura) e ChecklistModal.
+    sessao/        ← tela de entrada, store da sessão (modo local ou lotação).
+    sync/          ← baixar/enviar do servidor, aplicação do resultado no silo.
+    plans/         ← switcher de plano e botão de salvar cópia.
+    catalogo/      ← importação do XLS de localizadores do órgão.
   data/            ← 6 catálogos do Eproc embutidos (Caminho A — ver CLAUDE.md).
   components/      ← genéricos (Header, Sidebar, PanelHeader, Icon).
   utils/           ← cn, uid.
@@ -103,9 +107,68 @@ decisoes.md        ← decisões deliberadas de simplificação consciente.
 
 ---
 
+## Sessão: modo local ou lotação
+
+Ao abrir, o app pergunta **de quem são os planos** antes de mostrar o editor.
+São três caminhos:
+
+| Escolha | O que acontece |
+|---|---|
+| **Abrir modo local** | Os planos ficam só neste navegador. Nenhuma conexão é usada, nunca. |
+| **Entrar com código de lotação** | Baixa os planos daquela lotação e passa a trabalhar dentro dela. |
+| **Criar nova lotação** | Cria a lotação no servidor e devolve os dois códigos de acesso. |
+
+**Lotação** é o conjunto de planos de uma unidade (vara, cartório, gabinete),
+guardado no servidor de sincronização (ver `apps-script/`). Cada uma tem dois
+códigos:
+
+- **Código de visualização** — quem tiver só consegue **baixar** os planos.
+- **Código de edição** — também consegue **enviar** alterações. Trate como senha.
+
+Os códigos aparecem **uma única vez**, na criação: o servidor não tem como
+consultá-los nem revogá-los depois (`decisoes.md#D-8`).
+
+### Isolamento
+
+Cada lotação tem seu próprio silo no `localStorage`, e o modo local tem o dele.
+Entrar numa lotação **não apaga nem mistura** nada: o que você vê no seletor de
+planos é sempre só o do contexto atual, e sair de um contexto preserva o que
+estava lá para a próxima entrada. O catálogo de localizadores do órgão é a
+exceção deliberada — continua global ao navegador (`decisoes.md#D-7`).
+
+### Baixar e enviar
+
+Dentro de uma lotação, o cabeçalho ganha dois botões:
+
+- **Baixar do servidor** — traz a versão do servidor. Planos já conhecidos são
+  atualizados no lugar; planos excluídos no servidor somem daqui também.
+  Rascunhos criados aqui e nunca enviados são preservados.
+- **Enviar ao servidor** (só com código de edição) — envia **todos** os planos
+  da lotação e propaga as exclusões que você fez. Sem escolher plano a plano:
+  a lotação é o conjunto.
+
+Se um envio falhar, as exclusões pendentes não são perdidas — vão junto na
+tentativa seguinte.
+
+A tela de entrada guarda as lotações já usadas neste navegador (com o código),
+para reentrar em um clique. *Esquecer* remove a lotação da lista sem apagar os
+planos dela.
+
+> A sincronização exige que o backend em `apps-script/Code.gs` esteja
+> implantado **na versão atual**. Veja `apps-script/README.md`.
+
+---
+
 ## Persistência e migrações
 
-- O plano corrente fica em `localStorage` na chave `planejoeproc:plano`.
+- Os planos ficam em `localStorage`, com as chaves prefixadas pelo silo da
+  sessão: `planejoeproc:…` no modo local (as mesmas de sempre) e
+  `planejoeproc:lot:<workspaceId>:…` dentro de uma lotação. Ver
+  `src/infra/storage/escopo.ts`.
+- Sem sessão escolhida, o storage é inerte: toda leitura devolve vazio e toda
+  escrita é no-op — a tela de entrada não tem como sobrescrever plano nenhum.
+- A chave legada `planejoeproc:plano` (formato single-plano) é migrada uma
+  única vez, e só no modo local.
 - Se o JSON estiver malformado ou não passar no `PlanoSchema` (Zod), o conteúdo é **movido** para `planejoeproc:plano:corrompido:YYYY-MM-DD` e o app abre vazio. Não há perda silenciosa.
 - Toda gravação passa por um saver com debounce de 300 ms; mudanças muito próximas coalescem em uma única escrita.
 - O atalho `Delete` remove a seleção (nó ou aresta) — exceto quando o foco está em `INPUT`/`TEXTAREA`/`contenteditable`.
@@ -128,7 +191,8 @@ decisoes.md        ← decisões deliberadas de simplificação consciente.
 ## Documentação relacionada
 
 - **`CLAUDE.md`** — guia de stack, arquitetura, glossário de domínio, padrões de código e regras de ouro. Lido por Claude e útil para qualquer dev novo no projeto.
-- **`decisoes.md`** — registro de decisões deliberadas de simplificação (D-1: assunto livre; D-2: filtros como subset; D-3: condições textarea; D-4: `acaoTipo` + `acao`).
+- **`decisoes.md`** — registro de decisões deliberadas de simplificação (D-1: assunto livre; D-2: filtros como subset; D-3: condições textarea; D-4: `acaoTipo` + `acao`; D-8: backend Sheets+Drive; D-9: sessão por lotação).
+- **`apps-script/README.md`** — deploy e republicação do backend de sincronização.
 - **`listas_json/`** — referência completa dos 48 JSONs do Eproc.
 
 ---

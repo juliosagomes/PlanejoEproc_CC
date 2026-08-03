@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SCHEMA_VERSION, type Plano } from '@/domain';
-import { getActivePlanKey } from '@/infra/storage';
+import { getActivePlanKey, setEscopo } from '@/infra/storage';
 import {
   cancelPersist,
   defaultEdgeData,
@@ -22,6 +22,9 @@ beforeEach(() => {
   // de zerar o storage; senão um flush atrasado poderia repor a chave.
   cancelPersist();
   localStorage.clear();
+  // A persistência é no-op sem escopo (o app só o define depois do login);
+  // estes testes exercitam o comportamento dentro de uma sessão.
+  setEscopo({ tipo: 'local' });
   useCanvasStore.setState(ESTADO_INICIAL);
 });
 

@@ -1,12 +1,21 @@
 export {
+  // Escopo (silo de armazenamento por sessão)
+  getEscopo,
+  setEscopo,
+  prefixo,
+  indexKey,
+  activeKey,
+  planKey,
+  comEscopo,
+  isEscopoLocal,
+  getWorkspaceId,
+  type Escopo,
+} from './escopo';
+export {
   // Chaves
   LEGACY_KEY,
-  INDEX_KEY,
-  ACTIVE_KEY,
-  PLAN_KEY_PREFIX,
   BACKUP_KEY_PREFIX,
   // Helpers
-  getPlanKey,
   getActivePlanKey,
   planoVazio,
   // Leitura
@@ -15,6 +24,7 @@ export {
   getAtivoId,
   // Escrita
   savePlano,
+  sobrescreverPlano,
   setAtivo,
   criarPlano,
   importarPlano,

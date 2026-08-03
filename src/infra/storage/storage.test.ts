@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { SCHEMA_VERSION, type Plano } from '@/domain';
+import { setEscopo } from './escopo';
 import {
-  ACTIVE_KEY,
   BACKUP_KEY_PREFIX,
-  INDEX_KEY,
   LEGACY_KEY,
   criarPlano,
   criarSavePlanoDebounced,
@@ -11,7 +10,6 @@ import {
   excluirPlano,
   getActivePlanKey,
   getAtivoId,
-  getPlanKey,
   importarPlano,
   importarPlanos,
   listPlanos,
@@ -20,7 +18,21 @@ import {
   renomearPlano,
   savePlano,
   setAtivo,
+  sobrescreverPlano,
 } from './storage';
+
+/**
+ * Chaves do modo local, escritas à mão de propósito: são as mesmas de antes
+ * do conceito de escopo existir. Se alguém mudar o prefixo, estes testes
+ * quebram — que é exatamente o alarme desejado, porque isso deixaria os
+ * planos já salvos dos usuários inacessíveis.
+ */
+const INDEX_KEY = 'planejoeproc:plans:index';
+const ACTIVE_KEY = 'planejoeproc:plans:active';
+
+function getPlanKey(id: string): string {
+  return `planejoeproc:plan:${id}`;
+}
 
 function planoExemplo(nome = 'Plano de teste'): Plano {
   return {
@@ -67,6 +79,7 @@ const todayKey = `${BACKUP_KEY_PREFIX}${new Date().toISOString().slice(0, 10)}`;
 
 beforeEach(() => {
   localStorage.clear();
+  setEscopo({ tipo: 'local' });
   vi.restoreAllMocks();
   // Silencia warnings esperados nos cenários de erro.
   vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -264,6 +277,23 @@ describe('CRUD do índice', () => {
     expect(loadPlano(id).planoNome).toBe('Novo nome');
   });
 
+  it('sobrescreverPlano atualiza payload e nome no índice mantendo o id', () => {
+    const { id } = criarPlano('Original');
+    const outro = criarPlano('Outro').id;
+
+    sobrescreverPlano(id, planoExemplo('Vindo do sync'));
+
+    expect(loadPlano(id).planoNome).toBe('Vindo do sync');
+    expect(listPlanos().find((e) => e.id === id)?.nome).toBe('Vindo do sync');
+    // Não mexe no ativo — "Outro" continua sendo o plano ativo.
+    expect(getAtivoId()).toBe(outro);
+  });
+
+  it('sobrescreverPlano com id inexistente é no-op', () => {
+    sobrescreverPlano('não-existe', planoExemplo());
+    expect(listPlanos()).toEqual([]);
+  });
+
   it('renomearPlano com nome em branco usa fallback', () => {
     const { id } = criarPlano('X');
     renomearPlano(id, '   ');
@@ -405,5 +435,67 @@ describe('criarSavePlanoDebounced', () => {
     const save = criarSavePlanoDebounced(300);
     expect(() => save.flush()).not.toThrow();
     expect(getAtivoId()).toBeNull();
+  });
+});
+
+describe('isolamento entre silos', () => {
+  const LOTACAO_A = { tipo: 'lotacao', workspaceId: 'ws-a' } as const;
+  const LOTACAO_B = { tipo: 'lotacao', workspaceId: 'ws-b' } as const;
+  const LOCAL = { tipo: 'local' } as const;
+
+  it('planos do modo local não aparecem dentro de uma lotação', () => {
+    criarPlano('Plano local');
+    expect(listPlanos().map((p) => p.nome)).toEqual(['Plano local']);
+
+    setEscopo(LOTACAO_A);
+    expect(listPlanos()).toEqual([]);
+    expect(getAtivoId()).toBeNull();
+  });
+
+  it('voltar ao modo local traz os planos de volta intactos', () => {
+    const { id } = criarPlano('Plano local');
+    savePlano({ ...planoExemplo('Plano local'), planoNome: 'Plano local' });
+
+    setEscopo(LOTACAO_A);
+    criarPlano('Plano da lotação A');
+
+    setEscopo(LOCAL);
+    expect(listPlanos().map((p) => p.nome)).toEqual(['Plano local']);
+    expect(getAtivoId()).toBe(id);
+    expect(loadPlano(id).nodes).toHaveLength(1);
+  });
+
+  it('duas lotações não enxergam os planos uma da outra', () => {
+    setEscopo(LOTACAO_A);
+    criarPlano('Plano A');
+
+    setEscopo(LOTACAO_B);
+    expect(listPlanos()).toEqual([]);
+    criarPlano('Plano B');
+
+    setEscopo(LOTACAO_A);
+    expect(listPlanos().map((p) => p.nome)).toEqual(['Plano A']);
+  });
+
+  it('excluir dentro de uma lotação não toca no silo local', () => {
+    criarPlano('Plano local');
+
+    setEscopo(LOTACAO_A);
+    const { id } = criarPlano('Plano A');
+    excluirPlano(id);
+    expect(listPlanos()).toEqual([]);
+
+    setEscopo(LOCAL);
+    expect(listPlanos().map((p) => p.nome)).toEqual(['Plano local']);
+  });
+
+  it('a migração da chave legada só roda no modo local', () => {
+    localStorage.setItem(LEGACY_KEY, JSON.stringify(planoExemplo('Legado')));
+
+    setEscopo(LOTACAO_A);
+    expect(listPlanos()).toEqual([]);
+
+    setEscopo(LOCAL);
+    expect(listPlanos().map((p) => p.nome)).toEqual(['Legado']);
   });
 });

@@ -201,6 +201,115 @@ export const Icon = {
       />
     </svg>
   ),
+  /** Três nós conectados — usado para compartilhar/sincronizar planos. */
+  Share: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="3" cy="7" r="1.6" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="10.5" cy="2.8" r="1.6" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="10.5" cy="11.2" r="1.6" stroke="currentColor" strokeWidth="1.3" />
+      <path
+        d="m4.4 6.2 4.6-2.7M4.4 7.8l4.6 2.7"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  /** Nuvem com seta para baixo — "Baixar do servidor" (pull). */
+  CloudDown: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M4 9.5a2.5 2.5 0 0 1 .3-5A3.2 3.2 0 0 1 10.3 5a2.3 2.3 0 0 1-.3 4.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7 6.5v6m0 0L5.2 10.7M7 12.5l1.8-1.8"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  /** Nuvem com seta para cima — "Enviar ao servidor" (push). */
+  CloudUp: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M4 9.5a2.5 2.5 0 0 1 .3-5A3.2 3.2 0 0 1 10.3 5a2.3 2.3 0 0 1-.3 4.5"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M7 12.5v-6m0 0L5.2 8.3M7 6.5l1.8 1.8"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  /** Porta com seta saindo — trocar de lotação / voltar à tela de entrada. */
+  Logout: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M8.5 2.5h-5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h5"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.5 7h6m0 0-2-2m2 2-2 2"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  /** Prédio — identifica a lotação (unidade) na barra superior. */
+  Predio: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M2.5 12.5v-9L7 1.5l4.5 2v9M1.5 12.5h11"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5 6h1.2M7.8 6H9M5 8.4h1.2M7.8 8.4H9M6 12.5v-2h2v2"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  /** Cadeado — modo local, sem rede. */
+  Cadeado: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <rect
+        x="2.8"
+        y="6"
+        width="8.4"
+        height="6.5"
+        rx="1.2"
+        stroke="currentColor"
+        strokeWidth="1.3"
+      />
+      <path
+        d="M4.8 6V4.5a2.2 2.2 0 0 1 4.4 0V6"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
   /** Check do canto direito superior do nó "já criado". 10×10. */
   CheckCorner: (p: IconProps) => (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden {...p}>

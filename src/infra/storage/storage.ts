@@ -1,23 +1,23 @@
 import { SCHEMA_VERSION, type Plano } from '@/domain';
+import { activeKey, indexKey, isEscopoLocal, planKey } from './escopo';
 import { PlanoSchema, PlansIndexSchema } from './schema';
 
 /* ============================================================================
  * Chaves do localStorage
  *
- * Estrutura multi-plano:
- *  - INDEX_KEY    → array de metadados (id, nome, atualizadoEm) leve.
- *  - ACTIVE_KEY   → id do plano ativo (o que abre por padrão).
- *  - PLAN_KEY_PREFIX + id → payload completo de cada plano.
+ * As chaves de plano são derivadas do escopo corrente (ver `escopo.ts`), não
+ * fixas: cada lotação tem seu próprio silo, e o modo local mantém o prefixo
+ * histórico. Por isso `indexKey()`/`activeKey()`/`planKey()` são funções, e
+ * todas devolvem `null` quando não há sessão ativa — nesse estado toda função
+ * daqui é leitura vazia ou no-op.
  *
  * A chave LEGACY_KEY é o formato antigo (single-plano). Mantemos como rede
  * de segurança por uma versão: a primeira execução pós-migração lê dela só
  * se o índice estiver ausente, importa para o novo formato e a deixa intacta.
+ * Como é anterior ao conceito de lotação, só migra para o escopo local.
  * ========================================================================== */
 
 export const LEGACY_KEY = 'planejoeproc:plano';
-export const INDEX_KEY = 'planejoeproc:plans:index';
-export const ACTIVE_KEY = 'planejoeproc:plans:active';
-export const PLAN_KEY_PREFIX = 'planejoeproc:plan:';
 
 /**
  * Prefixo de chave para backups de dados que não puderam ser carregados
@@ -36,14 +36,13 @@ export interface PlanIndexEntry {
 
 export type PlansIndex = PlanIndexEntry[];
 
-export function getPlanKey(id: string): string {
-  return PLAN_KEY_PREFIX + id;
-}
-
-/** Conveniência para testes/UI: chave do plano ativo, ou null se não há ativo. */
+/**
+ * Chave do plano ativo no escopo corrente, ou null se não há ativo (nem
+ * sessão). Conveniência para testes e para inspecionar o storage.
+ */
 export function getActivePlanKey(): string | null {
   const id = getAtivoId();
-  return id === null ? null : getPlanKey(id);
+  return id === null ? null : planKey(id);
 }
 
 export function planoVazio(): Plano {
@@ -71,6 +70,26 @@ function getStorage(): Storage | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Resolve, de uma vez, o storage e as chaves do escopo corrente. Devolve null
+ * quando o storage está indisponível OU não há sessão ativa — os dois casos
+ * em que nenhuma função pública daqui deve fazer nada.
+ */
+interface Ctx {
+  storage: Storage;
+  indexK: string;
+  activeK: string;
+}
+
+function ctx(): Ctx | null {
+  const storage = getStorage();
+  if (!storage) return null;
+  const indexK = indexKey();
+  const activeK = activeKey();
+  if (indexK === null || activeK === null) return null;
+  return { storage, indexK, activeK };
 }
 
 function todayIso(): string {
@@ -108,8 +127,8 @@ function moveToBackup(storage: Storage, sourceKey: string, raw: string): void {
  * Índice
  * ========================================================================== */
 
-function readIndex(storage: Storage): PlansIndex {
-  const raw = storage.getItem(INDEX_KEY);
+function readIndex(c: Ctx): PlansIndex {
+  const raw = c.storage.getItem(c.indexK);
   if (raw === null) return [];
 
   let parsed: unknown;
@@ -117,7 +136,7 @@ function readIndex(storage: Storage): PlansIndex {
     parsed = JSON.parse(raw);
   } catch (err) {
     console.warn('[storage] Índice de planos corrompido (JSON); movendo para backup.', err);
-    moveToBackup(storage, INDEX_KEY, raw);
+    moveToBackup(c.storage, c.indexK, raw);
     return [];
   }
 
@@ -127,15 +146,15 @@ function readIndex(storage: Storage): PlansIndex {
       '[storage] Índice de planos com shape inválido; movendo para backup.',
       result.error.issues,
     );
-    moveToBackup(storage, INDEX_KEY, raw);
+    moveToBackup(c.storage, c.indexK, raw);
     return [];
   }
   return result.data;
 }
 
-function writeIndex(storage: Storage, index: PlansIndex): void {
+function writeIndex(c: Ctx, index: PlansIndex): void {
   try {
-    storage.setItem(INDEX_KEY, JSON.stringify(index));
+    c.storage.setItem(c.indexK, JSON.stringify(index));
   } catch (err) {
     console.warn('[storage] Falha ao gravar índice de planos (quota?).', err);
   }
@@ -144,14 +163,16 @@ function writeIndex(storage: Storage, index: PlansIndex): void {
 /* ============================================================================
  * Migração one-shot
  *
- * Idempotente: só roda quando o índice multi-plano ainda não existe E a chave
- * legada tem um plano válido. Cria a primeira entrada do índice, marca como
- * ativo e mantém a chave legada (rede de segurança por uma versão).
+ * Idempotente: só roda no escopo local, quando o índice multi-plano ainda não
+ * existe E a chave legada tem um plano válido. Cria a primeira entrada do
+ * índice, marca como ativo e mantém a chave legada (rede de segurança por uma
+ * versão).
  * ========================================================================== */
 
-function migrarSeNecessario(storage: Storage): void {
-  if (storage.getItem(INDEX_KEY) !== null) return;
-  const legacyRaw = storage.getItem(LEGACY_KEY);
+function migrarSeNecessario(c: Ctx): void {
+  if (!isEscopoLocal()) return;
+  if (c.storage.getItem(c.indexK) !== null) return;
+  const legacyRaw = c.storage.getItem(LEGACY_KEY);
   if (legacyRaw === null) return;
 
   let parsed: unknown;
@@ -166,6 +187,8 @@ function migrarSeNecessario(storage: Storage): void {
 
   const id = newId();
   const plano = result.data;
+  const chave = planKey(id);
+  if (chave === null) return;
   const entry: PlanIndexEntry = {
     id,
     nome: plano.planoNome.trim() || 'Plano migrado',
@@ -173,9 +196,9 @@ function migrarSeNecessario(storage: Storage): void {
   };
 
   try {
-    storage.setItem(getPlanKey(id), JSON.stringify(plano));
-    writeIndex(storage, [entry]);
-    storage.setItem(ACTIVE_KEY, id);
+    c.storage.setItem(chave, JSON.stringify(plano));
+    writeIndex(c, [entry]);
+    c.storage.setItem(c.activeK, id);
   } catch (err) {
     console.warn('[storage] Falha ao migrar plano legado.', err);
   }
@@ -186,29 +209,29 @@ function migrarSeNecessario(storage: Storage): void {
  * ========================================================================== */
 
 export function listPlanos(): PlansIndex {
-  const storage = getStorage();
-  if (!storage) return [];
-  migrarSeNecessario(storage);
-  return readIndex(storage);
+  const c = ctx();
+  if (!c) return [];
+  migrarSeNecessario(c);
+  return readIndex(c);
 }
 
 export function getAtivoId(): string | null {
-  const storage = getStorage();
-  if (!storage) return null;
-  migrarSeNecessario(storage);
-  return storage.getItem(ACTIVE_KEY);
+  const c = ctx();
+  if (!c) return null;
+  migrarSeNecessario(c);
+  return c.storage.getItem(c.activeK);
 }
 
 export function setAtivo(id: string): void {
-  const storage = getStorage();
-  if (!storage) return;
-  const index = readIndex(storage);
+  const c = ctx();
+  if (!c) return;
+  const index = readIndex(c);
   if (!index.some((e) => e.id === id)) {
     console.warn('[storage] setAtivo: id não encontrado no índice', id);
     return;
   }
   try {
-    storage.setItem(ACTIVE_KEY, id);
+    c.storage.setItem(c.activeK, id);
   } catch (err) {
     console.warn('[storage] Falha ao gravar ativo.', err);
   }
@@ -216,10 +239,11 @@ export function setAtivo(id: string): void {
 
 /**
  * Carrega um plano. Sem argumento, carrega o ativo; se não há ativo (boot
- * fresco ou todos excluídos), retorna plano vazio sem efeitos colaterais.
+ * fresco, silo novo, ou todos excluídos), retorna plano vazio sem efeitos
+ * colaterais.
  *
  * Casos cobertos:
- *  - localStorage indisponível ou nada salvo → plano vazio.
+ *  - Sem sessão, localStorage indisponível ou nada salvo → plano vazio.
  *  - JSON inválido → backup em chave -corrompido- + plano vazio.
  *  - Shape inválido (não passa no Zod) → backup + plano vazio.
  *  - Plano v1 válido → retorna o plano.
@@ -227,15 +251,16 @@ export function setAtivo(id: string): void {
  * Sempre retorna um Plano. Nunca lança.
  */
 export function loadPlano(id?: string): Plano {
-  const storage = getStorage();
-  if (!storage) return planoVazio();
-  migrarSeNecessario(storage);
+  const c = ctx();
+  if (!c) return planoVazio();
+  migrarSeNecessario(c);
 
-  const targetId = id ?? storage.getItem(ACTIVE_KEY);
+  const targetId = id ?? c.storage.getItem(c.activeK);
   if (targetId === null) return planoVazio();
 
-  const key = getPlanKey(targetId);
-  const raw = storage.getItem(key);
+  const key = planKey(targetId);
+  if (key === null) return planoVazio();
+  const raw = c.storage.getItem(key);
   if (raw === null) return planoVazio();
 
   let parsed: unknown;
@@ -243,7 +268,7 @@ export function loadPlano(id?: string): Plano {
     parsed = JSON.parse(raw);
   } catch (err) {
     console.warn(`[storage] JSON inválido em ${key}; movendo para backup.`, err);
-    moveToBackup(storage, key, raw);
+    moveToBackup(c.storage, key, raw);
     return planoVazio();
   }
 
@@ -253,34 +278,35 @@ export function loadPlano(id?: string): Plano {
       `[storage] Shape de plano irreconhecível em ${key}; movendo para backup.`,
       result.error.issues,
     );
-    moveToBackup(storage, key, raw);
+    moveToBackup(c.storage, key, raw);
     return planoVazio();
   }
   return result.data;
 }
 
 /**
- * Persiste o plano no slot ativo. Se não houver ativo registrado (primeiro
- * save após boot fresco), cria a entrada lazily — gera id, adiciona ao índice
- * e marca como ativo. Falhas (quota, storage indisponível) são logadas mas
- * não propagadas — o usuário continua trabalhando em memória.
+ * Persiste o plano no slot ativo do escopo corrente. Se não houver ativo
+ * registrado (primeiro save após entrar num silo novo), cria a entrada
+ * lazily — gera id, adiciona ao índice e marca como ativo. Falhas (quota,
+ * storage indisponível) são logadas mas não propagadas — o usuário continua
+ * trabalhando em memória.
  *
  * O nome do plano no índice é sincronizado com `plano.planoNome` a cada save,
  * de modo que renomes feitos pelo input do header se refletem no switcher.
  */
 export function savePlano(plano: Plano): void {
-  const storage = getStorage();
-  if (!storage) return;
+  const c = ctx();
+  if (!c) return;
 
-  let id = storage.getItem(ACTIVE_KEY);
-  let index = readIndex(storage);
+  let id = c.storage.getItem(c.activeK);
+  let index = readIndex(c);
   const nomeFinal = plano.planoNome || 'Plano sem título';
 
   if (id === null || !index.some((e) => e.id === id)) {
     id = newId();
     index = [...index, { id, nome: nomeFinal, atualizadoEm: nowIso() }];
     try {
-      storage.setItem(ACTIVE_KEY, id);
+      c.storage.setItem(c.activeK, id);
     } catch (err) {
       console.warn('[storage] Falha ao gravar ativo.', err);
       return;
@@ -291,9 +317,11 @@ export function savePlano(plano: Plano): void {
     );
   }
 
+  const key = planKey(id);
+  if (key === null) return;
   try {
-    storage.setItem(getPlanKey(id), JSON.stringify(plano));
-    writeIndex(storage, index);
+    c.storage.setItem(key, JSON.stringify(plano));
+    writeIndex(c, index);
   } catch (err) {
     console.warn('[storage] Falha ao salvar plano (quota?).', err);
   }
@@ -307,19 +335,20 @@ export function criarPlano(nome?: string): { id: string; plano: Plano } {
   const id = newId();
   const plano: Plano = { ...planoVazio(), planoNome: nome ?? 'Plano sem título' };
 
-  const storage = getStorage();
-  if (!storage) return { id, plano };
+  const c = ctx();
+  const key = planKey(id);
+  if (!c || key === null) return { id, plano };
 
   const entry: PlanIndexEntry = {
     id,
     nome: plano.planoNome,
     atualizadoEm: nowIso(),
   };
-  const index = readIndex(storage);
+  const index = readIndex(c);
   try {
-    storage.setItem(getPlanKey(id), JSON.stringify(plano));
-    writeIndex(storage, [...index, entry]);
-    storage.setItem(ACTIVE_KEY, id);
+    c.storage.setItem(key, JSON.stringify(plano));
+    writeIndex(c, [...index, entry]);
+    c.storage.setItem(c.activeK, id);
   } catch (err) {
     console.warn('[storage] Falha ao criar plano.', err);
   }
@@ -333,19 +362,20 @@ export function criarPlano(nome?: string): { id: string; plano: Plano } {
  */
 export function importarPlano(plano: Plano): { id: string } {
   const id = newId();
-  const storage = getStorage();
-  if (!storage) return { id };
+  const c = ctx();
+  const key = planKey(id);
+  if (!c || key === null) return { id };
 
   const entry: PlanIndexEntry = {
     id,
     nome: plano.planoNome.trim() || 'Plano importado',
     atualizadoEm: nowIso(),
   };
-  const index = readIndex(storage);
+  const index = readIndex(c);
   try {
-    storage.setItem(getPlanKey(id), JSON.stringify(plano));
-    writeIndex(storage, [...index, entry]);
-    storage.setItem(ACTIVE_KEY, id);
+    c.storage.setItem(key, JSON.stringify(plano));
+    writeIndex(c, [...index, entry]);
+    c.storage.setItem(c.activeK, id);
   } catch (err) {
     console.warn('[storage] Falha ao importar plano.', err);
   }
@@ -366,15 +396,17 @@ export function importarPlanos(plans: Plano[]): {
   ativoId: string | null;
 } {
   if (plans.length === 0) return { ids: [], ativoId: null };
-  const storage = getStorage();
-  if (!storage) return { ids: [], ativoId: null };
+  const c = ctx();
+  if (!c) return { ids: [], ativoId: null };
 
-  const index = readIndex(storage);
+  const index = readIndex(c);
   const novasEntries: PlanIndexEntry[] = [];
   const ids: string[] = [];
 
   for (const plano of plans) {
     const id = newId();
+    const key = planKey(id);
+    if (key === null) continue;
     ids.push(id);
     novasEntries.push({
       id,
@@ -382,18 +414,18 @@ export function importarPlanos(plans: Plano[]): {
       atualizadoEm: nowIso(),
     });
     try {
-      storage.setItem(getPlanKey(id), JSON.stringify(plano));
+      c.storage.setItem(key, JSON.stringify(plano));
     } catch (err) {
       console.warn('[storage] Falha ao gravar plano importado.', err);
     }
   }
 
-  writeIndex(storage, [...index, ...novasEntries]);
+  writeIndex(c, [...index, ...novasEntries]);
 
   const ultimoId = ids[ids.length - 1] ?? null;
   if (ultimoId !== null) {
     try {
-      storage.setItem(ACTIVE_KEY, ultimoId);
+      c.storage.setItem(c.activeK, ultimoId);
     } catch (err) {
       console.warn('[storage] Falha ao gravar ativo após importação em lote.', err);
     }
@@ -403,19 +435,53 @@ export function importarPlanos(plans: Plano[]): {
 }
 
 /**
+ * Sobrescreve o payload de um plano já existente, mantendo o `id` local.
+ * Usado pela sincronização: ao repetir o pull de um plano remoto já
+ * conhecido, o local correspondente é atualizado no lugar em vez de gerar
+ * uma entrada nova (o que `importarPlano` faria). Diferente de `savePlano`,
+ * não toca a chave de ativo — o plano sobrescrito não precisa virar o ativo.
+ * No-op silencioso se o id não existe no índice.
+ */
+export function sobrescreverPlano(id: string, plano: Plano): void {
+  const c = ctx();
+  if (!c) return;
+
+  const index = readIndex(c);
+  const entry = index.find((e) => e.id === id);
+  if (!entry) return;
+
+  const key = planKey(id);
+  if (key === null) return;
+
+  const nomeFinal = plano.planoNome.trim() || 'Plano sem título';
+  const novoIndex = index.map((e) =>
+    e.id === id ? { ...e, nome: nomeFinal, atualizadoEm: nowIso() } : e,
+  );
+
+  try {
+    c.storage.setItem(key, JSON.stringify(plano));
+    writeIndex(c, novoIndex);
+  } catch (err) {
+    console.warn('[storage] Falha ao sobrescrever plano.', err);
+  }
+}
+
+/**
  * Duplica um plano existente: copia o payload, renomeia para "Cópia de…",
  * registra com novo id e ativa. Retorna null se o id de origem não existe.
  */
 export function duplicarPlano(id: string): { id: string } | null {
-  const storage = getStorage();
-  if (!storage) return null;
+  const c = ctx();
+  if (!c) return null;
 
-  const index = readIndex(storage);
+  const index = readIndex(c);
   const entry = index.find((e) => e.id === id);
   if (!entry) return null;
 
   const original = loadPlano(id);
   const novoId = newId();
+  const key = planKey(novoId);
+  if (key === null) return null;
   const novoPlano: Plano = {
     ...original,
     planoNome: `Cópia de ${original.planoNome}`,
@@ -427,9 +493,9 @@ export function duplicarPlano(id: string): { id: string } | null {
   };
 
   try {
-    storage.setItem(getPlanKey(novoId), JSON.stringify(novoPlano));
-    writeIndex(storage, [...index, novaEntry]);
-    storage.setItem(ACTIVE_KEY, novoId);
+    c.storage.setItem(key, JSON.stringify(novoPlano));
+    writeIndex(c, [...index, novaEntry]);
+    c.storage.setItem(c.activeK, novoId);
   } catch (err) {
     console.warn('[storage] Falha ao duplicar plano.', err);
     return null;
@@ -443,9 +509,9 @@ export function duplicarPlano(id: string): { id: string } | null {
  * silencioso se o id não existe.
  */
 export function renomearPlano(id: string, nome: string): void {
-  const storage = getStorage();
-  if (!storage) return;
-  const index = readIndex(storage);
+  const c = ctx();
+  if (!c) return;
+  const index = readIndex(c);
   const entry = index.find((e) => e.id === id);
   if (!entry) return;
 
@@ -454,14 +520,15 @@ export function renomearPlano(id: string, nome: string): void {
     e.id === id ? { ...e, nome: nomeFinal, atualizadoEm: nowIso() } : e,
   );
 
-  const raw = storage.getItem(getPlanKey(id));
-  if (raw !== null) {
+  const key = planKey(id);
+  const raw = key === null ? null : c.storage.getItem(key);
+  if (key !== null && raw !== null) {
     try {
       const parsed: unknown = JSON.parse(raw);
       const result = PlanoSchema.safeParse(parsed);
       if (result.success) {
         const atualizado: Plano = { ...result.data, planoNome: nomeFinal };
-        storage.setItem(getPlanKey(id), JSON.stringify(atualizado));
+        c.storage.setItem(key, JSON.stringify(atualizado));
       }
     } catch {
       // Payload corrompido — sincronizamos só o índice; loadPlano lidará na
@@ -469,32 +536,39 @@ export function renomearPlano(id: string, nome: string): void {
     }
   }
 
-  writeIndex(storage, novoIndex);
+  writeIndex(c, novoIndex);
 }
 
 /**
  * Remove o plano. Se for o ativo, o próximo ativo é o mais recente do que
- * sobrou (por `atualizadoEm`); se a lista ficar vazia, ACTIVE_KEY é apagado.
+ * sobrou (por `atualizadoEm`); se a lista ficar vazia, a chave de ativo é
+ * apagada.
+ *
+ * Não registra tombstone de sincronização: quem exclui deliberadamente (o
+ * usuário, pelo switcher) passa por `features/sync/store.ts`, que marca a
+ * exclusão para propagar; quem exclui por reflexo do servidor (pull de um
+ * plano que sumiu lá) não deve marcar nada.
  */
 export function excluirPlano(id: string): void {
-  const storage = getStorage();
-  if (!storage) return;
+  const c = ctx();
+  if (!c) return;
 
-  const index = readIndex(storage);
+  const index = readIndex(c);
   const novoIndex = index.filter((e) => e.id !== id);
+  const key = planKey(id);
 
   try {
-    storage.removeItem(getPlanKey(id));
-    writeIndex(storage, novoIndex);
+    if (key !== null) c.storage.removeItem(key);
+    writeIndex(c, novoIndex);
 
-    if (storage.getItem(ACTIVE_KEY) === id) {
+    if (c.storage.getItem(c.activeK) === id) {
       const proximo = [...novoIndex].sort((a, b) =>
         b.atualizadoEm.localeCompare(a.atualizadoEm),
       )[0];
       if (proximo) {
-        storage.setItem(ACTIVE_KEY, proximo.id);
+        c.storage.setItem(c.activeK, proximo.id);
       } else {
-        storage.removeItem(ACTIVE_KEY);
+        c.storage.removeItem(c.activeK);
       }
     }
   } catch (err) {
@@ -506,7 +580,7 @@ export function excluirPlano(id: string): void {
  * Debounced saver
  *
  * Mantém a assinatura antiga — o caller só passa o `Plano`. Internamente,
- * `savePlano` resolve o id ativo (criando lazily se preciso).
+ * `savePlano` resolve o escopo e o id ativo (criando lazily se preciso).
  * ========================================================================== */
 
 export interface DebouncedSaver {

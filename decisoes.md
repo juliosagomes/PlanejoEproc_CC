@@ -82,6 +82,94 @@
 
 ---
 
+## D-8 · Sincronização é opt-in, sem login, backend Sheets+Drive
+
+> **Emendada por [D-9](#d-9--sessão-por-lotação-silo-de-armazenamento--tela-de-entrada).**
+> O "opt-in por modal" virou escolha de contexto na tela de entrada, e
+> "workspace" passou a se chamar **lotação** na UI. O que segue abaixo continua
+> valendo: backend, formato de armazenamento e modelo de acesso por código.
+
+**Decisão.** A feature de sincronização (`infra/sync/`, `features/sync/`)
+é inteiramente opcional: o app continua funcionando 100% offline para quem
+escolher o modo local — nenhuma chamada de rede acontece fora de uma ação
+explícita do usuário. O backend é um único Google Apps Script Web App
+(código de referência em `apps-script/`), com a planilha guardando só um
+índice (workspaces e metadados de cada plano) e o conteúdo de cada plano
+salvo como arquivo JSON no Drive, um por plano. Acesso é por código —
+`codigoLeitura` (só sincroniza) e `codigoEdicao` (também publica) — sem
+login algum; os códigos são, na prática, segredos tipo bearer-token.
+
+**Por que.** Um plano real medido (`exemplos/exemplo-família.json`) já fica
+em ~7,4 KB minificado com pouco texto livre preenchido; como `condicoes`,
+`acao`, `observacoes` e `minutaConteudo` (D-3/D-4) são `z.string()` sem
+`.max()`, um plano de vara completo facilmente passa de 20–80 KB — perto ou
+acima do limite de ~50.000 caracteres por célula do Google Sheets. Guardar o
+conteúdo em Drive (sem limite prático de tamanho) em vez de numa célula
+evita truncamento silencioso, mantendo o mesmo custo zero e a mesma conta
+Google. Não há login porque o público (servidores/magistrados usando o
+Eproc dentro do próprio órgão) não justifica, na fase de beta, o custo de
+implementar autenticação de verdade — o código já restringe quem consegue
+ler/escrever a quem o recebeu deliberadamente.
+
+**O que precisaria mudar para evoluir.** Se um `codigoEdicao` vazar, hoje não
+há como revogá-lo — precisaria de um endpoint `revogar` no Apps Script que
+gera um novo código e invalida o antigo. Se o volume de uso crescer além do
+que a cota gratuita do Apps Script aguenta, trocar `infra/sync/client.ts`
+para apontar a outro backend (Firebase, Supabase) é isolado — nada em
+`domain/` ou no restante de `infra/storage/` depende do transporte.
+
+---
+
+## D-9 · Sessão por lotação: silo de armazenamento + tela de entrada
+
+**Decisão.** O app abre numa **tela de entrada** onde o usuário escolhe o
+contexto: modo local, entrar numa **lotação** por código, ou criar uma. Cada
+contexto tem seu próprio silo de chaves no `localStorage`
+(`planejoeproc:…` no local — o prefixo histórico —, `planejoeproc:lot:<wsId>:…`
+nas lotações), gerido por `infra/storage/escopo.ts`. Dentro de uma lotação a
+sincronização vira dois botões no cabeçalho — *Baixar do servidor* e, com
+código de edição, *Enviar ao servidor* — no lugar do antigo modal
+"Compartilhar" com abas e checkboxes de quais planos publicar.
+
+**Por que.** No desenho anterior (D-8) todos os planos viviam num único índice
+plano: os locais e os recebidos de qualquer código. Depois de sincronizar com
+duas lotações diferentes, o `PlanSwitcher` virava uma lista sem procedência —
+o usuário não tinha como saber de quem era cada plano nem o que aconteceria ao
+publicar. Isolar por silo torna a resposta estrutural em vez de depender de um
+filtro que alguém possa esquecer de aplicar em algum caminho de leitura. Como
+consequência, "publicar quais planos?" deixa de ser uma pergunta: a lotação
+**é** o conjunto.
+
+Três subdecisões que valem registro:
+
+- **Silo por prefixo de chave, não campo `lotacaoId` filtrado.** Um campo
+  exigiria que toda leitura lembrasse de filtrar; o prefixo faz o vazamento
+  entre lotações ser impossível por construção. O modo local mantém o prefixo
+  antigo, então ninguém precisa de migração.
+- **Exclusões propagam por *tombstone*, não por "o push substitui o conjunto".**
+  O cliente guarda os `remotoId` que excluiu e os manda em `remover[]` no
+  próximo envio. A alternativa — o servidor apagar tudo que não veio no
+  payload — apagaria em silêncio o plano que um colega acabou de publicar,
+  sempre que o conjunto local estivesse desatualizado.
+- **A tela de entrada aparece sempre, mas guarda os códigos.** Aparecer sempre
+  deixa explícito em qual contexto se está (era justamente a informação que
+  faltava). Guardar o código em claro no `localStorage` é o preço de reentrar
+  em um clique; ele já é um bearer-token e o desenho anterior já persistia o
+  `codigoEdicao` na mesma condição, então não é regressão — mas é uma
+  superfície real: qualquer script rodando na página consegue lê-lo.
+
+**O que precisaria mudar para evoluir.** Se um dia houver login de verdade, a
+sessão deixa de ser escolha manual e vira consequência da autenticação — a
+`features/sessao/store.ts` continua sendo o único ponto que chama `setEscopo`,
+então o resto do app não muda. Se os códigos guardados virarem preocupação
+concreta, o caminho é não persistir o de edição (pedir a cada entrada) ou
+guardar só um handle opaco resolvido pelo servidor. Se surgir necessidade de
+mover um plano entre lotações, hoje só dá por exportar/importar arquivo —
+faria sentido uma ação dedicada, porque os silos são isolados de propósito.
+Revogação de código continua fora de escopo (ver D-8).
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

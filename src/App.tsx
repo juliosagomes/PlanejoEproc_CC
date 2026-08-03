@@ -9,6 +9,11 @@ import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
+import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
+import { TelaLogin } from '@/features/sessao/components/TelaLogin';
+import { useSessaoStore } from '@/features/sessao/store';
+import { SyncResultadoModal } from '@/features/sync/components/SyncResultadoModal';
+import { useSyncStore } from '@/features/sync/store';
 import {
   PLANO_BUNDLE_VERSION,
   PlanoBundleSchema,
@@ -16,7 +21,6 @@ import {
   type PlanIndexEntry,
   criarPlano,
   duplicarPlano,
-  excluirPlano,
   getAtivoId,
   importarPlano,
   importarPlanos,
@@ -26,15 +30,37 @@ import {
   renomearPlano,
   setAtivo,
 } from '@/infra/storage';
+import { downloadJson, hojeIso, safeFileName } from '@/utils/download';
 
 /**
  * Composição principal do app — Header + Sidebar + canvas + painel direito
- * condicional + modal de checklist. Conecta todos os handlers à store, gerencia
- * o universo multi-plano (lista, ativo, criação, switch, renomear, duplicar,
- * excluir, importar/exportar via arquivo) e implementa atalho Delete e flush
- * de persistência no unload.
+ * condicional + modais. Conecta todos os handlers à store, gerencia o universo
+ * multi-plano (lista, ativo, criação, switch, renomear, duplicar, excluir,
+ * importar/exportar via arquivo) e implementa atalho Delete e flush de
+ * persistência no unload.
+ *
+ * Antes de tudo isso vem a escolha de sessão: sem ela não há silo de
+ * armazenamento apontado, então o editor não teria de onde ler nem para onde
+ * gravar. Daí o único ramo de tela do app.
  */
 export default function App() {
+  const sessao = useSessaoStore((s) => s.sessao);
+
+  if (sessao === null) return <TelaLogin />;
+  return <Editor />;
+}
+
+function Editor() {
+  const sessao = useSessaoStore((s) => s.sessao);
+  const sairDaSessao = useSessaoStore((s) => s.sair);
+
+  const sincronizando = useSyncStore((s) => s.sincronizando);
+  const publicando = useSyncStore((s) => s.publicando);
+  const baixarDoServidor = useSyncStore((s) => s.baixarDoServidor);
+  const enviarAoServidor = useSyncStore((s) => s.enviarAoServidor);
+  const excluirPlanoDaSessao = useSyncStore((s) => s.excluirPlanoDaSessao);
+  const resetMensagensSync = useSyncStore((s) => s.resetMensagens);
+
   const planoNome = useCanvasStore((s) => s.planoNome);
   const flowMode = useCanvasStore((s) => s.flowMode);
   const selectedId = useCanvasStore((s) => s.selectedId);
@@ -187,7 +213,10 @@ export default function App() {
     // contrário ele seria gravado no slot do próximo ativo (corrupção).
     if (eraAtivo) cancelPersist();
 
-    excluirPlano(id);
+    // Passa pela store de sync (e não pelo `excluirPlano` do storage) porque,
+    // numa lotação, a exclusão precisa ficar marcada para propagar ao servidor
+    // no próximo envio.
+    excluirPlanoDaSessao(id);
 
     if (eraAtivo) {
       const novoAtivoId = getAtivoId();
@@ -247,41 +276,13 @@ export default function App() {
     input.click();
   };
 
-  // Helpers de download — extraídos para evitar duplicação entre o caminho
-  // de plano único e o de bundle. `safeFileName` produz um slug ASCII que
-  // sobrevive a sistemas de arquivo restritivos.
-  const safeFileName = (raw: string, fallback: string): string => {
-    const slug = raw
-      .replace(/[^\p{L}\p{N}_-]+/gu, '-')
-      .replace(/^-+|-+$/g, '')
-      .toLowerCase();
-    return slug || fallback;
-  };
-
-  const downloadJson = (filename: string, payload: unknown) => {
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-      a.remove();
-    }, 0);
-  };
-
   const onSalvarCopiaAtivo = () => {
     const plano = {
       ...useCanvasStore.getState().getPlano(),
       exportedAt: new Date().toISOString(),
     };
-    const today = new Date().toISOString().slice(0, 10);
     const nome = safeFileName(plano.planoNome || 'plano', 'plano');
-    downloadJson(`${nome}-${today}.json`, plano);
+    downloadJson(`${nome}-${hojeIso()}.json`, plano);
   };
 
   const onSalvarTodos = () => {
@@ -300,8 +301,30 @@ export default function App() {
       exportedAt: new Date().toISOString(),
       plans,
     };
-    const today = new Date().toISOString().slice(0, 10);
-    downloadJson(`planejoeproc-bundle-${today}.json`, bundle);
+    downloadJson(`planejoeproc-bundle-${hojeIso()}.json`, bundle);
+  };
+
+  /* ============================================================================
+   * Sincronização
+   *
+   * Pull e push gravam direto no storage, fora da store do canvas — podem
+   * afetar planos diferentes do ativo, ou o próprio ativo. Daí o flush antes
+   * (para não perder uma edição pendente) e, no caso do pull, o recarregar
+   * depois: o plano aberto no canvas pode ter sido sobrescrito ou excluído.
+   * ========================================================================== */
+
+  const onPull = async () => {
+    flushPersist();
+    await baixarDoServidor();
+    refreshPlanos();
+    const atual = getAtivoId();
+    loadPlanoAcao(atual !== null ? loadPlano(atual) : planoVazio());
+  };
+
+  const onPush = async () => {
+    flushPersist();
+    await enviarAoServidor();
+    refreshPlanos();
   };
 
   const criarNoCentro = () => {
@@ -313,11 +336,21 @@ export default function App() {
 
   const painelAberto = !!(selectedNode || selectedEdge);
 
+  // `Editor` só é montado com sessão ativa (ver `App`), mas o seletor devolve
+  // o tipo anulável — este guarda mantém o Header com prop não-anulável.
+  if (sessao === null) return null;
+
   return (
     <div className="flex flex-col h-screen">
       <Header
         planoNome={planoNome}
         onPlanoNomeChange={setPlanoNome}
+        sessao={sessao}
+        onTrocarSessao={sairDaSessao}
+        onPull={() => void onPull()}
+        onPush={() => void onPush()}
+        sincronizando={sincronizando}
+        publicando={publicando}
         planos={planos}
         ativoId={ativoId}
         onSwitchPlano={onSwitchPlano}
@@ -360,6 +393,8 @@ export default function App() {
         onClose={() => setShowCatalogoOrgao(false)}
       />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
+      <SyncResultadoModal onFechar={resetMensagensSync} />
+      <CodigosLotacaoModal />
     </div>
   );
 }

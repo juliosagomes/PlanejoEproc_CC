@@ -21,7 +21,7 @@ import {
   type Position,
   type PrefRule,
 } from '@/domain';
-import { criarSavePlanoDebounced, loadPlano as carregarDoStorage } from '@/infra/storage';
+import { criarSavePlanoDebounced, planoVazio } from '@/infra/storage';
 import { uid } from '@/utils/uid';
 
 /* ============================================================================
@@ -151,12 +151,17 @@ function flowParaPlano(state: CanvasState): Plano {
 }
 
 /* ============================================================================
- * Estado inicial vem do localStorage (ou plano vazio se nada lá). Importar o
- * módulo dispara essa leitura uma única vez. Tests resetam o estado via
- * `useCanvasStore.setState(...)` em beforeEach.
+ * Estado inicial é um plano VAZIO — não uma leitura do localStorage.
+ *
+ * Qual plano carregar depende do silo da sessão (ver infra/storage/escopo.ts),
+ * e a sessão só é escolhida na tela de login, depois deste módulo ser
+ * importado. Quem carrega o plano de verdade é `features/sessao/store.ts`,
+ * chamando a ação `loadPlano` logo após fixar o escopo.
+ *
+ * Tests resetam o estado via `useCanvasStore.setState(...)` em beforeEach.
  * ========================================================================== */
 
-const inicial = planoParaFlow(carregarDoStorage());
+const inicial = planoParaFlow(planoVazio());
 
 export const useCanvasStore = create<CanvasStore>()(
   subscribeWithSelector((set, get) => ({
