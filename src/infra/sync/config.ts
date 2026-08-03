@@ -4,4 +4,4 @@
  * funciona 100% offline sem essa configuração — só a feature de
  * "Compartilhar" fica indisponível até alguém preencher e rebuildar.
  */
-export const SYNC_API_URL = 'https://script.google.com/macros/s/AKfycbzYvnyRC6X0ueLyNXsQQR969gg9wmEib1rfF9lp_cyXcaCR5jjNGEabgRucO2ULDgWc/exec';
+export const SYNC_API_URL = 'https://script.google.com/macros/s/AKfycbzQFKDM4KavxwLCCsNuG4iOjFLYWGsysQ9zOWpjstns-lC2gjnesmuyaqB9KdX67r2o/exec';

@@ -85,7 +85,7 @@ export function Header({
   const podeEnviar = emLotacao && sessao.permissao === 'edicao';
   return (
     <header
-      className="flex items-center gap-3 px-4 no-print bg-superficie border-b border-borda flex-shrink-0"
+      className="flex items-center gap-2 px-4 no-print bg-superficie border-b border-borda flex-shrink-0"
       style={{ height: 50 }}
     >
       <div className="flex items-center gap-2">
@@ -105,9 +105,17 @@ export function Header({
         onExcluir={onExcluirPlano}
       />
 
+      {/* O elástico do cabeçalho: é este input que cede espaço quando a barra
+          aperta, para as ações à direita manterem a largura natural. */}
       <input
         className="input"
-        style={{ width: 240, height: 28, padding: '4px 10px', fontWeight: 500 }}
+        style={{
+          flex: '1 1 240px',
+          minWidth: 140,
+          height: 28,
+          padding: '4px 10px',
+          fontWeight: 500,
+        }}
         value={planoNome}
         onChange={(e) => onPlanoNomeChange(e.target.value)}
         placeholder="Nome do plano"
@@ -142,7 +150,9 @@ export function Header({
         })}
       </div>
 
-      <div className="hidden md:flex items-center gap-3 mono text-[11px] text-texto-3">
+      {/* Informativo, não acionável: some primeiro quando a barra aperta, para
+          o nome do plano e as ações manterem espaço utilizável. */}
+      <div className="hidden min-[2000px]:flex items-center gap-3 mono text-[11px] text-texto-3 flex-shrink-0 whitespace-nowrap">
         <span>
           <span className="text-texto-2">{stats.nodes}</span> nós
         </span>
@@ -159,60 +169,62 @@ export function Header({
         </span>
       </div>
 
-      <button
-        type="button"
-        className="btn btn-sm"
-        onClick={onNovo}
-        title="Cria um plano em branco e troca para ele (não apaga o atual)"
-      >
-        <Icon.File /> Novo plano
-      </button>
-      <button
-        type="button"
-        className="btn btn-sm"
-        onClick={onAbrirArquivo}
-        title="Abre um JSON de plano salvo (cria nova entrada no switcher)"
-      >
-        <Icon.Upload /> Abrir arquivo
-      </button>
-      <SalvarCopiaButton
-        totalPlanos={planos.length}
-        onSalvarAtivo={onSalvarCopiaAtivo}
-        onSalvarTodos={onSalvarTodos}
-      />
-      {emLotacao && (
+      <div className="flex items-center gap-2 flex-shrink-0">
         <button
           type="button"
           className="btn btn-sm"
-          onClick={onPull}
-          disabled={sincronizando || publicando}
-          title="Substitui os planos desta lotação pela versão do servidor"
+          onClick={onNovo}
+          title="Cria um plano em branco e troca para ele (não apaga o atual)"
         >
-          <Icon.CloudDown /> {sincronizando ? 'Baixando…' : 'Baixar do servidor'}
+          <Icon.File /> Novo plano
         </button>
-      )}
-      {podeEnviar && (
         <button
           type="button"
           className="btn btn-sm"
-          onClick={onPush}
-          disabled={sincronizando || publicando}
-          title="Envia todos os planos desta lotação e propaga as exclusões"
+          onClick={onAbrirArquivo}
+          title="Abre um JSON de plano salvo (cria nova entrada no switcher)"
         >
-          <Icon.CloudUp /> {publicando ? 'Enviando…' : 'Enviar ao servidor'}
+          <Icon.Upload /> Abrir arquivo
         </button>
-      )}
-      <button
-        type="button"
-        className="btn btn-sm"
-        onClick={onCatalogoOrgao}
-        title="Importa os localizadores do órgão para usar como sugestão"
-      >
-        <Icon.Library /> Catálogo órgão
-      </button>
-      <button type="button" className="btn btn-sm btn-accent" onClick={onChecklist}>
-        <Icon.Bolt /> Gerar Checklist
-      </button>
+        <SalvarCopiaButton
+          totalPlanos={planos.length}
+          onSalvarAtivo={onSalvarCopiaAtivo}
+          onSalvarTodos={onSalvarTodos}
+        />
+        {emLotacao && (
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={onPull}
+            disabled={sincronizando || publicando}
+            title="Substitui os planos desta lotação pela versão do servidor"
+          >
+            <Icon.CloudDown /> {sincronizando ? 'Baixando…' : 'Baixar do servidor'}
+          </button>
+        )}
+        {podeEnviar && (
+          <button
+            type="button"
+            className="btn btn-sm"
+            onClick={onPush}
+            disabled={sincronizando || publicando}
+            title="Envia todos os planos desta lotação e propaga as exclusões"
+          >
+            <Icon.CloudUp /> {publicando ? 'Enviando…' : 'Enviar ao servidor'}
+          </button>
+        )}
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={onCatalogoOrgao}
+          title="Importa os localizadores do órgão para usar como sugestão"
+        >
+          <Icon.Library /> Catálogo órgão
+        </button>
+        <button type="button" className="btn btn-sm btn-accent" onClick={onChecklist}>
+          <Icon.Bolt /> Gerar Checklist
+        </button>
+      </div>
     </header>
   );
 }

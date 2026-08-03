@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
 import type { Sessao } from '@/domain';
+import { CodigosAcessoModal } from './CodigosAcessoModal';
 import { SeloPermissao } from './SeloPermissao';
 
 interface SessaoBadgeProps {
@@ -17,6 +18,7 @@ interface SessaoBadgeProps {
  */
 export function SessaoBadge({ sessao, onTrocar }: SessaoBadgeProps) {
   const [open, setOpen] = useState(false);
+  const [verCodigos, setVerCodigos] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
@@ -86,6 +88,20 @@ export function SessaoBadge({ sessao, onTrocar }: SessaoBadgeProps) {
             )}
           </div>
 
+          {!local && (
+            <button
+              type="button"
+              role="menuitem"
+              className="w-full flex items-center gap-2 px-3 py-2 text-[12.5px] text-texto-2 hover:bg-superficie-2 border-0 bg-transparent cursor-pointer text-left"
+              onClick={() => {
+                setOpen(false);
+                setVerCodigos(true);
+              }}
+            >
+              <Icon.Cadeado /> Ver códigos de acesso
+            </button>
+          )}
+
           <button
             type="button"
             role="menuitem"
@@ -98,6 +114,10 @@ export function SessaoBadge({ sessao, onTrocar }: SessaoBadgeProps) {
             <Icon.Logout /> Trocar de lotação
           </button>
         </div>
+      )}
+
+      {verCodigos && sessao.tipo === 'lotacao' && (
+        <CodigosAcessoModal sessao={sessao} onFechar={() => setVerCodigos(false)} />
       )}
     </div>
   );

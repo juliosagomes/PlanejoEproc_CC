@@ -122,7 +122,8 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     try {
       // Sincroniza ANTES de trocar o escopo: só sabemos qual silo abrir
       // depois que o servidor devolve o `workspaceId`.
-      const { workspaceId, nome, planos, permissao } = await sincronizarApi(codigoLimpo);
+      const { workspaceId, nome, planos, permissao, codigoLeitura } =
+        await sincronizarApi(codigoLimpo);
 
       flushPersist();
       setEscopo({ tipo: 'lotacao', workspaceId });
@@ -138,7 +139,14 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
       });
 
       set({
-        sessao: { tipo: 'lotacao', workspaceId, nome, codigo: codigoLimpo, permissao },
+        sessao: {
+          tipo: 'lotacao',
+          workspaceId,
+          nome,
+          codigo: codigoLimpo,
+          codigoLeitura,
+          permissao,
+        },
         lotacoes: listLotacoes(),
         codigosNovaLotacao: null,
       });
@@ -202,6 +210,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
           workspaceId,
           nome: nomeLimpo,
           codigo: codigoEdicao,
+          codigoLeitura,
           permissao: 'edicao',
         },
         lotacoes: listLotacoes(),

@@ -20,6 +20,14 @@ export interface SessaoLotacao {
   nome: string;
   /** Código usado para entrar — de leitura ou de edição, conforme `permissao`. */
   codigo: string;
+  /**
+   * Código de leitura da lotação, para quem entrou como editor poder repassá-lo
+   * sem entregar junto o poder de publicar. Só vem preenchido quando
+   * `permissao === 'edicao'` — com código de leitura, `codigo` já É este valor.
+   * Opcional porque implantações antigas do Apps Script não o devolvem
+   * (ver decisoes.md#D-10).
+   */
+  codigoLeitura?: string;
   permissao: Permissao;
 }
 

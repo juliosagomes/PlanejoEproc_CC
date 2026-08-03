@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Icon } from '@/components/Icon';
 import { useSessaoStore } from '../store';
+import { CodigoLinha } from './CodigoLinha';
 
 /**
- * Exibe, uma única vez, os dois códigos de uma lotação recém-criada.
+ * Apresenta os dois códigos de uma lotação recém-criada.
  *
- * "Uma única vez" é literal: o servidor não tem endpoint para consultar nem
- * revogar códigos (decisoes.md#D-8), então quem fechar isto sem anotar perde
- * o código de leitura para sempre. Por isso o botão de fechar exige a
- * confirmação explícita do checkbox.
+ * Já não é a última chance de vê-los — desde D-10 o criador (que é editor)
+ * reconsulta os dois pelo menu do cabeçalho. O checkbox continua aqui porque
+ * o risco que sobra é outro: os códigos são irrevogáveis (decisoes.md#D-8) e
+ * ficam só neste navegador, então perder o acesso a ele é perder a lotação.
  */
 export function CodigosLotacaoModal() {
   const codigos = useSessaoStore((s) => s.codigosNovaLotacao);
@@ -59,8 +60,10 @@ export function CodigosLotacaoModal() {
             }}
             role="alert"
           >
-            <strong>Anote os dois códigos agora.</strong> Eles não podem ser
-            consultados nem trocados depois — esta é a única vez que aparecem.
+            <strong>Guarde os dois códigos fora deste navegador.</strong> Você
+            pode reconsultá-los depois em <em>Ver códigos de acesso</em>, no
+            menu da lotação, mas eles não podem ser trocados — e se este
+            navegador perder os dados, some o único acesso à lotação.
           </div>
 
           <CodigoLinha
@@ -100,51 +103,5 @@ export function CodigosLotacaoModal() {
         </div>
       </div>
     </>
-  );
-}
-
-function CodigoLinha({
-  rotulo,
-  ajuda,
-  valor,
-}: {
-  rotulo: string;
-  ajuda: string;
-  valor: string;
-}) {
-  const [copiado, setCopiado] = useState(false);
-
-  const copiar = () => {
-    navigator.clipboard
-      ?.writeText(valor)
-      .then(() => {
-        setCopiado(true);
-        window.setTimeout(() => setCopiado(false), 1800);
-      })
-      .catch(() => {
-        // Sem permissão/API — o valor está visível para cópia manual.
-      });
-  };
-
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="label" style={{ marginBottom: 0 }}>
-        {rotulo}
-      </span>
-      <span className="text-[11.5px] text-texto-3 leading-snug">{ajuda}</span>
-      <div className="flex items-center gap-2 mt-1">
-        <code className="mono text-[11.5px] px-2 py-1.5 rounded bg-superficie-2 border border-borda flex-1 truncate">
-          {valor}
-        </code>
-        <button
-          type="button"
-          className="btn btn-sm"
-          onClick={copiar}
-          aria-label={`Copiar ${rotulo}`}
-        >
-          <Icon.Copy /> {copiado ? 'Copiado' : 'Copiar'}
-        </button>
-      </div>
-    </div>
   );
 }

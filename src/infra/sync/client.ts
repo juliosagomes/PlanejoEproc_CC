@@ -32,6 +32,8 @@ export interface SincronizarResultado {
   nome: string;
   planos: SincronizarPlanoItem[];
   permissao: Permissao;
+  /** Presente só com permissão de edição, e só em implantações atualizadas. */
+  codigoLeitura?: string;
 }
 
 export interface PublicarResultado {
@@ -47,12 +49,44 @@ function checkConfigured(): void {
   }
 }
 
+/**
+ * O Apps Script sempre responde 200 quando a implantação está no ar — mesmo
+ * para erros de domínio, que vêm como `{ ok: false, erro }`. Então qualquer
+ * status fora de 2xx é problema de *implantação*, não de uso: diagnosticamos
+ * pelo código em vez de deixar o HTML de erro do Google cair no `res.json()`
+ * e virar a mensagem genérica "resposta inválida", que manda quem lê procurar
+ * bug no lugar errado.
+ */
+function mensagemDeStatus(status: number): string | null {
+  if (status === 404) {
+    return 'Servidor de sincronização não encontrado (404) — a implantação do Apps Script pode ter sido removida. Veja apps-script/README.md.';
+  }
+  if (status === 401 || status === 403) {
+    return `Servidor de sincronização recusou o acesso (${status}) — a implantação precisa estar publicada para "Qualquer pessoa". Veja apps-script/README.md.`;
+  }
+  if (status >= 500) {
+    return `Servidor de sincronização falhou (${status}). Tente de novo em alguns instantes.`;
+  }
+  return null;
+}
+
 async function parseJsonResponse(res: Response): Promise<unknown> {
+  if (!res.ok) {
+    console.error('[sync] resposta com status de erro', res.status, res.statusText);
+    throw new SyncError(
+      mensagemDeStatus(res.status) ??
+        `Servidor de sincronização respondeu com erro ${res.status}.`,
+    );
+  }
   try {
     return await res.json();
   } catch (err) {
+    // 200 sem JSON é tipicamente a página de login do Google: a implantação
+    // existe mas exige conta, então o navegador recebe HTML em vez da API.
     console.error('[sync] resposta não era JSON válido', res.status, res.statusText, err);
-    throw new SyncError('Resposta inválida do servidor de sincronização.');
+    throw new SyncError(
+      'Resposta inválida do servidor de sincronização — a implantação pode estar exigindo login. Veja apps-script/README.md.',
+    );
   }
 }
 
@@ -129,6 +163,6 @@ export async function sincronizar(codigo: string): Promise<SincronizarResultado>
   const result = SincronizarResponseSchema.safeParse(json);
   if (!result.success) throw new SyncError('Resposta inesperada ao sincronizar.');
   if (!result.data.ok) throw new SyncError(result.data.erro);
-  const { workspaceId, nome, planos, permissao } = result.data;
-  return { workspaceId, nome, planos, permissao };
+  const { workspaceId, nome, planos, permissao, codigoLeitura } = result.data;
+  return { workspaceId, nome, planos, permissao, codigoLeitura };
 }

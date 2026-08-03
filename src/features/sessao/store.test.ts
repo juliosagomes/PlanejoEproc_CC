@@ -113,6 +113,40 @@ describe('entrarComCodigo', () => {
     });
   });
 
+  it('com código de edição, guarda também o código de leitura devolvido', async () => {
+    vi.mocked(sincronizar).mockResolvedValue({
+      workspaceId: 'ws-1',
+      nome: '2ª Vara Cível',
+      permissao: 'edicao',
+      planos: [],
+      codigoLeitura: 'cod-leitura',
+    });
+
+    await useSessaoStore.getState().entrarComCodigo('cod-edicao');
+
+    expect(useSessaoStore.getState().sessao).toMatchObject({
+      codigo: 'cod-edicao',
+      codigoLeitura: 'cod-leitura',
+      permissao: 'edicao',
+    });
+  });
+
+  it('implantação antiga sem `codigoLeitura` não impede a entrada', async () => {
+    vi.mocked(sincronizar).mockResolvedValue({
+      workspaceId: 'ws-1',
+      nome: '2ª Vara Cível',
+      permissao: 'edicao',
+      planos: [],
+    });
+
+    const ok = await useSessaoStore.getState().entrarComCodigo('cod-edicao');
+
+    expect(ok).toBe(true);
+    const { sessao } = useSessaoStore.getState();
+    expect(sessao).toMatchObject({ permissao: 'edicao' });
+    expect(sessao?.tipo === 'lotacao' && sessao.codigoLeitura).toBeUndefined();
+  });
+
   it('guarda a lotação para reentrada em um clique', async () => {
     vi.mocked(sincronizar).mockResolvedValue({
       workspaceId: 'ws-1',

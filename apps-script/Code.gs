@@ -14,8 +14,9 @@
  *
  * Não há login: o "código" (leitura ou edição) É o segredo de acesso.
  * `codigoLeitura` só permite sincronizar (GET); `codigoEdicao` também
- * permite publicar (POST). Nenhum dos dois códigos aparece na resposta de
- * `sincronizar` — só o cliente que já os possui os conhece.
+ * permite publicar (POST). O `codigoEdicao` nunca aparece numa resposta; o
+ * `codigoLeitura` volta em `sincronizar` apenas para quem se autenticou com o
+ * código de edição, que já é a credencial mais forte (decisoes.md#D-10).
  *
  * Deploy: ver README.md nesta pasta.
  */
@@ -149,12 +150,23 @@ function actionSincronizar(codigo) {
 
   // `workspaceId` identifica a lotação no cliente (é o que nomeia o silo
   // local de planos). Não é credencial — os dois códigos são UUIDs à parte.
-  return ok({
+  const resposta = {
     workspaceId: workspace.workspaceId,
     nome: workspace.nome,
     planos,
     permissao: workspace.permissao,
-  });
+  };
+
+  // Quem provou ter o código de EDIÇÃO recebe também o de leitura, para poder
+  // repassar acesso somente-leitura sem entregar junto o poder de publicar.
+  // Não é elevação de privilégio: o código de edição já permite tudo que o de
+  // leitura permite. O caminho inverso nunca acontece — com código de leitura
+  // a resposta não carrega o de edição.
+  if (workspace.permissao === 'edicao') {
+    resposta.codigoLeitura = workspace.codigoLeitura;
+  }
+
+  return ok(resposta);
 }
 
 /**
@@ -238,6 +250,7 @@ function encontrarWorkspacePorCodigo(codigo) {
   return {
     workspaceId: linha.workspaceId,
     driveFolderId: linha.driveFolderId,
+    codigoLeitura: (linha.codigoLeitura || '').toString(),
     // Workspaces criados antes da coluna `nome` existir não têm rótulo.
     nome: (linha.nome || '').toString() || 'Lotação sem nome',
     permissao: linha.codigoEdicao === codigo ? 'edicao' : 'leitura',

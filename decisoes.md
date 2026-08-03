@@ -170,6 +170,47 @@ Revogação de código continua fora de escopo (ver D-8).
 
 ---
 
+## D-10 · Códigos consultáveis dentro da lotação, assimetricamente
+
+**Decisão.** O menu do cabeçalho ganha *Ver códigos de acesso*, que mostra o
+que a permissão da sessão autoriza: com código de leitura, só o de leitura;
+com código de edição, os dois. Para viabilizar o segundo caso,
+`actionSincronizar` passou a devolver `codigoLeitura` **apenas** quando o
+código apresentado foi o de edição. O `codigoEdicao` continua não aparecendo
+em resposta alguma.
+
+**Por que.** Antes, os códigos apareciam uma única vez — no
+`CodigosLotacaoModal`, na criação. Quem não anotou perdia o de leitura para
+sempre, e um colega que entrou com o código de edição nunca chegou a vê-lo:
+para dar acesso somente-leitura a alguém, a única saída prática era repassar o
+código de edição, ou seja, a ausência do recurso *empurrava* para o
+compartilhamento excessivo de privilégio. Devolver o código de leitura a quem
+já provou ter o de edição não concede capacidade nova: o de edição é
+estritamente mais forte — permite tudo que o de leitura permite, e mais. A
+assimetria é o que preserva a garantia que importa (leitura nunca vira
+edição), e é por isso que a condição vive no **servidor**, não na UI: um
+cliente adulterado não consegue pedir o que o código dele não autoriza.
+
+Duas consequências de implementação:
+
+- **`codigoLeitura` é `optional()` no schema Zod.** Uma implantação antiga do
+  Apps Script simplesmente não manda o campo; falhar a validação aí derrubaria
+  a entrada na lotação inteira por causa de um recurso acessório. A UI degrada
+  para um aviso pedindo para republicar o `Code.gs`.
+- **Não é persistido.** Fica só em `SessaoLotacao`, em memória, renovado a cada
+  `sincronizar`. `LotacaoConhecida` continua guardando um único código — o de
+  entrada —, então isto não amplia a superfície do `localStorage` discutida
+  em D-9.
+
+**O que precisaria mudar para evoluir.** Com revogação/rotação de código
+(fora de escopo, D-8), esta tela é o lugar natural para "gerar novo código de
+leitura" — o servidor trocaria o UUID na planilha e a resposta seguinte já
+traria o novo. Se um dia houver mais de dois níveis de permissão, a regra
+"editor vê tudo abaixo dele" generaliza, mas aí vale ordenar os níveis
+explicitamente em vez de repetir `if`.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

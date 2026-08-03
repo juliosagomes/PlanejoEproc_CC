@@ -32,6 +32,13 @@ export const SincronizarResponseSchema = z.union([
     nome: z.string(),
     planos: z.array(SincronizarPlanoItemSchema),
     permissao: PermissaoSchema,
+    /**
+     * Só vem quando o código usado foi o de edição. `optional()` de propósito:
+     * uma implantação antiga do Apps Script não o devolve, e nesse caso a UI
+     * apenas deixa de oferecer o código de leitura — não é motivo para falhar
+     * a entrada na lotação inteira (decisoes.md#D-10).
+     */
+    codigoLeitura: z.string().optional(),
   }),
   ErroResponseSchema,
 ]);

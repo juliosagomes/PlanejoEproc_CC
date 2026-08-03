@@ -92,6 +92,10 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
+    /* Altura fixa + rótulo quebrando em duas linhas fazia o texto vazar da
+       borda. Botão não quebra linha: quem não couber corta o layout, não a
+       caixa. */
+    white-space: nowrap;
     height: 28px;
     padding: 0 10px;
     border-radius: 6px;

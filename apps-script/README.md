@@ -52,6 +52,11 @@ preciso mexer em `src/infra/sync/config.ts`.
 > "Resposta inesperada ao sincronizar". Se você já tinha o backend no ar,
 > cole o `Code.gs` novo e republique **antes** de distribuir o app novo.
 >
+> Já a devolução do `codigoLeitura` a quem usa o código de edição
+> (decisoes.md#D-10) degrada de forma suave: contra uma implantação antiga,
+> "Ver códigos de acesso" mostra só um aviso no lugar do código de
+> visualização — o resto da lotação funciona normalmente.
+>
 > A planilha existente é aproveitada: `garantirHeaders` acrescenta sozinho a
 > coluna `nome` na aba `Workspaces`. Lotações criadas antes disso aparecem
 > como "Lotação sem nome" até alguém recriá-las.
