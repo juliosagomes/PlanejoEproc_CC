@@ -14,10 +14,28 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 
 ## Restrições do ambiente do usuário final (não-negociáveis)
 
-- App **funciona 100% offline** após download.
-- **Sem CDN em runtime.** Nada de `unpkg.com`, `cdn.jsdelivr.net`, `fonts.googleapis.com` no produto final. Tudo embutido no build.
-- **Sem instalação.** Abrir o `index.html` por duplo clique numa máquina sem Node, sem internet e sem privilégio de admin tem que funcionar.
-- **Distribuição: híbrida.** Pasta `PlanejoEproc/` (gerada por `npm run pack`) contendo: `index.html` singlefile (todo o app inline), `planos/` para o usuário guardar exports manuais de plano, `localizadores/` para o usuário guardar o XLS de localizadores do órgão exportado do Eproc, e `LEIA-ME.txt`. Modelo escolhido porque Chromium bloqueia ES modules carregados via `file://` (cada `import` dispara CORS sem origem HTTP), então qualquer alvo que emita `<script type="module">` separado dá tela branca em duplo clique. Singlefile contorna inlinando tudo; a pasta companion serve para arquivos auxiliares que o usuário consulta/edita externamente. Pelo mesmo motivo de CORS, o app **não consegue** ler `./localizadores/*.xls` sozinho — a pasta é só local de armazenamento; a importação é via botão "Catálogo órgão" no header (file picker).
+- App **funciona offline** para tudo que não seja sincronização. Modo local nunca toca a rede.
+- **Sem CDN em runtime.** Nada de `unpkg.com`, `cdn.jsdelivr.net`, `fonts.googleapis.com` no produto final. Tudo embutido no build. Na extensão isso deixa de ser só disciplina: a CSP do MV3 (`script-src 'self'`) proíbe.
+
+### Um alvo só: a extensão (decisoes.md#D-15)
+
+`npm run build` → `dist-ext/`, instalada em `chrome://extensions` → Modo do
+desenvolvedor → **Carregar sem compactação**. Não existe alvo alternativo: quem
+não puder instalar extensão fica sem o app, e isso é custo assumido no D-15.
+
+O `manifest.json` e os ícones são **emitidos pelo próprio build** (plugin
+`extensao()` no `vite.config.ts`, a partir de `manifest.config.ts`), então
+`dist-ext/` sai completo de cada compilação — inclusive em watch. Não há passo
+de empacotamento depois do Vite; se você sentir vontade de criar um, leia o
+D-15 primeiro, porque foi exatamente ele que quebrou o ciclo de dev.
+
+O service worker é uma **entrada do build normal**, não um segundo passe:
+`"type": "module"` no manifest permite `import` estático dos chunks
+compartilhados. Por isso `background.js` tem ~3 KB em vez de reempacotar
+`infra/` e Zod.
+
+O app **não consegue** ler o XLS de localizadores sozinho — a importação é
+sempre via botão "Catálogo órgão" no header (file picker).
 
 ## Stack obrigatória
 
@@ -31,9 +49,11 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 | Estado canvas | Zustand |
 | Validação | Zod (apenas nas bordas) |
 | Parser XLS | `xlsx` (SheetJS) — só para importar catálogo do órgão (decisoes.md#D-6) |
-| Persistência | localStorage atrás de `infra/storage/` (trocável por IndexedDB depois) |
+| Persistência | `chrome.storage.local`, atrás de `infra/plataforma/` (decisoes.md#D-12). O `localStorage` fica como backend dos testes e do `npm run dev` |
+| Extensão | Manifest V3, sem framework de extensão (nada de crxjs/webextension-polyfill) |
+| Tipos do Chrome | `@types/chrome` (devDependency) — sem ele, `chrome.*` seria `any` solto sob `strict` |
 | Testes | Vitest + jsdom (lógica pura prioridade; UI opcional) |
-| Distribuição | `vite build --mode singlefile` + `npm run pack` → `dist-pack/PlanejoEproc/` (singlefile + companion). |
+| Distribuição | `npm run build` → `dist-ext/`. Alvo único (decisoes.md#D-15) |
 | Pacotes | npm |
 
 **Não troque sem justificar por escrito antes de implementar.**
@@ -43,10 +63,13 @@ Servidores e magistrados do Poder Judiciário (TJMG e similares) que usam o Epro
 ```
 src/
   domain/          ← tipos puros e regras. NÃO importa React, ReactFlow, Zod.
-  infra/           ← adapter para mundo externo (storage, parsing, futuro fetch).
-    storage/       ← localStorage de planos e do catálogo do órgão.
+  infra/           ← adapter para mundo externo (storage, parsing, rede).
+    plataforma/    ← nível mais baixo: decide localStorage vs chrome.storage.
+    storage/       ← planos e catálogo do órgão, sempre SÍNCRONO.
     catalogo/      ← parser do XLS de localizadores do órgão (SheetJS).
+    sync/          ← cliente HTTP, pull/push headless, mapa e lotações.
   features/        ← organização por feature (canvas, checklist, etc.).
+  extension/       ← só a extensão: service worker, popup, hooks de chrome.*.
   data/            ← JSONs do Eproc embutidos no build (subset).
   components/      ← componentes genéricos (Header, Sidebar, PanelHeader).
   App.tsx
@@ -56,11 +79,18 @@ src/
 
 **Direção das setas:**
 - `domain` não importa nada do projeto.
+- `infra/plataforma` não importa nem `domain` — é o piso.
 - `infra` importa `domain`.
 - `features` importam `domain` e `infra`.
-- `App` orquestra `features`.
+- `extension` importa `domain` e `infra`; **nunca** o contrário.
+- `App` orquestra `features` e `extension`.
 
 Quebra dessa direção é antipadrão. Se sentir vontade de fazer `domain` importar React, **pare** — o desenho está errado.
+
+**Duas regras extras por causa da extensão:**
+
+- **`chrome.*` só aparece em `infra/plataforma/` e `src/extension/`.** Em qualquer outro lugar é sinal de que a fronteira vazou. `features/` e `App` falam com a extensão por hooks e mensagens tipadas (`extension/mensagens.ts`).
+- **`infra/storage` é síncrono e continua assim.** Se surgir vontade de torná-lo `async` para "acompanhar o `chrome.storage`", leia `decisoes.md#D-12` primeiro — o espelho existe exatamente para evitar isso.
 
 **Por feature:** cada pasta tem seus próprios componentes, store local (se houver), tipos locais e testes. **Não** crie pasta `components/` global gigante (exceto para os 3-4 componentes verdadeiramente genéricos).
 
@@ -115,9 +145,22 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 
 1. Marcação granular de campos.
 2. Catálogo da unidade.
-3. Extensão Chrome.
-4. Integração com Eproc real.
-5. Simulação / modo "play".
+3. **Integração com Eproc real** (content script lendo a tela do Eproc para
+   importar localizadores sem o XLS, ou marcar itens como criados). Continua
+   fora: depende do DOM real do sistema, que muda por tribunal e por versão.
+   Quando entrar, começa por um spike capturando o HTML da tela "Localizadores
+   do Órgão" — e o parser sai novo, espelhando a saída de
+   `infra/catalogo/parseLocalizadoresXls.ts`. A extensão **Epryx**, que fica na
+   pasta irmã deste repo, é artefato de terceiro assinado pela Web Store, sem
+   licença de reuso: serve no máximo como prova de que a técnica é viável —
+   **nenhum código dela deve ser copiado**.
+4. Simulação / modo "play".
+5. Publicação na Chrome Web Store, `update_url` próprio, política corporativa
+   TJMG. Hoje a instalação é "carregar sem compactação".
+6. Auto-reload da extensão em desenvolvimento (a página detectar o rebuild e se
+   recarregar sozinha). Avaliado e descartado: F5 resolve, e o mecanismo pediria
+   carimbo de build + polling — mais peças para dar errado do que economia de
+   teclas.
 
 ## Plano de execução (fases)
 
@@ -130,7 +173,21 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 - **Fase 4** — Componentes folha sem estado (LocalizadorNode, PjEdge, Icon, Header, Sidebar com handlers vazios).
 - **Fase 5** — Store Zustand do canvas + testes.
 - **Fase 6** — Componentes compostos (FlowCanvas, NodePanel, EdgePanel + modal, ChecklistModal + derive). Conecta importar/exportar.
-- **Fase 7** — Build offline + alvo singlefile + README.
+- **Fase 7** — Build offline + README.
+
+### Port para extensão do Chrome (concluído)
+
+- **Fase A** — `infra/plataforma/`: `StorageLike`, espelho síncrono do
+  `chrome.storage`, e as 4 cópias de `getStorage()` unificadas numa só.
+- **Fase B** — Alvo de build da extensão + `scripts/gen-icons.mjs`.
+- **Fase C** — `infra/sync/operacoes.ts` (pull/push sem UI, compartilhados com o
+  worker), `infra/sync/sessaoPersistida.ts`, `extension/background.ts`, e o
+  editor reagindo a mudanças externas.
+- **Fase D** — Allowlist de `chrome.storage.sync` para códigos e preferências +
+  popup.
+- **Fase E** — Alvo único (decisoes.md#D-15): singlefile apagado, os dois
+  passes do Vite fundidos num só, manifest emitido pelo build, e `npm run
+  dev:ext` (watch) como ciclo de desenvolvimento.
 
 ## Regras de ouro
 
@@ -149,7 +206,8 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 
 1. Todos os fluxos do `BETA_2.html` funcionam idênticos.
 2. JSON exportado reabre sem perda (round-trip testado).
-3. `npm run pack` gera `dist-pack/PlanejoEproc/` (com `index.html` singlefile, `planos/`, `LEIA-ME.txt`) que abre por duplo clique offline em máquina sem Node nem internet.
-4. `npm test` passa limpo.
-5. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist-singlefile/` retorna **zero** matches (proibido CDN em runtime).
-6. `vite-plugin-singlefile` precisa estar configurado para inlinar assets binários (WOFF2 viram base64 dentro do CSS).
+3. `npm run build` gera `dist-ext/` **completo** — manifest, ícones, páginas e service worker — que carrega sem compactação no Chrome e abre o editor em aba.
+4. `npm run dev:ext` mantém `dist-ext/` completo a cada rebuild: salvar um arquivo e apertar F5 na aba mostra a mudança, sem rodar npm de novo.
+5. `npm test` passa limpo.
+6. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist-ext/` retorna **zero** matches (proibido CDN em runtime).
+7. `dist-ext/` não contém `eval(` nem `new Function(` — a CSP do MV3 os bloqueia, e um deles escondido numa dependência só aparece em runtime.

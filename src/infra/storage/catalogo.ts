@@ -1,34 +1,23 @@
 import { type CatalogoOrgao } from '@/domain';
+import { getStorage, type StorageLike } from '@/infra/plataforma/storageLike';
 import { CatalogoOrgaoSchema } from './schema';
 import { BACKUP_KEY_PREFIX } from './storage';
 
 /**
  * Persistência do catálogo de localizadores do órgão (decisoes.md#D-7).
  *
- * Mora numa chave própria do localStorage, fora do índice de planos. É um
- * recurso global do navegador: importou uma vez, todos os planos sugerem.
- * Não entra no JSON exportado de plano — viaja independente.
+ * Mora numa chave própria, fora do índice de planos. É um recurso global do
+ * navegador: importou uma vez, todos os planos sugerem. Não entra no JSON
+ * exportado de plano — viaja independente.
  */
 
 export const CATALOGO_KEY = 'planejoeproc:catalogo:orgao';
-
-function getStorage(): Storage | null {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const probe = '__planejoeproc_probe_cat__';
-    localStorage.setItem(probe, '1');
-    localStorage.removeItem(probe);
-    return localStorage;
-  } catch {
-    return null;
-  }
-}
 
 function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function moveToBackup(storage: Storage, raw: string): void {
+function moveToBackup(storage: StorageLike, raw: string): void {
   const backupKey = `${BACKUP_KEY_PREFIX}orgao:${todayIso()}`;
   try {
     storage.setItem(backupKey, raw);
@@ -43,7 +32,7 @@ function moveToBackup(storage: Storage, raw: string): void {
 }
 
 /**
- * Lê o catálogo do localStorage. Retorna `null` quando não há catálogo
+ * Lê o catálogo do storage. Retorna `null` quando não há catálogo
  * importado (estado normal antes do primeiro import). Em caso de corrupção,
  * move para chave de backup e também retorna `null` — o usuário re-importa.
  */

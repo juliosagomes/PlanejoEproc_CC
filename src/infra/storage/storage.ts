@@ -1,9 +1,10 @@
 import { SCHEMA_VERSION, type Plano } from '@/domain';
+import { getStorage, type StorageLike } from '@/infra/plataforma/storageLike';
 import { activeKey, indexKey, isEscopoLocal, planKey } from './escopo';
 import { PlanoSchema, PlansIndexSchema } from './schema';
 
 /* ============================================================================
- * Chaves do localStorage
+ * Chaves de persistência
  *
  * As chaves de plano são derivadas do escopo corrente (ver `escopo.ts`), não
  * fixas: cada lotação tem seu próprio silo, e o modo local mantém o prefixo
@@ -56,29 +57,12 @@ export function planoVazio(): Plano {
 }
 
 /**
- * `localStorage` pode estar indisponível em alguns contextos (modo privado
- * estrito, iframe sem permissão, ambientes server-side). Detectamos com uma
- * gravação de teste em vez de só verificar `typeof`.
- */
-function getStorage(): Storage | null {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const probe = '__planejoeproc_probe__';
-    localStorage.setItem(probe, '1');
-    localStorage.removeItem(probe);
-    return localStorage;
-  } catch {
-    return null;
-  }
-}
-
-/**
  * Resolve, de uma vez, o storage e as chaves do escopo corrente. Devolve null
  * quando o storage está indisponível OU não há sessão ativa — os dois casos
  * em que nenhuma função pública daqui deve fazer nada.
  */
 interface Ctx {
-  storage: Storage;
+  storage: StorageLike;
   indexK: string;
   activeK: string;
 }
@@ -108,7 +92,7 @@ function newId(): string {
   return 'p-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
-function moveToBackup(storage: Storage, sourceKey: string, raw: string): void {
+function moveToBackup(storage: StorageLike, sourceKey: string, raw: string): void {
   const backupKey = `${BACKUP_KEY_PREFIX}${todayIso()}`;
   try {
     storage.setItem(backupKey, raw);
@@ -243,7 +227,7 @@ export function setAtivo(id: string): void {
  * colaterais.
  *
  * Casos cobertos:
- *  - Sem sessão, localStorage indisponível ou nada salvo → plano vazio.
+ *  - Sem sessão, storage indisponível ou nada salvo → plano vazio.
  *  - JSON inválido → backup em chave -corrompido- + plano vazio.
  *  - Shape inválido (não passa no Zod) → backup + plano vazio.
  *  - Plano v1 válido → retorna o plano.

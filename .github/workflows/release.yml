@@ -32,8 +32,22 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Pack
-        run: npm run pack
+      - name: Build
+        run: npm run build
+
+      # A CSP do MV3 (script-src 'self') bloqueia geração dinâmica de código.
+      # Uma dependência que use eval só quebraria em runtime, na máquina do
+      # usuário — então a barreira fica aqui (CLAUDE.md, critério 6).
+      - name: Verificar CSP e ausência de CDN
+        run: |
+          if grep -rEl "googleapis|gstatic|unpkg|jsdelivr" dist-ext; then
+            echo "::error::Referência a CDN encontrada no build."
+            exit 1
+          fi
+          if grep -rE "new Function\(|[^.[:alnum:]_]eval[[:space:]]*\(" dist-ext --include="*.js" -l; then
+            echo "::error::eval/new Function no bundle da extensão — a CSP do MV3 bloqueia."
+            exit 1
+          fi
 
       - name: Compute version and zip
         id: pack
@@ -44,10 +58,9 @@ jobs:
             VERSION="dev-${GITHUB_SHA::7}"
           fi
           ARTIFACT="PlanejoEproc-${VERSION}.zip"
-          # Zipa de dentro de dist-pack para que a raiz do .zip seja a pasta
-          # PlanejoEproc/ — ao extrair, o usuário recebe a pasta inteira já
-          # nomeada, sem aninhamento extra.
-          (cd dist-pack && zip -r "../${ARTIFACT}" PlanejoEproc)
+          # O manifest.json precisa ficar na RAIZ do zip, senão "Carregar sem
+          # compactação" não reconhece a pasta extraída como extensão.
+          (cd dist-ext && zip -r "../${ARTIFACT}" .)
           echo "artifact=${ARTIFACT}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 
@@ -55,7 +68,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.pack.outputs.artifact }}
+          name: PlanejoEproc-${{ steps.pack.outputs.version }}
           path: ${{ steps.pack.outputs.artifact }}
 
       - name: Create GitHub Release

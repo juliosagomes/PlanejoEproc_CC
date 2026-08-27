@@ -1,0 +1,31 @@
+<!--
+  Elementos de identificação da sessão, presentes em qualquer tela autenticada.
+  Anonimizados: login real → x0000000, nome real → FULANO DE TAL.
+
+  Formato observado:
+    - option.value  → 32 caracteres, NÃO numérico (é o par unidade+perfil)
+    - option.text   → "SIGLA/PAPEL"
+    - option.title  → "Nome por extenso da unidade - SIGLA/PAPEL"
+    - #nav-profile  → "NOME DO USUÁRIO (login)" seguido da lista de perfis
+
+  Por que a chave de cache é host::login::sigla e não só host: um host serve
+  TODAS as unidades do tribunal, e o mesmo usuário aqui tem 9 perfis. Chavear só
+  por host faria a última coleta sobrescrever a anterior sem nada denunciar a
+  troca.
+
+  Cuidado: option.value identifica o par unidade+perfil, não a unidade. O mesmo
+  usuário aparece na mesma vara com papéis diferentes ("USUÁRIO AUTOMATIZADOR" e
+  "GERENTE DE SECRETARIA"), com values distintos. Chavear pelo value criaria um
+  catálogo por papel. A sigla (antes da "/") é o recorte certo.
+-->
+<select id="selInfraUnidades" name="selInfraUnidades">
+<option value="a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6" title="Vara Única da Comarca de Capinópolis - CNS V.UNICA/ESTAGIÁRIO">CNS V.UNICA/ESTAGIÁRIO</option>
+<option value="b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7" title="Vara Única da Comarca de Minas Novas - MNV V.UNICA/GERENTE DE SECRETARIA">MNV V.UNICA/GERENTE DE SECRETARIA</option>
+<option value="c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8" title="1ª Vara Cível da Comarca de Uberlândia - ULA 1ª V.CV/USUÁRIO AUTOMATIZADOR">ULA 1ª V.CV/USUÁRIO AUTOMATIZADOR</option>
+<option value="d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9" title="2ª Vara de Família e Sucessões da Comarca de Uberlândia - ULA 2ª V.FAM.SUC/USUÁRIO AUTOMATIZADOR">ULA 2ª V.FAM.SUC/USUÁRIO AUTOMATIZADOR</option>
+<option value="e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0" selected="selected" title="2ª Vara de Família e Sucessões da Comarca de Uberlândia - ULA 2ª V.FAM.SUC/GERENTE DE SECRETARIA">ULA 2ª V.FAM.SUC/GERENTE DE SECRETARIA</option>
+</select>
+
+<div id="nav-profile">
+  <span class="font-weight-bold"><span>FULANO DE TAL (x0000000)</span></span>
+</div>

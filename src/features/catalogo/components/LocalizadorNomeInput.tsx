@@ -120,7 +120,8 @@ export function LocalizadorNomeInput({
       placeholder={placeholder}
       noOptionsMessage={() =>
         itens.length === 0
-          ? 'Nenhum catálogo do órgão importado. Importe pelo botão "Catálogo órgão" no header.'
+          ? 'Nenhum localizador conhecido ainda. Use "Sincronizar com a unidade" ' +
+            '(com o Eproc aberto) ou "Catálogo órgão" (XLS), no header.'
           : 'Sem sugestões — Enter para usar como nome livre.'
       }
       formatCreateLabel={(input) => `Usar "${input}" como nome livre`}

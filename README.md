@@ -6,72 +6,105 @@ Ferramenta web de **planejamento de fluxos do Eproc** (sistema de tramitação p
 
 ---
 
-## Distribuição (uso final)
+## Instalar como extensão
 
-A aplicação roda **100% offline** após download. Nenhuma referência a CDN em runtime. Pode abrir num computador sem Node e sem internet.
-
-Há dois alvos de build, escolha conforme a necessidade:
-
-### Alvo A · Pasta `dist/` (recomendado para distribuição interna)
-
-Estrutura clássica: HTML + pasta `assets/` com JS, CSS e WOFF2 separados. Cache do browser funciona normalmente.
+Alvo único (`decisoes.md#D-15`). Nenhuma referência a CDN em runtime; o modo
+local nunca toca a rede.
 
 ```bash
 npm install
 npm run build
 ```
 
-Saída: `dist/index.html` + `dist/assets/`. Para distribuir, **zipe a pasta `dist/`** inteira; o usuário descompacta e abre `index.html` (duplo clique) — funciona via `file://`.
+Saída: `dist-ext/` já completo — `manifest.json`, `index.html` (editor),
+`popup.html`, `assets/background.js` (service worker) e `icons/`. Não há passo
+de empacotamento depois do build.
 
-Tamanho típico: ~570 KB JS + ~25 KB CSS + ~225 KB de fontes (WOFF2 + WOFF).
+1. Abra `chrome://extensions`
+2. Ligue **Modo do desenvolvedor** (canto superior direito)
+3. **Carregar sem compactação** → escolha a pasta `dist-ext`
+4. O ícone aparece na barra. Clique nele para o painel, ou **Abrir editor** para
+   o canvas em aba inteira.
 
-### Alvo B · HTML único (singlefile)
-
-Tudo embutido num único arquivo. Serve quando o usuário recebe o app por e-mail, anexo ou sistema que só aceita um arquivo.
-
-```bash
-npm run build:singlefile
-```
-
-Saída: `dist-singlefile/index.html` (~870 KB). JS, CSS e os 4 pesos da Inter (WOFF2) ficam todos inlined — fonte como `data:font/woff2;base64,...` no CSS embutido. Não há nenhuma referência externa.
-
-Trade-off: arquivo maior por ser standalone e cache do browser não pode dividir os pedaços.
+> **Fixe o ID antes de distribuir.** Sem uma `key` no manifest, o Chrome deriva
+> o ID da extensão do **caminho da pasta** — mover ou renomear `dist-ext/` cria
+> uma extensão nova, e como `chrome.storage.sync` é indexado por ID, os códigos
+> de lotação replicados ficam para trás. Para fixar:
+>
+> 1. `chrome://extensions` → **Pacote de extensão**, apontando para `dist-ext/`
+> 2. guarde o `.pem` gerado **fora do repo** (já está no `.gitignore`)
+> 3. `openssl rsa -in chave.pem -pubout -outform DER | openssl base64 -A`
+> 4. cole o resultado em `CHAVE_PUBLICA`, no topo de `manifest.config.ts`
+>
+> O build avisa enquanto a chave estiver vazia.
 
 ---
 
 ## Desenvolvimento
 
+### O ciclo do dia a dia
+
 ```bash
-npm install         # instalar dependências
-npm run dev         # vite dev server (geralmente em http://localhost:5173)
-npm test            # vitest run (37 testes)
-npm run test:watch  # vitest em modo watch
-npm run typecheck   # tsc -b --noEmit
+npm run dev:ext      # deixe rodando num terminal
 ```
 
-Rotas operacionais comuns:
+É `vite build --watch`: recompila `dist-ext/` a cada save (~1–2 s), mantendo a
+pasta sempre completa — o `manifest.json` e os ícones são emitidos pelo próprio
+build, não por um script posterior. **A partir daí você só olha para o
+navegador:**
 
-| Comando                       | O que faz                                               |
-| ----------------------------- | ------------------------------------------------------- |
-| `npm run dev`                 | Servidor de desenvolvimento com HMR.                    |
-| `npm run build`               | Build de produção em `dist/`.                           |
-| `npm run build:singlefile`    | Build standalone em `dist-singlefile/index.html`.       |
-| `npm run preview`             | Serve o `dist/` para inspeção local.                    |
-| `npm test`                    | Roda toda a suíte (Vitest, jsdom).                      |
-| `npm run typecheck`           | Type check sem emitir nada.                             |
+| Mudou | O que fazer |
+| --- | --- |
+| Componente, store, CSS, `infra/` | **F5** na aba da extensão |
+| `src/extension/background.ts` | **Recarregar** no card em `chrome://extensions` |
+| `manifest.config.ts` | **Recarregar** no card, idem |
+
+Para trabalho de UI puro, `npm run dev` é ainda mais rápido: HMR, sem nem F5. A
+ressalva é que ali não existe `chrome.*` — a persistência cai no `localStorage`,
+e não há popup, sync de fundo nem notificações.
+
+Comandos:
+
+| Comando               | O que faz                                                     |
+| --------------------- | ------------------------------------------------------------- |
+| `npm run dev:ext`     | **Watch.** Recompila `dist-ext/` a cada save.                 |
+| `npm run dev`         | Servidor de dev com HMR, editor como página comum.            |
+| `npm run build`       | Build completo de `dist-ext/` (com typecheck).                |
+| `npm run preview`     | Serve `dist-ext/` por HTTP para inspeção (sem `chrome.*`).    |
+| `npm run icons`       | Regera os PNGs da extensão (versionados; raramente muda).     |
+| `npm test`            | Roda toda a suíte (Vitest, jsdom).                            |
+| `npm run typecheck`   | Type check sem emitir nada.                                   |
+
+`dev:ext` deixa o `tsc` de fora de propósito — erro de tipo aparece no editor e
+em `npm run typecheck`; pagá-lo a cada save só tornaria o loop lento.
+
+### Depurando o service worker
+
+Em `chrome://extensions`, no card do PlanejoEproc, clique em **service worker**
+para abrir o DevTools dele. Os logs saem com o prefixo `[planejoeproc:sw]`. Para
+forçar um ciclo sem esperar 15 minutos, no console dele:
+
+```js
+chrome.alarms.create('planejoeproc:sync', { delayInMinutes: 0.1 })
+```
+
+### Planos de amostra
+
+`exemplos/exemplo-família.json` serve para exercitar "Abrir arquivo" sem ter que
+desenhar um fluxo do zero.
 
 ---
 
 ## Stack
 
 - **Vite 5** + **React 18** + **TypeScript** com `strict`, `noUncheckedIndexedAccess`, `noUnusedLocals`.
+- **Manifest V3** sem framework de extensão — um build só do Vite, com as duas páginas e o service worker como entradas, e o `manifest.json` emitido por um plugin inline a partir de `manifest.config.ts`. `@types/chrome` só como devDependency.
 - **Tailwind v3** com tokens em PT-BR mapeando variáveis CSS (ver `src/index.css` `:root` + `tailwind.config.ts`).
 - **ReactFlow 11** para o canvas.
 - **Zustand 4** + `subscribeWithSelector` para a store do canvas.
 - **Zod** nas bordas (parsing de localStorage e import de JSON).
 - **Vitest 2** + **jsdom** para testes de lógica pura.
 - **@fontsource/inter** (subset latin) embutido no bundle.
-- **vite-plugin-singlefile** para o alvo standalone.
 
 ---
 
@@ -80,20 +113,29 @@ Rotas operacionais comuns:
 ```
 src/
   domain/          ← tipos puros (SCHEMA_VERSION, Plano, AtpRule, …). Sem React/RF/Zod.
-  infra/           ← adapter para mundo externo (storage com Zod e debounce, backup automático).
+  infra/
+    plataforma/    ← chrome.storage atrás de um espelho síncrono (D-12);
+                     localStorage como backend dos testes e do `npm run dev`.
+    storage/       ← planos e catálogo, com Zod, debounce e backup automático.
+    sync/          ← cliente HTTP, pull/push headless, mapa, lotações, prefs.
+    catalogo/      ← parser do XLS de localizadores do órgão (SheetJS).
   features/
     canvas/        ← store, ReactFlow, NodePanel, EdgePanel, modal de detalhamento.
     checklist/     ← derive (função pura) e ChecklistModal.
     sessao/        ← tela de entrada, store da sessão (modo local ou lotação).
-    sync/          ← baixar/enviar do servidor, aplicação do resultado no silo.
+    sync/          ← wrapper de UI sobre infra/sync/operacoes.
     plans/         ← switcher de plano e botão de salvar cópia.
     catalogo/      ← importação do XLS de localizadores do órgão.
+  extension/       ← só na extensão: service worker, popup, hooks de chrome.*.
   data/            ← 6 catálogos do Eproc embutidos (Caminho A — ver CLAUDE.md).
   components/      ← genéricos (Header, Sidebar, PanelHeader, Icon).
   utils/           ← cn, uid.
   App.tsx          ← orquestração.
-  main.tsx         ← bootstrap (importa @fontsource e index.css).
+  main.tsx         ← bootstrap (hidrata a plataforma antes do primeiro render).
   index.css        ← tokens visuais + @layer components.
+manifest.config.ts ← o manifest MV3. Emitido pelo build (plugin em vite.config.ts).
+scripts/
+  gen-icons.mjs    ← desenha os PNGs da extensão sem dependência externa.
 listas_json/       ← os 48 JSONs originais do Eproc (referência completa,
                      não embutidos no build — só os 6 de src/data/).
 PlanejoEproc__BETA_2.html.html
@@ -103,7 +145,9 @@ CLAUDE.md          ← guia para Claude (e humanos): arquitetura, padrões, glos
 decisoes.md        ← decisões deliberadas de simplificação consciente.
 ```
 
-**Direção das dependências (não inverter):** `domain` → `infra` → `features` → `App`. `domain` não importa nada do projeto. `components/` não importa de `features/`.
+**Direção das dependências (não inverter):** `domain` → `infra` → `features` → `App`, com `infra/plataforma` no piso (não importa nem `domain`) e `extension` importando de `infra`/`domain`, nunca o contrário. `domain` não importa nada do projeto. `components/` não importa de `features/`.
+
+**`chrome.*` só existe em `infra/plataforma/` e `src/extension/`.** Em qualquer outro arquivo é sinal de fronteira vazada.
 
 ---
 
@@ -151,8 +195,30 @@ Se um envio falhar, as exclusões pendentes não são perdidas — vão junto na
 tentativa seguinte.
 
 A tela de entrada guarda as lotações já usadas neste navegador (com o código),
-para reentrar em um clique. *Esquecer* remove a lotação da lista sem apagar os
-planos dela.
+para reentrar em um clique — as **20 mais recentes**. *Esquecer* remove a
+lotação da lista sem apagar os planos dela.
+
+### Sincronização automática (só na extensão)
+
+O service worker acorda a cada 15 minutos (ajustável no popup: 15/30/60 ou
+desligado) e **baixa** a última lotação que você abriu. Se algo mudou, uma
+notificação diz o quê; clicar nela abre o editor.
+
+Três escolhas de desenho que valem saber (`decisoes.md#D-13`):
+
+- **Só a última lotação.** Sincronizar todas as conhecidas gastaria a cota do
+  Apps Script baixando planos que ninguém está olhando.
+- **Só baixa, por padrão.** Enviar sozinho publicaria *todos* os seus planos e
+  propagaria exclusões sem você mandar — com uma cópia local desatualizada, isso
+  sobrescreve o trabalho de um colega em silêncio. Há um toggle "Enviar meus
+  planos junto" no popup, desligado de fábrica e com o aviso ao lado.
+- **Com o editor aberto, quem sincroniza é a aba.** O worker só avisa. Assim uma
+  única thread mexe no silo por vez, e o canvas recarrega o plano ativo sozinho
+  em vez de ficar exibindo uma versão que o storage não tem mais.
+
+Os códigos das lotações e essas preferências viajam por `chrome.storage.sync`,
+ou seja, aparecem em toda máquina logada no mesmo perfil do Chrome. **Planos
+não** — só metadados (`decisoes.md#D-14`).
 
 > A sincronização exige que o backend em `apps-script/Code.gs` esteja
 > implantado **na versão atual**. Veja `apps-script/README.md`.
@@ -161,10 +227,15 @@ planos dela.
 
 ## Persistência e migrações
 
-- Os planos ficam em `localStorage`, com as chaves prefixadas pelo silo da
-  sessão: `planejoeproc:…` no modo local (as mesmas de sempre) e
-  `planejoeproc:lot:<workspaceId>:…` dentro de uma lotação. Ver
-  `src/infra/storage/escopo.ts`.
+- Os planos ficam em `chrome.storage.local`. Todo o resto do código continua
+  enxergando uma API **síncrona** — `chrome.storage` é assíncrono, então há um
+  espelho em memória hidratado no boot, com escrita write-through
+  (`decisoes.md#D-12`). A escolha do backend acontece num único ponto
+  (`src/infra/plataforma/`), que cai no `localStorage` onde não há `chrome.*`:
+  os testes em jsdom e o `npm run dev`.
+- As chaves são prefixadas pelo silo da sessão: `planejoeproc:…` no modo local
+  (as mesmas de sempre) e `planejoeproc:lot:<workspaceId>:…` dentro de uma
+  lotação. Ver `src/infra/storage/escopo.ts`.
 - Sem sessão escolhida, o storage é inerte: toda leitura devolve vazio e toda
   escrita é no-op — a tela de entrada não tem como sobrescrever plano nenhum.
 - A chave legada `planejoeproc:plano` (formato single-plano) é migrada uma
@@ -181,17 +252,18 @@ planos dela.
 
 1. Todos os fluxos do `PlanejoEproc__BETA_2.html.html` funcionam idênticos no projeto Vite.
 2. JSON exportado reabre sem perda (round-trip testado).
-3. `npm run build` gera ZIP funcional offline em máquina sem Node nem internet.
-4. `npm test` passa limpo.
-5. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist/` retorna zero matches.
-6. `npm run build:singlefile` produz `dist-singlefile/index.html` standalone com fontes inlined.
+3. `npm run build` gera `dist-ext/` completo, que carrega sem compactação e abre o editor em aba.
+4. `npm run dev:ext` mantém `dist-ext/` completo a cada rebuild — salvar e apertar F5 mostra a mudança, sem rodar npm de novo.
+5. `npm test` passa limpo.
+6. `grep -rE "googleapis|gstatic|unpkg|jsdelivr" dist-ext/` retorna zero matches.
+7. `dist-ext/` não contém `eval(` nem `new Function(` — a CSP do MV3 bloqueia os dois.
 
 ---
 
 ## Documentação relacionada
 
 - **`CLAUDE.md`** — guia de stack, arquitetura, glossário de domínio, padrões de código e regras de ouro. Lido por Claude e útil para qualquer dev novo no projeto.
-- **`decisoes.md`** — registro de decisões deliberadas de simplificação (D-1: assunto livre; D-2: filtros como subset; D-3: condições textarea; D-4: `acaoTipo` + `acao`; D-8: backend Sheets+Drive; D-9: sessão por lotação).
+- **`decisoes.md`** — registro de decisões deliberadas (D-1: assunto livre; D-2: filtros como subset; D-3: condições textarea; D-4: `acaoTipo` + `acao`; D-8: backend Sheets+Drive; D-9: sessão por lotação; D-11: extensão como alvo principal; D-12: espelho síncrono do `chrome.storage`; D-13: sync de fundo só-pull; D-14: códigos via `chrome.storage.sync`; D-15: alvo único).
 - **`apps-script/README.md`** — deploy e republicação do backend de sincronização.
 - **`listas_json/`** — referência completa dos 48 JSONs do Eproc.
 

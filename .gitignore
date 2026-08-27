@@ -2,12 +2,14 @@
 node_modules
 
 # Build output
-dist
-dist-singlefile
-dist-pack
+dist-ext
 dist-ssr
 *.local
 outros_arquivos
+
+# Chave privada da extensão (gerada por chrome://extensions → "Pacote de
+# extensão"). Só a chave PÚBLICA vai versionada, dentro de scripts/pack-ext.mjs.
+*.pem
 
 # Editor / OS
 .vscode/*

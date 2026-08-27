@@ -43,7 +43,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
     try {
       await navigator.clipboard.writeText(md);
     } catch {
-      // Fallback para contextos sem clipboard API (file://, sem permissão).
+      // Fallback para quando a clipboard API é negada (permissão, foco perdido).
       const ta = document.createElement('textarea');
       ta.value = md;
       document.body.appendChild(ta);

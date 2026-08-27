@@ -21,6 +21,7 @@ import {
   type Position,
   type PrefRule,
 } from '@/domain';
+import { flushPlataforma } from '@/infra/plataforma';
 import { criarSavePlanoDebounced, planoVazio } from '@/infra/storage';
 import { uid } from '@/utils/uid';
 
@@ -313,9 +314,14 @@ useCanvasStore.subscribe(
 /**
  * Forço a gravação de qualquer plano pendente. Usado em `beforeunload` (Fase 6)
  * e em testes que precisam observar o estado persistido sem esperar o debounce.
+ *
+ * O `flushPlataforma()` no fim é o que faz isso valer na extensão: o debounce
+ * grava no espelho síncrono, e o espelho só emite o `chrome.storage.set` na
+ * microtask seguinte — que pode nunca chegar num `beforeunload`.
  */
 export function flushPersist(): void {
   debouncedSave.flush();
+  flushPlataforma();
 }
 
 /**

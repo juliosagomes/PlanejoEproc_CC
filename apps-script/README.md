@@ -29,14 +29,14 @@ tamanho e podem passar disso.
    - Tipo: **App da Web**.
    - Executar como: **Eu** (sua conta — o script precisa de acesso ao Drive
      e à planilha).
-   - Quem pode acessar: **Qualquer pessoa**. (É isso que permite o app
-     estático, rodando em `file://` no navegador de outra pessoa, chamar o
-     endpoint sem OAuth.)
+   - Quem pode acessar: **Qualquer pessoa**. (É isso que permite a extensão,
+     rodando no navegador de outra pessoa, chamar o endpoint sem OAuth — o
+     acesso é controlado pelos códigos de lotação, não pela conta Google.)
 5. Autorize as permissões pedidas (Drive + Planilhas) — o Google vai avisar
    que é um script não verificado; é o seu próprio script, pode confirmar.
 6. Copie a **URL do app da Web** (termina em `/exec`).
 7. Cole essa URL em `src/infra/sync/config.ts`, na constante
-   `SYNC_API_URL`, e rode `npm run build:singlefile` de novo.
+   `SYNC_API_URL`, e rode `npm run build` de novo.
 
 ## Reimplantar após editar o `Code.gs`
 

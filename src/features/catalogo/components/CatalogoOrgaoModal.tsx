@@ -203,11 +203,10 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
           )}
 
           <div className="text-[11.5px] text-texto-3 leading-snug">
-            <strong>Onde guardar o XLS:</strong> a pasta{' '}
-            <span className="mono">localizadores/</span> ao lado deste app é
-            o lugar sugerido para manter o arquivo. O navegador não consegue
-            ler dela sozinho — abra pelo botão abaixo quando quiser
-            atualizar.
+            <strong>Onde exportar:</strong> no Eproc, em Localizadores &rarr;
+            Localizadores do Órgão, use exportar/imprimir para gerar o{' '}
+            <span className="mono">.xls</span>. Guarde onde preferir e abra pelo
+            botão abaixo sempre que o órgão criar ou renomear localizadores.
           </div>
         </div>
 

@@ -2,7 +2,7 @@ import { TIPO_FLAGS, type FlagKey, type LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
 import { LocalizadorNomeInput } from '@/features/catalogo/components/LocalizadorNomeInput';
-import { selectItens, useCatalogoStore } from '@/features/catalogo/store';
+import { useSugestoesLocalizador } from '@/features/catalogo/sugestoes';
 import { cn } from '@/utils/cn';
 import { useCanvasStore, type FlowNode } from '../store';
 
@@ -13,7 +13,7 @@ interface NodePanelProps {
 export function NodePanel({ node }: NodePanelProps) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
-  const itensCatalogo = useCatalogoStore(selectItens);
+  const itensCatalogo = useSugestoesLocalizador();
   const data = node.data;
 
   const setFlag = (key: FlagKey, valor: boolean) =>

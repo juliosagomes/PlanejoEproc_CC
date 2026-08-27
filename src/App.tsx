@@ -3,11 +3,15 @@ import { ReactFlowProvider } from 'reactflow';
 
 import { Header, type HeaderStats } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
+import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
+import { SincronizacaoUnidadeModal } from '@/features/catalogo/components/SincronizacaoUnidadeModal';
+import { useCatalogoStore } from '@/features/catalogo/store';
+import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { TelaLogin } from '@/features/sessao/components/TelaLogin';
@@ -75,6 +79,12 @@ function Editor() {
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
 
+  const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
+  const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
+  const sincronizarUnidade = useUnidadeStore((s) => s.sincronizar);
+  const sincronizandoUnidade = useUnidadeStore((s) => s.sincronizando);
+  const resetMensagensUnidade = useUnidadeStore((s) => s.resetMensagens);
+
   // Espelha o índice de planos do storage. Atualizamos via refreshPlanos()
   // após cada operação de criar/abrir/duplicar/renomear/excluir/switch.
   // O nome do ativo pode estar 300ms defasado (debounce), mas o switcher
@@ -90,6 +100,14 @@ function Editor() {
   useEffect(() => {
     refreshPlanos();
   }, [refreshPlanos]);
+
+  // Os dois catálogos só podem ser lidos DEPOIS que `main.tsx` hidratou a
+  // plataforma — na extensão, o espelho do `chrome.storage` nasce vazio, e
+  // qualquer leitura em tempo de módulo cairia no localStorage.
+  useEffect(() => {
+    hidratarCatalogoOrgao();
+    hidratarCatalogoUnidade();
+  }, [hidratarCatalogoOrgao, hidratarCatalogoUnidade]);
 
   const selectedNode = useMemo(
     () => (selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null),
@@ -313,19 +331,40 @@ function Editor() {
    * depois: o plano aberto no canvas pode ter sido sobrescrito ou excluído.
    * ========================================================================== */
 
-  const onPull = async () => {
+  const onPull = useCallback(async () => {
     flushPersist();
     await baixarDoServidor();
     refreshPlanos();
     const atual = getAtivoId();
     loadPlanoAcao(atual !== null ? loadPlano(atual) : planoVazio());
-  };
+  }, [baixarDoServidor, refreshPlanos, loadPlanoAcao]);
 
   const onPush = async () => {
     flushPersist();
     await enviarAoServidor();
     refreshPlanos();
   };
+
+  /* ==========================================================================
+   * Mundo de fora (só na extensão)
+   *
+   * O pedido do service worker reusa exatamente o `onPull` do botão — é a mesma
+   * operação, só muda o gatilho. Já a mudança externa (outra aba gravou) não
+   * chama a rede: só recarrega o que está na tela.
+   * ======================================================================== */
+
+  const recarregarDoStorage = useCallback(() => {
+    refreshPlanos();
+    const atual = getAtivoId();
+    loadPlanoAcao(atual !== null ? loadPlano(atual) : planoVazio());
+  }, [refreshPlanos, loadPlanoAcao]);
+
+  const aoPedirSincronizacao = useCallback(() => void onPull(), [onPull]);
+
+  useSincronizacaoExterna({
+    aoPedirSincronizacao,
+    aoMudarPlanos: recarregarDoStorage,
+  });
 
   const criarNoCentro = () => {
     createNode({
@@ -362,6 +401,8 @@ function Editor() {
         onSalvarCopiaAtivo={onSalvarCopiaAtivo}
         onSalvarTodos={onSalvarTodos}
         onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
+        onSincronizarUnidade={() => void sincronizarUnidade()}
+        sincronizandoUnidade={sincronizandoUnidade}
         onChecklist={() => setShowChecklist(true)}
         flowMode={flowMode}
         onFlowModeChange={setFlowMode}
@@ -392,6 +433,7 @@ function Editor() {
         open={showCatalogoOrgao}
         onClose={() => setShowCatalogoOrgao(false)}
       />
+      <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
       <SyncResultadoModal onFechar={resetMensagensSync} />
       <CodigosLotacaoModal />

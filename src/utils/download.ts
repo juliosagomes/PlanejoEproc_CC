@@ -1,7 +1,7 @@
 /**
- * Download de arquivos gerados no cliente. Funciona em `file://` (requisito
- * de distribuição — ver CLAUDE.md): Blob + object URL não dependem de origem
- * HTTP.
+ * Download de arquivos gerados no cliente, via Blob + object URL — sem passar
+ * pela API `downloads` da extensão, que exigiria uma permissão a mais só para
+ * salvar um JSON que já está na memória da página.
  */
 
 /** Slug ASCII-safe que sobrevive a sistemas de arquivo restritivos. */

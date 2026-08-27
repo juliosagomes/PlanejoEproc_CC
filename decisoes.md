@@ -62,7 +62,7 @@
 
 ## D-6 · Parser de XLS via SheetJS embutido
 
-**Decisão.** O catálogo de localizadores do órgão é importado a partir do XLS exportado pelo Eproc, lido em runtime no browser via `xlsx` (SheetJS). A biblioteca é embutida no singlefile (~700 KB minificada).
+**Decisão.** O catálogo de localizadores do órgão é importado a partir do XLS exportado pelo Eproc, lido em runtime no browser via `xlsx` (SheetJS). A biblioteca é embutida no bundle (~700 KB minificada).
 
 **Por que.** O export oficial do Eproc é XLS binário (OLE2/BIFF8) — não HTML disfarçado nem CSV. As alternativas eram (a) pedir ao usuário converter para CSV no Excel antes de importar (atrito desnecessário num app que já promete ser "abrir e usar"), (b) ter uma página HTML companion só de conversão (UX de duas etapas), ou (c) embutir um parser XLS. Embutir é o caminho mais limpo: a importação acontece num clique. O custo de bundle é amortizado sobre uma feature que o usuário usa frequentemente. SheetJS é a única lib madura que lê BIFF8 em JS puro (sem WASM), é totalmente bundlável pelo Vite, e funciona em `file://`.
 
@@ -208,6 +208,190 @@ leitura" — o servidor trocaria o UUID na planilha e a resposta seguinte já
 traria o novo. Se um dia houver mais de dois níveis de permissão, a regra
 "editor vê tudo abaixo dele" generaliza, mas aí vale ordenar os níveis
 explicitamente em vez de repetir `if`.
+
+---
+
+## D-11 · Extensão do Chrome como alvo principal; singlefile rebaixado
+
+> **Emendada por [D-15](#d-15--alvo-único-singlefile-removido).**
+> O singlefile não existe mais — o "sem garantia de paridade" descrito abaixo
+> durou pouco e virou remoção. O resto (por que a extensão resolve os três
+> limites do `file://`) continua valendo, e é o registro de por que o alvo
+> existe.
+
+**Decisão.** O produto passa a ser uma **extensão MV3** (`npm run build` →
+`dist-ext/`, carregada sem compactação). O alvo singlefile
+continua existindo e buildando, mas **sem garantia de paridade de recursos** —
+sincronização automática, notificações e réplica de códigos entre máquinas só
+existem na extensão. Com isso, o item 3 do "Roadmap FORA de escopo" do
+`CLAUDE.md` (Extensão Chrome) sai de lá.
+
+**Por que.** Três limites do `file://` eram estruturais, não de implementação:
+
+1. O `localStorage` é indexado pelo **caminho do arquivo**. Mover a pasta
+   "perdia" os planos — o `LEIA-ME.txt` gerado pelo `pack.mjs` chegava a avisar
+   isso como se fosse comportamento esperado.
+2. Não existe processo de fundo. A sincronização com a lotação só acontecia
+   quando alguém clicava, então "o colega publicou e eu não sei" não tinha
+   solução possível.
+3. Chromium bloqueia ES modules em `file://`, o que obrigava ao singlefile e,
+   por tabela, a inlinar tudo num HTML de 1,3 MB.
+
+Em `chrome-extension://<id>` os três somem de uma vez: origem estável, service
+worker com `chrome.alarms`, e módulos carregando normalmente. O singlefile
+sobrevive porque nem toda máquina de órgão permite instalar extensão, e perder
+esse caminho fecharia a porta para quem mais precisa da ferramenta.
+
+**O que precisaria mudar para evoluir.** Publicar na Chrome Web Store exige
+conta de desenvolvedor, revisão e política de privacidade; o build já gera o
+`manifest.json` com `version` vinda do `package.json`, então falta só zipar e
+preencher a ficha. *(A previsão que estava aqui — "se o singlefile virar peso
+morto, apagá-lo é uma remoção limpa" — se cumpriu: ver D-15.)*
+
+---
+
+## D-12 · Espelho síncrono do `chrome.storage`, não migração para async
+
+**Decisão.** `infra/storage/` e `infra/sync/` continuam **100% síncronos**. O
+que muda é o backend por baixo: `infra/plataforma/storageLike.ts` define a
+interface mínima (`getItem`/`setItem`/`removeItem`) e
+`infra/plataforma/chromeMirror.ts` a implementa sobre um `Map` em memória,
+hidratado uma vez no boot a partir do `chrome.storage` e com escrita
+write-through coalescida por microtask. As quatro cópias duplicadas do helper
+`getStorage()` (storage, catalogo, syncMap, lotacoes) viraram uma só.
+
+**Por que.** `savePlano` é chamado pela subscription da store do canvas, que não
+pode esperar promessa sem virar máquina de estados. Migrar para `async`
+contaminaria a store do canvas, a de sessão, a de catálogo, a de sync, o
+`App.tsx` e os 135 testes existentes — um refactor grande, arriscado, e cujo
+único ganho seria satisfazer a forma da API do Chrome. O espelho entrega a
+mesma semântica com uma fronteira de ~150 linhas, e a prova é que a suíte
+inteira passou **sem uma linha alterada**.
+
+**Risco aceito.** Uma escrita disparada no `beforeunload` pode não chegar a ser
+persistida: o espelho só emite o `chrome.storage.set` na microtask seguinte, e a
+página pode morrer antes. Mitigação: `flushPersist()` (que o app já chamava no
+`beforeunload`) agora termina em `flushPlataforma()`, que despacha o lote na
+hora. Não há como *aguardar* a confirmação num handler de unload — a janela
+residual é o tempo do IPC.
+
+**O que precisaria mudar para evoluir.** Se um plano passar a não caber
+confortavelmente em memória (hoje o espelho carrega tudo), o caminho é paginar:
+manter no `Map` só o índice e o plano ativo, e buscar os demais sob demanda —
+o que aí sim exigiria uma API assíncrona para `loadPlano(id)` de plano
+não-ativo. Nada mais precisaria mudar.
+
+---
+
+## D-13 · Sincronização de fundo: só a última lotação, só pull, e delegando à aba
+
+**Decisão.** O service worker acorda por `chrome.alarms` (15 min por padrão) e:
+sincroniza **apenas a última lotação aberta**; faz **apenas pull** (o push
+automático é uma preferência que nasce desligada); e, se houver aba do editor
+aberta, **não age** — manda a mensagem `sincronize-voce` e deixa a aba fazer.
+
+**Por que.** Três riscos distintos, cada um com sua resposta:
+
+- **Sincronizar todas as lotações conhecidas** multiplicaria o consumo da cota
+  gratuita do Apps Script (`apps-script/README.md`) para baixar planos que o
+  usuário não está olhando. A última aberta é a única com chance de importar
+  agora.
+- **Push automático** manda *todos* os planos locais e propaga tombstones. Sem
+  intervenção humana, um silo desatualizado sobrescreveria em silêncio o
+  trabalho de um colega — exatamente o cenário que os tombstones existem para
+  evitar (D-9). O pull não tem esse risco: preserva rascunhos nunca publicados.
+  Por isso a assimetria, e por isso o aviso explícito no popup de quem ligar.
+- **Escrever no silo com o editor aberto** corromperia o estado: o plano ativo
+  vive na memória da store do canvas, e a próxima gravação com debounce
+  escreveria por cima do que acabou de chegar do servidor. Delegar garante uma
+  única thread mexendo no silo por vez, e reusa o caminho de recarga que o
+  `App.tsx` já tinha para depois do pull.
+
+Como consequência, `infra/sync/operacoes.ts` nasceu: pull e push extraídos do
+Zustand, recebendo a lotação por parâmetro, para que worker e UI executem
+exatamente o mesmo código. `features/sync/store.ts` virou um wrapper fino.
+E como a sessão é memória pura por desenho (D-9), o worker precisa de
+`infra/sync/sessaoPersistida.ts` para saber qual lotação é a "última" — que
+guarda só o `workspaceId`, nunca o código (esse continua vindo de `lotacoes.ts`).
+
+**O que precisaria mudar para evoluir.** Sincronizar várias lotações pede um
+alarme por lotação (ou um laço com espaçamento) e uma política de cota. Push
+automático seguro pede detecção de conflito de verdade — hoje não há vetor de
+versão nem `updatedAt` por plano no servidor que permita dizer "a minha cópia é
+mais velha". Enquanto isso não existir, manter o padrão desligado é a única
+posição defensável.
+
+---
+
+## D-14 · Códigos de lotação replicados via `chrome.storage.sync`
+
+**Decisão.** Duas chaves — `planejoeproc:lotacoes` (lotações conhecidas, **com
+os códigos**) e `planejoeproc:sync:prefs` — são roteadas pelo espelho para
+`chrome.storage.sync` em vez de `local`. Todo o resto, planos inclusive, fica em
+`local`. Erro de cota na escrita cai para `local` com aviso, sem quebrar o
+fluxo.
+
+**Por que.** Reentrar numa lotação exige o código; sem réplica, quem trabalha em
+duas máquinas precisa carregar o código à mão para a segunda — e o atrito
+empurra para o hábito de repassar o código de **edição** para tudo, que é
+justamente o que o D-10 tentou desestimular. Planos ficam fora porque o limite
+do `sync` é 8 KB por item e um plano de vara passa de 20–80 KB (D-8): tentar
+replicá-los produziria falhas silenciosas de cota, não sincronização.
+
+**Ampliação consciente da superfície.** O D-9 já registrava que os códigos ficam
+em claro e legíveis por qualquer script da página. Agora eles também **trafegam
+pela conta Google do usuário** e passam a existir em toda máquina logada no
+mesmo perfil Chrome. É o que foi pedido, e o alcance continua limitado ao
+próprio usuário — mas é maior do que era, e por isso está escrito aqui.
+Consequência de implementação: `registrarLotacao` passa a manter só as **20
+lotações mais recentes**, o que mantém o item bem abaixo dos 8 KB.
+
+**O que precisaria mudar para evoluir.** Se um dia houver login de verdade (D-9),
+a réplica deixa de fazer sentido: a lista de lotações viria do servidor e o
+`sync` guardaria no máximo uma preferência de UI. Se os códigos em claro virarem
+preocupação concreta antes disso, o caminho é não replicar o de edição — só o de
+leitura — e pedir o de edição a cada máquina nova.
+
+---
+
+## D-15 · Alvo único: singlefile removido
+
+**Decisão.** O alvo singlefile foi **apagado** — `scripts/pack.mjs`, o modo
+`singlefile` do Vite, o alvo `dist/` e a dependência `vite-plugin-singlefile`.
+Sobrou um alvo: `vite build` → `dist-ext/`. No mesmo movimento, os dois passes
+do Vite viraram um (o service worker é uma entrada do build normal, não um
+`vite.config.worker.ts` à parte) e o `manifest.json` passou a ser **emitido pelo
+próprio build**, por um plugin, em vez de por um script pós-build.
+
+**Por que.** O motivo imediato é o ciclo de desenvolvimento. Com o manifest e os
+ícones vindo de um script que rodava *depois* do Vite, `vite build --watch` era
+inútil: os assets eram regenerados, mas a pasta ficava sem manifest — e uma
+pasta sem manifest não é uma extensão. Consequência prática: era preciso rodar
+`npm run pack:ext` à mão a cada alteração para ver qualquer coisa no navegador.
+Emitindo o manifest de dentro do build, todo rebuild produz uma pasta completa
+por construção, e o ciclo vira `npm run dev:ext` uma vez + F5 na aba.
+
+Manter o singlefile ao lado disso custava um segundo modo de build, um segundo
+empacotador, uma dependência e uma seção de documentação — para um alvo que já
+estava declarado sem garantia de paridade (D-11) e que ninguém usava. Unificar
+também eliminou duplicação real: `infra/storage`, Zod e `infra/sync` estavam
+compilados duas vezes, uma no `background.js` e outra no bundle das páginas;
+agora são chunks compartilhados (o `background.js` caiu de ~99 KB para ~3 KB).
+
+**Custo assumido, explicitamente.** Quem não conseguir instalar extensão na
+máquina do órgão fica **sem o app** — não há mais um caminho alternativo. Essa
+era a razão de existir do singlefile, e ela foi deliberadamente descartada em
+favor de um repo com uma coisa só. Se essa restrição reaparecer num usuário
+real, o alvo está recuperável no histórico do git (commit anterior a este) —
+mas reintroduzi-lo significa reintroduzir a assimetria de recursos do D-11, não
+um app equivalente.
+
+**O que precisaria mudar para evoluir.** O `localStorage` continua no código
+como backend alternativo em `infra/plataforma/` — não por causa do singlefile,
+mas porque é o caminho dos testes (jsdom não tem `chrome`) e do `npm run dev`.
+Se o service worker um dia recusar os chunks compartilhados, o retorno é um
+`vite.config.worker.ts` com `lib` + `inlineDynamicImports`; o sintoma seria erro
+de registro do service worker no card de `chrome://extensions`.
 
 ---
 

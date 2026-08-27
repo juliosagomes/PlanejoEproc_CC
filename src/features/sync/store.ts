@@ -1,23 +1,16 @@
 import { create } from 'zustand';
 import { useSessaoStore } from '@/features/sessao/store';
-import { excluirPlano, listPlanos, loadPlano } from '@/infra/storage';
+import { excluirPlano } from '@/infra/storage';
+import { SyncError } from '@/infra/sync/client';
+import { registrarExclusaoLocal } from '@/infra/sync/lotacoes';
 import {
-  SyncError,
-  publicar as publicarApi,
-  sincronizar as sincronizarApi,
-  type PlanoParaPublicar,
-} from '@/infra/sync/client';
-import {
-  limparTombstones,
-  listTombstones,
-  registrarExclusaoLocal,
-} from '@/infra/sync/lotacoes';
-import {
-  findEntradaPorLocal,
-  registrarEntrada,
-  removerEntradaPorLocal,
-} from '@/infra/sync/syncMap';
-import { aplicarSincronizacao, type ResumoSincronizacao } from './aplicar';
+  pull,
+  push,
+  type LotacaoAlvo,
+  type ResumoPublicacao,
+  type ResumoSincronizacao,
+} from '@/infra/sync/operacoes';
+import { removerEntradaPorLocal } from '@/infra/sync/syncMap';
 
 /* ============================================================================
  * STORE DE SINCRONIZAÇÃO
@@ -28,14 +21,12 @@ import { aplicarSincronizacao, type ResumoSincronizacao } from './aplicar';
  *  - Enviar ao servidor (push): manda todos os planos da lotação e propaga as
  *    exclusões feitas aqui. Só existe com código de edição.
  *
- * A sessão corrente vem de `features/sessao/store` — esta store não decide em
- * qual lotação está, só age sobre ela.
+ * A lógica de verdade mora em `infra/sync/operacoes` (compartilhada com o
+ * service worker da extensão — decisoes.md#D-13); esta store só resolve *qual*
+ * lotação é a corrente e guarda o estado que a UI pinta.
  * ========================================================================== */
 
-export interface ResumoPublicacao {
-  enviados: number;
-  removidos: number;
-}
+export type { ResumoPublicacao };
 
 interface SyncState {
   publicando: boolean;
@@ -55,9 +46,14 @@ interface SyncActions {
 
 export type SyncStore = SyncState & SyncActions;
 
-function sessaoLotacao() {
+function alvoDaSessao(): LotacaoAlvo | null {
   const { sessao } = useSessaoStore.getState();
-  return sessao?.tipo === 'lotacao' ? sessao : null;
+  if (sessao?.tipo !== 'lotacao') return null;
+  return {
+    workspaceId: sessao.workspaceId,
+    codigo: sessao.codigo,
+    permissao: sessao.permissao,
+  };
 }
 
 function mensagemDeErro(err: unknown, fallback: string): string {
@@ -74,14 +70,12 @@ export const useSyncStore = create<SyncStore>((set) => ({
   ultimoPush: null,
 
   baixarDoServidor: async () => {
-    const sessao = sessaoLotacao();
-    if (!sessao) return;
+    const alvo = alvoDaSessao();
+    if (!alvo) return;
 
     set({ sincronizando: true, ultimoErro: null, ultimoPull: null, ultimoPush: null });
     try {
-      const { planos } = await sincronizarApi(sessao.codigo);
-      const resumo = aplicarSincronizacao(planos, sessao.codigo);
-      set({ ultimoPull: resumo });
+      set({ ultimoPull: await pull(alvo) });
     } catch (err) {
       set({ ultimoErro: mensagemDeErro(err, 'Erro inesperado ao baixar do servidor.') });
     } finally {
@@ -90,38 +84,13 @@ export const useSyncStore = create<SyncStore>((set) => ({
   },
 
   enviarAoServidor: async () => {
-    const sessao = sessaoLotacao();
-    if (!sessao || sessao.permissao !== 'edicao') return;
+    const alvo = alvoDaSessao();
+    if (!alvo) return;
 
     set({ publicando: true, ultimoErro: null, ultimoPull: null, ultimoPush: null });
     try {
-      const entradas = listPlanos();
-      // Plano ainda sem `remotoId` está sendo publicado pela primeira vez: o
-      // UUID nasce aqui e é reenviado nas próximas vezes, para o servidor
-      // atualizar no lugar em vez de duplicar.
-      const payload: PlanoParaPublicar[] = entradas.map((e) => ({
-        remotoId: findEntradaPorLocal(e.id)?.remotoId ?? crypto.randomUUID(),
-        plano: loadPlano(e.id),
-      }));
-      const remover = listTombstones(sessao.workspaceId);
-
-      await publicarApi(sessao.codigo, payload, remover);
-
-      const quando = new Date().toISOString();
-      entradas.forEach((entrada, i) => {
-        registrarEntrada({
-          localId: entrada.id,
-          remotoId: payload[i]!.remotoId,
-          workspaceCodigo: sessao.codigo,
-          papel: 'dono',
-          ultimaSincronizacao: quando,
-        });
-      });
-      // Só limpa depois do sucesso: se a chamada falhar, as exclusões
-      // continuam pendentes e vão junto na próxima tentativa.
-      limparTombstones(sessao.workspaceId);
-
-      set({ ultimoPush: { enviados: payload.length, removidos: remover.length } });
+      const resumo = await push(alvo);
+      if (resumo) set({ ultimoPush: resumo });
     } catch (err) {
       set({ ultimoErro: mensagemDeErro(err, 'Erro inesperado ao enviar ao servidor.') });
     } finally {
@@ -130,11 +99,11 @@ export const useSyncStore = create<SyncStore>((set) => ({
   },
 
   excluirPlanoDaSessao: (localId) => {
-    const sessao = sessaoLotacao();
-    if (sessao) {
+    const alvo = alvoDaSessao();
+    if (alvo) {
       // A ordem importa: o tombstone precisa do `remotoId`, que só existe no
       // mapa até a linha seguinte.
-      registrarExclusaoLocal(sessao.workspaceId, localId);
+      registrarExclusaoLocal(alvo.workspaceId, localId);
       removerEntradaPorLocal(localId);
     }
     excluirPlano(localId);

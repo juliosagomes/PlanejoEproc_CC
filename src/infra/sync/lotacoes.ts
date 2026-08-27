@@ -1,4 +1,5 @@
 import type { Permissao } from '@/domain';
+import { getStorage } from '@/infra/plataforma/storageLike';
 import { findEntradaPorLocal } from './syncMap';
 
 /* ============================================================================
@@ -29,20 +30,19 @@ export interface LotacaoConhecida {
 const LOTACOES_KEY = 'planejoeproc:lotacoes';
 const TOMBSTONES_KEY_PREFIX = 'planejoeproc:lot:';
 
+/**
+ * Teto da lista de lotações conhecidas.
+ *
+ * Esta chave é replicada por `chrome.storage.sync` (decisoes.md#D-14), cujo
+ * limite é 8 KB **por item**. Uma entrada tem ~200 bytes, então 20 deixa folga
+ * larga; sem teto, a lista cresceria para sempre e um dia a réplica começaria a
+ * falhar em silêncio. Descartar a mais antiga custa uma redigitação de código;
+ * estourar a cota custaria a réplica inteira.
+ */
+const MAX_LOTACOES = 20;
+
 function tombstonesKey(workspaceId: string): string {
   return `${TOMBSTONES_KEY_PREFIX}${workspaceId}:tombstones`;
-}
-
-function getStorage(): Storage | null {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const probe = '__planejoeproc_probe_lot__';
-    localStorage.setItem(probe, '1');
-    localStorage.removeItem(probe);
-    return localStorage;
-  } catch {
-    return null;
-  }
 }
 
 function readList<T>(key: string): T[] {
@@ -100,7 +100,9 @@ export function registrarLotacao(lotacao: LotacaoConhecida): void {
     : lotacao;
 
   const resto = listLotacoes().filter((l) => l.workspaceId !== lotacao.workspaceId);
-  writeList(LOTACOES_KEY, [...resto, entrada]);
+  // `listLotacoes` devolve da mais recente para a mais antiga, e `entrada`
+  // acabou de ser acessada — então cortar o fim descarta as mais antigas.
+  writeList(LOTACOES_KEY, [entrada, ...resto].slice(0, MAX_LOTACOES));
 }
 
 /** Remove a lotação da lista de recentes. Não apaga os planos do silo. */

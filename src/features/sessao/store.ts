@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Sessao } from '@/domain';
 import { flushPersist, useCanvasStore } from '@/features/canvas/store';
-import { aplicarSincronizacao, garantirAtivoValido } from '@/features/sync/aplicar';
+import { aplicarSincronizacao, garantirAtivoValido } from '@/infra/sync/aplicar';
 import {
   criarPlano,
   importarPlano,
@@ -22,6 +22,11 @@ import {
   registrarLotacao,
   type LotacaoConhecida,
 } from '@/infra/sync/lotacoes';
+import {
+  getUltimaLotacao,
+  limparUltimaLotacao,
+  setUltimaLotacao,
+} from '@/infra/sync/sessaoPersistida';
 import { registrarEntrada } from '@/infra/sync/syncMap';
 import { lerPlanosLocais } from './planosLocais';
 
@@ -110,6 +115,9 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
   entrarLocal: () => {
     flushPersist();
     setEscopo({ tipo: 'local' });
+    // Modo local é offline por definição: apagar a marca impede que o service
+    // worker continue sincronizando uma lotação que o usuário deixou para trás.
+    limparUltimaLotacao();
     carregarAtivoNoCanvas();
     set({ sessao: { tipo: 'local' }, erro: null, codigosNovaLotacao: null });
   },
@@ -137,6 +145,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
         permissao,
         ultimoAcesso: nowIso(),
       });
+      setUltimaLotacao(workspaceId);
 
       set({
         sessao: {
@@ -203,6 +212,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
         permissao: 'edicao',
         ultimoAcesso: quando,
       });
+      setUltimaLotacao(workspaceId);
 
       set({
         sessao: {
@@ -228,6 +238,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
   sair: () => {
     flushPersist();
     setEscopo(null);
+    limparUltimaLotacao();
     // Canvas em branco: com escopo null nenhuma escrita acontece, então isto
     // não apaga nada — só evita que os nós da sessão anterior apareçam por
     // trás da tela de login.
@@ -242,6 +253,9 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
 
   esquecer: (workspaceId) => {
     esquecerLotacao(workspaceId);
+    // Sem o código guardado não há como sincronizar; deixar a marca apontando
+    // para ela faria o service worker tentar e falhar a cada alarme.
+    if (getUltimaLotacao() === workspaceId) limparUltimaLotacao();
     set({ lotacoes: listLotacoes() });
   },
 

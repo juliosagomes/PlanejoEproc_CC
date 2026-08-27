@@ -30,6 +30,7 @@ interface CatalogoState {
 }
 
 interface CatalogoActions {
+  hidratar: () => void;
   importarXls: (file: File) => Promise<void>;
   limpar: () => void;
   resetMensagens: () => void;
@@ -37,12 +38,22 @@ interface CatalogoActions {
 
 export type CatalogoStore = CatalogoState & CatalogoActions;
 
-const inicial = loadCatalogoOrgao();
-
+/**
+ * `catalogo` nasce `null` e é hidratado pelo `App` depois do primeiro render.
+ *
+ * Ler no topo do módulo — como era até aqui — não funciona na extensão:
+ * `main.tsx` importa `App`, e com ele esta store, **antes** de
+ * `inicializarPlataforma()` resolver. A leitura caía num `localStorage` vazio
+ * enquanto `saveCatalogoOrgao` (chamado depois, já com a plataforma pronta)
+ * gravava no espelho do `chrome.storage`: o catálogo importado sumia a cada
+ * recarga da aba.
+ */
 export const useCatalogoStore = create<CatalogoStore>((set) => ({
-  catalogo: inicial,
+  catalogo: null,
   ultimoErro: null,
   ultimasStats: null,
+
+  hidratar: () => set({ catalogo: loadCatalogoOrgao() }),
 
   importarXls: async (file) => {
     try {

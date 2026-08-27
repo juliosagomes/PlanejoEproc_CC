@@ -45,11 +45,21 @@ export {
   clearCatalogoOrgao,
 } from './catalogo';
 export {
+  CATALOGO_UNIDADE_PREFIXO,
+  catalogoUnidadeKey,
+  getUnidadeAtiva,
+  loadCatalogoUnidade,
+  loadCatalogoUnidadeAtiva,
+  saveCatalogoUnidade,
+  clearCatalogoUnidade,
+} from './catalogoUnidade';
+export {
   PlanoSchema,
   PlanoBundleSchema,
   PLANO_BUNDLE_VERSION,
   PlanIndexEntrySchema,
   PlansIndexSchema,
   CatalogoOrgaoSchema,
+  CatalogoUnidadeSchema,
   type PlanoBundle,
 } from './schema';

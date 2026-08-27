@@ -1,0 +1,106 @@
+<!--
+  acao=localizador_orgao_listar — "Localizadores do Órgão"
+  Recorte da table.infraTable: cabeçalho real (com as tabelas de ordenação
+  aninhadas) + 7 das 50 linhas da primeira página. Total real: 179 registros.
+-->
+<table class="infraTable" summary="Tabela de Localizadores.">
+<tbody>
+<tr>
+<th class="infraTh" width="1%"></th>
+<th class="infraTh" width="20%"><table class="infraTableOrdenacao"><tbody><tr class="infraTrOrdenacao"><td width="1%" class="infraTdSetaOrdenacao"></td><td rowspan="2" valign="center" class="infraTdRotuloOrdenacao">Localizador</td></tr><tr class="infraTrOrdenacao"><td class="infraTdSetaOrdenacao"></td></tr></tbody></table></th>
+<th class="infraTh" width="20%"><table class="infraTableOrdenacao"><tbody><tr class="infraTrOrdenacao"><td width="1%" class="infraTdSetaOrdenacao"></td><td rowspan="2" valign="center" class="infraTdRotuloOrdenacao">Nome do Localizador</td></tr><tr class="infraTrOrdenacao"><td class="infraTdSetaOrdenacao"></td></tr></tbody></table></th>
+<th class="infraTh" width="30%"><table class="infraTableOrdenacao"><tbody><tr class="infraTrOrdenacao"><td width="1%" class="infraTdSetaOrdenacao"></td><td rowspan="2" valign="center" class="infraTdRotuloOrdenacao">Descrição do Localizador</td></tr><tr class="infraTrOrdenacao"><td class="infraTdSetaOrdenacao"></td></tr></tbody></table></th>
+<th class="infraTh" width="8%"><table class="infraTableOrdenacao"><tbody><tr class="infraTrOrdenacao"><td width="1%" class="infraTdSetaOrdenacao"></td><td rowspan="2" valign="center" class="infraTdRotuloOrdenacao">Localizador Sistema</td></tr><tr class="infraTrOrdenacao"><td class="infraTdSetaOrdenacao"></td></tr></tbody></table></th>
+<th class="infraTh" width="10%"><table class="infraTableOrdenacao"><tbody><tr class="infraTrOrdenacao"><td width="1%" class="infraTdSetaOrdenacao"></td><td rowspan="2" valign="center" class="infraTdRotuloOrdenacao">Data Inclusão</td></tr><tr class="infraTrOrdenacao"><td class="infraTdSetaOrdenacao"></td></tr></tbody></table></th>
+<th class="infraTh" width="6%"><table class="infraTableOrdenacao"><tbody><tr class="infraTrOrdenacao"><td width="1%" class="infraTdSetaOrdenacao"></td><td rowspan="2" valign="center" class="infraTdRotuloOrdenacao">Total de processos</td></tr><tr class="infraTrOrdenacao"><td class="infraTdSetaOrdenacao"></td></tr></tbody></table></th>
+<th class="infraTh" width="5%">Ações</th>
+</tr>
+
+<!-- sigla == nome, emoji composto com modificador de tom de pele -->
+<tr class="infraTrClara">
+<td></td>
+<td>&#128105;&#127997;&#8205;&#128300; Habilitar Perito</td>
+<td>&#128105;&#127997;&#8205;&#128300; Habilitar Perito</td>
+<td>Agrupa processos em que há necessidade de habilitação de perito nomeado pelo juízo para realização de perícia.</td>
+<td>Não</td>
+<td>08/04/2026 19:44:17</td>
+<td>2</td>
+<td></td>
+</tr>
+
+<!-- sigla difere do nome SÓ pelo emoji colado; a regra "metades idênticas"
+     falha aqui e precisa do descarte de decoração. Note o travessão – (U+2013). -->
+<tr class="infraTrEscura">
+<td></td>
+<td>&#128184;ISENTO DE CUSTAS INICIAIS &#8211; L. 14.939/03</td>
+<td>ISENTO DE CUSTAS INICIAIS &#8211; L. 14.939/03</td>
+<td>Aloca processos da classe Inventário cujo valor da causa não ultrapassem R$ 144.747,50, conforme determina o inciso II do art. 8º da Lei 14.939/03.</td>
+<td>Sim</td>
+<td>16/01/2026 16:59:41</td>
+<td>63</td>
+<td></td>
+</tr>
+
+<!-- sigla == nome, parênteses no nome -->
+<tr class="infraTrClara">
+<td></td>
+<td>&#128221; Minutar (Secretaria)</td>
+<td>&#128221; Minutar (Secretaria)</td>
+<td>Localizador para agrupar processos em que há minuta a ser elaborada pela secretaria.</td>
+<td>Não</td>
+<td>23/02/2026 17:37:24</td>
+<td>58</td>
+<td></td>
+</tr>
+
+<!-- sigla != nome E o nome contém " - " interno: o caso que quebra o corte no
+     primeiro separador quando lido pelo <select> -->
+<tr class="infraTrEscura">
+<td></td>
+<td>&#128240; CERTDJEN &#128240;</td>
+<td>CERTIDÃO DE DISTRIBUIÇÃO - DJEN</td>
+<td>Processos aguardando certidão de distribuição para o DJEN.</td>
+<td>Não</td>
+<td>11/11/2025 09:12:40</td>
+<td>0</td>
+<td></td>
+</tr>
+
+<!-- sigla abreviada != nome por extenso, sem emoji -->
+<tr class="infraTrClara">
+<td></td>
+<td>AlvEletr60Dias</td>
+<td>Alvarás Eletr. Últimos 60 Dias</td>
+<td>Alvarás eletrônicos expedidos nos últimos 60 dias.</td>
+<td>Sim</td>
+<td>02/05/2025 08:00:00</td>
+<td>17</td>
+<td></td>
+</tr>
+
+<!-- sigla == nome a menos de acento e caixa: exige NFKD + remoção de \p{M} -->
+<tr class="infraTrEscura">
+<td></td>
+<td>CITACAO DJE NÃO CONFIRMADA</td>
+<td>Citação DJE Não Confirmada</td>
+<td>Citações pelo DJE sem confirmação de leitura no prazo.</td>
+<td>Não</td>
+<td>14/07/2025 15:33:02</td>
+<td>4</td>
+<td></td>
+</tr>
+
+<!-- nome com " - " interno em AMBOS os lados (sigla == nome duplicado) -->
+<tr class="infraTrClara">
+<td></td>
+<td>&#128309; Conclusos - Pedido Reconvencional</td>
+<td>&#128309; Conclusos - Pedido Reconvencional</td>
+<td>Conclusos ao gabinete para apreciação de pedido reconvencional.</td>
+<td>Não</td>
+<td>19/09/2025 11:05:27</td>
+<td>1</td>
+<td></td>
+</tr>
+
+</tbody>
+</table>

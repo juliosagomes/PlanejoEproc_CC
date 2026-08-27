@@ -1,16 +1,21 @@
 import { z } from 'zod';
 import {
   CATALOGO_ORGAO_VERSION,
+  CATALOGO_UNIDADE_VERSION,
   PREF_TIPOS,
   SCHEMA_VERSION,
   SUBITEM_CATS,
   TIPO_CONTROLE_VALUES,
   type CatalogoOrgao,
+  type CatalogoUnidade,
   type Edge,
+  type ItemCatalogoUnidade,
   type Localizador,
   type LocalizadorOrgao,
+  type LocalizadorUnidade,
   type Plano,
   type Subitem,
+  type UnidadeEproc,
 } from '@/domain';
 
 /**
@@ -221,3 +226,55 @@ export const CatalogoOrgaoSchema = z.object({
   importadoEm: z.string(),
   itens: z.array(LocalizadorOrgaoSchema),
 }) satisfies z.ZodType<CatalogoOrgao>;
+
+/* ---------------------------------------------------------------------------
+ * Catálogo lido direto da unidade no Eproc.
+ *
+ * Os três catálogos de Fase 2 (preferências, modelos, textos padrão) são
+ * `.optional()` porque um catálogo gravado hoje precisa continuar validando
+ * quando eles existirem — não há máquina de migração, e falhar a validação
+ * significa jogar fora o catálogo do usuário (o `load` põe em quarentena).
+ * Mesmo raciocínio do D-10.
+ * ------------------------------------------------------------------------ */
+
+const UnidadeEprocSchema = z.object({
+  chave: z.string(),
+  host: z.string(),
+  login: z.string(),
+  sigla: z.string(),
+  nome: z.string().optional(),
+}) satisfies z.ZodType<UnidadeEproc>;
+
+const LocalizadorUnidadeSchema = z.object({
+  eprocId: z.string().optional(),
+  sigla: z.string(),
+  nome: z.string(),
+  descricao: z.string().optional(),
+  sistema: z.boolean(),
+  dataInclusao: z.string().optional(),
+  qtdProcessos: z.number().optional(),
+}) satisfies z.ZodType<LocalizadorUnidade>;
+
+const ItemCatalogoUnidadeSchema = z.object({
+  eprocId: z.string(),
+  nome: z.string(),
+  orgao: z.string().optional(),
+  detalhe: z.string().optional(),
+}) satisfies z.ZodType<ItemCatalogoUnidade>;
+
+const FonteResultadoSchema = z.object({
+  status: z.enum(['ok', 'vazio', 'semPermissao', 'falhou']),
+  itens: z.number().optional(),
+  motivo: z.string().optional(),
+});
+
+export const CatalogoUnidadeSchema = z.object({
+  version: z.literal(CATALOGO_UNIDADE_VERSION),
+  unidade: UnidadeEprocSchema,
+  coletadoEm: z.string(),
+  localizadores: z.array(LocalizadorUnidadeSchema),
+  preferencias: z.array(ItemCatalogoUnidadeSchema).optional(),
+  modelos: z.array(ItemCatalogoUnidadeSchema).optional(),
+  textosPadrao: z.array(ItemCatalogoUnidadeSchema).optional(),
+  fontes: z.record(z.string(), FonteResultadoSchema),
+}) satisfies z.ZodType<CatalogoUnidade>;

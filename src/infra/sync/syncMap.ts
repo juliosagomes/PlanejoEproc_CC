@@ -1,6 +1,8 @@
+import { getStorage } from '@/infra/plataforma/storageLike';
+
 /**
- * Mapa local de sincronização: liga um plano local (`localId`, do
- * `localStorage` de `infra/storage`) a um plano remoto (`remotoId`, do
+ * Mapa local de sincronização: liga um plano local (`localId`, do storage de
+ * `infra/storage`) a um plano remoto (`remotoId`, do
  * workspace no backend). Existe porque `Plano` (domain) não tem `id`
  * próprio — `localId` é gerado por instalação e não viaja no JSON.
  *
@@ -30,18 +32,6 @@ export interface SyncMapEntry {
 }
 
 const SYNC_MAP_KEY = 'planejoeproc:sync:map';
-
-function getStorage(): Storage | null {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const probe = '__planejoeproc_probe_sync__';
-    localStorage.setItem(probe, '1');
-    localStorage.removeItem(probe);
-    return localStorage;
-  } catch {
-    return null;
-  }
-}
 
 function readList<T>(key: string): T[] {
   const storage = getStorage();

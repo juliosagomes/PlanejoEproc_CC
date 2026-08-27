@@ -11,7 +11,7 @@ import type { Config } from 'tailwindcss';
  * `text-aresta-atp`) — casa com a UI do produto e os comentários de domínio.
  */
 export default {
-  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  content: ['./index.html', './popup.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {

@@ -1,0 +1,85 @@
+<!--
+  acao=modelo_padrao_listar — "Modelos Padrão"
+  Recorte: cabeçalho + 4 das 25 linhas da 1ª página. Total real: 180 registros,
+  25 por página (≠ dos 50 de localizador_orgao_listar — a paginação NÃO tem
+  tamanho fixo entre telas; sempre ler hdnInfraNroItens).
+
+  A coluna "Órgão" traz a sigla da unidade: é ela que separa os modelos DESTA
+  unidade dos herdados de outro órgão. "Público" é S/N. "Usuário" é o login de
+  quem criou (anonimizado aqui).
+
+  Cabeçalho abreviado: as <table class="infraTableOrdenacao"> aninhadas são
+  idênticas às de localizadorOrgaoListar.html, que é a fixture que trava essa
+  armadilha.
+-->
+<table class="infraTable" summary="Tabela de Modelos.">
+<tbody>
+<tr>
+<th class="infraTh" width="1%"></th>
+<th class="infraTh">Órgão</th>
+<th class="infraTh">Código</th>
+<th class="infraTh">Tipo de documento</th>
+<th class="infraTh">Descrição</th>
+<th class="infraTh">Classificação</th>
+<th class="infraTh">Público</th>
+<th class="infraTh">Usuário</th>
+<th class="infraTh">Inclusão</th>
+<th class="infraTh">Ações</th>
+</tr>
+
+<tr class="infraTrClara">
+<td></td>
+<td>ULA 2ª V.FAM.SUC</td>
+<td>41967</td>
+<td>Ato Ordinatório</td>
+<td>Certidão de juntada</td>
+<td></td>
+<td>S</td>
+<td>x0000000</td>
+<td>20/01/2026 18:28:03</td>
+<td></td>
+</tr>
+
+<tr class="infraTrEscura">
+<td></td>
+<td>ULA 2ª V.FAM.SUC</td>
+<td>55734</td>
+<td>Certidão</td>
+<td>Certidão de Regularidade</td>
+<td></td>
+<td>S</td>
+<td>x0000000</td>
+<td>03/03/2026 17:56:33</td>
+<td></td>
+</tr>
+
+<!-- descrição com " - " interno: não confundir com separador -->
+<tr class="infraTrClara">
+<td></td>
+<td>ULA 2ª V.FAM.SUC</td>
+<td>55759</td>
+<td>Certidão</td>
+<td>Certidão de Regularidade - Versão Formulário</td>
+<td></td>
+<td>S</td>
+<td>x0000000</td>
+<td>03/03/2026 18:54:04</td>
+<td></td>
+</tr>
+
+<!-- modelo de OUTRO órgão, não público: o par (Órgão, Público) é o filtro -->
+<tr class="infraTrEscura">
+<td></td>
+<td>ULA 1ª V.CV</td>
+<td>38210</td>
+<td>Despacho</td>
+<td>Despacho Saneador</td>
+<td>Cível</td>
+<td>N</td>
+<td>x0000001</td>
+<td>07/08/2025 10:41:19</td>
+<td></td>
+</tr>
+
+</tbody>
+</table>

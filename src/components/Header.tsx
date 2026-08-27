@@ -36,6 +36,8 @@ export interface HeaderProps {
   onSalvarCopiaAtivo: () => void;
   onSalvarTodos: () => void;
   onCatalogoOrgao: () => void;
+  onSincronizarUnidade: () => void;
+  sincronizandoUnidade: boolean;
   onChecklist: () => void;
   flowMode: FlowMode;
   onFlowModeChange: (mode: FlowMode) => void;
@@ -76,6 +78,8 @@ export function Header({
   onSalvarCopiaAtivo,
   onSalvarTodos,
   onCatalogoOrgao,
+  onSincronizarUnidade,
+  sincronizandoUnidade,
   onChecklist,
   flowMode,
   onFlowModeChange,
@@ -216,8 +220,18 @@ export function Header({
         <button
           type="button"
           className="btn btn-sm"
+          onClick={onSincronizarUnidade}
+          disabled={sincronizandoUnidade}
+          title="Lê os localizadores direto do Eproc, na aba onde você está logado"
+        >
+          <Icon.CloudDown />{' '}
+          {sincronizandoUnidade ? 'Sincronizando…' : 'Sincronizar com a unidade'}
+        </button>
+        <button
+          type="button"
+          className="btn btn-sm"
           onClick={onCatalogoOrgao}
-          title="Importa os localizadores do órgão para usar como sugestão"
+          title="Importa os localizadores do órgão a partir do XLS exportado do Eproc"
         >
           <Icon.Library /> Catálogo órgão
         </button>

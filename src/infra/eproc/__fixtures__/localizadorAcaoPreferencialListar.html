@@ -1,0 +1,53 @@
+<!--
+  acao=localizador_acao_preferencial_listar
+  "Ações Preferenciais por Localizador do Órgão"
+
+  Recorte: cabeçalho + 3 das 96 linhas. Esta tela NÃO pagina — devolve tudo de
+  uma vez (não há "N registros" no rodapé nem hdnInfraPaginaAtual útil).
+
+  É o mapa Preferência → Localizador: no vocabulário do PlanejoEproc, as arestas
+  verdes. Uma linha = um localizador + as preferências que atuam sobre ele.
+
+  ARMADILHA que esta fixture existe para travar: as ações vêm como nós de texto
+  separados por <br>, sem espaço. Ler `celula.textContent` direto cola os nomes
+  ("...Emenda Inicial🔵▶️GAB - Inicial Ar..."). É preciso trocar <br> por \n
+  antes de ler. Note também que o " - " aqui pertence ao nome da ação
+  ("GAB - Determinar Emenda Inicial") e NÃO é o separador sigla/nome do <select>.
+-->
+<table class="infraTable" summary="Tabela de Ações Preferenciais.">
+<tbody>
+<tr>
+<th class="infraTh" width="1%"></th>
+<th class="infraTh">Localizador</th>
+<th class="infraTh">Descrição</th>
+<th class="infraTh">Ações preferenciais</th>
+<th class="infraTh">Ações</th>
+</tr>
+
+<tr class="infraTrClara">
+<td></td>
+<td>&#128221; Minutar (Secretaria)</td>
+<td>&#128221; Minutar (Secretaria)</td>
+<td>&#128309;&#9199;&#65039;GAB - Determinar Emenda Inicial<br>&#128309;&#9654;&#65039;GAB - Inicial Arquivar<br>&#128309;&#9654;&#65039;GAB - Inicial Citar<br>&#128309;&#9654;&#65039;GAB - Inicial Deferir Liminar</td>
+<td></td>
+</tr>
+
+<tr class="infraTrEscura">
+<td></td>
+<td>&#128309; Analisar Desarquivamento</td>
+<td>&#128309; Analisar Desarquivamento</td>
+<td>&#128309;&#9199;&#65039;GAB - Determinar Emenda Inicial<br>&#128309;&#9654;&#65039;GAB - Inicial Arquivar</td>
+<td></td>
+</tr>
+
+<!-- localizador sem nenhuma ação preferencial: célula vazia -->
+<tr class="infraTrClara">
+<td></td>
+<td>AlvEletr60Dias</td>
+<td>Alvarás Eletr. Últimos 60 Dias</td>
+<td></td>
+<td></td>
+</tr>
+
+</tbody>
+</table>
