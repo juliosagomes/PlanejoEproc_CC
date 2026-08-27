@@ -57,13 +57,35 @@ export interface LocalizadorUnidade {
 
 /** Item simples de catálogo — preferências, modelos, textos padrão. */
 export interface ItemCatalogoUnidade {
-  /** Código do Eproc. */
-  eprocId: string;
+  /**
+   * Código do Eproc. Ausente nas **preferências**: a tela que as lista
+   * (`consultar_formulario_personalizacao_grupo`) mostra só o nome, sem link
+   * que carregue o `num_id_form_personalizacao`. Para sugerir nomes no editor
+   * isso basta; para qualquer integração mais funda, não.
+   */
+  eprocId?: string;
   nome: string;
   /** Sigla do órgão dono, para separar o que é da unidade do que é herdado. */
   orgao?: string;
   /** Tipo de documento (modelos) ou sigla auto-texto (textos padrão). */
   detalhe?: string;
+}
+
+/**
+ * Vínculo entre um localizador e as preferências que atuam sobre ele — o que o
+ * Eproc chama de **ação preferencial**.
+ *
+ * É a única coisa coletada que não é catálogo: catálogo é lista de nomes para
+ * sugerir, isto é **grafo** — no vocabulário do PlanejoEproc, as arestas verdes
+ * que já existem na unidade. Por ora entra só como informação no painel do
+ * localizador; transformá-lo em arestas do plano é outra decisão, registrada no
+ * roadmap do CLAUDE.md.
+ */
+export interface AcaoPreferencialUnidade {
+  /** Sigla do localizador, como casa com `LocalizadorUnidade.sigla`. */
+  localizador: string;
+  /** Nomes das preferências vinculadas, na ordem em que a tela lista. */
+  preferencias: string[];
 }
 
 export type FonteStatus = 'ok' | 'vazio' | 'semPermissao' | 'falhou';
@@ -74,6 +96,7 @@ export const FONTES = [
   'preferencias',
   'modelos',
   'textosPadrao',
+  'acoesPreferenciais',
 ] as const;
 
 export type FonteId = (typeof FONTES)[number];

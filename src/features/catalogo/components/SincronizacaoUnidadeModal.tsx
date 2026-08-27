@@ -1,5 +1,14 @@
+import type { FonteId, FonteResultado } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { useUnidadeStore } from '../storeUnidade';
+
+const ROTULO_FONTE: Record<FonteId, string> = {
+  catalogoSelect: 'Códigos dos localizadores',
+  localizadoresOrgao: 'Localizadores do órgão',
+  preferencias: 'Preferências',
+  modelos: 'Modelos',
+  textosPadrao: 'Textos padrão',
+};
 
 interface SincronizacaoUnidadeModalProps {
   onFechar: () => void;
@@ -22,6 +31,12 @@ export function SincronizacaoUnidadeModal({ onFechar }: SincronizacaoUnidadeModa
 
   const falhou = erro !== null;
   const unidade = catalogo?.unidade;
+  // Inclui fontes `ok` que trouxeram motivo: uma coleta pode ter dado certo e
+  // ainda assim vir incompleta (a paginação parou no meio). Silenciar isso
+  // apresenta a primeira página como se fosse o total.
+  const problemas = Object.entries(catalogo?.fontes ?? {}).filter(
+    ([, r]) => r.status !== 'ok' || r.motivo,
+  ) as [FonteId, FonteResultado][];
 
   return (
     <>
@@ -80,8 +95,28 @@ export function SincronizacaoUnidadeModal({ onFechar }: SincronizacaoUnidadeModa
                 <Linha rotulo="Ignorados (repetidos)" valor={resumo.duplicados} />
               )}
               <Linha rotulo="Com código do Eproc" valor={resumo.comId} />
+              <Linha rotulo="Preferências" valor={resumo.preferencias} />
+              <Linha rotulo="Modelos" valor={resumo.modelos} />
+              <Linha rotulo="Textos padrão" valor={resumo.textosPadrao} />
             </ul>
           ) : null}
+
+          {/* Um "0" sozinho não diz se a fonte veio vazia, se o perfil não
+              alcança a tela ou se o parser quebrou — e sem isso não há como
+              diagnosticar nada sem abrir o console. */}
+          {!falhou && problemas.length > 0 && (
+            <div
+              className="text-[11.5px] text-texto-3 leading-snug flex flex-col gap-1"
+              style={{ borderTop: '1px solid var(--borda)', paddingTop: 10, marginTop: 2 }}
+            >
+              {problemas.map(([fonte, r]) => (
+                <div key={fonte}>
+                  <span className="font-semibold text-texto-2">{ROTULO_FONTE[fonte]}: </span>
+                  {r.motivo ?? (r.status === 'vazio' ? 'nada encontrado' : r.status)}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div

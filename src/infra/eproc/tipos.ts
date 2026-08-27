@@ -21,6 +21,13 @@ export interface FonteBruta {
    * página — e é exatamente o formato das fixtures.
    */
   fragmentos: string[];
+  /**
+   * Rótulo de cada fragmento, paralelo a `fragmentos`. Usado pelas preferências,
+   * que vêm em uma requisição por **tipo** (Minuta, Movimentação, Intimação) —
+   * o tipo não está dentro do XML, só na pergunta que o produziu, e se perde se
+   * não for carregado junto.
+   */
+  rotulos?: string[];
   /** Total anunciado pela tela ("179 registros"), quando houver. */
   totalAnunciado?: number;
 }

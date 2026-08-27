@@ -34,8 +34,13 @@ O service worker é uma **entrada do build normal**, não um segundo passe:
 compartilhados. Por isso `background.js` tem ~3 KB em vez de reempacotar
 `infra/` e Zod.
 
-O app **não consegue** ler o XLS de localizadores sozinho — a importação é
-sempre via botão "Catálogo órgão" no header (file picker).
+Dois caminhos para conhecer os localizadores da unidade, e os dois continuam
+existindo (decisoes.md#D-16):
+
+- **"Sincronizar com a unidade"** lê direto do Eproc, na aba onde o usuário já
+  está logado. Exige extensão instalada e sessão viva.
+- **"Catálogo órgão"** importa o XLS pelo file picker. É o caminho offline, e o
+  app **não consegue** ler esse arquivo sozinho — sempre pelo botão.
 
 ## Stack obrigatória
 
@@ -67,9 +72,11 @@ src/
     plataforma/    ← nível mais baixo: decide localStorage vs chrome.storage.
     storage/       ← planos e catálogo do órgão, sempre SÍNCRONO.
     catalogo/      ← parser do XLS de localizadores do órgão (SheetJS).
+    eproc/         ← leitura da unidade no Eproc: parsers puros, Zod, merge.
     sync/          ← cliente HTTP, pull/push headless, mapa e lotações.
   features/        ← organização por feature (canvas, checklist, etc.).
   extension/       ← só a extensão: service worker, popup, hooks de chrome.*.
+    coletor/       ← script injetado na aba do Eproc. Regras próprias, ver abaixo.
   data/            ← JSONs do Eproc embutidos no build (subset).
   components/      ← componentes genéricos (Header, Sidebar, PanelHeader).
   App.tsx
@@ -91,6 +98,23 @@ Quebra dessa direção é antipadrão. Se sentir vontade de fazer `domain` impor
 
 - **`chrome.*` só aparece em `infra/plataforma/` e `src/extension/`.** Em qualquer outro lugar é sinal de que a fronteira vazou. `features/` e `App` falam com a extensão por hooks e mensagens tipadas (`extension/mensagens.ts`).
 - **`infra/storage` é síncrono e continua assim.** Se surgir vontade de torná-lo `async` para "acompanhar o `chrome.storage`", leia `decisoes.md#D-12` primeiro — o espelho existe exatamente para evitar isso.
+
+**Três regras do coletor (`extension/coletor/eproc.ts`).** Ele é injetado na aba
+do Eproc por `chrome.scripting.executeScript`, e isso impõe restrições que não
+existem em nenhum outro arquivo do projeto:
+
+- **Tudo vive dentro da função.** O `executeScript` serializa com `toString()` e
+  re-avalia na outra página; nada do escopo de módulo existe lá. Um helper no
+  topo do arquivo ou um `import` de valor vira `ReferenceError` **no console da
+  aba do Eproc**, não no do app. Só `import type` é permitido. Há teste que
+  reproduz a re-avaliação em escopo vazio justamente para isso.
+- **Roda em `world: 'MAIN'`.** As telas de modelos e textos padrão só paginam
+  chamando `infraAcaoPaginar`, função **da página**, que o mundo isolado não
+  enxerga. No isolado a coleta traz só a primeira página sem erro nenhum.
+- **Ele não parseia.** Recorta fragmentos HTML/XML e devolve; interpretar é
+  trabalho de `infra/eproc/`, onde há testes. Consequência: o que exige escolha
+  (qual tabela pegar) é decidido **dentro** da página, para que dado alheio —
+  como a tabela de servidores de um grupo — nunca saia de lá.
 
 **Por feature:** cada pasta tem seus próprios componentes, store local (se houver), tipos locais e testes. **Não** crie pasta `components/` global gigante (exceto para os 3-4 componentes verdadeiramente genéricos).
 
@@ -144,20 +168,22 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 ## Roadmap FORA de escopo (não começar)
 
 1. Marcação granular de campos.
-2. Catálogo da unidade.
-3. **Integração com Eproc real** (content script lendo a tela do Eproc para
-   importar localizadores sem o XLS, ou marcar itens como criados). Continua
-   fora: depende do DOM real do sistema, que muda por tribunal e por versão.
-   Quando entrar, começa por um spike capturando o HTML da tela "Localizadores
-   do Órgão" — e o parser sai novo, espelhando a saída de
-   `infra/catalogo/parseLocalizadoresXls.ts`. A extensão **Epryx**, que fica na
-   pasta irmã deste repo, é artefato de terceiro assinado pela Web Store, sem
-   licença de reuso: serve no máximo como prova de que a técnica é viável —
-   **nenhum código dela deve ser copiado**.
-4. Simulação / modo "play".
-5. Publicação na Chrome Web Store, `update_url` próprio, política corporativa
+2. ~~Catálogo da unidade~~ e ~~Integração com Eproc real~~ — **entraram** em
+   agosto/2026 (decisoes.md#D-16). O que continua fora deste tema:
+   - **Escrever no Eproc.** A coleta é só leitura, e assim fica.
+   - **Detalhe interno da preferência** (evento, localizador destino): exige
+     avaliar `arrCamposPersonalizados` no MAIN world, ou seja `eval` — proibido
+     pelo critério de "pronto" nº 7.
+   - **ATPs cadastradas** (`automatizar_localizadores`) e o **mapa
+     Preferência→Localizador** (`localizador_acao_preferencial_listar`). O
+     segundo está mapeado e é barato de parsear; o que falta é decidir se ele
+     vira informação no painel de aresta ou arestas geradas no plano — e isso
+     muda a premissa do app, que existe para você *desenhar* o fluxo. Decisão
+     antes de código.
+3. Simulação / modo "play".
+4. Publicação na Chrome Web Store, `update_url` próprio, política corporativa
    TJMG. Hoje a instalação é "carregar sem compactação".
-6. Auto-reload da extensão em desenvolvimento (a página detectar o rebuild e se
+5. Auto-reload da extensão em desenvolvimento (a página detectar o rebuild e se
    recarregar sozinha). Avaliado e descartado: F5 resolve, e o mecanismo pediria
    carimbo de build + polling — mais peças para dar errado do que economia de
    teclas.

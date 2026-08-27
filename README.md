@@ -119,14 +119,16 @@ src/
     storage/       ← planos e catálogo, com Zod, debounce e backup automático.
     sync/          ← cliente HTTP, pull/push headless, mapa, lotações, prefs.
     catalogo/      ← parser do XLS de localizadores do órgão (SheetJS).
+    eproc/         ← leitura da unidade no Eproc: parsers puros + Zod + merge.
   features/
     canvas/        ← store, ReactFlow, NodePanel, EdgePanel, modal de detalhamento.
     checklist/     ← derive (função pura) e ChecklistModal.
     sessao/        ← tela de entrada, store da sessão (modo local ou lotação).
     sync/          ← wrapper de UI sobre infra/sync/operacoes.
     plans/         ← switcher de plano e botão de salvar cópia.
-    catalogo/      ← importação do XLS de localizadores do órgão.
+    catalogo/      ← os dois catálogos: import do XLS e coleta da unidade.
   extension/       ← só na extensão: service worker, popup, hooks de chrome.*.
+    coletor/       ← script injetado na aba do Eproc (regras próprias, ver CLAUDE.md).
   data/            ← 6 catálogos do Eproc embutidos (Caminho A — ver CLAUDE.md).
   components/      ← genéricos (Header, Sidebar, PanelHeader, Icon).
   utils/           ← cn, uid.
@@ -222,6 +224,54 @@ não** — só metadados (`decisoes.md#D-14`).
 
 > A sincronização exige que o backend em `apps-script/Code.gs` esteja
 > implantado **na versão atual**. Veja `apps-script/README.md`.
+
+---
+
+## Catálogo da unidade: sincronizar com o Eproc
+
+O botão **"Sincronizar com a unidade"**, no cabeçalho, lê da sua unidade no Eproc
+os **localizadores**, **preferências**, **modelos** e **textos padrão**, e passa a
+usá-los como sugestão no editor — no nome do localizador e nos recursos atrelados
+a uma transição.
+
+Cuidado com o vocabulário: aqui há **duas** sincronizações diferentes, e o botão
+diz qual é qual.
+
+| | lê de | traz |
+|---|---|---|
+| *Sincronizar com a unidade* | o Eproc | catálogos da sua vara |
+| *Baixar do servidor* | o Apps Script | planos da lotação |
+
+**Como usar**
+
+1. Abra o Eproc numa aba e faça login.
+2. Volte para a aba do PlanejoEproc e clique em *Sincronizar com a unidade*.
+
+Não é preciso estar numa tela específica — o app entra pelo painel. Se não houver
+aba do Eproc aberta, ele avisa; ele nunca navega por conta própria.
+
+**O que esperar**
+
+É **só leitura**: nada é criado, alterado ou apagado no Eproc. A coleta leva
+alguns segundos, porque as telas de modelos e textos padrão precisam ser
+paginadas uma a uma.
+
+O resultado aparece com a contagem por tipo. Se alguma fonte vier vazia ou
+incompleta, o modal diz **por quê** — perfil sem acesso àquela tela, sessão
+expirada, ou paginação que não avançou. Resultado parcial é sucesso: uma tela que
+seu perfil não alcança não derruba o resto.
+
+Cada unidade tem seu próprio catálogo, identificado por *servidor + login +
+sigla da unidade*. Trocar de unidade no Eproc e sincronizar de novo **não**
+sobrescreve o catálogo da anterior; trocar só de papel na mesma vara aproveita o
+mesmo catálogo.
+
+**O XLS continua funcionando.** O botão *Catálogo órgão* importa a planilha
+exportada do Eproc, e é o caminho de quem não pode usar a coleta. As sugestões
+mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
+
+> Detalhes técnicos das rotas usadas, e por que cada uma foi escolhida:
+> `decisoes.md#D-16`.
 
 ---
 

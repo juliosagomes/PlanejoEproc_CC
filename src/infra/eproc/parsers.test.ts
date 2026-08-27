@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 // `?raw` em vez de `fs`: é o Vite que resolve o caminho, então o teste não
 // depende de qual diretório o vitest considera raiz.
 import ESCOPO from './__fixtures__/escopoUnidade.html?raw';
+import MODELOS from './__fixtures__/modeloPadraoListar.html?raw';
+import PREFERENCIAS from './__fixtures__/preferenciaAutoCompletar.xml?raw';
+import TEXTOS from './__fixtures__/textoPadraoListar.html?raw';
 import PREFERENCIAL from './__fixtures__/localizadorAcaoPreferencialListar.html?raw';
 import ORGAO from './__fixtures__/localizadorOrgaoListar.html?raw';
 import SELECT from './__fixtures__/selLocalizador.html?raw';
@@ -15,6 +18,8 @@ import {
 import { montarUnidade } from './escopoUnidade';
 import { anexarIds, deduplicar } from './montarCatalogo';
 import { semDecoracao, separarSiglaNome } from './nomeLocalizador';
+import { parseModeloPadrao, parseTextoPadrao } from './parseListasSimples';
+import { montarPreferencias, parsePreferenciasXml } from './parsePreferencias';
 import { ehTelaDeLocalizadores, parseLocalizadorOrgao } from './parseLocalizadorOrgao';
 import { parseSelectLocalizadores } from './parseSelectLocalizadores';
 
@@ -196,6 +201,74 @@ describe('parseLocalizadorOrgao', () => {
 });
 
 /* ------------------------------------------------------------------------ */
+
+describe('listas simples', () => {
+  it('lê modelos com tipo de documento como detalhe', () => {
+    const itens = parseModeloPadrao(MODELOS);
+    expect(itens).toHaveLength(4);
+    expect(itens[0]).toEqual({
+      eprocId: '41967',
+      nome: 'Certidão de juntada',
+      orgao: 'ULA 2ª V.FAM.SUC',
+      detalhe: 'Ato Ordinatório',
+    });
+  });
+
+  it('não confunde " - " dentro da descrição com separador', () => {
+    const itens = parseModeloPadrao(MODELOS);
+    expect(itens[2]?.nome).toBe('Certidão de Regularidade - Versão Formulário');
+  });
+
+  it('preserva itens de outros órgãos em vez de filtrá-los no parser', () => {
+    const itens = parseModeloPadrao(MODELOS);
+    expect(itens.some((i) => i.orgao === 'ULA 1ª V.CV')).toBe(true);
+  });
+
+  it('lê textos padrão com a sigla auto-texto como detalhe', () => {
+    const itens = parseTextoPadrao(TEXTOS);
+    expect(itens).toHaveLength(3);
+    expect(itens[0]?.detalhe).toBe('INTAUTOR');
+    expect(itens[1]?.nome).toBe('Conclusão – sentença');
+  });
+});
+
+describe('preferências (autocompletar)', () => {
+  it('decodifica as entidades escapadas duas vezes', () => {
+    // No XML está `&amp;#128309;`. O DOMParser resolve o `&amp;` e sobra o
+    // literal `&#128309;` — daí o decodeHtmlEntities DEPOIS do parser.
+    const itens = parsePreferenciasXml(PREFERENCIAS, 'Minuta');
+    expect(itens[0]?.nome).toBe('🔵 Despacho - Deferir Cit/Int por WhatsApp');
+    expect(itens[3]?.nome).toBe('🔵▶️GAB - Inicial Execução Prisão');
+  });
+
+  it('guarda só o primeiro campo do id composto', () => {
+    const itens = parsePreferenciasXml(PREFERENCIAS, 'Minuta');
+    expect(itens[0]?.eprocId).toBe('31210000012345');
+  });
+
+  it('carrega o tipo, que não existe dentro do XML', () => {
+    const itens = parsePreferenciasXml(PREFERENCIAS, 'Intimação');
+    expect(itens.every((i) => i.detalhe === 'Intimação')).toBe(true);
+  });
+
+  it('descarta item sem descrição', () => {
+    // A fixture tem 6 <item>, um deles com descricao vazia.
+    expect(parsePreferenciasXml(PREFERENCIAS, 'Minuta')).toHaveLength(5);
+  });
+
+  it('devolve vazio em XML inválido, sem lançar', () => {
+    expect(parsePreferenciasXml('<itens><item', 'Minuta')).toEqual([]);
+  });
+
+  it('deduplica por nome entre tipos, preservando o primeiro tipo visto', () => {
+    const itens = montarPreferencias([
+      [{ nome: 'Intimar Exequente', detalhe: 'Minuta' }],
+      [{ nome: 'Intimar Exequente', detalhe: 'Intimação' }, { nome: 'Outra', detalhe: 'Intimação' }],
+    ]);
+    expect(itens).toHaveLength(2);
+    expect(itens[0]?.detalhe).toBe('Minuta');
+  });
+});
 
 describe('teste cruzado: <select> × listagem do órgão', () => {
   it('reconstrói do rótulo do <select> a mesma sigla e nome que a listagem traz em colunas separadas', () => {

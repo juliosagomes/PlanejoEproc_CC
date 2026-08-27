@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  controlador_ajax.php?acao_ajax=preferencia_auto_completar&nomeAcao=<tipo>&hash=<hash>
+
+  Resposta real (recorte de 6 dos 123 itens de nomeAcao=minuta_cadastrar).
+
+  DOIS PONTOS QUE O PARSER PRECISA TRATAR:
+
+  1. As entidades vêm ESCAPADAS DUAS VEZES: aqui está `&amp;#128309;`, então o
+     parser de XML devolve o literal `&#128309;` e ainda falta decodificar. É
+     por isso que o `decodeHtmlEntities` é usado depois do DOMParser, e não em
+     vez dele.
+
+  2. O `id` é composto por campos separados por `|`. Só o primeiro é o código
+     estável; o resto é estado efêmero.
+
+  O tipo da preferência NÃO aparece em lugar nenhum aqui: só existe no
+  `nomeAcao` da requisição. Por isso o coletor carrega o rótulo em paralelo.
+
+  Nota: este arquivo é deliberadamente 100% ISO-8859-1, inclusive nos
+  comentários. O Eproc serve latin-1, e o teste do coletor converte a fixture
+  para bytes latin-1 antes de entregá-la ao parser; um caractere fora dessa
+  faixa (travessão, aspas curvas) viraria byte de controle e quebraria o XML.
+-->
+<itens>
+  <item id="31210000012345|0|N" descricao="&amp;#128309; Despacho - Deferir Cit/Int por WhatsApp" complemento="" />
+  <item id="31210000012346|0|N" descricao="&amp;#128309;&amp;#9199;&amp;#65039;GAB - Determinar Emenda Inicial" complemento="" />
+  <item id="31210000012347|0|N" descricao="&amp;#128309;&amp;#9654;&amp;#65039;GAB - Inicial CLIM - CEJUSC" complemento="" />
+  <item id="31210000012348|0|N" descricao="&amp;#128309;&amp;#9654;&amp;#65039;GAB - Inicial Execu&amp;#231;&amp;#227;o Pris&amp;#227;o" complemento="" />
+  <item id="31210000012349|0|N" descricao="Z1 - &amp;#128226; Intimar Exequente" complemento="" />
+  <item id="31210000012350|0|N" descricao="" complemento="" />
+</itens>

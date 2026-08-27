@@ -11,6 +11,7 @@ import {
 } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
+import { SubitemNomeInput } from '@/features/catalogo/components/SubitemNomeInput';
 import { cn } from '@/utils/cn';
 import { uid } from '@/utils/uid';
 import { defaultEdgeData, useCanvasStore, type FlowEdge } from '../store';
@@ -195,12 +196,19 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                       ))}
                     </select>
                     <div className="flex flex-col gap-0.5 min-w-0">
-                      <input
-                        className="input"
-                        style={{ height: 26, padding: '2px 6px', fontSize: 12 }}
-                        placeholder="Nome do recurso"
+                      <SubitemNomeInput
                         value={s.nome}
-                        onChange={(e) => updateSub(i, { nome: e.target.value })}
+                        categoria={s.categoria}
+                        onChange={(nome, existeNaUnidade) =>
+                          // Só liga `ja_criado`, nunca desliga: bater com o
+                          // catálogo prova que o recurso existe, mas não bater
+                          // não prova o contrário (pode ser um nome livre para
+                          // algo que o usuário já criou à mão).
+                          updateSub(i, {
+                            nome,
+                            ...(existeNaUnidade ? { ja_criado: true } : {}),
+                          })
+                        }
                       />
                       <input
                         className="input text-texto-2"

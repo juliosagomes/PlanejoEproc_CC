@@ -256,7 +256,7 @@ const LocalizadorUnidadeSchema = z.object({
 }) satisfies z.ZodType<LocalizadorUnidade>;
 
 const ItemCatalogoUnidadeSchema = z.object({
-  eprocId: z.string(),
+  eprocId: z.string().optional(),
   nome: z.string(),
   orgao: z.string().optional(),
   detalhe: z.string().optional(),

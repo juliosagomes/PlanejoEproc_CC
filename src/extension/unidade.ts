@@ -50,6 +50,14 @@ export async function coletarDaUnidade(): Promise<ColetaUnidade> {
 
   const resultados = await chrome.scripting.executeScript({
     target: { tabId: aba.id, allFrames: true },
+    // MAIN, não o mundo isolado padrão. As telas de Modelos e Textos Padrão só
+    // paginam chamando `infraAcaoPaginar`, que é uma função **da página** — e o
+    // mundo isolado, por construção, não enxerga variáveis JS da página. No
+    // isolado o laço aborta na primeira volta e a coleta traz só a primeira
+    // página, sem erro nenhum (foi o sintoma: 25 de 180 modelos).
+    //
+    // O coletor não usa `chrome.*` — se um dia usar, isto deixa de funcionar.
+    world: 'MAIN',
     func: coletarUnidadeNaAba,
   });
 

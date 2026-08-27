@@ -3,6 +3,7 @@ import {
   type CatalogoUnidade,
   type FonteId,
   type FonteResultado,
+  type ItemCatalogoUnidade,
   type LocalizadorUnidade,
   type UnidadeEproc,
 } from '@/domain';
@@ -70,6 +71,9 @@ export interface MontagemCatalogo {
   unidade: UnidadeEproc;
   localizadores: LocalizadorUnidade[];
   fontes: Partial<Record<FonteId, FonteResultado>>;
+  modelos?: ItemCatalogoUnidade[];
+  textosPadrao?: ItemCatalogoUnidade[];
+  preferencias?: ItemCatalogoUnidade[];
   /** Injetável para teste; padrão é agora. */
   agora?: string;
 }
@@ -80,6 +84,9 @@ export function montarCatalogoUnidade(m: MontagemCatalogo): CatalogoUnidade {
     unidade: m.unidade,
     coletadoEm: m.agora ?? new Date().toISOString(),
     localizadores: m.localizadores,
+    ...(m.modelos ? { modelos: m.modelos } : {}),
+    ...(m.textosPadrao ? { textosPadrao: m.textosPadrao } : {}),
+    ...(m.preferencias ? { preferencias: m.preferencias } : {}),
     fontes: m.fontes,
   };
 }

@@ -395,6 +395,90 @@ de registro do service worker no card de `chrome://extensions`.
 
 ---
 
+## D-16 · Catálogo lido direto da unidade no Eproc
+
+**Decisão.** O app passa a ler localizadores, preferências, modelos e textos
+padrão **direto do Eproc**, por um botão no cabeçalho. A coleta roda na aba do
+Eproc já autenticada, via `chrome.scripting.executeScript` sob demanda —
+não há `content_scripts` no manifest, então nada roda no Eproc sem o clique. Só
+leitura: nada é escrito no sistema do tribunal. Com isso, os itens 2 e 3 do
+"Roadmap FORA de escopo" do `CLAUDE.md` saem de lá.
+
+O código novo mora em `infra/eproc/` (parsers puros + Zod + merge) e
+`extension/coletor/` (o script injetado). **Não** em `infra/sync/`, que é a
+sincronização de *planos com o Apps Script* (D-8/D-9/D-13) e não tem relação
+nenhuma com o Eproc. Misturar as duas sob o mesmo nome é o principal risco de
+confusão da feature; na UI, "sincronizar" passou a exigir qualificação — *com a
+unidade* × *com o servidor*.
+
+**Por que assim, e não como estava planejado.** Quase toda decisão aqui foi
+corrigida pelo contato com o Eproc real, e vale registrar o que foi medido:
+
+- **Não existe URL de ação montável.** Toda ação exige `hash` assinado, e o hash
+  é de uso único. Só se segue `<a href>` vindo do DOM. Entrada estável:
+  `https://<host>/eproc/` (raiz, sem query) redireciona para o painel com hash
+  novo.
+- **`localizador_orgao_listar` responde a `fetch` e pagina por POST** do form —
+  medido: 50+50+50+29 = 179 únicos, zero sobreposição. O Epryx usa iframe aqui;
+  partindo do painel de secretaria, não é preciso.
+- **Modelos e textos padrão exigem o iframe.** Nessas telas todos os controles de
+  página são `javascript:infraAcaoPaginar(…)`: sem URL para seguir, o POST do
+  form devolve página sem grade, e trocar itens-por-página não dispara requisição
+  alguma (verificado com o monitor de rede). Paginar exige o JS da página rodar.
+- **O coletor roda em `world: 'MAIN'`.** O mundo isolado, que é o padrão, não
+  enxerga funções da página — `infraAcaoPaginar` seria invisível e a coleta
+  traria só a primeira página **sem erro nenhum**. O coletor não usa `chrome.*`;
+  se um dia usar, esta escolha quebra.
+- **Preferências vêm do autocompletar**, uma requisição por tipo
+  (`nomeAcao` = `minuta_cadastrar` / `processo_movimento_consultar` /
+  `processo_intimacao_bloco`), sem paginação. Um único `hash`, extraído do HTML
+  de qualquer tela de lista do painel, serve os três. A alternativa —
+  passear pelos grupos de preferências — custava 6 requisições e passava por uma
+  tela que lista **nome e login dos servidores do grupo**; o autocompletar não
+  toca nesse dado.
+- **Modelos vêm da grade, não do autocompletar.** O autocompletar
+  (`modelo_matriz_padrao_auto_completar`) devolve 933 numa requisição, mas só
+  existe com processo aberto e mistura modelos de todo o tribunal. A grade dá os
+  ~180 **da unidade** — para um catálogo de unidade, a rota mais rica não é a
+  mais adequada.
+
+**Escopo por unidade.** Chave `host::login::sigla`, lida ao vivo de
+`#selInfraUnidades` e `#nav-profile`. Um host serve todas as varas do tribunal;
+chavear só por host faria a coleta de uma unidade sobrescrever a da outra sem
+nada denunciar a troca. A sigla exclui o **papel** de propósito: o mesmo usuário
+aparece na mesma vara como "Gerente de Secretaria" e como "Usuário Automatizador",
+e chavear pelo `value` do `<option>` criaria um catálogo por papel.
+
+O catálogo do XLS (D-7) **continua existindo**. É o caminho de quem não pode usar
+a coleta, e o app precisa seguir 100% offline. As sugestões leem a união dos dois,
+com o da unidade vencendo em colisão.
+
+**Sobre o Epryx.** O usuário tem permissão dos autores para reusar o código (o
+`CLAUDE.md` afirmava o contrário e foi corrigido junto com esta decisão). Na
+prática o que se aproveitou foi o **mapa** — quais telas expõem o quê, e as
+armadilhas conhecidas —, não arquivos: o Epryx é JS clássico sobre globais e este
+projeto é TS estrito em camadas. Duas conclusões dele foram contrariadas por
+medição (o iframe no `localizador_orgao_listar`, e o "beco sem saída" do
+`modelo_padrao_listar`), e uma foi confirmada (o iframe nas grades de modelos e
+textos).
+
+**Custo assumido.** A coleta depende de rotas e do DOM do Eproc, que mudam por
+tribunal e por versão. A mitigação é degradação por fonte — cada uma tem status e
+motivo próprios, e resultado parcial é sucesso — mais conferência de tela antes de
+parsear, porque um hash gasto **não dá erro**: desvia para o Painel do Servidor,
+que também tem `table.infraTable`. Quebra vai acontecer; o desenho existe para
+que ela apareça como aviso, não como dado errado em silêncio.
+
+**O que precisaria mudar para evoluir.** Se um usuário de outro tribunal reportar
+desvio no `localizador_orgao_listar`, o caminho de volta é o iframe, que já existe
+em `coletarGradePorIframe`. Preferências vêm sem código do Eproc (a tela não expõe
+`num_id_form_personalizacao`): qualquer integração mais funda que autocompletar
+precisará de outra rota. O mapa Preferência→Localizador
+(`localizador_acao_preferencial_listar`) está mapeado e fora de escopo até haver
+decisão sobre o que fazer com ele — ver o item correspondente no `CLAUDE.md`.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).
