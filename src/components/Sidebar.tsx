@@ -7,6 +7,8 @@ export const NEW_NODE_DATATYPE = 'application/x-pj-newnode';
 interface SidebarProps {
   /** Disparado quando o usuário clica no botão (ou faz double-click no card). */
   onCreateNode: () => void;
+  /** Sessão de visualização: some com a área de "Adicionar". */
+  somenteLeitura?: boolean;
 }
 
 /**
@@ -15,8 +17,12 @@ interface SidebarProps {
  *
  * O drop em si é tratado pelo `FlowCanvas` (Fase 6) — aqui só configuramos o
  * `dataTransfer` na origem.
+ *
+ * Some inteira quando o usuário clica na marca do cabeçalho — é o botão de
+ * mostrar/esconder, e quem já sabe arrastar não precisa da legenda ocupando
+ * 220px de tela.
  */
-export function Sidebar({ onCreateNode }: SidebarProps) {
+export function Sidebar({ onCreateNode, somenteLeitura = false }: SidebarProps) {
   const onDragStart = (e: DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData(NEW_NODE_DATATYPE, '1');
     e.dataTransfer.effectAllowed = 'move';
@@ -24,9 +30,19 @@ export function Sidebar({ onCreateNode }: SidebarProps) {
 
   return (
     <aside
+      id="pj-sidebar"
       className="flex flex-col h-full no-print bg-superficie border-r border-borda flex-shrink-0"
       style={{ width: 220 }}
     >
+      {somenteLeitura ? (
+        <div className="p-3 border-b border-borda">
+          <div className="section-h mb-2">Visualização</div>
+          <div className="text-[11.5px] text-texto-2 leading-snug">
+            Você entrou com o código de leitura desta lotação. Dá para abrir os
+            planos, gerar checklist e salvar cópia — mas não alterar nada.
+          </div>
+        </div>
+      ) : (
       <div className="p-3 border-b border-borda">
         <div className="section-h mb-2">Adicionar</div>
         <div
@@ -64,17 +80,27 @@ export function Sidebar({ onCreateNode }: SidebarProps) {
           <Icon.Plus /> Criar nó
         </button>
       </div>
+      )}
 
       <div className="p-3 flex-1 overflow-auto scroll text-[11.5px] text-texto-2 leading-relaxed">
         <div className="section-h mb-2">Como usar</div>
-        <ul className="list-disc pl-4 mb-3.5">
-          <li>Clique num nó/aresta para editar à direita.</li>
-          <li>Conecte nós arrastando das alças laterais.</li>
-          <li>
-            Marque <strong>já existe no Eproc</strong> conforme criar.
-          </li>
-          <li>Tudo é salvo automaticamente.</li>
-        </ul>
+        {somenteLeitura ? (
+          <ul className="list-disc pl-4 mb-3.5">
+            <li>Clique num nó/aresta para ver os detalhes à direita.</li>
+            <li>
+              Para editar, entre de novo com o <strong>código de edição</strong>.
+            </li>
+          </ul>
+        ) : (
+          <ul className="list-disc pl-4 mb-3.5">
+            <li>Clique num nó/aresta para editar à direita.</li>
+            <li>Conecte nós arrastando das alças laterais.</li>
+            <li>
+              Marque <strong>já existe no Eproc</strong> conforme criar.
+            </li>
+            <li>Tudo é salvo automaticamente.</li>
+          </ul>
+        )}
 
         <div className="section-h mb-2">Tipos de transição</div>
         <div className="flex flex-col gap-1.5">

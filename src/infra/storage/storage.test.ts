@@ -8,6 +8,7 @@ import {
   criarSavePlanoDebounced,
   duplicarPlano,
   excluirPlano,
+  excluirTodosPlanos,
   getActivePlanKey,
   getAtivoId,
   importarPlano,
@@ -497,5 +498,31 @@ describe('isolamento entre silos', () => {
 
     setEscopo(LOCAL);
     expect(listPlanos().map((p) => p.nome)).toEqual(['Legado']);
+  });
+
+  it('apagar todos limpa o silo corrente e nenhum outro', () => {
+    // O risco que este teste cerca: `planejoeproc:` é prefixo de
+    // `planejoeproc:lot:…`, então uma varredura por prefixo no modo local
+    // levaria junto os planos de todas as lotações (decisoes.md#D-18).
+    setEscopo(LOTACAO_A);
+    criarPlano('Plano A');
+
+    setEscopo(LOCAL);
+    const { id } = criarPlano('Plano local 1');
+    criarPlano('Plano local 2');
+
+    expect(excluirTodosPlanos()).toBe(2);
+    expect(listPlanos()).toEqual([]);
+    expect(getAtivoId()).toBeNull();
+    expect(localStorage.getItem(getPlanKey(id))).toBeNull();
+
+    setEscopo(LOTACAO_A);
+    expect(listPlanos().map((p) => p.nome)).toEqual(['Plano A']);
+  });
+
+  it('apagar todos num silo vazio é no-op e devolve zero', () => {
+    setEscopo(LOCAL);
+    expect(excluirTodosPlanos()).toBe(0);
+    expect(listPlanos()).toEqual([]);
   });
 });

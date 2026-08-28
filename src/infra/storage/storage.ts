@@ -560,6 +560,43 @@ export function excluirPlano(id: string): void {
   }
 }
 
+/**
+ * Esvazia o silo do escopo corrente: todos os planos, o índice e o ponteiro de
+ * ativo. É o "apagar todos" do modo local (decisoes.md#D-18).
+ *
+ * Percorre o índice em vez de varrer o storage por prefixo: o índice é a lista
+ * autoritativa do silo, e uma varredura por prefixo apanharia chaves de outros
+ * escopos (`planejoeproc:` é prefixo de `planejoeproc:lot:…`). Devolve quantos
+ * planos saíram, para a UI poder confirmar o que fez.
+ *
+ * Não registra tombstone, pela mesma razão de `excluirPlano`: quem propaga
+ * exclusão ao servidor é `features/sync/store.ts`.
+ */
+export function excluirTodosPlanos(): number {
+  const c = ctx();
+  if (!c) return 0;
+
+  const index = readIndex(c);
+  for (const entrada of index) {
+    const key = planKey(entrada.id);
+    if (key === null) continue;
+    try {
+      c.storage.removeItem(key);
+    } catch (err) {
+      console.warn('[storage] Falha ao apagar plano.', err);
+    }
+  }
+
+  try {
+    c.storage.removeItem(c.indexK);
+    c.storage.removeItem(c.activeK);
+  } catch (err) {
+    console.warn('[storage] Falha ao limpar o índice de planos.', err);
+  }
+
+  return index.length;
+}
+
 /* ============================================================================
  * Debounced saver
  *

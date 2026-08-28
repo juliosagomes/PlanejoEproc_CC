@@ -94,10 +94,11 @@ src/
 
 Quebra dessa direção é antipadrão. Se sentir vontade de fazer `domain` importar React, **pare** — o desenho está errado.
 
-**Duas regras extras por causa da extensão:**
+**Três regras extras por causa da extensão:**
 
 - **`chrome.*` só aparece em `infra/plataforma/` e `src/extension/`.** Em qualquer outro lugar é sinal de que a fronteira vazou. `features/` e `App` falam com a extensão por hooks e mensagens tipadas (`extension/mensagens.ts`).
 - **`infra/storage` é síncrono e continua assim.** Se surgir vontade de torná-lo `async` para "acompanhar o `chrome.storage`", leia `decisoes.md#D-12` primeiro — o espelho existe exatamente para evitar isso.
+- **O service worker não escreve plano.** Ele verifica o servidor e notifica; aplicar é sempre um clique do usuário no editor (`decisoes.md#D-17`). Se aparecer a ideia de "sincronizar sozinho para poupar um clique", ela já foi implementada e removida — o motivo está no D-17, e é perda de trabalho, não preferência de estilo.
 
 **Três regras do coletor (`extension/coletor/eproc.ts`).** Ele é injetado na aba
 do Eproc por `chrome.scripting.executeScript`, e isso impõe restrições que não
@@ -134,12 +135,18 @@ existem em nenhum outro arquivo do projeto:
 - **Localizador** — fila/agrupador de processos. É o **nó do grafo**.
 - **ATP** — *Automatização de Tramitação Processual*. Aresta animada azul.
 - **Preferência** — regra/template do servidor. Aresta verde sólida.
+- **Ação preferencial** — o **vínculo** entre uma preferência e um localizador,
+  como o Eproc chama. Não é sinônimo de Preferência: a preferência é a regra, a
+  ação preferencial é o fato de ela atuar naquele localizador.
 - **Manual** — transição sem automação. Aresta cinza tracejada.
 - **Modelo** — minuta/template de texto.
 - **Texto padrão** — trecho reutilizável de redação.
 - **Regra de ATP** — gatilho + condição + ação.
 - **Gatilho** — evento que dispara automação. Espelha `selTipoControle` (9 tipos).
 - **Unidade** — vara, cartório, gabinete.
+- **Ações Preferenciais Vinculadas** — rótulo do bloco que lista, no painel do
+  localizador, as preferências que já atuam nele segundo o Eproc. É informação,
+  não plano (`decisoes.md#D-16`).
 - **Flags do localizador (hardcoded):** `T` Trabalhado, `E` Espera, `G` Gatilho, `F` Fixo de fluxo.
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
@@ -174,15 +181,21 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
    - **Detalhe interno da preferência** (evento, localizador destino): exige
      avaliar `arrCamposPersonalizados` no MAIN world, ou seja `eval` — proibido
      pelo critério de "pronto" nº 7.
-   - **ATPs cadastradas** (`automatizar_localizadores`) e o **mapa
-     Preferência→Localizador** (`localizador_acao_preferencial_listar`). O
-     segundo está mapeado e é barato de parsear; o que falta é decidir se ele
-     vira informação no painel de aresta ou arestas geradas no plano — e isso
-     muda a premissa do app, que existe para você *desenhar* o fluxo. Decisão
-     antes de código.
+   - **ATPs cadastradas** (`automatizar_localizadores`).
+   - **Gerar arestas** a partir das ações preferenciais coletadas. Os vínculos já
+     são sincronizados e aparecem como **informação** no painel do localizador
+     ("Ações Preferenciais Vinculadas"). Convertê-los em arestas do plano é outra
+     coisa: muda a premissa do app, que existe para você *desenhar* o fluxo, e o
+     transformaria em diagramador do que já está lá. Pode ser o uso certo —
+     desenhar o "como está" antes do "como deveria ser" —, mas é decisão de
+     produto, não continuação. Decidir antes de codar.
 3. Simulação / modo "play".
-4. Publicação na Chrome Web Store, `update_url` próprio, política corporativa
-   TJMG. Hoje a instalação é "carregar sem compactação".
+4. ~~Publicação na Chrome Web Store~~ — **entrou** em agosto/2026. O alvo agora
+   é a **loja pública**. O que isso muda no dia a dia: `manifest.config.ts` é
+   material de revisão da Google (cada `permission` precisa de justificativa
+   defensável), a `CHAVE_PUBLICA` deixa de ser opcional, e mudança de
+   comportamento visível ao usuário pede versão nova em `package.json`.
+   Continua fora: `update_url` próprio e política corporativa TJMG.
 5. Auto-reload da extensão em desenvolvimento (a página detectar o rebuild e se
    recarregar sozinha). Avaliado e descartado: F5 resolve, e o mecanismo pediria
    carimbo de build + polling — mais peças para dar errado do que economia de
@@ -214,6 +227,16 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 - **Fase E** — Alvo único (decisoes.md#D-15): singlefile apagado, os dois
   passes do Vite fundidos num só, manifest emitido pelo build, e `npm run
   dev:ext` (watch) como ciclo de desenvolvimento.
+
+### Preparação para a loja (em curso, agosto/2026)
+
+- Marca única: o glifo do ícone da extensão substituiu o "eP" no cabeçalho e na
+  tela de entrada (`components/BrandMark.tsx`). Mexeu no desenho de
+  `scripts/gen-icons.mjs`? Refaça a conta de coordenadas lá também.
+- Verificação de fundo no lugar da sincronização automática (decisoes.md#D-17).
+- "Apagar todos os planos", só no modo local (decisoes.md#D-18).
+- Sessão de visualização virou somente leitura de verdade (decisoes.md#D-19).
+- A marca do cabeçalho mostra/esconde a barra lateral.
 
 ## Regras de ouro
 

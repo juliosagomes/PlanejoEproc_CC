@@ -127,5 +127,6 @@ export interface CatalogoUnidade {
   preferencias?: ItemCatalogoUnidade[];
   modelos?: ItemCatalogoUnidade[];
   textosPadrao?: ItemCatalogoUnidade[];
+  acoesPreferenciais?: AcaoPreferencialUnidade[];
   fontes: Partial<Record<FonteId, FonteResultado>>;
 }

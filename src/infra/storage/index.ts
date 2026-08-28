@@ -32,6 +32,7 @@ export {
   duplicarPlano,
   renomearPlano,
   excluirPlano,
+  excluirTodosPlanos,
   // Debounced
   criarSavePlanoDebounced,
   type DebouncedSaver,

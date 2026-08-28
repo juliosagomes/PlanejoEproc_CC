@@ -28,7 +28,20 @@ export interface SyncMapEntry {
   workspaceCodigo: string;
   /** 'dono' = publicado a partir deste navegador; 'assinante' = recebido via sincronizar. */
   papel: SyncPapel;
+  /** Relógio **local** do último pull/push deste plano. Só para exibição. */
   ultimaSincronizacao: string;
+  /**
+   * Carimbo que o **servidor** deu à versão que temos aqui. É o que a
+   * verificação de fundo compara para saber se apareceu algo novo lá
+   * (decisoes.md#D-17) — por isso vem do servidor, e não do relógio desta
+   * máquina: diferença de fuso ou de alguns segundos entre os dois relógios
+   * faria a extensão anunciar mudança a cada verificação.
+   *
+   * Opcional porque entradas gravadas antes do D-17 não o têm. Sem ele, a
+   * verificação assume "não sei" e conta o plano como alterado uma vez; o
+   * primeiro pull/push seguinte preenche e o ruído acaba.
+   */
+  remotoAtualizadoEm?: string;
 }
 
 const SYNC_MAP_KEY = 'planejoeproc:sync:map';
@@ -76,9 +89,19 @@ export function registrarEntrada(entrada: SyncMapEntry): void {
   writeList(SYNC_MAP_KEY, [...lista, entrada]);
 }
 
-export function atualizarUltimaSincronizacao(remotoId: string, quando: string): void {
+export function atualizarUltimaSincronizacao(
+  remotoId: string,
+  quando: string,
+  remotoAtualizadoEm?: string,
+): void {
   const lista = listSyncMap().map((e) =>
-    e.remotoId === remotoId ? { ...e, ultimaSincronizacao: quando } : e,
+    e.remotoId === remotoId
+      ? {
+          ...e,
+          ultimaSincronizacao: quando,
+          ...(remotoAtualizadoEm === undefined ? {} : { remotoAtualizadoEm }),
+        }
+      : e,
   );
   writeList(SYNC_MAP_KEY, lista);
 }

@@ -55,6 +55,7 @@ beforeEach(() => {
     selectedId: null,
     planoNome: 'Plano sem título',
     flowMode: 'organic',
+    somenteLeitura: false,
   });
 });
 
@@ -171,7 +172,7 @@ describe('entrarComCodigo', () => {
     vi.mocked(sincronizar).mockResolvedValue({
       workspaceId: 'ws-1',
       nome: 'Vara',
-      permissao: 'leitura',
+      permissao: 'edicao',
       planos: [],
     });
 
@@ -182,6 +183,36 @@ describe('entrarComCodigo', () => {
     expect(comEscopo({ tipo: 'local' }, () => listPlanos()).map((p) => p.nome)).toEqual([
       'Plano do modo local',
     ]);
+  });
+
+  it('entrar com código de leitura não cria plano nem marca o canvas como editável', async () => {
+    vi.mocked(sincronizar).mockResolvedValue({
+      workspaceId: 'ws-1',
+      nome: 'Vara',
+      permissao: 'leitura',
+      planos: [],
+    });
+
+    await useSessaoStore.getState().entrarComCodigo('cod-leitura');
+
+    // O plano em branco de cortesia é a primeira escrita da sessão — e uma
+    // sessão de visualização não escreve (decisoes.md#D-19).
+    expect(listPlanos()).toEqual([]);
+    expect(useCanvasStore.getState().somenteLeitura).toBe(true);
+  });
+
+  it('voltar para o modo local destrava o canvas', async () => {
+    vi.mocked(sincronizar).mockResolvedValue({
+      workspaceId: 'ws-1',
+      nome: 'Vara',
+      permissao: 'leitura',
+      planos: [],
+    });
+    await useSessaoStore.getState().entrarComCodigo('cod-leitura');
+    expect(useCanvasStore.getState().somenteLeitura).toBe(true);
+
+    useSessaoStore.getState().entrarLocal();
+    expect(useCanvasStore.getState().somenteLeitura).toBe(false);
   });
 
   it('em caso de erro não troca o escopo nem a sessão', async () => {

@@ -37,3 +37,16 @@ export type Sessao = SessaoLocal | SessaoLotacao;
 export function podeEditar(sessao: Sessao): sessao is SessaoLotacao {
   return sessao.tipo === 'lotacao' && sessao.permissao === 'edicao';
 }
+
+/**
+ * `true` quando a sessão é **só de visualização**: entrou numa lotação com o
+ * código de leitura.
+ *
+ * Não é o complemento de `podeEditar` — o modo local não publica em servidor
+ * nenhum e mesmo assim é totalmente editável. O que separa os dois é de quem é
+ * o plano: no modo local é seu, na lotação lida com código de leitura é de
+ * outra pessoa (decisoes.md#D-19).
+ */
+export function somenteVisualizacao(sessao: Sessao): boolean {
+  return sessao.tipo === 'lotacao' && sessao.permissao === 'leitura';
+}

@@ -22,33 +22,35 @@ import { getStorage } from '@/infra/plataforma/storageLike';
 const ULTIMA_KEY = 'planejoeproc:sessao:ultima';
 const PREFS_KEY = 'planejoeproc:sync:prefs';
 const ULTIMO_EM_KEY = 'planejoeproc:sync:ultimo';
+const ULTIMA_VERIFICACAO_KEY = 'planejoeproc:sync:verificado';
+const PENDENTE_KEY = 'planejoeproc:sync:pendente';
 
-/** Intervalos oferecidos no popup. `null` = sincronização automática desligada. */
+/** Intervalos oferecidos no popup. `null` = verificação automática desligada. */
 export const INTERVALOS_MIN = [15, 30, 60] as const;
 
 const UltimaSessaoSchema = z.object({ workspaceId: z.string().min(1) });
 
+/**
+ * Uma preferência só, e é sobre *avisar* — não sobre sincronizar
+ * (decisoes.md#D-17).
+ *
+ * O schema já teve `autoPush` e `notificar`. Sumiram junto com a sincronização
+ * automática: `autoPush` publicava todos os planos sem ninguém mandar, e
+ * `notificar` desligado com intervalo ligado passou a não significar nada — a
+ * notificação virou o único resultado da verificação.
+ *
+ * `z.object` descarta chave desconhecida, então prefs gravadas antes disto
+ * continuam válidas e só perdem os dois campos.
+ */
 const PrefsSchema = z.object({
-  /** Minutos entre sincronizações automáticas; `null` desliga. */
+  /** Minutos entre verificações do servidor; `null` desliga. */
   intervaloMin: z.union([z.literal(15), z.literal(30), z.literal(60), z.null()]),
-  /** Enviar também, não só baixar. Perigoso — ver `PREFS_PADRAO`. */
-  autoPush: z.boolean(),
-  notificar: z.boolean(),
 });
 
 export type PrefsSync = z.infer<typeof PrefsSchema>;
 
-/**
- * `autoPush` nasce **desligado** de propósito. Um push manda todos os planos
- * locais e propaga tombstones; disparado sem intervenção do usuário, um silo
- * desatualizado sobrescreveria em silêncio o trabalho de um colega — exatamente
- * o cenário que o desenho de tombstones existe para evitar (decisoes.md#D-9).
- * O pull não tem esse risco: preserva rascunhos nunca publicados (`aplicar.ts`).
- */
 export const PREFS_PADRAO: PrefsSync = {
   intervaloMin: 15,
-  autoPush: false,
-  notificar: true,
 };
 
 function ler<T>(chave: string, schema: z.ZodType<T>): T | null {
@@ -115,7 +117,12 @@ export function setPrefs(prefs: PrefsSync): void {
 }
 
 /* ============================================================================
- * Marca d'água da última sincronização (só para exibir no popup)
+ * Marcas d'água (só para exibir no popup)
+ *
+ * Duas, e a diferença é o ponto do D-17: **sincronizar** é trazer os planos, e
+ * só acontece quando o usuário manda; **verificar** é perguntar ao servidor se
+ * há novidade, e é o que o alarme faz sozinho. Um popup que dissesse
+ * "sincronizado há 3 min" depois de uma verificação estaria mentindo.
  * ========================================================================== */
 
 export function getUltimaSincronizacao(): string | null {
@@ -124,4 +131,38 @@ export function getUltimaSincronizacao(): string | null {
 
 export function marcarSincronizacao(quando = new Date().toISOString()): void {
   gravar(ULTIMO_EM_KEY, quando);
+}
+
+export function getUltimaVerificacao(): string | null {
+  return ler(ULTIMA_VERIFICACAO_KEY, z.string().datetime());
+}
+
+export function marcarVerificacao(quando = new Date().toISOString()): void {
+  gravar(ULTIMA_VERIFICACAO_KEY, quando);
+}
+
+/* ============================================================================
+ * O que a última verificação encontrou
+ *
+ * Precisa ser persistido, e não guardado em memória: o service worker do MV3 é
+ * reciclado entre eventos, então o resultado do alarme das 14h já não existe
+ * quando o popup abre às 14h05.
+ * ========================================================================== */
+
+const PendenteSchema = z.object({
+  recebidos: z.number().int().nonnegative(),
+  atualizados: z.number().int().nonnegative(),
+  removidos: z.number().int().nonnegative(),
+});
+
+export type ResumoPendente = z.infer<typeof PendenteSchema>;
+
+/** `null` quando a última verificação não achou diferença (ou nunca houve uma). */
+export function getPendente(): ResumoPendente | null {
+  return ler(PENDENTE_KEY, PendenteSchema);
+}
+
+export function setPendente(resumo: ResumoPendente | null): void {
+  if (resumo === null) apagar(PENDENTE_KEY);
+  else gravar(PENDENTE_KEY, resumo);
 }

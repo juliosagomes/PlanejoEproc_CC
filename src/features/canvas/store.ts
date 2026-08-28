@@ -46,6 +46,19 @@ interface CanvasState {
   selectedId: string | null;
   planoNome: string;
   flowMode: FlowMode;
+  /**
+   * Sessão de visualização (código de leitura de uma lotação). Toda ação que
+   * muda o conteúdo do plano vira no-op, e a persistência é desligada.
+   *
+   * O guarda mora aqui, e não só na UI, porque esconder botão não é garantia:
+   * atalho de teclado, `EdgeDetailModal` já aberto quando a sessão trocou, ou
+   * um componente novo que alguém esqueça de gatilhar continuariam gravando.
+   * A UI ainda desabilita os controles — isto é a rede embaixo dela.
+   *
+   * Quem escreve é `features/sessao/store.ts`, no mesmo ponto em que fixa o
+   * escopo de armazenamento.
+   */
+  somenteLeitura: boolean;
 }
 
 interface CanvasActions {
@@ -55,6 +68,7 @@ interface CanvasActions {
   onConnect: (connection: Connection) => void;
 
   // Mutações de domínio
+  /** Devolve o id do nó criado, ou `''` quando a sessão é de visualização. */
   createNode: (position: Position) => string;
   updateNode: (id: string, patch: Partial<LocalizadorData>) => void;
   updateEdge: (id: string, patch: Partial<EdgeData>) => void;
@@ -65,6 +79,7 @@ interface CanvasActions {
   setSelectedId: (id: string | null) => void;
   setPlanoNome: (nome: string) => void;
   setFlowMode: (mode: FlowMode) => void;
+  setSomenteLeitura: (valor: boolean) => void;
 
   // Toggles de "já criado"
   toggleNodeCreated: (id: string) => void;
@@ -171,14 +186,29 @@ export const useCanvasStore = create<CanvasStore>()(
     selectedId: null,
     planoNome: inicial.planoNome,
     flowMode: inicial.flowMode,
+    somenteLeitura: false,
 
-    onNodesChange: (changes) =>
-      set((s) => ({ nodes: applyNodeChanges(changes, s.nodes) as FlowNode[] })),
+    // Em visualização, filtramos em vez de ignorar: `dimensions` e `select` são
+    // o ReactFlow medindo e destacando o que já está na tela, e barrá-las
+    // quebraria o desenho das arestas. `position` e `remove` são edição.
+    onNodesChange: (changes) => {
+      const efetivas = get().somenteLeitura
+        ? changes.filter((c) => c.type === 'dimensions' || c.type === 'select')
+        : changes;
+      if (efetivas.length === 0) return;
+      set((s) => ({ nodes: applyNodeChanges(efetivas, s.nodes) as FlowNode[] }));
+    },
 
-    onEdgesChange: (changes) =>
-      set((s) => ({ edges: applyEdgeChanges(changes, s.edges) as FlowEdge[] })),
+    onEdgesChange: (changes) => {
+      const efetivas = get().somenteLeitura
+        ? changes.filter((c) => c.type === 'select')
+        : changes;
+      if (efetivas.length === 0) return;
+      set((s) => ({ edges: applyEdgeChanges(efetivas, s.edges) as FlowEdge[] }));
+    },
 
     onConnect: (connection) => {
+      if (get().somenteLeitura) return;
       if (!connection.source || !connection.target) return;
       const novaAresta: FlowEdge = {
         id: uid('e'),
@@ -193,6 +223,7 @@ export const useCanvasStore = create<CanvasStore>()(
     },
 
     createNode: (position) => {
+      if (get().somenteLeitura) return '';
       const id = uid('n');
       set((s) => ({
         nodes: [
@@ -204,49 +235,71 @@ export const useCanvasStore = create<CanvasStore>()(
       return id;
     },
 
-    updateNode: (id, patch) =>
+    updateNode: (id, patch) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         nodes: s.nodes.map((n) =>
           n.id === id ? { ...n, data: { ...n.data, ...patch } } : n,
         ),
-      })),
+      }));
+    },
 
-    updateEdge: (id, patch) =>
+    updateEdge: (id, patch) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         edges: s.edges.map((e) =>
           e.id === id
             ? { ...e, data: { ...(e.data ?? defaultEdgeData()), ...patch } }
             : e,
         ),
-      })),
+      }));
+    },
 
-    deleteNode: (id) =>
+    deleteNode: (id) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         nodes: s.nodes.filter((n) => n.id !== id),
         edges: s.edges.filter((e) => e.source !== id && e.target !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
-      })),
+      }));
+    },
 
-    deleteEdge: (id) =>
+    deleteEdge: (id) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         edges: s.edges.filter((e) => e.id !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
-      })),
+      }));
+    },
 
     setSelectedId: (id) => set({ selectedId: id }),
-    setPlanoNome: (nome) => set({ planoNome: nome }),
+
+    setPlanoNome: (nome) => {
+      if (get().somenteLeitura) return;
+      set({ planoNome: nome });
+    },
+
+    // Sem guarda de propósito: `flowMode` é como o plano é *desenhado* na tela,
+    // não o que ele diz. Trocar Orgânico/Diagrama continua valendo em
+    // visualização — e como a persistência está desligada nesse modo, a escolha
+    // vive só nesta aba e não vira alteração no plano de ninguém.
     setFlowMode: (mode) => set({ flowMode: mode }),
 
-    toggleNodeCreated: (id) =>
+    setSomenteLeitura: (valor) => set({ somenteLeitura: valor }),
+
+    toggleNodeCreated: (id) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         nodes: s.nodes.map((n) =>
           n.id === id
             ? { ...n, data: { ...n.data, ja_criado: !n.data.ja_criado } }
             : n,
         ),
-      })),
+      }));
+    },
 
-    toggleSubitemCreated: (edgeId, index) =>
+    toggleSubitemCreated: (edgeId, index) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         edges: s.edges.map((e) => {
           if (e.id !== edgeId) return e;
@@ -256,9 +309,11 @@ export const useCanvasStore = create<CanvasStore>()(
           );
           return { ...e, data: { ...data, subitems } };
         }),
-      })),
+      }));
+    },
 
-    toggleEdgeRuleCreated: (edgeId) =>
+    toggleEdgeRuleCreated: (edgeId) => {
+      if (get().somenteLeitura) return;
       set((s) => ({
         edges: s.edges.map((e) => {
           if (e.id !== edgeId) return e;
@@ -277,7 +332,8 @@ export const useCanvasStore = create<CanvasStore>()(
             data: { ...data, pref: { ...rule, ja_criado: !rule.ja_criado } },
           };
         }),
-      })),
+      }));
+    },
 
     loadPlano: (plano) => {
       const flow = planoParaFlow(plano);
@@ -307,7 +363,14 @@ const debouncedSave = criarSavePlanoDebounced();
 
 useCanvasStore.subscribe(
   (s) => [s.nodes, s.edges, s.planoNome, s.flowMode] as const,
-  () => debouncedSave(useCanvasStore.getState().getPlano()),
+  () => {
+    // Em visualização, o que sobra de mutação são as medições do ReactFlow e o
+    // modo de desenho — nada que valha gravar, e gravar carimbaria
+    // `atualizadoEm` no índice de uma lotação que não é nossa para mexer.
+    const estado = useCanvasStore.getState();
+    if (estado.somenteLeitura) return;
+    debouncedSave(estado.getPlano());
+  },
   { equalityFn: shallow },
 );
 
@@ -320,7 +383,13 @@ useCanvasStore.subscribe(
  * microtask seguinte — que pode nunca chegar num `beforeunload`.
  */
 export function flushPersist(): void {
-  debouncedSave.flush();
+  // Numa sessão de visualização não há gravação legítima a forçar: o que
+  // estivesse pendente foi agendado depois da trava ligar, ou seja, é
+  // exatamente o que não deve ir para o disco. Descartar aqui fecha a última
+  // fresta — a assinatura já não agenda nada, mas um save de milissegundos
+  // antes da troca de sessão ainda chegaria vivo até este flush.
+  if (useCanvasStore.getState().somenteLeitura) debouncedSave.cancel();
+  else debouncedSave.flush();
   flushPlataforma();
 }
 

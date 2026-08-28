@@ -87,16 +87,28 @@ function nowIso(): string {
  * Silo vazio (primeira entrada, ou lotação recém-criada) ganha um plano em
  * branco já registrado no índice, em vez de só carregar um `planoVazio()` na
  * memória: sem a entrada, o seletor de planos diria "nenhum plano salvo"
- * enquanto o usuário edita, até o primeiro save com debounce criá-la.
+ * enquanto o usuário edita, até o primeiro save com debounce criá-la. Numa
+ * sessão de visualização isso não vale — não há edição para acompanhar, e
+ * criar plano seria a primeira escrita de um modo que promete não escrever.
+ *
+ * O `setSomenteLeitura` vem **antes** do `loadPlano`: a assinatura de
+ * persistência dispara no carregamento, e ela decide olhando essa flag.
  */
-function carregarAtivoNoCanvas(): void {
+function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
+  const canvas = useCanvasStore.getState();
+  canvas.setSomenteLeitura(somenteLeitura);
+
   garantirAtivoValido();
   if (listPlanos().length === 0) {
+    if (somenteLeitura) {
+      canvas.loadPlano(planoVazio());
+      return;
+    }
     const { plano } = criarPlano();
-    useCanvasStore.getState().loadPlano(plano);
+    canvas.loadPlano(plano);
     return;
   }
-  useCanvasStore.getState().loadPlano(loadPlano());
+  canvas.loadPlano(loadPlano());
 }
 
 function mensagemDeErro(err: unknown, fallback: string): string {
@@ -118,7 +130,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     // Modo local é offline por definição: apagar a marca impede que o service
     // worker continue sincronizando uma lotação que o usuário deixou para trás.
     limparUltimaLotacao();
-    carregarAtivoNoCanvas();
+    carregarAtivoNoCanvas(false);
     set({ sessao: { tipo: 'local' }, erro: null, codigosNovaLotacao: null });
   },
 
@@ -136,7 +148,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
       flushPersist();
       setEscopo({ tipo: 'lotacao', workspaceId });
       aplicarSincronizacao(planos, codigoLimpo);
-      carregarAtivoNoCanvas();
+      carregarAtivoNoCanvas(permissao === 'leitura');
 
       registrarLotacao({
         workspaceId,
@@ -203,7 +215,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
           ultimaSincronizacao: quando,
         });
       }
-      carregarAtivoNoCanvas();
+      carregarAtivoNoCanvas(false);
 
       registrarLotacao({
         workspaceId,
@@ -242,6 +254,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     // Canvas em branco: com escopo null nenhuma escrita acontece, então isto
     // não apaga nada — só evita que os nós da sessão anterior apareçam por
     // trás da tela de login.
+    useCanvasStore.getState().setSomenteLeitura(false);
     useCanvasStore.getState().loadPlano(planoVazio());
     set({
       sessao: null,

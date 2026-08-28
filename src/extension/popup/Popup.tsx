@@ -6,9 +6,14 @@ import type { Estado, ParaWorker, RespostaAcao, RespostaEstado } from '../mensag
 /* ============================================================================
  * POPUP
  *
- * A superfície pequena: em que lotação estou, quando sincronizei, sincronizar
- * agora, e as três preferências. O editor de verdade abre em aba — canvas não
- * cabe em 360px.
+ * A superfície pequena: em que lotação estou, se há novidade no servidor,
+ * verificar agora, e de quanto em quanto tempo verificar. O editor de verdade
+ * abre em aba — canvas não cabe em 360px.
+ *
+ * O que este painel **não** tem é um botão de baixar. Trazer os planos é uma
+ * escrita no silo e pode passar por cima de uma edição em andamento; ela mora
+ * onde o canvas está para recarregar depois, no botão "Baixar do servidor" do
+ * cabeçalho (decisoes.md#D-17).
  *
  * Todo o estado vem do service worker; o popup não lê o storage direto. Assim
  * há uma única resposta para "qual é a lotação corrente", e ela é a mesma que
@@ -27,6 +32,14 @@ function haQuantoTempo(iso: string | null): string {
   const horas = Math.floor(min / 60);
   if (horas < 24) return `há ${horas} h`;
   return `há ${Math.floor(horas / 24)} d`;
+}
+
+function textoPendente(p: NonNullable<Estado['pendente']>): string {
+  const partes: string[] = [];
+  if (p.recebidos > 0) partes.push(`${p.recebidos} plano(s) novo(s)`);
+  if (p.atualizados > 0) partes.push(`${p.atualizados} com alteração`);
+  if (p.removidos > 0) partes.push(`${p.removidos} removido(s) lá`);
+  return partes.join(' · ');
 }
 
 export function Popup() {
@@ -54,11 +67,11 @@ export function Popup() {
     void carregar();
   }, [carregar]);
 
-  const sincronizarAgora = async () => {
+  const verificarAgora = async () => {
     setOcupado(true);
     setErro(null);
     try {
-      const r = await enviar<RespostaAcao>({ tipo: 'sincronizar-agora' });
+      const r = await enviar<RespostaAcao>({ tipo: 'verificar-agora' });
       if (!r.ok) setErro(r.erro);
       await carregar();
     } catch {
@@ -97,7 +110,7 @@ export function Popup() {
     return <div className="p-4 text-xs text-texto-3">Carregando…</div>;
   }
 
-  const { lotacao, prefs } = estado;
+  const { lotacao, prefs, pendente } = estado;
 
   return (
     <div className="flex flex-col gap-3 p-3.5 w-[340px] bg-fundo text-texto">
@@ -119,14 +132,15 @@ export function Popup() {
               <SeloPermissao permissao={lotacao.permissao} />
             </div>
             <p className="mt-1 text-[11px] text-texto-3">
-              Sincronizado {haQuantoTempo(estado.ultimaSincronizacao)}
+              Verificado {haQuantoTempo(estado.ultimaVerificacao)} · baixado{' '}
+              {haQuantoTempo(estado.ultimaSincronizacao)}
             </p>
           </>
         ) : (
           <p className="text-[12px] text-texto-2">
             Modo local — nenhuma lotação aberta.
             <span className="block mt-1 text-[11px] text-texto-3">
-              Entre numa lotação pelo editor para sincronizar automaticamente.
+              Entre numa lotação pelo editor para acompanhar o servidor.
             </span>
           </p>
         )}
@@ -138,25 +152,40 @@ export function Popup() {
         </p>
       )}
 
+      {/* O aviso é o produto da verificação. O botão que age fica no editor, de
+          propósito: é lá que o canvas recarrega o plano ativo depois do pull. */}
+      {pendente && (
+        <section className="rounded-md border border-destaque-borda bg-destaque-suave px-2.5 py-2">
+          <p className="text-[12px] font-medium text-texto">Há novidade no servidor</p>
+          <p className="mt-0.5 text-[11px] text-texto-2">{textoPendente(pendente)}</p>
+          <button
+            className="btn btn-sm btn-primary mt-2 w-full justify-center"
+            onClick={() => void enviar({ tipo: 'abrir-editor' })}
+          >
+            Abrir editor para baixar
+          </button>
+        </section>
+      )}
+
       <button
-        className="btn btn-primary w-full justify-center"
+        className="btn w-full justify-center"
         disabled={ocupado || lotacao === null}
-        onClick={() => void sincronizarAgora()}
+        onClick={() => void verificarAgora()}
       >
-        {ocupado ? 'Sincronizando…' : 'Sincronizar agora'}
+        {ocupado ? 'Verificando…' : 'Verificar agora'}
       </button>
 
       <section className="flex flex-col gap-2 border-t border-borda pt-3">
         <label className="flex items-center justify-between gap-2 text-[12px]">
-          <span>Sincronizar sozinho</span>
+          <span>Verificar sozinho</span>
           <select
             className="select w-auto"
             value={prefs.intervaloMin ?? 'off'}
             onChange={(e) => {
               const v = e.target.value;
               void salvarPrefs({
-                ...prefs,
-                intervaloMin: v === 'off' ? null : (Number(v) as (typeof INTERVALOS_MIN)[number]),
+                intervaloMin:
+                  v === 'off' ? null : (Number(v) as (typeof INTERVALOS_MIN)[number]),
               });
             }}
           >
@@ -168,32 +197,11 @@ export function Popup() {
             <option value="off">desligado</option>
           </select>
         </label>
-
-        <label className="flex items-center gap-2 text-[12px]">
-          <input
-            type="checkbox"
-            checked={prefs.notificar}
-            onChange={(e) => void salvarPrefs({ ...prefs, notificar: e.target.checked })}
-          />
-          <span>Avisar quando algo mudar</span>
-        </label>
-
-        <label className="flex items-start gap-2 text-[12px]">
-          <input
-            type="checkbox"
-            className="mt-0.5"
-            checked={prefs.autoPush}
-            disabled={lotacao?.permissao !== 'edicao'}
-            onChange={(e) => void salvarPrefs({ ...prefs, autoPush: e.target.checked })}
-          />
-          <span>
-            Enviar meus planos junto
-            <span className="block text-[11px] text-texto-3">
-              Publica todos os planos desta lotação a cada sincronização. Se a sua
-              cópia estiver desatualizada, sobrescreve o que um colega publicou.
-            </span>
-          </span>
-        </label>
+        <p className="text-[11px] text-texto-3 leading-snug">
+          A extensão só olha e avisa. Baixar os planos é sempre você quem manda, no
+          editor — assim uma atualização nunca cai por cima do que você está
+          escrevendo.
+        </p>
       </section>
     </div>
   );

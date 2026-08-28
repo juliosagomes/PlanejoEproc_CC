@@ -1,6 +1,7 @@
 import { TIPO_FLAGS, type FlagKey, type LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
+import { AcoesPreferenciaisNoEproc } from '@/features/catalogo/components/AcoesPreferenciaisNoEproc';
 import { LocalizadorNomeInput } from '@/features/catalogo/components/LocalizadorNomeInput';
 import { useSugestoesLocalizador } from '@/features/catalogo/sugestoes';
 import { cn } from '@/utils/cn';
@@ -13,6 +14,7 @@ interface NodePanelProps {
 export function NodePanel({ node }: NodePanelProps) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
+  const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const itensCatalogo = useSugestoesLocalizador();
   const data = node.data;
 
@@ -28,27 +30,37 @@ export function NodePanel({ node }: NodePanelProps) {
         eyebrow="Nó · Localizador"
         title={data.nome || 'Sem nome'}
         right={
-          <button
-            type="button"
-            className="btn btn-sm btn-ghost"
-            onClick={() => deleteNode(node.id)}
-          >
-            <Icon.Trash /> Remover
-          </button>
+          somenteLeitura ? undefined : (
+            <button
+              type="button"
+              className="btn btn-sm btn-ghost"
+              onClick={() => deleteNode(node.id)}
+            >
+              <Icon.Trash /> Remover
+            </button>
+          )
         }
       />
+      {/* Um `fieldset[disabled]` desliga todo controle aninhado de uma vez. É
+          a diferença entre um lugar para acertar e trinta — e o guarda do store
+          continua embaixo, para o que não é controle de formulário.
+          `display: contents` mantém o layout: o fieldset desaparece da caixa,
+          só a semântica fica. */}
+      <fieldset disabled={somenteLeitura} className="contents">
       <div className="flex-1 overflow-auto scroll p-4 flex flex-col gap-3.5">
         <div>
           <label className="label">Nome do localizador</label>
           <LocalizadorNomeInput
             value={data.nome}
             itens={itensCatalogo}
-            autoFocus
+            autoFocus={!somenteLeitura}
             onChangeNome={(nome) => updateNode(node.id, { nome })}
             onPickFromCatalogo={onPickFromCatalogo}
             onDeleteEmpty={() => deleteNode(node.id)}
           />
         </div>
+
+        <AcoesPreferenciaisNoEproc nome={data.nome} />
 
         <div>
           <label className="label">Descrição</label>
@@ -126,6 +138,7 @@ export function NodePanel({ node }: NodePanelProps) {
           />
         </div>
       </div>
+      </fieldset>
     </div>
   );
 }

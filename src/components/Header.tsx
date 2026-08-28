@@ -1,4 +1,5 @@
 import type { FlowMode, Sessao } from '@/domain';
+import { GlifoMarca } from '@/components/BrandMark';
 import { Icon } from '@/components/Icon';
 import { PlanSwitcher } from '@/features/plans/PlanSwitcher';
 import { SalvarCopiaButton } from '@/features/plans/SalvarCopiaButton';
@@ -16,9 +17,17 @@ export interface HeaderStats {
 export interface HeaderProps {
   planoNome: string;
   onPlanoNomeChange: (nome: string) => void;
+  // Barra lateral (a marca à esquerda é o botão que a mostra/esconde)
+  sidebarVisivel: boolean;
+  onAlternarSidebar: () => void;
   // Sessão (modo local ou lotação)
   sessao: Sessao;
   onTrocarSessao: () => void;
+  /**
+   * Sessão de visualização: nada aqui pode alterar o plano. Some com as ações
+   * que criam, abrem ou renomeiam, e trava o nome do plano ativo.
+   */
+  somenteLeitura: boolean;
   onPull: () => void;
   onPush: () => void;
   sincronizando: boolean;
@@ -30,6 +39,8 @@ export interface HeaderProps {
   onRenomearPlano: (id: string) => void;
   onDuplicarPlano: (id: string) => void;
   onExcluirPlano: (id: string) => void;
+  /** Só existe no modo local (decisoes.md#D-18); ausente esconde a opção. */
+  onApagarTodosPlanos?: () => void;
   // Ações de fluxo
   onNovo: () => void;
   onAbrirArquivo: () => void;
@@ -61,8 +72,11 @@ const FLOW_MODE_OPTIONS: ReadonlyArray<{ id: FlowMode; label: string }> = [
 export function Header({
   planoNome,
   onPlanoNomeChange,
+  sidebarVisivel,
+  onAlternarSidebar,
   sessao,
   onTrocarSessao,
+  somenteLeitura,
   onPull,
   onPush,
   sincronizando,
@@ -73,6 +87,7 @@ export function Header({
   onRenomearPlano,
   onDuplicarPlano,
   onExcluirPlano,
+  onApagarTodosPlanos,
   onNovo,
   onAbrirArquivo,
   onSalvarCopiaAtivo,
@@ -93,7 +108,21 @@ export function Header({
       style={{ height: 50 }}
     >
       <div className="flex items-center gap-2">
-        <span className="brand-mark">eP</span>
+        <button
+          type="button"
+          className="brand-mark"
+          onClick={onAlternarSidebar}
+          aria-expanded={sidebarVisivel}
+          aria-controls="pj-sidebar"
+          title={
+            sidebarVisivel ? 'Ocultar a barra lateral' : 'Mostrar a barra lateral'
+          }
+          aria-label={
+            sidebarVisivel ? 'Ocultar a barra lateral' : 'Mostrar a barra lateral'
+          }
+        >
+          <GlifoMarca width={17} height={17} />
+        </button>
         <span className="font-semibold text-[13px]">PlanejoEproc</span>
       </div>
 
@@ -103,10 +132,12 @@ export function Header({
         planos={planos}
         ativoId={ativoId}
         ativoNomeLive={planoNome}
+        somenteLeitura={somenteLeitura}
         onSwitch={onSwitchPlano}
         onRenomear={onRenomearPlano}
         onDuplicar={onDuplicarPlano}
         onExcluir={onExcluirPlano}
+        onApagarTodos={onApagarTodosPlanos}
       />
 
       {/* O elástico do cabeçalho: é este input que cede espaço quando a barra
@@ -122,8 +153,10 @@ export function Header({
         }}
         value={planoNome}
         onChange={(e) => onPlanoNomeChange(e.target.value)}
+        readOnly={somenteLeitura}
         placeholder="Nome do plano"
         aria-label="Nome do plano ativo"
+        title={somenteLeitura ? 'Sessão de visualização — nome travado' : undefined}
       />
 
       <div className="flex-1" />
@@ -174,22 +207,28 @@ export function Header({
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0">
-        <button
-          type="button"
-          className="btn btn-sm"
-          onClick={onNovo}
-          title="Cria um plano em branco e troca para ele (não apaga o atual)"
-        >
-          <Icon.File /> Novo plano
-        </button>
-        <button
-          type="button"
-          className="btn btn-sm"
-          onClick={onAbrirArquivo}
-          title="Abre um JSON de plano salvo (cria nova entrada no switcher)"
-        >
-          <Icon.Upload /> Abrir arquivo
-        </button>
+        {/* Criar e importar escrevem no silo — fora numa sessão de visualização.
+            Exportar (SalvarCopiaButton) continua: baixar uma cópia é leitura. */}
+        {!somenteLeitura && (
+          <>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={onNovo}
+              title="Cria um plano em branco e troca para ele (não apaga o atual)"
+            >
+              <Icon.File /> Novo plano
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm"
+              onClick={onAbrirArquivo}
+              title="Abre um JSON de plano salvo (cria nova entrada no switcher)"
+            >
+              <Icon.Upload /> Abrir arquivo
+            </button>
+          </>
+        )}
         <SalvarCopiaButton
           totalPlanos={planos.length}
           onSalvarAtivo={onSalvarCopiaAtivo}

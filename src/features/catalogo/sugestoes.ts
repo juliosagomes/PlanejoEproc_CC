@@ -47,6 +47,30 @@ export function useSugestoesLocalizador(): LocalizadorOrgao[] {
   }, [doXls, daUnidade]);
 }
 
+/**
+ * Ações preferenciais que a unidade já tem neste localizador, no Eproc.
+ *
+ * Informação, não plano: mostra o "como está" ao lado do que o usuário está
+ * desenhando. O casamento é por nome canonizado contra a **sigla** — que é o que
+ * a autocomplete grava em `nome` quando o usuário escolhe do catálogo, e também
+ * o que a tela de ações preferenciais lista na coluna "Localizador".
+ *
+ * Devolve lista vazia para nome livre, nome de outra unidade, ou antes da
+ * primeira sincronização.
+ */
+export function useAcoesPreferenciaisDoLocalizador(nome: string): string[] {
+  const catalogo = useUnidadeStore((s) => s.catalogo);
+
+  return useMemo(() => {
+    const alvo = semDecoracao(nome);
+    if (!alvo || !catalogo?.acoesPreferenciais) return [];
+    return (
+      catalogo.acoesPreferenciais.find((v) => semDecoracao(v.localizador) === alvo)
+        ?.preferencias ?? []
+    );
+  }, [catalogo, nome]);
+}
+
 export interface SugestaoSubitem {
   nome: string;
   /** Tipo de documento (modelos) ou sigla auto-texto (textos padrão). */

@@ -33,6 +33,7 @@ export function FlowCanvas() {
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
   const selectedId = useCanvasStore((s) => s.selectedId);
+  const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const onNodesChange = useCanvasStore((s) => s.onNodesChange);
   const onEdgesChange = useCanvasStore((s) => s.onEdgesChange);
   const onConnect = useCanvasStore((s) => s.onConnect);
@@ -61,6 +62,7 @@ export function FlowCanvas() {
   const isEmpty = nodes.length === 0;
 
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
+    if (somenteLeitura) return;
     if (!Array.from(e.dataTransfer.types).includes(NEW_NODE_DATATYPE)) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
@@ -68,6 +70,7 @@ export function FlowCanvas() {
   };
   const onDragLeave = () => setArrastando(false);
   const onDrop = (e: DragEvent<HTMLDivElement>) => {
+    if (somenteLeitura) return;
     e.preventDefault();
     setArrastando(false);
     if (!Array.from(e.dataTransfer.types).includes(NEW_NODE_DATATYPE)) return;
@@ -76,6 +79,7 @@ export function FlowCanvas() {
   };
 
   const onPaneDoubleClick = (e: MouseEvent) => {
+    if (somenteLeitura) return;
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
     createNode(position);
   };
@@ -98,6 +102,12 @@ export function FlowCanvas() {
         onEdgeClick={(_, e) => setSelectedId(e.id)}
         onPaneClick={() => setSelectedId(null)}
         onDoubleClick={onPaneDoubleClick}
+        // Arrastar nó e puxar aresta são as duas edições que acontecem no
+        // próprio canvas; selecionar continua, senão não haveria como abrir o
+        // painel de detalhes para *ver* o que está ali.
+        nodesDraggable={!somenteLeitura}
+        nodesConnectable={!somenteLeitura}
+        edgesUpdatable={!somenteLeitura}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         defaultEdgeOptions={{ type: 'pj' }}
@@ -131,8 +141,17 @@ export function FlowCanvas() {
           <div className="empty-card">
             <div className="text-[13px] font-semibold mb-1">Quadro vazio</div>
             <div className="text-xs text-texto-2 leading-relaxed">
-              Arraste <strong>Novo localizador</strong> da barra lateral, ou clique duas
-              vezes no canvas para criar um nó.
+              {somenteLeitura ? (
+                <>
+                  Este plano não tem nenhum localizador. Você está numa sessão de
+                  visualização, então não há o que criar aqui.
+                </>
+              ) : (
+                <>
+                  Arraste <strong>Novo localizador</strong> da barra lateral, ou clique
+                  duas vezes no canvas para criar um nó.
+                </>
+              )}
             </div>
           </div>
         </div>

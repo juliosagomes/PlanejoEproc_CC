@@ -55,7 +55,7 @@ describe('textoDoResumo', () => {
     expect(textoDoResumo({ recebidos: 0, atualizados: 0, removidos: 0 })).toBe('');
   });
 
-  it('lista só o que aconteceu', () => {
+  it('lista só o que o servidor tem de diferente', () => {
     expect(textoDoResumo({ recebidos: 3, atualizados: 0, removidos: 0 })).toBe(
       '3 plano(s) novo(s)',
     );
@@ -63,7 +63,7 @@ describe('textoDoResumo', () => {
 
   it('junta as três contagens', () => {
     expect(textoDoResumo({ recebidos: 1, atualizados: 2, removidos: 3 })).toBe(
-      '1 plano(s) novo(s) · 2 atualizado(s) · 3 removido(s)',
+      '1 plano(s) novo(s) · 2 com alteração · 3 removido(s) lá',
     );
   });
 });

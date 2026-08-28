@@ -1,4 +1,5 @@
 import type {
+  AcaoPreferencialUnidade,
   CatalogoUnidade,
   FonteId,
   FonteResultado,
@@ -7,6 +8,8 @@ import type {
 } from '@/domain';
 import { montarUnidade } from './escopoUnidade';
 import { anexarIds, deduplicar, montarCatalogoUnidade } from './montarCatalogo';
+import { semDecoracao } from './nomeLocalizador';
+import { parseAcaoPreferencial } from './parseAcaoPreferencial';
 import { parseModeloPadrao, parseTextoPadrao } from './parseListasSimples';
 import { parseLocalizadorOrgao } from './parseLocalizadorOrgao';
 import { montarPreferencias, parsePreferenciasXml } from './parsePreferencias';
@@ -32,6 +35,8 @@ export interface ResumoColeta {
   modelos: number;
   textosPadrao: number;
   preferencias: number;
+  /** Localizadores que já têm ao menos uma ação preferencial no Eproc. */
+  acoesPreferenciais: number;
 }
 
 export type ResultadoColeta =
@@ -120,6 +125,7 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
   const modelos = parseAcessoria(coleta, 'modelos', parseModeloPadrao, fontes);
   const textosPadrao = parseAcessoria(coleta, 'textosPadrao', parseTextoPadrao, fontes);
   const preferencias = aplicarPreferencias(coleta, fontes);
+  const acoesPreferenciais = aplicarAcoesPreferenciais(coleta, fontes);
 
   return {
     ok: true,
@@ -130,6 +136,7 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
       ...(modelos.length > 0 ? { modelos } : {}),
       ...(textosPadrao.length > 0 ? { textosPadrao } : {}),
       ...(preferencias.length > 0 ? { preferencias } : {}),
+      ...(acoesPreferenciais.length > 0 ? { acoesPreferenciais } : {}),
       ...(agora ? { agora } : {}),
     }),
     resumo: {
@@ -140,6 +147,7 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
       modelos: modelos.length,
       textosPadrao: textosPadrao.length,
       preferencias: preferencias.length,
+      acoesPreferenciais: acoesPreferenciais.length,
     },
   };
 }
@@ -168,6 +176,43 @@ function aplicarPreferencias(
     return itens;
   } catch (err) {
     fontes.preferencias = {
+      status: 'falhou',
+      itens: 0,
+      motivo: err instanceof Error ? err.message : String(err),
+    };
+    return [];
+  }
+}
+
+/**
+ * Vínculos localizador↔preferência. Caminho próprio porque o formato não é
+ * `ItemCatalogoUnidade` — é uma relação, não um item de catálogo.
+ */
+function aplicarAcoesPreferenciais(
+  coleta: ColetaUnidade,
+  fontes: Partial<Record<FonteId, FonteResultado>>,
+): AcaoPreferencialUnidade[] {
+  const bruta = coleta.fontes.acoesPreferenciais;
+  if (!bruta || bruta.status !== 'ok') {
+    if (bruta) fontes.acoesPreferenciais = resultadoDeFonte(bruta, 0);
+    return [];
+  }
+
+  try {
+    const vistos = new Set<string>();
+    const itens: AcaoPreferencialUnidade[] = [];
+    for (const fragmento of bruta.fragmentos) {
+      for (const vinculo of parseAcaoPreferencial(fragmento)) {
+        const chave = semDecoracao(vinculo.localizador);
+        if (!chave || vistos.has(chave)) continue;
+        vistos.add(chave);
+        itens.push(vinculo);
+      }
+    }
+    fontes.acoesPreferenciais = resultadoDeFonte(bruta, itens.length);
+    return itens;
+  } catch (err) {
+    fontes.acoesPreferenciais = {
       status: 'falhou',
       itens: 0,
       motivo: err instanceof Error ? err.message : String(err),

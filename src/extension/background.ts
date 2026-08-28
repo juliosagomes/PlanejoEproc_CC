@@ -2,47 +2,51 @@ import { inicializarPlataforma, flushPlataforma } from '@/infra/plataforma';
 import { setEscopo } from '@/infra/storage';
 import { SyncError } from '@/infra/sync/client';
 import { findLotacao } from '@/infra/sync/lotacoes';
+import { houveMudanca, verificar, type ResumoSincronizacao } from '@/infra/sync/operacoes';
 import {
-  houveMudanca,
-  pull,
-  push,
-  type ResumoSincronizacao,
-} from '@/infra/sync/operacoes';
-import {
+  getPendente,
   getPrefs,
   getUltimaLotacao,
   getUltimaSincronizacao,
+  getUltimaVerificacao,
+  setPendente,
   setPrefs,
 } from '@/infra/sync/sessaoPersistida';
 import { alvoDeFundo, textoDoResumo } from './fundo';
-import type {
-  Estado,
-  ParaPagina,
-  ParaWorker,
-  RespostaAcao,
-  RespostaEstado,
-} from './mensagens';
+import type { Estado, ParaWorker, RespostaAcao, RespostaEstado } from './mensagens';
 
 /* ============================================================================
  * SERVICE WORKER
  *
- * Responsabilidades: manter o alarme de sincronização, executar o pull quando
- * nenhuma aba do editor está aberta, notificar quando algo mudou, e responder
+ * Responsabilidades: manter o alarme de verificação, perguntar ao servidor se
+ * há novidade na última lotação aberta, notificar quando houver, e responder
  * ao popup.
+ *
+ * O que ele **não** faz mais: baixar planos (decisoes.md#D-17). Um pull de
+ * fundo aplica o servidor por cima do silo, e o alarme não tem como saber que
+ * a pessoa está no meio de uma alteração — o trabalho dela desaparecia sem
+ * aviso. Agora o worker só lê para comparar; escrever plano é sempre decisão de
+ * quem está na frente do editor.
  *
  * MV3 recicla o worker a qualquer momento, então **nada** aqui pode viver em
  * memória entre eventos: todo handler re-hidrata o espelho do `chrome.storage`
- * antes de ler qualquer coisa. O único estado de módulo é o mutex de
- * sincronização, e ele é intencionalmente descartável — se o worker morrer no
- * meio de um pull, o alarme seguinte simplesmente tenta de novo.
+ * antes de ler qualquer coisa, e o resultado da última verificação é
+ * persistido. O único estado de módulo é o mutex, e ele é intencionalmente
+ * descartável — se o worker morrer no meio, o alarme seguinte tenta de novo.
  * ========================================================================== */
 
-const ALARME = 'planejoeproc:sync';
+const ALARME = 'planejoeproc:verificar';
+/**
+ * Nome do alarme antes do D-17. Alarmes sobrevivem à atualização da extensão,
+ * então sem apagá-lo explicitamente ele continuaria acordando o worker a cada
+ * 15 min para cair no `return` do listener — para sempre.
+ */
+const ALARME_LEGADO = 'planejoeproc:sync';
 const NOTIFICACAO = 'planejoeproc:mudou';
 const EDITOR = 'index.html';
 
-/** Impede que o alarme e o botão "Sincronizar agora" se atropelem. */
-let sincronizando = false;
+/** Impede que o alarme e o botão "Verificar agora" se atropelem. */
+let verificando = false;
 let ultimoErro: string | null = null;
 
 function log(...args: unknown[]): void {
@@ -54,10 +58,11 @@ function log(...args: unknown[]): void {
  * ========================================================================== */
 
 async function reprogramarAlarme(): Promise<void> {
+  await chrome.alarms.clear(ALARME_LEGADO);
   await chrome.alarms.clear(ALARME);
   const { intervaloMin } = getPrefs();
   if (intervaloMin === null) {
-    log('sincronização automática desligada');
+    log('verificação automática desligada');
     return;
   }
   chrome.alarms.create(ALARME, {
@@ -66,42 +71,14 @@ async function reprogramarAlarme(): Promise<void> {
     // inteiro — quem acabou de instalar ficaria 15 min sem entender o porquê.
     delayInMinutes: 1,
   });
-  log(`alarme a cada ${intervaloMin} min`);
-}
-
-/* ============================================================================
- * Delegação para a aba aberta
- * ========================================================================== */
-
-/**
- * O editor mantém o plano ativo em memória, na store do canvas. Se o worker
- * sobrescrevesse o silo por baixo, a próxima gravação com debounce do canvas
- * escreveria por cima do que acabou de chegar do servidor.
- *
- * Então: havendo aba do editor, ela sincroniza; o worker só cutuca. Uma única
- * thread mexe no silo por vez, e a aba já sabe recarregar o ativo depois do
- * pull.
- */
-async function editorAberto(): Promise<boolean> {
-  const url = chrome.runtime.getURL(EDITOR);
-  const abas = await chrome.tabs.query({ url });
-  return abas.length > 0;
-}
-
-async function pedirParaAbaSincronizar(): Promise<boolean> {
-  const msg: ParaPagina = { tipo: 'sincronize-voce' };
-  try {
-    await chrome.runtime.sendMessage(msg);
-    return true;
-  } catch {
-    // "Receiving end does not exist": a aba foi fechada entre a checagem e o
-    // envio. Cai para o caminho headless.
-    return false;
-  }
+  log(`verificando a cada ${intervaloMin} min`);
 }
 
 /* ============================================================================
  * Notificação
+ *
+ * É o único efeito da verificação. O texto diz o que mudou **e** o que fazer,
+ * porque a extensão deliberadamente não faz por conta própria.
  * ========================================================================== */
 
 function notificar(nomeLotacao: string, resumo: ResumoSincronizacao): void {
@@ -109,53 +86,48 @@ function notificar(nomeLotacao: string, resumo: ResumoSincronizacao): void {
     type: 'basic',
     iconUrl: chrome.runtime.getURL('icons/icon128.png'),
     title: `PlanejoEproc — ${nomeLotacao}`,
-    message: textoDoResumo(resumo),
+    message: `${textoDoResumo(resumo)}. Abra o editor e clique em "Baixar do servidor" quando quiser trazer.`,
   });
 }
 
 /* ============================================================================
- * Sincronização de fundo
+ * Verificação de fundo
  * ========================================================================== */
 
-async function sincronizarDeFundo(origem: 'alarme' | 'popup'): Promise<RespostaAcao> {
-  if (sincronizando) return { ok: false, erro: 'Sincronização já em andamento.' };
-  sincronizando = true;
+async function verificarDeFundo(
+  origem: 'alarme' | 'popup',
+): Promise<RespostaAcao> {
+  if (verificando) return { ok: false, erro: 'Verificação já em andamento.' };
+  verificando = true;
   try {
     await inicializarPlataforma();
 
     const alvo = alvoDeFundo();
     if (!alvo) {
-      log(`${origem}: sem lotação ativa, nada a fazer`);
+      log(`${origem}: sem lotação ativa, nada a verificar`);
       return { ok: true };
     }
 
-    if (await editorAberto()) {
-      if (await pedirParaAbaSincronizar()) {
-        log(`${origem}: delegado à aba do editor`);
-        return { ok: true };
-      }
-    }
-
+    // O escopo aponta o silo só para **ler** o índice na comparação; nenhuma
+    // escrita de plano acontece daqui.
     setEscopo({ tipo: 'lotacao', workspaceId: alvo.workspaceId });
-    const prefs = getPrefs();
-    const resumo = await pull(alvo);
-    if (prefs.autoPush && alvo.permissao === 'edicao') await push(alvo);
+    const resumo = await verificar(alvo);
+    const mudou = houveMudanca(resumo);
+    setPendente(mudou ? resumo : null);
     flushPlataforma();
 
     ultimoErro = null;
-    log(`${origem}: pull ok`, resumo);
+    log(`${origem}: verificado`, resumo);
 
-    if (prefs.notificar && houveMudanca(resumo)) {
-      notificar(findLotacao(alvo.workspaceId)?.nome ?? 'Lotação', resumo);
-    }
+    if (mudou) notificar(findLotacao(alvo.workspaceId)?.nome ?? 'Lotação', resumo);
     return { ok: true };
   } catch (err) {
     ultimoErro =
-      err instanceof SyncError ? err.message : 'Falha inesperada ao sincronizar.';
-    console.error('[planejoeproc:sw] sincronização falhou', err);
+      err instanceof SyncError ? err.message : 'Falha inesperada ao verificar.';
+    console.error('[planejoeproc:sw] verificação falhou', err);
     return { ok: false, erro: ultimoErro };
   } finally {
-    sincronizando = false;
+    verificando = false;
     // O escopo é estado de módulo compartilhado com `infra/storage`; deixá-lo
     // apontado depois do evento faria a próxima leitura do worker cair num silo
     // que talvez não seja mais o corrente.
@@ -180,8 +152,10 @@ async function montarEstado(): Promise<Estado> {
         }
       : null,
     ultimaSincronizacao: getUltimaSincronizacao(),
+    ultimaVerificacao: getUltimaVerificacao(),
+    pendente: getPendente(),
     prefs: getPrefs(),
-    sincronizando,
+    verificando,
     ultimoErro,
   };
 }
@@ -217,7 +191,7 @@ chrome.runtime.onStartup.addListener(() => {
 
 chrome.alarms.onAlarm.addListener((alarme) => {
   if (alarme.name !== ALARME) return;
-  void sincronizarDeFundo('alarme');
+  void verificarDeFundo('alarme');
 });
 
 chrome.notifications.onClicked.addListener((id) => {
@@ -238,8 +212,8 @@ chrome.runtime.onMessage.addListener(
         void montarEstado().then((estado) => sendResponse({ ok: true, estado }));
         return true;
 
-      case 'sincronizar-agora':
-        void sincronizarDeFundo('popup').then(sendResponse);
+      case 'verificar-agora':
+        void verificarDeFundo('popup').then(sendResponse);
         return true;
 
       case 'salvar-prefs':

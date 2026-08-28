@@ -1,10 +1,18 @@
 import type { Permissao } from '@/domain';
 import { listPlanos, loadPlano } from '@/infra/storage';
-import { aplicarSincronizacao, type ResumoSincronizacao } from './aplicar';
+import {
+  aplicarSincronizacao,
+  diffSincronizacao,
+  type ResumoSincronizacao,
+} from './aplicar';
 import { publicar as publicarApi, sincronizar as sincronizarApi } from './client';
 import type { PlanoParaPublicar } from './client';
 import { limparTombstones, listTombstones } from './lotacoes';
-import { marcarSincronizacao } from './sessaoPersistida';
+import {
+  marcarSincronizacao,
+  marcarVerificacao,
+  setPendente,
+} from './sessaoPersistida';
 import { findEntradaPorLocal, registrarEntrada } from './syncMap';
 
 /* ============================================================================
@@ -42,6 +50,29 @@ export async function pull(alvo: LotacaoAlvo): Promise<ResumoSincronizacao> {
   const { planos } = await sincronizarApi(alvo.codigo);
   const resumo = aplicarSincronizacao(planos, alvo.codigo);
   marcarSincronizacao();
+  marcarVerificacao();
+  // Acabamos de trazer tudo: o aviso do popup não tem mais o que apontar.
+  setPendente(null);
+  return resumo;
+}
+
+/**
+ * Pergunta ao servidor o que ele tem e **não escreve nada**: devolve o que
+ * mudaria num pull.
+ *
+ * É o que a extensão passou a fazer em segundo plano (decisoes.md#D-17).
+ * Baixar sozinho desfazia o trabalho de quem estivesse editando naquele
+ * momento — o alarme não tem como saber que a pessoa está no meio de uma
+ * alteração. Verificar e avisar deixa a decisão com ela.
+ *
+ * Custa uma chamada de `sincronizar` igual à do pull: o Apps Script não tem
+ * endpoint de "só os carimbos" (apps-script/Code.gs). O que se economiza não é
+ * rede, é a escrita.
+ */
+export async function verificar(alvo: LotacaoAlvo): Promise<ResumoSincronizacao> {
+  const { planos } = await sincronizarApi(alvo.codigo);
+  const resumo = diffSincronizacao(planos);
+  marcarVerificacao();
   return resumo;
 }
 
@@ -65,22 +96,35 @@ export async function push(alvo: LotacaoAlvo): Promise<ResumoPublicacao | null> 
   }));
   const remover = listTombstones(alvo.workspaceId);
 
-  await publicarApi(alvo.codigo, payload, remover);
+  const resultado = await publicarApi(alvo.codigo, payload, remover);
+
+  // O carimbo vem da resposta, não do relógio daqui: é ele que a verificação de
+  // fundo compara depois (decisoes.md#D-17), e um `Date.now()` local já
+  // nasceria fora de sincronia com o do servidor.
+  const carimbos = new Map(resultado.publicados.map((p) => [p.remotoId, p.atualizadoEm]));
 
   const quando = new Date().toISOString();
   entradas.forEach((entrada, i) => {
+    const remotoId = payload[i]!.remotoId;
     registrarEntrada({
       localId: entrada.id,
-      remotoId: payload[i]!.remotoId,
+      remotoId,
       workspaceCodigo: alvo.codigo,
       papel: 'dono',
       ultimaSincronizacao: quando,
+      ...(carimbos.has(remotoId)
+        ? { remotoAtualizadoEm: carimbos.get(remotoId) }
+        : {}),
     });
   });
   // Só limpa depois do sucesso: se a chamada falhar, as exclusões continuam
   // pendentes e vão junto na próxima tentativa.
   limparTombstones(alvo.workspaceId);
   marcarSincronizacao();
+  marcarVerificacao();
+  // O servidor agora tem exatamente o que temos aqui — o que estava marcado
+  // como novidade era, no mínimo, o que acabamos de sobrescrever.
+  setPendente(null);
 
   return { enviados: payload.length, removidos: remover.length };
 }

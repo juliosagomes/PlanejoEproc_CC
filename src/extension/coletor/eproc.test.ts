@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import ACOES from '@/infra/eproc/__fixtures__/localizadorAcaoPreferencialListar.html?raw';
 import ORGAO from '@/infra/eproc/__fixtures__/localizadorOrgaoListar.html?raw';
 import MODELOS from '@/infra/eproc/__fixtures__/modeloPadraoListar.html?raw';
 import PREF_XML from '@/infra/eproc/__fixtures__/preferenciaAutoCompletar.xml?raw';
@@ -165,6 +166,7 @@ const MENU = `
   <a aria-label="Lista de Processos por Localizador" href="controlador.php?acao=localizador_processos_lista&hash=def">Lista</a>
   <a href="controlador.php?acao=modelo_padrao_listar&hash=ghi">Modelos Padrão</a>
   <a href="controlador.php?acao=texto_padrao_listar&hash=jkl">Textos Padrão</a>
+  <a href="controlador.php?acao=localizador_acao_preferencial_listar&hash=mno">Ações Preferenciais</a>
 `;
 
 /**
@@ -175,6 +177,9 @@ const MENU = `
  * de código é puramente numérica — as datas têm barras e não casam.
  */
 let proximoCodigo = 90000;
+/** Esta tela não pagina: sem rodapé de "N registros", o laço não deve rodar. */
+const PAGINA_ACOES = `<html><body>${ACOES}</body></html>`;
+
 const PAGINA_MODELOS_2 = `<html><body>${MODELOS.replace(
   />(\d{4,6})</g,
   () => `>${(proximoCodigo += 1)}<`,
@@ -198,6 +203,9 @@ describe('coletor do Eproc', () => {
         if (url.includes('localizador_orgao_listar')) return Promise.resolve(resposta(PAGINA_ORGAO));
         if (url.includes('localizador_processos_lista')) return Promise.resolve(resposta(PAGINA_SELECT));
         if (url.includes('preferencia_auto_completar')) return Promise.resolve(resposta(PREF_XML));
+        if (url.includes('localizador_acao_preferencial_listar')) {
+          return Promise.resolve(resposta(PAGINA_ACOES));
+        }
         if (url.includes('modelo_padrao_listar')) return Promise.resolve(resposta(PAGINA_MODELOS));
         if (url.includes('texto_padrao_listar')) return Promise.resolve(resposta(PAGINA_TEXTOS));
         return Promise.resolve(resposta('<html><body>tela desconhecida</body></html>'));
@@ -259,6 +267,18 @@ describe('coletor do Eproc', () => {
     // 3 tipos de preferência, 5 itens úteis cada, deduplicados por nome.
     expect(r.resumo.preferencias).toBe(5);
     expect(r.catalogo.preferencias?.[0]?.detalhe).toBe('Minuta');
+    // 3 linhas na fixture, uma sem vínculo nenhum.
+    expect(r.resumo.acoesPreferenciais).toBe(2);
+    expect(r.catalogo.acoesPreferenciais?.[0]?.preferencias).toHaveLength(4);
+  });
+
+  it('colhe as ações preferenciais por fetch, sem entrar no laço de paginação', async () => {
+    const coleta = await coletarUnidadeNaAba();
+    const fonte = coleta.fontes.acoesPreferenciais;
+    expect(fonte?.status).toBe('ok');
+    // A tela não anuncia total, então não há como (nem por que) paginar.
+    expect(fonte?.fragmentos).toHaveLength(1);
+    expect(fonte?.totalAnunciado).toBeUndefined();
   });
 
   it('pagina a grade pelo JS da página, não por fetch', async () => {

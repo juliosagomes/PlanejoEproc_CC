@@ -394,7 +394,9 @@ body {
     pointer-events: none;
   }
 
-  /* ---------- Marca (logo do header) ---------- */
+  /* ---------- Marca (logo do header) ----------
+     O conteúdo é o glifo de `components/BrandMark.tsx`, que herda a cor por
+     `currentColor` — daí o `color` continuar aqui. */
   .brand-mark {
     width: 26px;
     height: 26px;
@@ -403,11 +405,29 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--superficie);
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: -0.02em;
+    flex-shrink: 0;
+    color: #fff;
     box-shadow: 0 1px 2px rgba(20, 22, 28, 0.12);
+  }
+
+  /* A marca do cabeçalho é um botão (esconde a barra lateral). */
+  button.brand-mark {
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    transition:
+      filter 0.12s ease,
+      transform 0.12s ease;
+  }
+  button.brand-mark:hover {
+    filter: brightness(1.08);
+  }
+  button.brand-mark:active {
+    transform: scale(0.94);
+  }
+  button.brand-mark:focus-visible {
+    outline: 2px solid var(--destaque);
+    outline-offset: 2px;
   }
 
   /* ---------- Scroll customizado ---------- */

@@ -168,8 +168,9 @@ São três caminhos:
 guardado no servidor de sincronização (ver `apps-script/`). Cada uma tem dois
 códigos:
 
-- **Código de visualização** — quem tiver só consegue **baixar** os planos.
-- **Código de edição** — também consegue **enviar** alterações. Trate como senha.
+- **Código de visualização** — quem tiver **só olha**: abre os planos, gera
+  checklist e salva cópia, mas não altera nada (`decisoes.md#D-19`).
+- **Código de edição** — edita e **envia** alterações. Trate como senha.
 
 Os códigos aparecem **uma única vez**, na criação: o servidor não tem como
 consultá-los nem revogá-los depois (`decisoes.md#D-8`).
@@ -196,27 +197,37 @@ Dentro de uma lotação, o cabeçalho ganha dois botões:
 Se um envio falhar, as exclusões pendentes não são perdidas — vão junto na
 tentativa seguinte.
 
+No **modo local** o seletor de planos tem, no rodapé, um *Apagar todos os
+planos*. Ele não existe dentro de uma lotação: lá cada exclusão propaga ao
+servidor, e apagar tudo apagaria para a unidade inteira (`decisoes.md#D-18`).
+Como o modo local não tem cópia no servidor, a confirmação pede que você digite
+`APAGAR`.
+
 A tela de entrada guarda as lotações já usadas neste navegador (com o código),
 para reentrar em um clique — as **20 mais recentes**. *Esquecer* remove a
 lotação da lista sem apagar os planos dela.
 
-### Sincronização automática (só na extensão)
+### Verificação automática (só na extensão)
 
 O service worker acorda a cada 15 minutos (ajustável no popup: 15/30/60 ou
-desligado) e **baixa** a última lotação que você abriu. Se algo mudou, uma
-notificação diz o quê; clicar nela abre o editor.
+desligado), pergunta ao servidor o que há na última lotação que você abriu e
+**avisa** se apareceu novidade. Clicar na notificação abre o editor.
 
-Três escolhas de desenho que valem saber (`decisoes.md#D-13`):
+**Ele não baixa nada.** Baixar continua sendo um clique seu, no botão *Baixar do
+servidor* — e é de propósito (`decisoes.md#D-17`): um pull automático aplica a
+versão do servidor por cima da sua, e o alarme não tem como saber que você está
+no meio de uma alteração. Já aconteceu de o trabalho de alguém sumir quinze
+minutos depois de começar. Enquanto não houver detecção de conflito de verdade,
+quem decide a hora de trazer é quem está olhando a tela.
 
-- **Só a última lotação.** Sincronizar todas as conhecidas gastaria a cota do
-  Apps Script baixando planos que ninguém está olhando.
-- **Só baixa, por padrão.** Enviar sozinho publicaria *todos* os seus planos e
-  propagaria exclusões sem você mandar — com uma cópia local desatualizada, isso
-  sobrescreve o trabalho de um colega em silêncio. Há um toggle "Enviar meus
-  planos junto" no popup, desligado de fábrica e com o aviso ao lado.
-- **Com o editor aberto, quem sincroniza é a aba.** O worker só avisa. Assim uma
-  única thread mexe no silo por vez, e o canvas recarrega o plano ativo sozinho
-  em vez de ficar exibindo uma versão que o storage não tem mais.
+Duas escolhas que continuam valendo (`decisoes.md#D-13`):
+
+- **Só a última lotação.** Consultar todas as conhecidas gastaria a cota do
+  Apps Script por planos que ninguém está olhando.
+- **Nada de envio automático.** Publicar sozinho mandaria *todos* os seus planos
+  e propagaria exclusões sem você pedir — com uma cópia desatualizada, isso
+  sobrescreve o trabalho de um colega em silêncio. O toggle que existia foi
+  removido.
 
 Os códigos das lotações e essas preferências viajam por `chrome.storage.sync`,
 ou seja, aparecem em toda máquina logada no mesmo perfil do Chrome. **Planos
@@ -233,6 +244,11 @@ O botão **"Sincronizar com a unidade"**, no cabeçalho, lê da sua unidade no E
 os **localizadores**, **preferências**, **modelos** e **textos padrão**, e passa a
 usá-los como sugestão no editor — no nome do localizador e nos recursos atrelados
 a uma transição.
+
+Traz também as **ações preferenciais** (quais preferências já atuam em cada
+localizador). Elas aparecem como informação no painel do localizador, no bloco
+*"Ações Preferenciais Vinculadas"* — é o "como está" ao lado do que você está
+desenhando. Nada disso vira aresta no plano: o desenho continua seu.
 
 Cuidado com o vocabulário: aqui há **duas** sincronizações diferentes, e o botão
 diz qual é qual.

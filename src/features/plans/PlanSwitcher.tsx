@@ -13,10 +13,18 @@ export interface PlanSwitcherProps {
    * atualiza quando o debounced save dispara).
    */
   ativoNomeLive: string;
+  /** Sessão de visualização: trocar de plano continua, mexer neles não. */
+  somenteLeitura?: boolean;
   onSwitch: (id: string) => void;
   onRenomear: (id: string) => void;
   onDuplicar: (id: string) => void;
   onExcluir: (id: string) => void;
+  /**
+   * Apaga o silo inteiro de uma vez. Só o modo local recebe este handler
+   * (decisoes.md#D-18) — numa lotação, "todos" seria uma exclusão em massa
+   * propagada ao servidor no próximo envio, e isso ninguém faz por engano.
+   */
+  onApagarTodos?: () => void;
 }
 
 /**
@@ -29,10 +37,12 @@ export function PlanSwitcher({
   planos,
   ativoId,
   ativoNomeLive,
+  somenteLeitura = false,
   onSwitch,
   onRenomear,
   onDuplicar,
   onExcluir,
+  onApagarTodos,
 }: PlanSwitcherProps) {
   const [open, setOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -132,37 +142,57 @@ export function PlanSwitcher({
                       />
                       <span className="truncate">{nomeExibido}</span>
                     </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
-                      onClick={() => onRenomear(p.id)}
-                      title="Renomear"
-                      aria-label={`Renomear ${nomeExibido}`}
-                    >
-                      <Icon.Pencil />
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
-                      onClick={() => onDuplicar(p.id)}
-                      title="Duplicar"
-                      aria-label={`Duplicar ${nomeExibido}`}
-                    >
-                      <Icon.Copy />
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
-                      onClick={() => onExcluir(p.id)}
-                      title="Excluir"
-                      aria-label={`Excluir ${nomeExibido}`}
-                    >
-                      <Icon.Trash />
-                    </button>
+                    {!somenteLeitura && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          onClick={() => onRenomear(p.id)}
+                          title="Renomear"
+                          aria-label={`Renomear ${nomeExibido}`}
+                        >
+                          <Icon.Pencil />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          onClick={() => onDuplicar(p.id)}
+                          title="Duplicar"
+                          aria-label={`Duplicar ${nomeExibido}`}
+                        >
+                          <Icon.Copy />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
+                          onClick={() => onExcluir(p.id)}
+                          title="Excluir"
+                          aria-label={`Excluir ${nomeExibido}`}
+                        >
+                          <Icon.Trash />
+                        </button>
+                      </>
+                    )}
                   </li>
                 );
               })}
             </ul>
+          )}
+
+          {onApagarTodos && ordenados.length > 0 && !somenteLeitura && (
+            <div className="border-t border-borda p-1">
+              <button
+                type="button"
+                role="menuitem"
+                className="w-full flex items-center gap-2 rounded px-2 py-1.5 text-left text-[12px] text-aviso hover:bg-aviso-suave border-0 bg-transparent cursor-pointer"
+                onClick={() => {
+                  setOpen(false);
+                  onApagarTodos();
+                }}
+              >
+                <Icon.Trash /> Apagar todos os planos
+              </button>
+            </div>
           )}
         </div>
       )}

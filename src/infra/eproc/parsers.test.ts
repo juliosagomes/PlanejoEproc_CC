@@ -18,6 +18,7 @@ import {
 import { montarUnidade } from './escopoUnidade';
 import { anexarIds, deduplicar } from './montarCatalogo';
 import { semDecoracao, separarSiglaNome } from './nomeLocalizador';
+import { parseAcaoPreferencial } from './parseAcaoPreferencial';
 import { parseModeloPadrao, parseTextoPadrao } from './parseListasSimples';
 import { montarPreferencias, parsePreferenciasXml } from './parsePreferencias';
 import { ehTelaDeLocalizadores, parseLocalizadorOrgao } from './parseLocalizadorOrgao';
@@ -112,7 +113,9 @@ describe('infraTable', () => {
         <tr><th>Localizador Sistema</th><th>Localizador</th><th>Nome do Localizador</th></tr>
         <tr><td>Não</td><td>SIG</td><td>Nome Longo</td></tr>
       </tbody></table>`;
-    const grade = abrirGrade(
+    // Tipo explícito: sem ele, `C` é inferido só de `camposObrigatorios` e o
+    // `nome` no mapa de sinônimos vira "propriedade desconhecida".
+    const grade = abrirGrade<'sigla' | 'sistema' | 'nome'>(
       embaralhado,
       { sigla: ['LOCALIZADOR'], sistema: ['LOCALIZADOR SISTEMA'], nome: ['NOME DO LOCALIZADOR'] },
       ['sigla', 'sistema'],
@@ -232,6 +235,33 @@ describe('listas simples', () => {
   });
 });
 
+describe('ações preferenciais por localizador', () => {
+  it('separa as ações da célula, que vêm coladas por <br>', () => {
+    const vinculos = parseAcaoPreferencial(PREFERENCIAL);
+    expect(vinculos[0]?.localizador).toBe('📝 Minutar (Secretaria)');
+    expect(vinculos[0]?.preferencias).toEqual([
+      '🔵⏯️GAB - Determinar Emenda Inicial',
+      '🔵▶️GAB - Inicial Arquivar',
+      '🔵▶️GAB - Inicial Citar',
+      '🔵▶️GAB - Inicial Deferir Liminar',
+    ]);
+  });
+
+  it('descarta localizador sem nenhum vínculo', () => {
+    // A fixture tem 3 linhas; a terceira (AlvEletr60Dias) tem a célula vazia.
+    const vinculos = parseAcaoPreferencial(PREFERENCIAL);
+    expect(vinculos).toHaveLength(2);
+    expect(vinculos.map((v) => v.localizador)).not.toContain('AlvEletr60Dias');
+  });
+
+  it('não trata o " - " do nome da ação como separador', () => {
+    // Aqui o " - " pertence ao nome ("GAB - Determinar…") e não é a divisão
+    // sigla/nome que a regra das metades resolve no <select>.
+    const acoes = parseAcaoPreferencial(PREFERENCIAL)[0]?.preferencias ?? [];
+    expect(acoes[0]).toContain(' - ');
+  });
+});
+
 describe('preferências (autocompletar)', () => {
   it('decodifica as entidades escapadas duas vezes', () => {
     // No XML está `&amp;#128309;`. O DOMParser resolve o `&amp;` e sobra o
@@ -276,7 +306,7 @@ describe('teste cruzado: <select> × listagem do órgão', () => {
     // verdade de referência — ela tem sigla e nome em colunas próprias —, e as
     // 7 primeiras opções da fixture do <select> são exatamente os 7 mesmos
     // localizadores, na mesma ordem. Se a regra errar, aqui aparece.
-    const grade = abrirGrade(
+    const grade = abrirGrade<'sigla' | 'nome' | 'sistema'>(
       ORGAO,
       {
         sigla: ['LOCALIZADOR'],

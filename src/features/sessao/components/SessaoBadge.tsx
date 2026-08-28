@@ -80,8 +80,9 @@ export function SessaoBadge({ sessao, onTrocar }: SessaoBadgeProps) {
                 <SeloPermissao permissao={sessao.permissao} />
                 {sessao.permissao === 'leitura' && (
                   <div className="text-[11.5px] text-texto-3 leading-snug mt-1.5">
-                    Você pode editar à vontade aqui, mas não enviar ao servidor.
-                    Para isso, é preciso o código de edição.
+                    Você entrou com o código de leitura: dá para abrir os planos,
+                    gerar checklist e salvar cópia, mas não alterá-los. Para editar,
+                    é preciso o código de edição.
                   </div>
                 )}
               </div>

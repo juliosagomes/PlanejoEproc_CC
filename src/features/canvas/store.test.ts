@@ -15,6 +15,7 @@ const ESTADO_INICIAL = {
   selectedId: null,
   planoNome: 'Plano sem título',
   flowMode: 'organic' as const,
+  somenteLeitura: false,
 };
 
 beforeEach(() => {
@@ -339,5 +340,112 @@ describe('persistência reativa', () => {
     const key = getActivePlanKey();
     expect(key).not.toBeNull();
     expect(localStorage.getItem(key!)).not.toBeNull();
+  });
+});
+
+/* ============================================================================
+ * Sessão de visualização (decisoes.md#D-19)
+ *
+ * A UI esconde e desabilita os controles, mas quem garante é o store: atalho
+ * de teclado, modal já aberto quando a sessão trocou ou componente novo que
+ * alguém esqueça de gatilhar passariam direto por uma trava só de UI.
+ * ========================================================================== */
+
+describe('somenteLeitura', () => {
+  function comPlanoCarregado() {
+    // Ordem igual à do `features/sessao/store.ts`: trava primeiro, carrega
+    // depois. Ao contrário, o próprio `loadPlano` agendaria uma gravação.
+    useCanvasStore.getState().setSomenteLeitura(true);
+    useCanvasStore.getState().loadPlano({
+      version: SCHEMA_VERSION,
+      planoNome: 'Plano da lotação',
+      flowMode: 'organic',
+      nodes: [
+        { id: 'n1', position: { x: 0, y: 0 }, data: defaultLocalizadorData() },
+        { id: 'n2', position: { x: 100, y: 0 }, data: defaultLocalizadorData() },
+      ],
+      edges: [
+        {
+          id: 'e1',
+          source: 'n1',
+          target: 'n2',
+          sourceHandle: null,
+          targetHandle: null,
+          data: defaultEdgeData(),
+        },
+      ],
+    });
+  }
+
+  it('nenhuma mutação de conteúdo passa', () => {
+    comPlanoCarregado();
+    const antes = useCanvasStore.getState().getPlano();
+    const s = useCanvasStore.getState();
+
+    s.createNode({ x: 5, y: 5 });
+    s.updateNode('n1', { nome: 'invadido' });
+    s.updateEdge('e1', { resumo: 'invadido' });
+    s.toggleNodeCreated('n1');
+    s.toggleSubitemCreated('e1', 0);
+    s.toggleEdgeRuleCreated('e1');
+    s.setPlanoNome('outro nome');
+    s.deleteEdge('e1');
+    s.deleteNode('n1');
+    s.onConnect({ source: 'n1', target: 'n2', sourceHandle: null, targetHandle: null });
+
+    expect(useCanvasStore.getState().getPlano()).toEqual(antes);
+  });
+
+  it('createNode devolve string vazia em vez de um id que não existe', () => {
+    comPlanoCarregado();
+    expect(useCanvasStore.getState().createNode({ x: 5, y: 5 })).toBe('');
+  });
+
+  it('selecionar e trocar o modo de desenho continuam valendo', () => {
+    comPlanoCarregado();
+    useCanvasStore.getState().setSelectedId('n1');
+    useCanvasStore.getState().setFlowMode('sharp');
+
+    expect(useCanvasStore.getState().selectedId).toBe('n1');
+    expect(useCanvasStore.getState().flowMode).toBe('sharp');
+  });
+
+  it('remoção vinda do ReactFlow (tecla Delete, drag) não passa', () => {
+    comPlanoCarregado();
+    useCanvasStore.getState().onNodesChange([{ id: 'n1', type: 'remove' }]);
+    useCanvasStore.getState().onEdgesChange([{ id: 'e1', type: 'remove' }]);
+
+    expect(useCanvasStore.getState().nodes).toHaveLength(2);
+    expect(useCanvasStore.getState().edges).toHaveLength(1);
+  });
+
+  it('medição do ReactFlow passa — sem ela as arestas não se desenham', () => {
+    comPlanoCarregado();
+    useCanvasStore
+      .getState()
+      .onNodesChange([{ id: 'n1', type: 'dimensions', dimensions: { width: 180, height: 60 } }]);
+
+    expect(useCanvasStore.getState().nodes[0]?.width).toBe(180);
+  });
+
+  it('não grava nada no storage, nem pelo flush', () => {
+    comPlanoCarregado();
+    useCanvasStore
+      .getState()
+      .onNodesChange([{ id: 'n1', type: 'dimensions', dimensions: { width: 180, height: 60 } }]);
+    useCanvasStore.getState().setFlowMode('sharp');
+
+    flushPersist();
+    expect(getActivePlanKey()).toBeNull();
+  });
+
+  it('trava ligada no meio do caminho descarta o save já agendado', () => {
+    // O caso que a ordem "trava antes, carrega depois" evita — mas que um
+    // `loadPlano` fora de ordem reintroduziria em silêncio.
+    useCanvasStore.getState().createNode({ x: 1, y: 2 });
+    useCanvasStore.getState().setSomenteLeitura(true);
+
+    flushPersist();
+    expect(getActivePlanKey()).toBeNull();
   });
 });

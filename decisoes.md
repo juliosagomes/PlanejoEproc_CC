@@ -285,6 +285,13 @@ não-ativo. Nada mais precisaria mudar.
 
 ## D-13 · Sincronização de fundo: só a última lotação, só pull, e delegando à aba
 
+> **Superada em parte pelo D-17** (agosto/2026). O que sobrou de pé: "só a
+> última lotação". O pull automático e a delegação à aba foram removidos — o
+> worker não escreve mais plano nenhum. Fica registrada porque o raciocínio
+> sobre cota continua valendo e porque a terceira bala descreve o problema que
+> o D-17 resolveu de outro jeito.
+
+
 **Decisão.** O service worker acorda por `chrome.alarms` (15 min por padrão) e:
 sincroniza **apenas a última lotação aberta**; faz **apenas pull** (o push
 automático é uma preferência que nasce desligada); e, se houver aba do editor
@@ -397,8 +404,9 @@ de registro do service worker no card de `chrome://extensions`.
 
 ## D-16 · Catálogo lido direto da unidade no Eproc
 
-**Decisão.** O app passa a ler localizadores, preferências, modelos e textos
-padrão **direto do Eproc**, por um botão no cabeçalho. A coleta roda na aba do
+**Decisão.** O app passa a ler localizadores, preferências, modelos, textos
+padrão e os **vínculos de ação preferencial** **direto do Eproc**, por um botão
+no cabeçalho. A coleta roda na aba do
 Eproc já autenticada, via `chrome.scripting.executeScript` sob demanda —
 não há `content_scripts` no manifest, então nada roda no Eproc sem o clique. Só
 leitura: nada é escrito no sistema do tribunal. Com isso, os itens 2 e 3 do
@@ -442,6 +450,20 @@ corrigida pelo contato com o Eproc real, e vale registrar o que foi medido:
   ~180 **da unidade** — para um catálogo de unidade, a rota mais rica não é a
   mais adequada.
 
+**Vínculos de ação preferencial: coletados, mas só como informação.**
+`localizador_acao_preferencial_listar` é a única fonte que não é catálogo — não é
+lista de nomes para sugerir, é **relação**: no vocabulário do PlanejoEproc, as
+arestas verdes que a unidade já tem. Ela responde a `fetch` e **não pagina**
+(devolve tudo, sem rodapé de registros), então custa uma requisição.
+
+O consumo é deliberadamente tímido: um bloco de leitura no painel do localizador
+("No Eproc, já atuam aqui"), que some quando não há o que dizer. **Não** gera
+arestas no plano. A razão não é técnica — o parser é o mais fácil de todos —, é
+de produto: o app existe para o usuário *desenhar* o fluxo, e materializar o
+fluxo atual como arestas o transformaria em diagramador do que já está lá. Pode
+vir a ser o uso certo; enquanto não for decidido, mostrar ao lado é reversível e
+gerar não é.
+
 **Escopo por unidade.** Chave `host::login::sigla`, lida ao vivo de
 `#selInfraUnidades` e `#nav-profile`. Um host serve todas as varas do tribunal;
 chavear só por host faria a coleta de uma unidade sobrescrever a da outra sem
@@ -473,9 +495,138 @@ que ela apareça como aviso, não como dado errado em silêncio.
 desvio no `localizador_orgao_listar`, o caminho de volta é o iframe, que já existe
 em `coletarGradePorIframe`. Preferências vêm sem código do Eproc (a tela não expõe
 `num_id_form_personalizacao`): qualquer integração mais funda que autocompletar
-precisará de outra rota. O mapa Preferência→Localizador
-(`localizador_acao_preferencial_listar`) está mapeado e fora de escopo até haver
-decisão sobre o que fazer com ele — ver o item correspondente no `CLAUDE.md`.
+precisará de outra rota. E se um dia os vínculos virarem arestas de verdade, o
+dado já está no catálogo — falta só a decisão de produto e o consumidor.
+
+---
+
+## D-17 · A extensão verifica e avisa; baixar continua sendo decisão do usuário
+
+**Decisão.** O alarme do service worker deixou de fazer pull. Ele consulta o
+servidor, compara com o que há no silo (`diffSincronizacao`, que não escreve
+nada) e, havendo diferença, **notifica**. Trazer os planos continua existindo
+num lugar só: o botão "Baixar do servidor", no cabeçalho do editor. O popup
+perdeu o botão "Sincronizar agora" — virou "Verificar agora" — e a preferência
+`autoPush` foi removida junto com a `notificar`.
+
+**Por que.** Um pull aplica a versão do servidor por cima do silo. O alarme não
+tem como saber que a pessoa está no meio de uma alteração, e o D-13 tinha uma
+resposta parcial para isso: com o editor aberto, delegava à aba. Só que
+delegar não resolvia o problema — apenas mudava quem executava o mesmo pull.
+A aba recarregava o plano ativo do storage e o que estivesse sendo escrito
+naquele instante sumia. O usuário via o próprio trabalho desaparecer sem ter
+clicado em nada, quinze minutos depois de começar.
+
+Sincronização automática pressupõe que a máquina saiba resolver o conflito. Aqui
+não há vetor de versão nem merge — a política é "o servidor manda" (D-9). Sob
+essa política, a única aplicação segura é a que a pessoa pediu, sabendo o que
+tem na tela. Automatizar o resto é automatizar a perda.
+
+`autoPush` cai pelo mesmo argumento, com o sinal trocado: publicar sozinho
+sobrescreve o trabalho de um colega em vez do próprio. Ele já nascia desligado
+por isso; com o pull automático fora, manter só a metade perigosa não fazia
+sentido. E `notificar` deixou de significar algo: a notificação passou a ser o
+**único** resultado da verificação — desligá-la com o intervalo ligado seria
+pedir para o worker acordar de hora em hora e não fazer nada.
+
+Duas consequências de mecânica que valem registro:
+
+- **O carimbo comparado vem do servidor**, não do relógio local
+  (`SyncMapEntry.remotoAtualizadoEm`). Com `Date.now()` daqui, alguns segundos
+  de diferença entre os dois relógios fariam a extensão anunciar mudança a cada
+  verificação — e uma notificação que sempre aparece é uma notificação que o
+  usuário desliga, perdendo junto os avisos verdadeiros. Por isso o `push`
+  passou a ler `atualizadoEm` da resposta do `publicar`.
+- **O resultado é persistido** (`planejoeproc:sync:pendente`). O worker MV3 é
+  reciclado entre eventos: o que o alarme das 14h descobriu não existe mais na
+  memória quando o popup abre às 14h05.
+
+**O que precisaria mudar para evoluir.** Pull automático seguro pede o que o
+D-13 já apontava e continua faltando: detecção de conflito de verdade. Com
+`atualizadoEm` por plano dos dois lados — e agora há, dos dois lados — dá para
+construir um "traga só o que não conflita com o que estou editando". Enquanto
+esse cálculo não existir, verificar e avisar é a posição defensável. Um passo
+intermediário barato: em vez da notificação do sistema, uma faixa dentro do
+editor com um botão "baixar agora", para quem já está com a aba aberta.
+
+---
+
+## D-18 · "Apagar todos os planos" só existe no modo local
+
+**Decisão.** O seletor de planos ganhou um "Apagar todos os planos" no rodapé,
+e o `App` só passa o handler quando `sessao.tipo === 'local'`. A confirmação
+não é um `window.confirm`: pede que o usuário digite `APAGAR`.
+
+**Por que.** O modo local acumula lixo — plano de teste, cópia de cópia,
+importação que deu errado — e apagar um a um pelo menu é trabalho manual sem
+recompensa. Numa lotação a mesma ação seria outra coisa inteiramente: cada
+exclusão vira tombstone e propaga ao servidor no envio seguinte, ou seja,
+apagaria o trabalho da unidade inteira para todo mundo. A distância entre
+"limpar meu navegador" e isso é grande demais para caber no mesmo botão, com o
+mesmo rótulo, a um clique de distância.
+
+O `APAGAR` digitado existe porque daqui não há desfazer **nem cópia remota**: o
+modo local nunca envia nada. Um `confirm` está a um Enter distraído do
+irreversível.
+
+`excluirTodosPlanos()` percorre o índice em vez de varrer o storage por
+prefixo, e isso é a parte que mais pede cuidado de quem for mexer:
+`planejoeproc:` é prefixo de `planejoeproc:lot:<wsId>:`, então uma varredura
+ingênua rodada no modo local levaria junto os planos de todas as lotações. Há
+teste para exatamente esse caso.
+
+**O que precisaria mudar para evoluir.** Se um dia fizer sentido esvaziar uma
+lotação, é operação de servidor com confirmação própria e registro de quem fez
+— não o mesmo botão com outra `sessao`.
+
+---
+
+## D-19 · Sessão de visualização é somente leitura de verdade
+
+**Decisão.** Entrar numa lotação com o **código de leitura** trava a edição.
+Antes, "visualização" significava só "não pode publicar": o usuário editava à
+vontade e a alteração ficava no silo local dele. Agora nada altera o plano —
+canvas, painéis, checklist e nome do plano ficam desabilitados, e a
+persistência é desligada.
+
+**Por que.** O rótulo dizia uma coisa e o app fazia outra. Quem recebe um
+código de leitura entende que está olhando, não editando; a UI reforçava isso
+com o selo "Visualização" e ainda assim aceitava tudo. O resultado eram
+alterações que a pessoa achava que estavam valendo e que ninguém mais veria —
+o pior dos dois mundos, porque nem editar de verdade ela estava, nem sabia
+disso. E o primeiro "Baixar do servidor" sobrescrevia esse trabalho fantasma
+sem aviso, porque o servidor manda (D-9).
+
+**Onde a trava mora, e por que em dois lugares.** O guarda de verdade é a flag
+`somenteLeitura` na store do canvas: toda mutação de conteúdo vira no-op e a
+assinatura de persistência não agenda gravação. Esconder botão não é garantia —
+atalho de teclado, modal já aberto quando a sessão trocou, ou um componente
+novo que alguém esqueça de gatilhar passariam direto. A UI desabilita por cima
+disso porque um campo que aceita digitação e descarta o texto é pior do que um
+campo cinza.
+
+Três coisas continuam liberadas de propósito, e a fronteira é "isto muda o
+plano?":
+
+- **Selecionar nó/aresta e abrir o detalhamento** — é como se *lê* o plano.
+  O modal abre com os campos travados em vez de não abrir.
+- **Trocar Orgânico/Diagrama** — é como o plano é desenhado na tela, não o que
+  ele diz. Como a persistência está desligada, a escolha vive só naquela aba.
+- **Salvar cópia, gerar checklist, catálogos do órgão e da unidade** — exportar
+  é leitura, e os catálogos são globais ao navegador (D-7), não conteúdo da
+  lotação de ninguém.
+
+Dois detalhes que só aparecem rodando: a sessão de leitura **não** cria o plano
+em branco de cortesia num silo vazio (seria a primeira escrita de um modo que
+promete não escrever), e `flushPersist()` descarta em vez de gravar quando a
+flag está ligada — senão um save agendado milissegundos antes da troca de
+sessão ainda chegaria vivo ao disco.
+
+**O que precisaria mudar para evoluir.** O pedido natural é "quero mexer na
+minha cópia sem publicar". Isso não é afrouxar a trava: é um "Salvar como plano
+local" que copia o plano da lotação para o silo local e abre lá, onde a pessoa
+é dona. Enquanto isso não existir, o caminho é "Salvar cópia" e reabrir o JSON
+no modo local.
 
 ---
 

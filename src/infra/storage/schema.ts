@@ -6,6 +6,7 @@ import {
   SCHEMA_VERSION,
   SUBITEM_CATS,
   TIPO_CONTROLE_VALUES,
+  type AcaoPreferencialUnidade,
   type CatalogoOrgao,
   type CatalogoUnidade,
   type Edge,
@@ -262,6 +263,11 @@ const ItemCatalogoUnidadeSchema = z.object({
   detalhe: z.string().optional(),
 }) satisfies z.ZodType<ItemCatalogoUnidade>;
 
+const AcaoPreferencialUnidadeSchema = z.object({
+  localizador: z.string(),
+  preferencias: z.array(z.string()),
+}) satisfies z.ZodType<AcaoPreferencialUnidade>;
+
 const FonteResultadoSchema = z.object({
   status: z.enum(['ok', 'vazio', 'semPermissao', 'falhou']),
   itens: z.number().optional(),
@@ -276,5 +282,6 @@ export const CatalogoUnidadeSchema = z.object({
   preferencias: z.array(ItemCatalogoUnidadeSchema).optional(),
   modelos: z.array(ItemCatalogoUnidadeSchema).optional(),
   textosPadrao: z.array(ItemCatalogoUnidadeSchema).optional(),
+  acoesPreferenciais: z.array(AcaoPreferencialUnidadeSchema).optional(),
   fontes: z.record(z.string(), FonteResultadoSchema),
 }) satisfies z.ZodType<CatalogoUnidade>;

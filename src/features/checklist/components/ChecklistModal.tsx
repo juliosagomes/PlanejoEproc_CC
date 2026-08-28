@@ -29,6 +29,9 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const toggleNodeCreated = useCanvasStore((s) => s.toggleNodeCreated);
   const toggleSubitemCreated = useCanvasStore((s) => s.toggleSubitemCreated);
   const toggleEdgeRuleCreated = useCanvasStore((s) => s.toggleEdgeRuleCreated);
+  // O checklist é útil como leitura numa sessão de visualização; só as marcações
+  // de "já criado" ficam travadas — elas são edição do plano.
+  const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
 
   const [copiado, setCopiado] = useState(false);
 
@@ -174,6 +177,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                             className="pj-check"
                             style={{ marginTop: 2 }}
                             checked={it.ja_criado}
+                            disabled={somenteLeitura}
                             onChange={onToggle}
                           />
                           <div className="flex-1 min-w-0">
@@ -282,6 +286,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                                   className="pj-check"
                                   style={{ marginTop: 2 }}
                                   checked={ch.ja_criado}
+                                  disabled={somenteLeitura}
                                   onChange={() =>
                                     toggleSubitemCreated(ch.edgeId, ch.index)
                                   }

@@ -1,5 +1,6 @@
 import {
   CATALOGO_UNIDADE_VERSION,
+  type AcaoPreferencialUnidade,
   type CatalogoUnidade,
   type FonteId,
   type FonteResultado,
@@ -74,6 +75,7 @@ export interface MontagemCatalogo {
   modelos?: ItemCatalogoUnidade[];
   textosPadrao?: ItemCatalogoUnidade[];
   preferencias?: ItemCatalogoUnidade[];
+  acoesPreferenciais?: AcaoPreferencialUnidade[];
   /** Injetável para teste; padrão é agora. */
   agora?: string;
 }
@@ -87,6 +89,7 @@ export function montarCatalogoUnidade(m: MontagemCatalogo): CatalogoUnidade {
     ...(m.modelos ? { modelos: m.modelos } : {}),
     ...(m.textosPadrao ? { textosPadrao: m.textosPadrao } : {}),
     ...(m.preferencias ? { preferencias: m.preferencias } : {}),
+    ...(m.acoesPreferenciais ? { acoesPreferenciais: m.acoesPreferenciais } : {}),
     fontes: m.fontes,
   };
 }

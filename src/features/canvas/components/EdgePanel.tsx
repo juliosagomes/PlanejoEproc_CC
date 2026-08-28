@@ -24,6 +24,7 @@ interface EdgePanelProps {
 export function EdgePanel({ edge }: EdgePanelProps) {
   const updateEdge = useCanvasStore((s) => s.updateEdge);
   const deleteEdge = useCanvasStore((s) => s.deleteEdge);
+  const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
 
   const data: EdgeData = edge.data ?? defaultEdgeData();
   const kind = data.kind;
@@ -62,16 +63,23 @@ export function EdgePanel({ edge }: EdgePanelProps) {
           eyebrow="Aresta · Transição"
           title={KIND_LABELS[kind]}
           right={
-            <button
-              type="button"
-              className="btn btn-sm btn-ghost"
-              onClick={() => deleteEdge(edge.id)}
-            >
-              <Icon.Trash /> Remover
-            </button>
+            somenteLeitura ? undefined : (
+              <button
+                type="button"
+                className="btn btn-sm btn-ghost"
+                onClick={() => deleteEdge(edge.id)}
+              >
+                <Icon.Trash /> Remover
+              </button>
+            )
           }
         />
         <div className="flex-1 overflow-auto scroll p-4 flex flex-col gap-3.5">
+          {/* Dois fieldsets em vez de um: o botão "Detalhar" fica entre eles e
+              precisa continuar clicável em visualização — o detalhamento é
+              conteúdo do plano, e o modal já abre com os campos travados.
+              `display: contents` some da caixa, então o gap do flex não muda. */}
+          <fieldset disabled={somenteLeitura} className="contents">
           <div>
             <label className="label">Tipo</label>
             <div className="grid grid-cols-3 gap-1.5">
@@ -104,6 +112,7 @@ export function EdgePanel({ edge }: EdgePanelProps) {
               </button>
             </div>
           </div>
+          </fieldset>
 
           {kind !== 'manual' && (() => {
             const preenchido =
@@ -117,16 +126,20 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                 )}
                 onClick={() => setDetalheAberto(true)}
                 title={
-                  preenchido
-                    ? `Detalhamento preenchido — clique para editar`
-                    : `Abrir detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`
+                  somenteLeitura
+                    ? `Ver o detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`
+                    : preenchido
+                      ? `Detalhamento preenchido — clique para editar`
+                      : `Abrir detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`
                 }
               >
-                <Icon.Bolt /> Detalhar {kind === 'pref' ? 'Preferência' : 'ATP'}
+                <Icon.Bolt /> {somenteLeitura ? 'Ver' : 'Detalhar'}{' '}
+                {kind === 'pref' ? 'Preferência' : 'ATP'}
               </button>
             );
           })()}
 
+          <fieldset disabled={somenteLeitura} className="contents">
           <div>
             <label className="label">Resumo</label>
             <textarea
@@ -242,6 +255,7 @@ export function EdgePanel({ edge }: EdgePanelProps) {
               placeholder="Notas livres sobre esta transição…"
             />
           </div>
+          </fieldset>
         </div>
       </div>
 

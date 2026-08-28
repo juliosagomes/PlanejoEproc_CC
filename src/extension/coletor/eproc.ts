@@ -439,7 +439,35 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
     }
   }
 
-  /* --- fonte 5: preferências, pelo autocomplete --------------------------- */
+  /* --- fonte 5: vínculos de ação preferencial ----------------------------- */
+
+  try {
+    const link = acharLink(docMenu, (a) =>
+      /[?&]acao=localizador_acao_preferencial_listar(&|$|")/.test(
+        a.getAttribute('href') ?? '',
+      ),
+    );
+    // Esta tela não pagina: devolve tudo numa resposta só, sem rodapé de "N
+    // registros". `coletarGrade` colhe a primeira página e, sem total anunciado,
+    // não entra no laço — que é o comportamento certo aqui. Por isso ela usa
+    // fetch, e não o iframe que as grades de modelos e textos exigem.
+    fontes.acoesPreferenciais = link
+      ? await coletarGrade(link)
+      : {
+          status: 'semPermissao',
+          fragmentos: [],
+          motivo:
+            'Ação "Ações Preferenciais por Localizador" ausente no menu deste perfil.',
+        };
+  } catch (err) {
+    fontes.acoesPreferenciais = {
+      status: 'falhou',
+      fragmentos: [],
+      motivo: err instanceof Error ? err.message : String(err),
+    };
+  }
+
+  /* --- fonte 6: preferências, pelo autocomplete --------------------------- */
 
   try {
     // O `hash` do autocomplete não se inventa: é lido do HTML de uma tela que o

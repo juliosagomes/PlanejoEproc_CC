@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { BrandMark } from '@/components/BrandMark';
 import { Icon } from '@/components/Icon';
 import type { LotacaoConhecida } from '@/infra/sync/lotacoes';
 import { baixarPlanosLocais, contarPlanosLocais } from '../planosLocais';
@@ -72,7 +73,7 @@ export function TelaLogin() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-fundo">
       <div className="w-full" style={{ maxWidth: 460 }}>
         <div className="flex items-center gap-2.5 mb-5">
-          <span className="brand-mark">eP</span>
+          <BrandMark tamanho={30} />
           <div>
             <div className="font-semibold text-[15px] leading-tight">PlanejoEproc</div>
             <div className="text-[12px] text-texto-3 leading-tight">

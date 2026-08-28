@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 
+import { somenteVisualizacao } from '@/domain';
 import { Header, type HeaderStats } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
@@ -25,6 +26,7 @@ import {
   type PlanIndexEntry,
   criarPlano,
   duplicarPlano,
+  excluirTodosPlanos,
   getAtivoId,
   importarPlano,
   importarPlanos,
@@ -78,6 +80,9 @@ function Editor() {
 
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
+  // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
+  // estado de tela: quem trabalha em monitor apertado esconde e segue.
+  const [sidebarVisivel, setSidebarVisivel] = useState(true);
 
   const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
   const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
@@ -150,6 +155,7 @@ function Editor() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== 'Delete') return;
+      if (useCanvasStore.getState().somenteLeitura) return;
       const t = e.target as HTMLElement | null;
       if (!t) return;
       const tag = t.tagName;
@@ -242,6 +248,39 @@ function Editor() {
         novoAtivoId !== null ? loadPlano(novoAtivoId) : planoVazio(),
       );
     }
+    refreshPlanos();
+  };
+
+  /**
+   * Esvazia o silo do modo local de uma vez.
+   *
+   * Só existe aqui (decisoes.md#D-18): numa lotação, "todos" viraria uma
+   * exclusão em massa propagada ao servidor no envio seguinte, e a diferença
+   * entre limpar o próprio navegador e limpar o trabalho da unidade inteira é
+   * grande demais para caber no mesmo botão.
+   *
+   * A confirmação exige digitar APAGAR — `window.confirm` é um Enter distraído
+   * de distância, e daqui não há desfazer.
+   */
+  const onApagarTodosPlanos = () => {
+    flushPersist();
+    const total = listPlanos().length;
+    if (total === 0) return;
+
+    const resposta = window.prompt(
+      `Apagar ${total} plano(s) deste navegador?\n\n` +
+        'Isto não pode ser desfeito, e não há cópia no servidor — o modo local ' +
+        'nunca envia nada.\n\n' +
+        'Para confirmar, digite APAGAR:',
+    );
+    if (resposta === null || resposta.trim().toUpperCase() !== 'APAGAR') return;
+
+    // Sem cancelPersist(), o save pendente do canvas recriaria, no slot novo, o
+    // plano que acabamos de apagar.
+    cancelPersist();
+    excluirTodosPlanos();
+    const { plano } = criarPlano();
+    loadPlanoAcao(plano);
     refreshPlanos();
   };
 
@@ -348,9 +387,9 @@ function Editor() {
   /* ==========================================================================
    * Mundo de fora (só na extensão)
    *
-   * O pedido do service worker reusa exatamente o `onPull` do botão — é a mesma
-   * operação, só muda o gatilho. Já a mudança externa (outra aba gravou) não
-   * chama a rede: só recarrega o que está na tela.
+   * Outra aba do editor gravou. Não há rede envolvida: só recarregar o que
+   * está na tela. O service worker não escreve mais nada (decisoes.md#D-17),
+   * então ele não aparece aqui.
    * ======================================================================== */
 
   const recarregarDoStorage = useCallback(() => {
@@ -359,12 +398,7 @@ function Editor() {
     loadPlanoAcao(atual !== null ? loadPlano(atual) : planoVazio());
   }, [refreshPlanos, loadPlanoAcao]);
 
-  const aoPedirSincronizacao = useCallback(() => void onPull(), [onPull]);
-
-  useSincronizacaoExterna({
-    aoPedirSincronizacao,
-    aoMudarPlanos: recarregarDoStorage,
-  });
+  useSincronizacaoExterna({ aoMudarPlanos: recarregarDoStorage });
 
   const criarNoCentro = () => {
     createNode({
@@ -379,13 +413,18 @@ function Editor() {
   // o tipo anulável — este guarda mantém o Header com prop não-anulável.
   if (sessao === null) return null;
 
+  const somenteLeitura = somenteVisualizacao(sessao);
+
   return (
     <div className="flex flex-col h-screen">
       <Header
         planoNome={planoNome}
         onPlanoNomeChange={setPlanoNome}
+        sidebarVisivel={sidebarVisivel}
+        onAlternarSidebar={() => setSidebarVisivel((v) => !v)}
         sessao={sessao}
         onTrocarSessao={sairDaSessao}
+        somenteLeitura={somenteLeitura}
         onPull={() => void onPull()}
         onPush={() => void onPush()}
         sincronizando={sincronizando}
@@ -396,6 +435,9 @@ function Editor() {
         onRenomearPlano={onRenomearPlano}
         onDuplicarPlano={onDuplicarPlano}
         onExcluirPlano={onExcluirPlano}
+        onApagarTodosPlanos={
+          sessao.tipo === 'local' ? onApagarTodosPlanos : undefined
+        }
         onNovo={onNovo}
         onAbrirArquivo={onAbrirArquivo}
         onSalvarCopiaAtivo={onSalvarCopiaAtivo}
@@ -410,7 +452,9 @@ function Editor() {
       />
 
       <div className="flex flex-1 min-h-0">
-        <Sidebar onCreateNode={criarNoCentro} />
+        {sidebarVisivel && (
+          <Sidebar onCreateNode={criarNoCentro} somenteLeitura={somenteLeitura} />
+        )}
 
         <ReactFlowProvider>
           <FlowCanvas />
