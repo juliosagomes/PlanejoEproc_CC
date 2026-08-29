@@ -9,6 +9,8 @@ interface SidebarProps {
   onCreateNode: () => void;
   /** Sessão de visualização: some com a área de "Adicionar". */
   somenteLeitura?: boolean;
+  /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
+  onVerTutorial: () => void;
 }
 
 /**
@@ -22,7 +24,11 @@ interface SidebarProps {
  * mostrar/esconder, e quem já sabe arrastar não precisa da legenda ocupando
  * 220px de tela.
  */
-export function Sidebar({ onCreateNode, somenteLeitura = false }: SidebarProps) {
+export function Sidebar({
+  onCreateNode,
+  somenteLeitura = false,
+  onVerTutorial,
+}: SidebarProps) {
   const onDragStart = (e: DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData(NEW_NODE_DATATYPE, '1');
     e.dataTransfer.effectAllowed = 'move';
@@ -101,6 +107,15 @@ export function Sidebar({ onCreateNode, somenteLeitura = false }: SidebarProps) 
             <li>Tudo é salvo automaticamente.</li>
           </ul>
         )}
+
+        {/* Fora do <ul>: um <button> dentro de um item com marcador fica torto. */}
+        <button
+          type="button"
+          className="btn btn-sm w-full justify-center mb-3.5"
+          onClick={onVerTutorial}
+        >
+          <Icon.Ajuda /> Ver tutorial
+        </button>
 
         <div className="section-h mb-2">Tipos de transição</div>
         <div className="flex flex-col gap-1.5">

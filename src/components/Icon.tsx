@@ -310,6 +310,20 @@ export const Icon = {
       />
     </svg>
   ),
+  /** Interrogação em círculo — abre o tutorial. */
+  Ajuda: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3" />
+      <path
+        d="M5.6 5.4a1.45 1.45 0 0 1 2.8.5c0 1-1.4 1.2-1.4 2.1"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="7" cy="10.2" r="0.75" fill="currentColor" />
+    </svg>
+  ),
   /** Check do canto direito superior do nó "já criado". 10×10. */
   CheckCorner: (p: IconProps) => (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden {...p}>

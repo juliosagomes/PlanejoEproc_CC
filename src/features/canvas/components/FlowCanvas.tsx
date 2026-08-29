@@ -105,6 +105,10 @@ export function FlowCanvas() {
         // Arrastar nó e puxar aresta são as duas edições que acontecem no
         // próprio canvas; selecionar continua, senão não haveria como abrir o
         // painel de detalhes para *ver* o que está ali.
+        // O duplo clique tem um efeito só: criar um localizador onde o cursor
+        // está. Com o zoom do ReactFlow ligado, o mesmo gesto também aproximava
+        // a tela, e o nó recém-criado saía de onde o usuário mirou.
+        zoomOnDoubleClick={false}
         nodesDraggable={!somenteLeitura}
         nodesConnectable={!somenteLeitura}
         edgesUpdatable={!somenteLeitura}

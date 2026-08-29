@@ -630,6 +630,84 @@ no modo local.
 
 ---
 
+## D-20 · Tutorial de primeira execução em slides ilustrados
+
+**Decisão.** Na primeira vez que o editor carrega, abre um modal de 8 slides
+percorrendo o caminho inteiro do produto: sincronizar com a unidade → criar dois
+localizadores → conectar → tipo e resumo → recurso atrelado → balão de hover →
+checklist. Cada slide tem um desenho, e o desenho é **ilustração**: o tutorial
+não grava plano, não injeta dados em store nenhuma e não toca no catálogo. Fecha
+por Concluir, Pular, X, Esc ou clique no scrim — todos marcam como visto — e
+volta pelo "Ver tutorial", na barra lateral.
+
+**Por que slides, e não um tour sobre a UI real.** O tour (balões apontando para
+os botões de verdade, resto da tela escurecido) ensina onde as coisas ficam, mas
+amarra o tutorial às posições atuais dos elementos: qualquer mexida no cabeçalho
+desalinha um balão, e o sintoma é silencioso — ninguém tem teste de "o balão
+aponta para o botão certo". Slides desenhados custam o acoplamento oposto, que é
+mais barato: ficam desatualizados se o produto mudar, mas isso é revisão de
+texto, não bug de layout.
+
+**Por que as ilustrações reusam as classes CSS reais.** As cenas são montadas com
+`.pj-node`, `.edge-label`, `.edge-tooltip`, `.subitem`, `.edge-swatch` — as
+mesmas do app. Custo zero de bundle (o CSS já existe, e o `content` do Tailwind
+já cobre `src/**/*.tsx`), fica idêntico ao produto e acompanha mudança de tema
+sozinho. O que **não** dá para reusar são os componentes: `LocalizadorNode`
+renderiza `<Handle>` e quebra fora do `ReactFlowProvider`, `PjEdge` chama
+`useReactFlow()`, e o `react-select` do `LocalizadorNomeInput` portaliza o menu
+em `zIndex: 60` — acima do `.modal` (51), ele escaparia por cima da moldura do
+slide. Daí as cópias em HTML puro, com a lista de classes emprestadas anotada no
+topo de `ilustracoes/pecas.tsx`: o acoplamento é aceitável, invisível não é.
+
+**Onde os detalhes mordem.**
+
+- **A flag é global ao navegador** (`planejoeproc:tutorial:visto`), fora de silo:
+  `escopo.ts` devolve `null` sem sessão, e uma chave com escopo não conseguiria
+  ser gravada em metade dos momentos em que faz sentido. Guarda `{ versao, em }`,
+  não um booleano — a versão é o que permite reexibir um roteiro novo, e ela é
+  constante própria, desacoplada do `package.json` (senão toda release
+  reexibiria os slides).
+- **Fica fora da allowlist do `chrome.storage.sync`.** A assimetria de erro
+  aponta para `local`: não replicar custa rever 8 slides, com "Pular" a um
+  clique; replicar mal custa um usuário novo que **nunca** vê o tutorial porque
+  outro perfil o dispensou. E a cota do `sync` é apertada para as chaves que
+  realmente doem se sumirem (D-14).
+- **Abre no inicializador preguiçoso do `useState`, não num `useEffect`.**
+  `main.tsx` só renderiza depois de `inicializarPlataforma()` e `getStorage()` é
+  síncrono, então a flag já está legível no primeiro render. Com efeito, o editor
+  apareceria por um quadro sem o tutorial e os slides cairiam na tela depois.
+- **Marca ao fechar, nunca ao abrir.** Marcar só ao concluir faria de "Pular"
+  uma promessa quebrada no boot seguinte; marcar na abertura sumiria com o
+  tutorial em dev, porque o `StrictMode` roda o efeito duas vezes.
+- **Cede a vez ao `CodigosLotacaoModal`.** Ele aparece exatamente no primeiro
+  carregamento do editor de uma lotação recém-criada — o mesmo instante em que o
+  tutorial quer abrir — e é o que não pode perder a disputa: scrim que não fecha
+  e botão travado por checkbox, porque os códigos são exibidos uma única vez
+  (D-8). A supressão é explícita (`podeAbrirAgora`), não por z-index nem por
+  ordem de irmãos no JSX, que são contratos invisíveis.
+- **Não se impõe em sessão de visualização** (D-19): o roteiro inteiro é sobre
+  editar. Efeito colateral proposital — como a marca só é gravada ao fechar um
+  modal aberto, a sessão de leitura nunca a grava, e quem entrar depois com o
+  código de edição ainda ganha a abertura automática.
+- **Sem `ModalShell` compartilhado.** Os nove modais do app divergem em coisas de
+  verdade (o do checklist é impresso, o dos códigos tem scrim que não fecha), e
+  este — bolinhas, três botões, corpo que troca — é o pior molde possível para
+  extrair a abstração. Se a dedup vier, é commit próprio, e aí o tutorial já é o
+  nono cliente.
+
+**Junto veio uma correção no canvas:** `zoomOnDoubleClick={false}`. O duplo
+clique passou a ter um efeito só — criar o localizador onde o cursor está —, que
+é o gesto que o passo 3 ensina.
+
+**O que precisaria mudar para evoluir.** Se o roteiro crescer muito, o modal vira
+o lugar errado e o caminho é uma página de ajuda própria. Se a queixa for "vi os
+slides mas travei na hora de fazer", o passo seguinte é o oposto do que foi
+decidido aqui: um tour sobre a UI real, e aí vale medir antes. E se um dia
+houver `@testing-library`, o `TutorialModal` ganha teste de render — hoje só a
+lógica pura (`roteiro`, `navegacao`, `abertura`, a flag) é coberta.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

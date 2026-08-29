@@ -74,7 +74,7 @@ src/
     catalogo/      ← parser do XLS de localizadores do órgão (SheetJS).
     eproc/         ← leitura da unidade no Eproc: parsers puros, Zod, merge.
     sync/          ← cliente HTTP, pull/push headless, mapa e lotações.
-  features/        ← organização por feature (canvas, checklist, etc.).
+  features/        ← organização por feature (canvas, checklist, tutorial…).
   extension/       ← só a extensão: service worker, popup, hooks de chrome.*.
     coletor/       ← script injetado na aba do Eproc. Regras próprias, ver abaixo.
   data/            ← JSONs do Eproc embutidos no build (subset).
@@ -237,6 +237,10 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 - "Apagar todos os planos", só no modo local (decisoes.md#D-18).
 - Sessão de visualização virou somente leitura de verdade (decisoes.md#D-19).
 - A marca do cabeçalho mostra/esconde a barra lateral.
+- Tutorial de 8 slides na primeira execução (decisoes.md#D-20), em
+  `features/tutorial/`. As ilustrações reusam as **classes** do app, nunca os
+  componentes — a lista de classes emprestadas está no topo de
+  `ilustracoes/pecas.tsx`; renomeou uma delas, passe o grep lá.
 
 ## Regras de ouro
 

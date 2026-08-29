@@ -19,6 +19,8 @@ import { TelaLogin } from '@/features/sessao/components/TelaLogin';
 import { useSessaoStore } from '@/features/sessao/store';
 import { SyncResultadoModal } from '@/features/sync/components/SyncResultadoModal';
 import { useSyncStore } from '@/features/sync/store';
+import { TutorialModal } from '@/features/tutorial/components/TutorialModal';
+import { deveAbrirNaPrimeiraVez, podeAbrirAgora } from '@/features/tutorial/abertura';
 import {
   PLANO_BUNDLE_VERSION,
   PlanoBundleSchema,
@@ -36,6 +38,11 @@ import {
   renomearPlano,
   setAtivo,
 } from '@/infra/storage';
+import {
+  TUTORIAL_VERSAO,
+  getTutorialVisto,
+  marcarTutorialVisto,
+} from '@/infra/storage/tutorial';
 import { downloadJson, hojeIso, safeFileName } from '@/utils/download';
 
 /**
@@ -83,6 +90,37 @@ function Editor() {
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
+
+  /* ==========================================================================
+   * Tutorial (decisoes.md#D-20)
+   *
+   * A decisão de abrir é tomada no **inicializador preguiçoso**, não num
+   * `useEffect`. `main.tsx` só renderiza depois de `inicializarPlataforma()` e
+   * `getStorage()` é síncrono, então a flag já está legível no primeiro render.
+   * Um efeito desenharia o editor por um quadro e jogaria os slides na tela
+   * depois — o piscar que se quer evitar.
+   * ======================================================================== */
+  const somenteLeitura = sessao !== null && somenteVisualizacao(sessao);
+  const [tutorialPendente, setTutorialPendente] = useState(() =>
+    deveAbrirNaPrimeiraVez({
+      vistoVersao: getTutorialVisto(),
+      versaoAtual: TUTORIAL_VERSAO,
+      somenteLeitura,
+    }),
+  );
+  const [tutorialManual, setTutorialManual] = useState(false);
+  const codigosPendentes = useSessaoStore((s) => s.codigosNovaLotacao) !== null;
+
+  const tutorialAberto =
+    tutorialManual || podeAbrirAgora({ pendente: tutorialPendente, codigosPendentes });
+
+  // Fechar por qualquer via marca como visto. Marcar só ao concluir faria de
+  // "Pular" uma promessa quebrada no boot seguinte.
+  const fecharTutorial = useCallback(() => {
+    marcarTutorialVisto();
+    setTutorialPendente(false);
+    setTutorialManual(false);
+  }, []);
 
   const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
   const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
@@ -413,8 +451,6 @@ function Editor() {
   // o tipo anulável — este guarda mantém o Header com prop não-anulável.
   if (sessao === null) return null;
 
-  const somenteLeitura = somenteVisualizacao(sessao);
-
   return (
     <div className="flex flex-col h-screen">
       <Header
@@ -453,7 +489,11 @@ function Editor() {
 
       <div className="flex flex-1 min-h-0">
         {sidebarVisivel && (
-          <Sidebar onCreateNode={criarNoCentro} somenteLeitura={somenteLeitura} />
+          <Sidebar
+            onCreateNode={criarNoCentro}
+            somenteLeitura={somenteLeitura}
+            onVerTutorial={() => setTutorialManual(true)}
+          />
         )}
 
         <ReactFlowProvider>
@@ -481,6 +521,7 @@ function Editor() {
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
       <SyncResultadoModal onFechar={resetMensagensSync} />
       <CodigosLotacaoModal />
+      <TutorialModal open={tutorialAberto} onFechar={fecharTutorial} />
     </div>
   );
 }
