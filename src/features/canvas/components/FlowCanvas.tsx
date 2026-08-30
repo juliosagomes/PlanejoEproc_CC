@@ -78,8 +78,13 @@ export function FlowCanvas() {
     createNode(position);
   };
 
+  // O handler mora no wrapper, então recebe o duplo clique de qualquer
+  // descendente — inclusive de um nó ou de uma aresta, onde criar um
+  // localizador solto por baixo nunca foi a intenção. Só o fundo cria.
   const onPaneDoubleClick = (e: MouseEvent) => {
     if (somenteLeitura) return;
+    const alvo = e.target as Element | null;
+    if (!alvo?.classList.contains('react-flow__pane')) return;
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
     createNode(position);
   };

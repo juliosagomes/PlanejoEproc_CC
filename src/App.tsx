@@ -174,12 +174,6 @@ function Editor() {
     return { nodes: nodes.length, edges: edges.length, pendentes };
   }, [nodes, edges]);
 
-  // PjEdge lê o modo deste atributo do body (hack herdado do BETA_2 — ver
-  // comentário em PjEdge.tsx).
-  useEffect(() => {
-    document.body.dataset.flowMode = flowMode;
-  }, [flowMode]);
-
   // Garante que qualquer save pendente seja gravado antes do tab fechar.
   useEffect(() => {
     const onBeforeUnload = () => flushPersist();

@@ -359,6 +359,30 @@ body {
     box-shadow: 0 1px 0 rgba(20, 22, 28, 0.04);
     white-space: nowrap;
     width: fit-content;
+    /* O wrapper do foreignObject desliga os eventos para não engolir cliques
+       na área transparente ao redor; a pílula reativa os seus. */
+    pointer-events: auto;
+  }
+  /* Alça do cotovelo (modo Diagrama). A linha grossa transparente é o alvo do
+     ponteiro; o indicador fino embaixo é só o aviso visual de que ali se
+     arrasta, e por isso não recebe eventos.
+
+     O cursor é perpendicular ao segmento: um cotovelo vertical anda para os
+     lados, um horizontal anda para cima e para baixo. */
+  .edge-dobra {
+    stroke: transparent;
+    stroke-width: 16;
+    stroke-linecap: round;
+  }
+  .edge-dobra.orient-vertical,
+  .edge-label.arrastavel.orient-vertical { cursor: ew-resize; }
+  .edge-dobra.orient-horizontal,
+  .edge-label.arrastavel.orient-horizontal { cursor: ns-resize; }
+  .edge-dobra-indicador {
+    stroke-width: 5;
+    stroke-linecap: round;
+    opacity: 0.22;
+    pointer-events: none;
   }
   .badge-count {
     display: inline-flex;
