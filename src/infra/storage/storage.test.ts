@@ -148,6 +148,34 @@ describe('savePlano lazy-cria entrada no índice', () => {
     savePlano(original);
     expect(loadPlano()).toEqual(original);
   });
+
+  // `planoExemplo` não tem `dobra`, então o teste acima já prova que o campo é
+  // de fato opcional (plano antigo não vai para o backup de corrompido). Este
+  // fecha o outro lado: com dobra, ela sobrevive ao round-trip.
+  it('round-trip preserva a dobra manual da aresta', () => {
+    const original = planoExemplo();
+    const [aresta] = original.edges;
+    if (!aresta) throw new Error('fixture sem aresta');
+    aresta.data.dobra = { fracaoX: 0.2, desvioY: -40 };
+
+    savePlano(original);
+
+    expect(loadPlano().edges[0]?.data.dobra).toEqual({ fracaoX: 0.2, desvioY: -40 });
+  });
+
+  // `z.number()` sozinho barra NaN mas deixa passar Infinity, que viraria uma
+  // coordenada de path inválida. Um plano assim é dado corrompido: vai para o
+  // backup e o app abre vazio, em vez de desenhar lixo.
+  it('rejeita dobra com valor não-finito', () => {
+    const original = planoExemplo();
+    savePlano(original);
+    const chave = getPlanKey(getAtivoId()!);
+    const bruto = JSON.parse(localStorage.getItem(chave)!) as Plano;
+    bruto.edges[0]!.data.dobra = { fracaoX: 1e999 }; // Infinity após o parse
+    localStorage.setItem(chave, JSON.stringify(bruto));
+
+    expect(loadPlano()).toEqual(planoVazio());
+  });
 });
 
 describe('migração da chave legada', () => {

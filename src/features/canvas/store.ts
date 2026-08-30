@@ -14,6 +14,7 @@ import { shallow } from 'zustand/shallow';
 import {
   SCHEMA_VERSION,
   type AtpRule,
+  type DobraAresta,
   type EdgeData,
   type FlowMode,
   type LocalizadorData,
@@ -72,6 +73,15 @@ interface CanvasActions {
   createNode: (position: Position) => string;
   updateNode: (id: string, patch: Partial<LocalizadorData>) => void;
   updateEdge: (id: string, patch: Partial<EdgeData>) => void;
+  /**
+   * Move (ou zera) a dobra manual da aresta no modo Diagrama.
+   *
+   * Ação própria em vez de `updateEdge(id, { dobra: undefined })` porque o
+   * spread do `updateEdge` deixaria a chave presente valendo `undefined` —
+   * some do JSON, mas fica no objeto em memória, e "restaurar automático" é
+   * exatamente o caso em que essa sutileza morderia.
+   */
+  setDobra: (id: string, dobra?: DobraAresta) => void;
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
 
@@ -252,6 +262,19 @@ export const useCanvasStore = create<CanvasStore>()(
             ? { ...e, data: { ...(e.data ?? defaultEdgeData()), ...patch } }
             : e,
         ),
+      }));
+    },
+
+    // A dobra é conteúdo do plano — diferente do `flowMode`, que é só como o
+    // plano é desenhado —, então respeita a trava de visualização.
+    setDobra: (id, dobra) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        edges: s.edges.map((e) => {
+          if (e.id !== id) return e;
+          const { dobra: _antiga, ...resto } = e.data ?? defaultEdgeData();
+          return { ...e, data: dobra === undefined ? resto : { ...resto, dobra } };
+        }),
       }));
     },
 

@@ -185,6 +185,35 @@ export type EdgeRule =
   | { kind: 'pref'; rule: PrefRule };
 
 /**
+ * Posição manual da dobra ("cotovelo") da aresta no modo Diagrama.
+ *
+ * Guardada em dois campos porque *qual* eixo dobra depende de onde os nós
+ * estão: com o destino folgadamente à direita o cotovelo é o segmento vertical
+ * e anda no eixo x; caso contrário é o horizontal, e anda no y. O campo não
+ * usado fica `undefined`, que significa automático — e é preservado, para que
+ * mover um localizador para o outro lado e voltar traga o ajuste de volta.
+ *
+ * As duas unidades são diferentes de propósito, e os nomes dizem qual é qual.
+ * Ver decisoes.md#D-21.
+ */
+export interface DobraAresta {
+  /**
+   * Onde o segmento **vertical** dobra, como fração [0,1] do vão entre as duas
+   * alças. Relativa, e não coordenada absoluta: mover os nós mantém o cotovelo
+   * proporcional em vez de deixá-lo para trás. Ausente ≡ 0.5, o automático.
+   */
+  fracaoX?: number;
+  /**
+   * Deslocamento do segmento **horizontal** a partir da linha média entre as
+   * alças, em unidades do canvas. Aqui não é fração porque no caso que mais
+   * importa — a seta que volta para trás entre dois nós na mesma altura — o
+   * vão de referência seria zero, e nenhuma fração significaria coisa alguma.
+   * Ausente ≡ 0, o automático.
+   */
+  desvioY?: number;
+}
+
+/**
  * Dados associados a uma aresta. Convenção: quando `kind === 'manual'`, tanto
  * `atp` quanto `pref` são `undefined` e `subitems` é `[]`.
  *
@@ -199,4 +228,10 @@ export interface EdgeData {
   subitems: Subitem[];
   atp?: AtpRule;
   pref?: PrefRule;
+  /**
+   * Ajuste manual do cotovelo. Só tem efeito no modo Diagrama, mas é
+   * preservado no Orgânico — mesmo princípio de `atp`/`pref` acima: alternar o
+   * modo por engano não pode apagar o que o usuário ajustou.
+   */
+  dobra?: DobraAresta;
 }

@@ -9,6 +9,7 @@ import {
   type AcaoPreferencialUnidade,
   type CatalogoOrgao,
   type CatalogoUnidade,
+  type DobraAresta,
   type Edge,
   type ItemCatalogoUnidade,
   type Localizador,
@@ -129,6 +130,13 @@ const PrefRuleSchema = z.object({
 
 const EdgeKindSchema = z.enum(['atp', 'pref', 'manual']);
 
+// `.finite()` porque `z.number()` sozinho barra NaN mas deixa passar
+// Infinity — que aqui viraria uma coordenada de path inválida.
+const DobraArestaSchema = z.object({
+  fracaoX: z.number().finite().optional(),
+  desvioY: z.number().finite().optional(),
+}) satisfies z.ZodType<DobraAresta>;
+
 const EdgeDataSchema = z.object({
   kind: EdgeKindSchema,
   resumo: z.string(),
@@ -136,6 +144,7 @@ const EdgeDataSchema = z.object({
   subitems: z.array(SubitemSchema),
   atp: AtpRuleSchema.optional(),
   pref: PrefRuleSchema.optional(),
+  dobra: DobraArestaSchema.optional(),
 });
 
 const PositionSchema = z.object({

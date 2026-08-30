@@ -161,6 +161,54 @@ describe('updateEdge / deleteEdge', () => {
   });
 });
 
+describe('setDobra', () => {
+  function arestaDeTeste(): string {
+    const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const b = useCanvasStore.getState().createNode({ x: 300, y: 0 });
+    useCanvasStore.getState().onConnect({
+      source: a,
+      target: b,
+      sourceHandle: null,
+      targetHandle: null,
+    });
+    const id = useCanvasStore.getState().edges[0]?.id;
+    if (!id) throw new Error('aresta não criada');
+    return id;
+  }
+
+  it('grava a dobra sem tocar no resto do data', () => {
+    const id = arestaDeTeste();
+    useCanvasStore.getState().updateEdge(id, { resumo: 'após citação' });
+
+    useCanvasStore.getState().setDobra(id, { fracaoX: 0.8 });
+
+    const data = useCanvasStore.getState().edges[0]?.data;
+    expect(data?.dobra).toEqual({ fracaoX: 0.8 });
+    expect(data?.resumo).toBe('após citação');
+  });
+
+  // Sem argumento é "restaurar automático" — a chave tem que sumir do objeto,
+  // não ficar valendo `undefined`.
+  it('sem dobra remove a chave', () => {
+    const id = arestaDeTeste();
+    useCanvasStore.getState().setDobra(id, { fracaoX: 0.8 });
+
+    useCanvasStore.getState().setDobra(id);
+
+    const data = useCanvasStore.getState().edges[0]?.data;
+    expect(data && 'dobra' in data).toBe(false);
+  });
+
+  it('é no-op em sessão de visualização', () => {
+    const id = arestaDeTeste();
+    useCanvasStore.setState({ somenteLeitura: true });
+
+    useCanvasStore.getState().setDobra(id, { fracaoX: 0.1 });
+
+    expect(useCanvasStore.getState().edges[0]?.data?.dobra).toBeUndefined();
+  });
+});
+
 describe('toggles', () => {
   it('toggleNodeCreated alterna ja_criado do nó', () => {
     const id = useCanvasStore.getState().createNode({ x: 0, y: 0 });
@@ -283,6 +331,7 @@ describe('loadPlano / getPlano', () => {
           observacao: '',
           subitems: [],
           pref: { implantar: true, ja_criado: false, nome: 'p1', tipo: 'Minuta' },
+          dobra: { fracaoX: 0.75 },
         },
       },
     ],
