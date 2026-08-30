@@ -50,6 +50,17 @@ export const Icon = {
       />
     </svg>
   ),
+  Undo: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M3 6.5h5.5a2.75 2.75 0 0 1 0 5.5H6M3 6.5 5.5 4M3 6.5 5.5 9"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   Bolt: (p: IconProps) => (
     <svg {...baseProps} {...p}>
       <path d="M7.5 1 3 8h3.2L6 13l4.5-7H7.3z" fill="currentColor" />

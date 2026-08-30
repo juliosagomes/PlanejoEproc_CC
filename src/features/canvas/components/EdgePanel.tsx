@@ -14,6 +14,7 @@ import { PanelHeader } from '@/components/PanelHeader';
 import { SubitemNomeInput } from '@/features/catalogo/components/SubitemNomeInput';
 import { cn } from '@/utils/cn';
 import { uid } from '@/utils/uid';
+import { temDobraManual } from '../dobra';
 import { defaultEdgeData, useCanvasStore, type FlowEdge } from '../store';
 import { EdgeDetailModal } from './EdgeDetailModal';
 
@@ -24,6 +25,8 @@ interface EdgePanelProps {
 export function EdgePanel({ edge }: EdgePanelProps) {
   const updateEdge = useCanvasStore((s) => s.updateEdge);
   const deleteEdge = useCanvasStore((s) => s.deleteEdge);
+  const setDobra = useCanvasStore((s) => s.setDobra);
+  const flowMode = useCanvasStore((s) => s.flowMode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
 
   const data: EdgeData = edge.data ?? defaultEdgeData();
@@ -243,6 +246,20 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Só aparece quando há o que restaurar. O gesto de reset é o duplo
+              clique na alça; este botão é a descoberta dele — sem ele, quem
+              arrastou a dobra por engano não tem como saber que dá para voltar. */}
+          {flowMode === 'sharp' && temDobraManual(data.dobra) && (
+            <button
+              type="button"
+              className="btn btn-sm w-full justify-center"
+              onClick={() => setDobra(edge.id)}
+              title="Devolve a dobra desta seta ao ponto calculado automaticamente"
+            >
+              <Icon.Undo /> Restaurar dobra automática
+            </button>
           )}
 
           <div>

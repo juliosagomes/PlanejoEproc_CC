@@ -309,6 +309,7 @@ mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
 - Se o JSON estiver malformado ou não passar no `PlanoSchema` (Zod), o conteúdo é **movido** para `planejoeproc:plano:corrompido:YYYY-MM-DD` e o app abre vazio. Não há perda silenciosa.
 - Toda gravação passa por um saver com debounce de 300 ms; mudanças muito próximas coalescem em uma única escrita.
 - O atalho `Delete` remove a seleção (nó ou aresta) — exceto quando o foco está em `INPUT`/`TEXTAREA`/`contenteditable`.
+- No modo **Diagrama**, o segmento central de cada seta é arrastável: puxe o cotovelo para onde a linha deve dobrar. O ajuste é salvo no plano e acompanha os localizadores quando você os move. Para voltar ao automático, dê dois cliques na alça ou use "Restaurar dobra automática" no painel da aresta (`decisoes.md#D-21`).
 - `beforeunload` faz flush do save pendente.
 - Quando o `SCHEMA_VERSION` virar 2, a migração será escrita em `src/infra/storage/` com **teste de regressão** (importa arquivo da v1, confere que não perde dado).
 

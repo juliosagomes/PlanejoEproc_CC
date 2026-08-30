@@ -708,6 +708,92 @@ lógica pura (`roteiro`, `navegacao`, `abertura`, a flag) é coberta.
 
 ---
 
+## D-21 · Dobra da seta arrastável no modo Diagrama
+
+**Decisão.** No modo Diagrama, o segmento central de cada seta é uma alça: o
+usuário arrasta o cotovelo para onde quiser, e a posição vai para o plano em
+`EdgeData.dobra`. Duplo clique na alça, ou o botão no painel da aresta,
+restauram o automático. O modo Orgânico continua 100% calculado.
+
+**Por que.**
+
+- **A queixa é real e não tinha saída.** O `getSmoothStepPath` dobra sempre no
+  meio geométrico; a própria biblioteca chama seu roteador de *"not as good as
+  a real orthogonal edge routing, but good enough as a default"*. Em quadro
+  cheio esse meio cai em cima de outro localizador, e a única correção
+  disponível era mover os nós — ou seja, estragar o arranjo para consertar a
+  seta.
+- **Relativo, não coordenada absoluta.** Com absoluto, arrastar um localizador
+  deixa a dobra parada no lugar antigo e a seta vira um zigue-zague; o usuário
+  reajustaria a cada movimento. Guardando relativo, a dobra acompanha os nós, e
+  o valor neutro é a ausência do campo — o que faz de "restaurar automático" um
+  simples apagar, sem número mágico.
+- **Duas unidades, uma por eixo, e é de propósito.** Qual eixo dobra depende de
+  onde os nós estão: destino folgadamente à direita → segmento vertical, que
+  anda no x; caso contrário → horizontal, que anda no y.
+  - No **x** o campo é uma **fração** do vão entre as alças. O vão é
+    estritamente positivo por construção (é a própria condição que escolhe esse
+    ramo), a fração escala quando o usuário afasta os nós, e 0.5 coincide
+    exatamente com o `getEdgeCenter` da lib.
+  - No **y** é um **desvio** a partir da linha média. Fração aqui seria um bug:
+    o caso que mais pede o ajuste é a seta que volta para trás entre dois nós
+    **na mesma altura**, onde o vão de referência é zero e nenhuma fração
+    significaria coisa alguma — arrastar não moveria nada.
+  Os nomes dos campos (`fracaoX`, `desvioY`) dizem a unidade, porque um
+  `{ x, y }` faria todo leitor futuro assumir a mesma nos dois e escrever o bug
+  de novo.
+- **O eixo ocioso é preservado**, não apagado: mover um localizador para o outro
+  lado troca a orientação, e desfazer o movimento tem que trazer o ajuste
+  antigo de volta.
+- **`centerX`/`centerY` em vez de roteador próprio.** O `getSmoothStepPath` já
+  aceita esses dois parâmetros; escrever um roteador ortogonal nosso (ou trazer
+  `elkjs`/`dagre`, que são dependência nova e peso de bundle) seria pagar caro
+  por algo que a lib entrega num argumento. Passamos **só o eixo ativo**: o
+  `getPoints` devolve `centerX` e `centerY` como `labelX`/`labelY`
+  independentemente do split que escolheu, então mandar o eixo ocioso não
+  mudaria o caminho mas faria o rótulo pular.
+- **Segmento, não waypoints livres.** Pontos arbitrários dão mais liberdade e
+  muito mais superfície: criar/remover ponto, ordenar, migrar quando um handle
+  muda de lado. O gesto do Miro — agarrar o cotovelo — resolve a queixa inteira
+  com um número por eixo.
+- **É conteúdo do plano, então respeita o D-19.** Ao contrário do `flowMode`,
+  que é só como o plano é desenhado e continua livre em visualização, a dobra
+  entra na guarda de somente leitura como qualquer outra mutação.
+- **Sem bump de `SCHEMA_VERSION`.** O campo é opcional; `version: z.literal(1)`
+  rejeitaria qualquer outro número e mandaria para o backup todo plano já
+  gravado. Mesmo raciocínio do D-10.
+- **Definir a dobra é gesto só de ponteiro, e isso é assumido.** O CLAUDE.md
+  pede WCAG AA, e aqui a saída é que o ajuste é refinamento cosmético com um
+  default sempre utilizável — nenhuma informação ou capacidade se perde sem
+  ele —, enquanto **desfazer** tem caminho acessível: o botão no painel da
+  aresta.
+
+**Junto vieram duas limpezas.** `PjEdge` lia o modo de
+`document.body.dataset.flowMode`, hack herdado do BETA_2 que o próprio
+comentário do arquivo marcava para troca. Um atributo escrito fora do React não
+dispara re-render, e a alça precisa aparecer no instante em que o modo muda —
+agora o modo vem da store, e o `useEffect` que escrevia o dataset em `App.tsx`
+saiu (nada mais o lia; o CSS nunca usou).
+
+E o `onDoubleClick` do `FlowCanvas` passou a exigir que o alvo seja o próprio
+pane. Ele mora no `<div>` wrapper, então recebia o duplo clique de qualquer
+descendente: dar dois cliques num nó ou numa aresta **já criava um localizador
+solto por baixo**. O bug é anterior a esta mudança, mas o reset da dobra por
+duplo clique passaria por cima dele, então foi consertado na origem em vez de
+contornado.
+
+**O que precisaria mudar para evoluir.** Se o localizador ganhar handles nos
+quatro lados, `features/canvas/dobra.ts` precisa ser revisto junto: ele replica
+o `getPoints` do ReactFlow apenas para o caso de handles opostos, que é o único
+que o app produz hoje — há teste de contrato com a lib exatamente para isso
+aparecer como falha, e não como seta torta na tela. Se a queixa virar "quero
+desviar de dois obstáculos na mesma seta", aí sim o caminho é waypoints livres,
+e o campo `dobra` migra para uma lista de pontos. E quando houver undo/redo, o
+arrasto já está preparado: ele commita uma vez, no soltar, não a cada
+movimento.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).
