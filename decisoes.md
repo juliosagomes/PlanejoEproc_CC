@@ -794,6 +794,84 @@ movimento.
 
 ---
 
+## D-22 · Flags do localizador viram lista do plano, definida pelo usuário
+
+**Decisão.** As quatro flags fixas em código (`T` Trabalhado, `E` Espera, `G`
+Gatilho, `F` Fixo de fluxo) viram uma lista editável que mora **dentro do plano**
+(`Plano.flags`), e o nó passa a guardar **ids** (`LocalizadorData.flags:
+string[]`) em vez de um mapa de quatro booleanos. Cada item tem sigla, rótulo e
+uma cor de uma paleta de oito. Plano novo nasce só com **Espera** e **Fixo de
+fluxo**. Marcar um localizador passa a ter uma função além do enfeite: a barra
+lateral realça no canvas o que aquela flag trabalha. `SCHEMA_VERSION` vai a
+**2**, com migração v1→v2 embutida no `PlanoSchema`.
+
+**Por que.**
+
+- **A pergunta real é "quem trabalha isto".** As quatro flags eram decorativas —
+  nada no app lia `flags`: nem o checklist, nem a sincronização, nem as
+  estatísticas. O que o usuário automatizador precisa marcar é o recorte do
+  trabalho da unidade, e esse recorte muda de vara para vara: umas separam por
+  **setor** (Cálculo, Triagem, Expedição), outras, menores, por **servidor**
+  nomeado. Uma tabela fixa em código não tem como acertar isso.
+- **Setor e servidor são o mesmo tipo de marcador, numa lista plana.** A
+  hierarquia "servidores dentro de um setor" foi considerada e descartada: cada
+  unidade escolhe **um** dos dois eixos, não os dois ao mesmo tempo, então a
+  hierarquia pagaria em UI e em regras de herança (mover alguém de setor, remover
+  um setor com gente dentro) por um poder que ninguém pediu.
+- **Dentro do plano, não numa chave global do navegador.** É a diferença para o
+  catálogo do órgão (D-7), e a razão é a direção oposta: o catálogo é uma
+  propriedade do usuário que deve valer para todos os planos, enquanto a lista de
+  setores é vocabulário **daquele desenho**, e o plano é a unidade de
+  compartilhamento — exportado em JSON ou publicado numa lotação. Global, o plano
+  chegaria no colega cheio de chips órfãos apontando para ids que a máquina dele
+  nunca viu. O custo aceito é a duplicação: dois planos da mesma vara mantêm
+  listas independentes. Cabe, porque a lista tem uma dúzia de itens, não
+  centenas como o catálogo.
+- **O nó guarda id, não rótulo.** Renomear "Cálculo" para "Setor de Cálculo" ou
+  trocar a cor não pode desfazer marcação nenhuma. Só remover o marcador faz
+  isso — e aí a remoção limpa os nós na mesma ação, para não deixar id órfão que
+  voltaria a valer se alguém recriasse uma flag com o mesmo id.
+- **`Trabalhado` e `Gatilho` saem dos padrões, mas não dos planos que os usam.**
+  "Trabalhado" ficou redundante — um localizador marcado com um setor **é** um
+  localizador trabalhado —, e "Gatilho" colide com o gatilho da ATP, que é
+  conceito de aresta e tem os 9 tipos de `selTipoControle` atrás. Mas apagá-los
+  de planos existentes seria perder trabalho em silêncio, então a migração os
+  recria como marcadores comuns **quando algum nó os usa**, prontos para o
+  usuário remover.
+- **A migração mora dentro do `PlanoSchema`, não nos chamadores.**
+  `PlanoSchema.safeParse` é chamado em sete pontos, e um deles — `loadPlano` —
+  manda para a quarentena tudo que não valida. Um schema que apenas rejeitasse a
+  v1 não daria erro nenhum: daria todo plano já salvo sumindo da tela. Com
+  `z.union([PlanoV2Schema, PlanoV1Schema.transform(migrar)])`, os sete pontos
+  herdam a migração sem uma linha de mudança, `PlanoBundleSchema` inclusive.
+- **Cor é índice, não valor.** O domínio guarda `1..8`; a cor real mora em
+  `.flag-cor-N` no CSS. Assim o domínio continua sem saber de apresentação e o
+  tema resolve claro/escuro num lugar só. As quatro primeiras são exatamente as
+  cores históricas de T/E/G/F, para que um plano migrado não mude de aparência.
+- **Realçar, não filtrar de verdade.** O que está fora do setor escolhido recua
+  em opacidade, mas continua na tela e clicável: um fluxo com metade dos nós
+  escondidos vira um grafo com arestas saindo para o nada. E `filtroFlags` **não
+  é persistido** — é ajuste desta aba, como o zoom. Gravá-lo faria "olhar o
+  trabalho do Setor de Cálculo" virar alteração no plano da unidade inteira, e o
+  realce continua valendo em sessão de visualização (D-19) justamente porque
+  olhar não é editar.
+
+**O protótipo diverge a partir daqui.** O `PlanejoEproc__BETA_2.html.html` é
+declarado fonte da verdade do domínio no CLAUDE.md e mantém a tabela de quatro
+flags fixas. Neste ponto ele está congelado: não vale a pena retroportar, e quem
+comparar os dois deve tratar o app como o corrente.
+
+**O que precisaria mudar para evoluir.** Se aparecer o pedido de "checklist por
+setor" — entregar a cada um a sua parte do que falta criar no Eproc —, o lugar é
+`features/checklist/derive.ts`, que hoje ignora `flags` por completo e agrupa só
+por categoria de subitem; a marcação já está lá, é trabalho de apresentação. Se
+o pedido for contagem de pendências por setor no cabeçalho, o cálculo do `stats`
+em `App.tsx` é o ponto. E se a duplicação entre planos da mesma vara incomodar
+de verdade, o caminho **não** é mudar o escopo: é um botão de "copiar setores de
+outro plano", mantendo a lista dentro de cada plano.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

@@ -33,6 +33,7 @@ export function FlowCanvas() {
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
   const selectedId = useCanvasStore((s) => s.selectedId);
+  const filtroFlags = useCanvasStore((s) => s.filtroFlags);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const onNodesChange = useCanvasStore((s) => s.onNodesChange);
   const onEdgesChange = useCanvasStore((s) => s.onEdgesChange);
@@ -40,15 +41,43 @@ export function FlowCanvas() {
   const setSelectedId = useCanvasStore((s) => s.setSelectedId);
   const createNode = useCanvasStore((s) => s.createNode);
 
+  /**
+   * Realce por setor (decisoes.md#D-22): com o filtro ligado, o que não é do
+   * setor escolhido recua para o fundo. Nada é escondido — o nó continua na
+   * tela, clicável e arrastável, porque o fluxo só faz sentido inteiro; o que
+   * muda é para onde o olho vai.
+   *
+   * `esmaecidos` é o conjunto dos nós fora do filtro; a aresta acompanha quando
+   * qualquer uma das pontas está fora, senão sobrariam setas nítidas ligando
+   * cartões apagados.
+   */
+  const esmaecidos = useMemo(() => {
+    if (filtroFlags.length === 0) return null;
+    const fora = new Set<string>();
+    for (const n of nodes) {
+      if (!n.data.flags.some((id) => filtroFlags.includes(id))) fora.add(n.id);
+    }
+    return fora;
+  }, [nodes, filtroFlags]);
+
   const decoratedNodes = useMemo(
-    () => nodes.map((n) => ({ ...n, selected: n.id === selectedId })),
-    [nodes, selectedId],
+    () =>
+      nodes.map((n) => ({
+        ...n,
+        selected: n.id === selectedId,
+        className: esmaecidos?.has(n.id) ? 'pj-esmaecido' : undefined,
+      })),
+    [nodes, selectedId, esmaecidos],
   );
   const decoratedEdges = useMemo(
     () =>
       edges.map((e) => ({
         ...e,
         selected: e.id === selectedId,
+        className:
+          esmaecidos?.has(e.source) || esmaecidos?.has(e.target)
+            ? 'pj-esmaecido'
+            : undefined,
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: corDoMarcador(e.data?.kind),
@@ -56,7 +85,7 @@ export function FlowCanvas() {
           height: 14,
         },
       })),
-    [edges, selectedId],
+    [edges, selectedId, esmaecidos],
   );
 
   const isEmpty = nodes.length === 0;

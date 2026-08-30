@@ -327,7 +327,7 @@ body {
     flex-wrap: wrap;
   }
 
-  /* ---------- Chips de flag (T/E/G/F) ---------- */
+  /* ---------- Chips de flag (paleta de 8, indexada por CORES_FLAG) ---------- */
   .flag-chip {
     display: inline-flex;
     align-items: center;
@@ -341,10 +341,21 @@ body {
     font-family: 'JetBrains Mono', ui-monospace, monospace;
     letter-spacing: 0.04em;
   }
-  .flag-T { background: oklch(0.94 0.04 265); color: oklch(0.40 0.13 265); }
-  .flag-E { background: oklch(0.95 0.04 75);  color: oklch(0.42 0.13 75); }
-  .flag-G { background: oklch(0.94 0.05 25);  color: oklch(0.42 0.14 25); }
-  .flag-F { background: oklch(0.95 0.02 250); color: oklch(0.40 0.04 250); }
+  /* As quatro primeiras são as cores históricas de T/E/G/F, nesta ordem, para
+     que um plano migrado continue com a mesma aparência. As outras quatro
+     completam a roda. */
+  .flag-cor-1 { background: oklch(0.94 0.04 265); color: oklch(0.40 0.13 265); }
+  .flag-cor-2 { background: oklch(0.95 0.04 75);  color: oklch(0.42 0.13 75); }
+  .flag-cor-3 { background: oklch(0.94 0.05 25);  color: oklch(0.42 0.14 25); }
+  .flag-cor-4 { background: oklch(0.95 0.02 250); color: oklch(0.40 0.04 250); }
+  .flag-cor-5 { background: oklch(0.93 0.05 155); color: oklch(0.40 0.12 155); }
+  .flag-cor-6 { background: oklch(0.94 0.05 330); color: oklch(0.42 0.14 330); }
+  .flag-cor-7 { background: oklch(0.94 0.05 195); color: oklch(0.40 0.11 195); }
+  .flag-cor-8 { background: oklch(0.94 0.05 120); color: oklch(0.40 0.11 120); }
+
+  /* Realce por flag: o que está fora do filtro recua, mas continua na tela e
+     continua clicável — some do foco, não do plano. */
+  .pj-esmaecido { opacity: 0.22; transition: opacity 0.15s ease; }
 
   /* ---------- Aresta (label e badge de progresso) ---------- */
   .edge-label {

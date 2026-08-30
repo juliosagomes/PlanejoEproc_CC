@@ -9,7 +9,7 @@ import {
 const noLocalizador = (id: string, nome: string, ja_criado = false): Localizador => ({
   id,
   position: { x: 0, y: 0 },
-  data: { nome, ja_criado, flags: {} },
+  data: { nome, ja_criado, flags: [] },
 });
 
 describe('deriveChecklist', () => {

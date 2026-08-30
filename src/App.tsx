@@ -14,6 +14,7 @@ import { SincronizacaoUnidadeModal } from '@/features/catalogo/components/Sincro
 import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
+import { FlagsModal } from '@/features/flags/components/FlagsModal';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { TelaLogin } from '@/features/sessao/components/TelaLogin';
 import { useSessaoStore } from '@/features/sessao/store';
@@ -79,14 +80,18 @@ function Editor() {
   const selectedId = useCanvasStore((s) => s.selectedId);
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
+  const flags = useCanvasStore((s) => s.flags);
+  const filtroFlags = useCanvasStore((s) => s.filtroFlags);
 
   const setPlanoNome = useCanvasStore((s) => s.setPlanoNome);
   const setFlowMode = useCanvasStore((s) => s.setFlowMode);
+  const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
   const loadPlanoAcao = useCanvasStore((s) => s.loadPlano);
   const createNode = useCanvasStore((s) => s.createNode);
 
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
+  const [showFlags, setShowFlags] = useState(false);
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
@@ -432,6 +437,16 @@ function Editor() {
 
   useSincronizacaoExterna({ aoMudarPlanos: recarregarDoStorage });
 
+  const alternarFiltroFlag = useCallback(
+    (id: string) => {
+      const atual = useCanvasStore.getState().filtroFlags;
+      setFiltroFlags(
+        atual.includes(id) ? atual.filter((x) => x !== id) : [...atual, id],
+      );
+    },
+    [setFiltroFlags],
+  );
+
   const criarNoCentro = () => {
     createNode({
       x: 200 + Math.random() * 80,
@@ -487,6 +502,10 @@ function Editor() {
             onCreateNode={criarNoCentro}
             somenteLeitura={somenteLeitura}
             onVerTutorial={() => setTutorialManual(true)}
+            flags={flags}
+            filtroFlags={filtroFlags}
+            onAlternarFiltroFlag={alternarFiltroFlag}
+            onGerenciarFlags={() => setShowFlags(true)}
           />
         )}
 
@@ -502,7 +521,13 @@ function Editor() {
             transition: 'width .15s ease',
           }}
         >
-          {selectedNode && <NodePanel key={selectedNode.id} node={selectedNode} />}
+          {selectedNode && (
+            <NodePanel
+              key={selectedNode.id}
+              node={selectedNode}
+              onGerenciarFlags={() => setShowFlags(true)}
+            />
+          )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}
         </aside>
       </div>
@@ -513,6 +538,7 @@ function Editor() {
       />
       <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
+      <FlagsModal open={showFlags} onClose={() => setShowFlags(false)} />
       <SyncResultadoModal onFechar={resetMensagensSync} />
       <CodigosLotacaoModal />
       <TutorialModal open={tutorialAberto} onFechar={fecharTutorial} />

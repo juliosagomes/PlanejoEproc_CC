@@ -1,4 +1,4 @@
-import { TIPO_FLAGS, type FlagKey, type LocalizadorOrgao } from '@/domain';
+import type { LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
 import { AcoesPreferenciaisNoEproc } from '@/features/catalogo/components/AcoesPreferenciaisNoEproc';
@@ -9,17 +9,18 @@ import { useCanvasStore, type FlowNode } from '../store';
 
 interface NodePanelProps {
   node: FlowNode;
+  /** Abre o modal de gerenciamento das flags do plano. */
+  onGerenciarFlags: () => void;
 }
 
-export function NodePanel({ node }: NodePanelProps) {
+export function NodePanel({ node, onGerenciarFlags }: NodePanelProps) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
+  const flags = useCanvasStore((s) => s.flags);
+  const toggleFlagNoNo = useCanvasStore((s) => s.toggleFlagNoNo);
   const itensCatalogo = useSugestoesLocalizador();
   const data = node.data;
-
-  const setFlag = (key: FlagKey, valor: boolean) =>
-    updateNode(node.id, { flags: { ...data.flags, [key]: valor } });
 
   const onPickFromCatalogo = (item: LocalizadorOrgao) =>
     updateNode(node.id, { nome: item.nome, ja_criado: true });
@@ -99,32 +100,50 @@ export function NodePanel({ node }: NodePanelProps) {
         </div>
 
         <div>
-          <label className="label">Flags de tipo (opcional)</label>
-          <div className="flex flex-wrap gap-1.5">
-            {TIPO_FLAGS.map((f) => {
-              const ativa = !!data.flags[f.key];
-              return (
-                <button
-                  key={f.key}
-                  type="button"
-                  className={cn('btn btn-sm', ativa && 'btn-primary')}
-                  onClick={() => setFlag(f.key, !ativa)}
-                >
-                  <span
-                    className={`flag-chip flag-${f.code}`}
-                    style={
-                      ativa
-                        ? { background: 'rgba(255,255,255,.18)', color: '#fff' }
-                        : undefined
-                    }
-                  >
-                    {f.code}
-                  </span>
-                  {f.label}
-                </button>
-              );
-            })}
+          <div className="flex items-baseline justify-between gap-2">
+            <label className="label">Setores e marcadores (opcional)</label>
+            {!somenteLeitura && (
+              <button
+                type="button"
+                className="text-[11px] text-texto-3 hover:text-texto underline"
+                onClick={onGerenciarFlags}
+              >
+                Gerenciar
+              </button>
+            )}
           </div>
+          {flags.length === 0 ? (
+            <div className="text-[11.5px] text-texto-3 leading-snug">
+              Nenhum marcador definido neste plano.
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {flags.map((f) => {
+                const ativa = data.flags.includes(f.id);
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    className={cn('btn btn-sm', ativa && 'btn-primary')}
+                    aria-pressed={ativa}
+                    onClick={() => toggleFlagNoNo(node.id, f.id)}
+                  >
+                    <span
+                      className={`flag-chip flag-cor-${f.cor}`}
+                      style={
+                        ativa
+                          ? { background: 'rgba(255,255,255,.18)', color: '#fff' }
+                          : undefined
+                      }
+                    >
+                      {f.code}
+                    </span>
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div>

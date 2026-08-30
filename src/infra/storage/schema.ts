@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   CATALOGO_ORGAO_VERSION,
   CATALOGO_UNIDADE_VERSION,
+  CORES_FLAG,
   PREF_TIPOS,
   SCHEMA_VERSION,
   SUBITEM_CATS,
@@ -9,6 +10,7 @@ import {
   type AcaoPreferencialUnidade,
   type CatalogoOrgao,
   type CatalogoUnidade,
+  type DefinicaoFlag,
   type DobraAresta,
   type Edge,
   type ItemCatalogoUnidade,
@@ -19,6 +21,7 @@ import {
   type Subitem,
   type UnidadeEproc,
 } from '@/domain';
+import { migrarPlanoV1 } from './migracoes';
 
 /**
  * Schemas Zod que validam dados externos contra o domain v1.
@@ -32,12 +35,32 @@ import {
  * domain? O TypeScript reclama aqui.
  */
 
-const FlagsLocalizadorSchema = z.object({
-  trabalhado: z.boolean().optional(),
-  espera: z.boolean().optional(),
-  gatilho: z.boolean().optional(),
-  fixo: z.boolean().optional(),
-});
+// `z.enum` só aceita strings e a paleta é de números, então o union é escrito à
+// mão. Os dois checks abaixo garantem que ele e `CORES_FLAG` não se separem.
+const CorFlagSchema = z.union([
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+  z.literal(6),
+  z.literal(7),
+  z.literal(8),
+]);
+
+type _CorCobreSchema =
+  z.infer<typeof CorFlagSchema> extends (typeof CORES_FLAG)[number] ? true : false;
+type _CorCobrePaleta =
+  (typeof CORES_FLAG)[number] extends z.infer<typeof CorFlagSchema> ? true : false;
+const _corOk: [_CorCobreSchema, _CorCobrePaleta] = [true, true];
+void _corOk;
+
+const DefinicaoFlagSchema = z.object({
+  id: z.string(),
+  code: z.string(),
+  label: z.string(),
+  cor: CorFlagSchema,
+}) satisfies z.ZodType<DefinicaoFlag>;
 
 const SubitemSchema = z.object({
   id: z.string(),
@@ -157,7 +180,7 @@ const LocalizadorDataSchema = z.object({
   descricao: z.string().optional(),
   observacao: z.string().optional(),
   ja_criado: z.boolean(),
-  flags: FlagsLocalizadorSchema,
+  flags: z.array(z.string()),
 });
 
 const LocalizadorSchema = z.object({
@@ -177,14 +200,67 @@ const EdgeSchema = z.object({
 
 const FlowModeSchema = z.enum(['organic', 'sharp']);
 
-export const PlanoSchema = z.object({
+const PlanoV2Schema = z.object({
   version: z.literal(SCHEMA_VERSION),
   planoNome: z.string(),
   flowMode: FlowModeSchema,
+  flags: z.array(DefinicaoFlagSchema),
   nodes: z.array(LocalizadorSchema),
   edges: z.array(EdgeSchema),
   exportedAt: z.string().optional(),
 }) satisfies z.ZodType<Plano>;
+
+/* ---------------------------------------------------------------------------
+ * Plano v1 — congelado.
+ *
+ * Só existe para alimentar a migração; nada além dela deve importá-lo. As
+ * flags do nó eram um mapa esparso de quatro chaves booleanas, e `z.object`
+ * descarta chave desconhecida em silêncio: era exatamente isso que impedia
+ * qualquer flag customizada de sobreviver a um reload antes da v2.
+ * ------------------------------------------------------------------------ */
+
+const FlagsLocalizadorV1Schema = z.object({
+  trabalhado: z.boolean().optional(),
+  espera: z.boolean().optional(),
+  gatilho: z.boolean().optional(),
+  fixo: z.boolean().optional(),
+});
+
+export const PlanoV1Schema = z.object({
+  version: z.literal(1),
+  planoNome: z.string(),
+  flowMode: FlowModeSchema,
+  nodes: z.array(
+    z.object({
+      id: z.string(),
+      position: PositionSchema,
+      data: z.object({
+        nome: z.string(),
+        descricao: z.string().optional(),
+        observacao: z.string().optional(),
+        ja_criado: z.boolean(),
+        flags: FlagsLocalizadorV1Schema,
+      }),
+    }),
+  ),
+  edges: z.array(EdgeSchema),
+  exportedAt: z.string().optional(),
+});
+
+export type PlanoV1 = z.infer<typeof PlanoV1Schema>;
+
+/**
+ * O schema público sempre **devolve v2**, migrando o que chegar em v1.
+ *
+ * A migração mora aqui, e não em cada chamador, porque `safeParse` é chamado em
+ * sete pontos (storage, import de arquivo, pull da lotação) e um deles —
+ * `loadPlano` — manda para a quarentena tudo que não valida. Um schema que
+ * apenas rejeitasse a v1 faria todo plano já salvo sumir da tela.
+ */
+export const PlanoSchema = z.union([
+  PlanoV2Schema,
+  PlanoV1Schema.transform(migrarPlanoV1),
+]) satisfies z.ZodType<Plano, z.ZodTypeDef, unknown>;
 
 /**
  * Bundle de exportação contendo múltiplos planos. O `kind` literal serve de

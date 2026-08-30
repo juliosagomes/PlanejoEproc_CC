@@ -1,7 +1,21 @@
 {
-  "version": 1,
+  "version": 2,
   "planoNome": "(Exemplo) Família",
   "flowMode": "organic",
+  "flags": [
+    {
+      "id": "flag-espera",
+      "code": "E",
+      "label": "Espera",
+      "cor": 2
+    },
+    {
+      "id": "flag-fixo",
+      "code": "F",
+      "label": "Fixo de fluxo",
+      "cor": 4
+    }
+  ],
   "nodes": [
     {
       "id": "n-mozb9sv4",
@@ -12,7 +26,7 @@
       "data": {
         "nome": "[FAMÍLIA] Ag. Contestação",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -24,7 +38,7 @@
       "data": {
         "nome": "[FAMÍLIA] Ag. Réplica",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -37,7 +51,7 @@
         "nome": "[FAMÍLIA] Decorrido o prazo da contestação",
         "descricao": "Localizador intermediário para não disparo imediato da regra",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -49,7 +63,7 @@
       "data": {
         "nome": "🔵 Conclusos - Pedido Reconvencional",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -62,7 +76,7 @@
         "nome": "Analisar Reconvenção/Liminar em Contestação",
         "descricao": "Quando adv. peticiona como \"RECONVENÇÃO\" ou \"PETIÇÃO URGENTE\"",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -74,7 +88,7 @@
       "data": {
         "nome": "[FAMÍLIA] Decorrido o prazo da réplica",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -86,7 +100,7 @@
       "data": {
         "nome": "[FAMÍLIA] Ag. Parecer do MP",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -98,7 +112,7 @@
       "data": {
         "nome": "🔵Conclusos - Esp. de Provas",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -110,7 +124,7 @@
       "data": {
         "nome": "[FAMÍLIA] Ag. Especificação de Provas",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -123,7 +137,7 @@
         "nome": "[FAMÍLIA] Analisar Contestação 👀",
         "descricao": "Processos que contém mais de um réu",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     },
     {
@@ -135,7 +149,7 @@
       "data": {
         "nome": "🔵 Conclusos",
         "ja_criado": false,
-        "flags": {}
+        "flags": []
       }
     }
   ],

@@ -1,13 +1,16 @@
-import type { FlagsLocalizador } from './flags';
+import type { DefinicaoFlag } from './flags';
 import type { EdgeData } from './edges';
 
 /**
  * Versão do schema do plano. Toda persistência (localStorage, JSON exportado)
- * carrega esse número. Migrações são escritas só quando v2 sair, com teste
- * de regressão (importar arquivo da versão anterior, conferir que dado não
- * foi perdido).
+ * carrega esse número.
+ *
+ * v2 trouxe as flags customizáveis (decisoes.md#D-22). A migração v1→v2 mora em
+ * `infra/storage/migracoes.ts` e é aplicada dentro do próprio `PlanoSchema`,
+ * para que todo call site a herde — inclusive o `loadPlano`, que manda para a
+ * quarentena tudo que não valida.
  */
-export const SCHEMA_VERSION = 1 as const;
+export const SCHEMA_VERSION = 2 as const;
 
 export type SchemaVersion = typeof SCHEMA_VERSION;
 
@@ -22,7 +25,12 @@ export interface LocalizadorData {
   observacao?: string;
   /** Marcado quando o localizador já existe no Eproc. */
   ja_criado: boolean;
-  flags: FlagsLocalizador;
+  /**
+   * Ids das flags do plano que valem neste localizador. Id sem definição
+   * correspondente é ignorado na renderização, não é erro: outra aba pode ter
+   * apagado a definição entre um render e outro.
+   */
+  flags: string[];
 }
 
 export interface Localizador {
@@ -59,6 +67,13 @@ export interface Plano {
   version: SchemaVersion;
   planoNome: string;
   flowMode: FlowMode;
+  /**
+   * Definições das flags deste plano. Moram aqui, e não numa chave global do
+   * navegador, porque o plano é a unidade de compartilhamento: exportado ou
+   * sincronizado por lotação, ele chega no colega com os mesmos chips
+   * (decisoes.md#D-22).
+   */
+  flags: DefinicaoFlag[];
   nodes: Localizador[];
   edges: Edge[];
   exportedAt?: string;

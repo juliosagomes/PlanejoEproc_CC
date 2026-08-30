@@ -1,5 +1,7 @@
 import type { DragEvent } from 'react';
+import type { DefinicaoFlag } from '@/domain';
 import { Icon } from '@/components/Icon';
+import { cn } from '@/utils/cn';
 
 /** Tipo MIME interno usado para identificar o drag-and-drop de "novo localizador". */
 export const NEW_NODE_DATATYPE = 'application/x-pj-newnode';
@@ -11,6 +13,16 @@ interface SidebarProps {
   somenteLeitura?: boolean;
   /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
   onVerTutorial: () => void;
+
+  /* --- Setores e marcadores (decisoes.md#D-22) ---
+     Chegam por prop, e não da store do canvas, porque `components/` não importa
+     de `features/` — quem costura as duas pontas é o App. */
+  flags: DefinicaoFlag[];
+  /** Ids realçados agora; vazio = nada esmaecido no canvas. */
+  filtroFlags: string[];
+  onAlternarFiltroFlag: (id: string) => void;
+  /** Abre o modal de gestão. Escondido em visualização. */
+  onGerenciarFlags: () => void;
 }
 
 /**
@@ -28,6 +40,10 @@ export function Sidebar({
   onCreateNode,
   somenteLeitura = false,
   onVerTutorial,
+  flags,
+  filtroFlags,
+  onAlternarFiltroFlag,
+  onGerenciarFlags,
 }: SidebarProps) {
   const onDragStart = (e: DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData(NEW_NODE_DATATYPE, '1');
@@ -116,6 +132,59 @@ export function Sidebar({
         >
           <Icon.Ajuda /> Ver tutorial
         </button>
+
+        <div className="flex items-baseline justify-between gap-2 mb-2">
+          <div className="section-h">Setores</div>
+          {/* Filtrar continua valendo em visualização — é olhar, não editar.
+              Só a gestão da lista some. */}
+          {!somenteLeitura && (
+            <button
+              type="button"
+              className="text-[10.5px] text-texto-3 hover:text-texto underline"
+              onClick={onGerenciarFlags}
+            >
+              Gerenciar
+            </button>
+          )}
+        </div>
+        {flags.length === 0 ? (
+          <div className="text-[10.5px] text-texto-3 leading-snug mb-3.5">
+            {somenteLeitura
+              ? 'Este plano não define setores.'
+              : 'Defina setores ou servidores para marcar quem trabalha cada localizador.'}
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-1 mb-3.5">
+            {flags.map((f) => {
+              const ativo = filtroFlags.includes(f.id);
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  className={cn(
+                    'flex items-center gap-1 rounded px-1.5 py-1 text-[10.5px] leading-none max-w-full',
+                    ativo ? 'bg-destaque-suave text-texto' : 'text-texto-2',
+                  )}
+                  style={{
+                    border: `1px solid ${ativo ? 'var(--destaque-borda)' : 'var(--borda)'}`,
+                  }}
+                  aria-pressed={ativo}
+                  title={`Realçar o que ${f.label} trabalha`}
+                  onClick={() => onAlternarFiltroFlag(f.id)}
+                >
+                  <span className={`flag-chip flag-cor-${f.cor}`}>{f.code}</span>
+                  <span className="truncate">{f.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+        {filtroFlags.length > 0 && (
+          <div className="text-[10.5px] text-texto-3 leading-snug -mt-2.5 mb-3.5">
+            Realçando {filtroFlags.length} de {flags.length}. Clique de novo para
+            mostrar tudo.
+          </div>
+        )}
 
         <div className="section-h mb-2">Tipos de transição</div>
         <div className="flex flex-col gap-1.5">

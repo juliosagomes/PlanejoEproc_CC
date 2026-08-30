@@ -50,6 +50,17 @@ export const Icon = {
       />
     </svg>
   ),
+  Etiqueta: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M7.4 1.9H11.5a.6.6 0 0 1 .6.6v4.1a1 1 0 0 1-.3.7l-4.7 4.7a1 1 0 0 1-1.4 0L2.0 8.4a1 1 0 0 1 0-1.4l4.7-4.7a1 1 0 0 1 .7-.4Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <circle cx="9.5" cy="4.5" r="0.9" fill="currentColor" />
+    </svg>
+  ),
   Undo: (p: IconProps) => (
     <svg {...baseProps} {...p}>
       <path

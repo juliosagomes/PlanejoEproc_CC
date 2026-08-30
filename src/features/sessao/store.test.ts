@@ -31,6 +31,7 @@ function plano(nome: string): Plano {
     version: SCHEMA_VERSION,
     planoNome: nome,
     flowMode: 'organic',
+    flags: [],
     nodes: [],
     edges: [],
   };

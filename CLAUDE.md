@@ -6,7 +6,7 @@
 
 Aplicação web React + TypeScript chamada **PlanejoEproc**, derivada do protótipo monolítico `PlanejoEproc__BETA_2.html.html` na raiz. O protótipo é a **fonte da verdade do domínio, dos fluxos de UI e do comportamento esperado**, mas o produto final é um projeto Vite estruturado, com testes, validação de schemas, e arquitetura por camadas.
 
-Estágio: **beta**, sem usuários reais. `SCHEMA_VERSION = 1`. **Sem requisito de retrocompatibilidade** ainda. Migrações virão quando v2 sair.
+Estágio: **beta**, sem usuários reais. `SCHEMA_VERSION = 2` (as flags customizáveis do D-22 trouxeram a v2). A migração v1→v2 mora em `infra/storage/migracoes.ts` e é aplicada **dentro do `PlanoSchema`**, para que os sete pontos que chamam `safeParse` a herdem — em especial `loadPlano`, que manda para a quarentena tudo que não valida. Toda versão nova segue esse molde, com teste de regressão.
 
 ## Para quem
 
@@ -147,7 +147,12 @@ existem em nenhum outro arquivo do projeto:
 - **Ações Preferenciais Vinculadas** — rótulo do bloco que lista, no painel do
   localizador, as preferências que já atuam nele segundo o Eproc. É informação,
   não plano (`decisoes.md#D-16`).
-- **Flags do localizador (hardcoded):** `T` Trabalhado, `E` Espera, `G` Gatilho, `F` Fixo de fluxo.
+- **Flag do localizador** — marcador definido pelo usuário dizendo **quem
+  trabalha** aquele localizador: um **setor** ("Setor de Cálculo") ou um
+  **servidor** ("Joana Silva"), como a unidade preferir recortar. Os dois são o
+  mesmo tipo de marcador, numa lista plana. A lista é do **plano**
+  (`Plano.flags`); o nó guarda ids. Plano novo nasce com `E` Espera e `F` Fixo de
+  fluxo, e o usuário edita à vontade (decisoes.md#D-22).
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -156,7 +161,7 @@ existem em nenhum outro arquivo do projeto:
 A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por enquanto (texto/string), e ficarão tipados quando o catálogo entrar.
 
 - **Aresta** tem `rule` discriminado por `kind` (`'atp' | 'pref' | 'manual'`); ATP tem `trigger` discriminado por `tipo` (9 valores espelhando `selTipoControle`).
-- **Schema versionado:** `SCHEMA_VERSION = 1`. Toda chave de localStorage e arquivo exportado carrega `version`. Migrações são escritas só quando v2 sair, com **teste de regressão**.
+- **Schema versionado:** `SCHEMA_VERSION = 2`. Toda chave de localStorage e arquivo exportado carrega `version`. Cada migração vem com **teste de regressão** (abrir um plano da versão anterior e conferir que nada se perdeu) — ver `infra/storage/migracoes.test.ts`.
 - Decisões deliberadas de simplificação: ver `decisoes.md`.
 
 ## Catálogo do Eproc embutido (Caminho A)
@@ -241,6 +246,8 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
   `features/tutorial/`. As ilustrações reusam as **classes** do app, nunca os
   componentes — a lista de classes emprestadas está no topo de
   `ilustracoes/pecas.tsx`; renomeou uma delas, passe o grep lá.
+- Flags do localizador customizáveis por setor/servidor (decisoes.md#D-22), em
+  `features/flags/`. Trouxeram a `SCHEMA_VERSION = 2` e a primeira migração.
 
 ## Regras de ouro
 

@@ -15,6 +15,8 @@ const ESTADO_INICIAL = {
   selectedId: null,
   planoNome: 'Plano sem título',
   flowMode: 'organic' as const,
+  flags: [],
+  filtroFlags: [],
   somenteLeitura: false,
 };
 
@@ -52,12 +54,12 @@ describe('updateNode', () => {
     const id = useCanvasStore.getState().createNode({ x: 0, y: 0 });
     useCanvasStore.getState().updateNode(id, {
       nome: 'Aguardando despacho',
-      flags: { espera: true },
+      flags: ['flag-espera'],
     });
 
     const data = useCanvasStore.getState().nodes[0]?.data;
     expect(data?.nome).toBe('Aguardando despacho');
-    expect(data?.flags.espera).toBe(true);
+    expect(data?.flags).toEqual(['flag-espera']);
     expect(data?.ja_criado).toBe(false); // intacto
   });
 });
@@ -307,6 +309,7 @@ describe('loadPlano / getPlano', () => {
     version: SCHEMA_VERSION,
     planoNome: 'Plano de teste',
     flowMode: 'sharp',
+    flags: [{ id: 'f-1', code: 'SC', label: 'Setor de Cálculo', cor: 5 }],
     nodes: [
       {
         id: 'n-1',
@@ -314,7 +317,7 @@ describe('loadPlano / getPlano', () => {
         data: {
           nome: 'L1',
           ja_criado: true,
-          flags: { trabalhado: true },
+          flags: ['f-1'],
         },
       },
     ],
@@ -351,6 +354,86 @@ describe('loadPlano / getPlano', () => {
   });
 });
 
+/* ============================================================================
+ * Flags do plano (decisoes.md#D-22)
+ * ========================================================================== */
+
+describe('flags do plano', () => {
+  it('criarFlag preenche sigla e cor sozinha', () => {
+    const id = useCanvasStore.getState().criarFlag('  Setor de Cálculo  ');
+    const f = useCanvasStore.getState().flags[0];
+    expect(f?.id).toBe(id);
+    expect(f?.label).toBe('Setor de Cálculo');
+    expect(f?.code).toBe('SC');
+    expect(f?.cor).toBe(1);
+  });
+
+  it('criarFlag recusa rótulo em branco', () => {
+    expect(useCanvasStore.getState().criarFlag('   ')).toBe('');
+    expect(useCanvasStore.getState().flags).toHaveLength(0);
+  });
+
+  it('cores novas não repetem enquanto a paleta tiver folga', () => {
+    useCanvasStore.getState().criarFlag('Um');
+    useCanvasStore.getState().criarFlag('Dois');
+    expect(useCanvasStore.getState().flags.map((f) => f.cor)).toEqual([1, 2]);
+  });
+
+  it('toggleFlagNoNo marca e desmarca sem tocar nos outros nós', () => {
+    const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const b = useCanvasStore.getState().createNode({ x: 100, y: 0 });
+    const f = useCanvasStore.getState().criarFlag('Triagem');
+
+    useCanvasStore.getState().toggleFlagNoNo(a, f);
+    expect(useCanvasStore.getState().nodes[0]?.data.flags).toEqual([f]);
+    expect(useCanvasStore.getState().nodes[1]?.data.flags).toEqual([]);
+
+    useCanvasStore.getState().toggleFlagNoNo(a, f);
+    expect(useCanvasStore.getState().nodes[0]?.data.flags).toEqual([]);
+    void b;
+  });
+
+  it('atualizarFlag preserva as marcações — o id não muda', () => {
+    const n = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const f = useCanvasStore.getState().criarFlag('Triagem');
+    useCanvasStore.getState().toggleFlagNoNo(n, f);
+
+    useCanvasStore.getState().atualizarFlag(f, { label: 'Setor de Triagem', cor: 7 });
+
+    expect(useCanvasStore.getState().flags[0]?.label).toBe('Setor de Triagem');
+    expect(useCanvasStore.getState().flags[0]?.cor).toBe(7);
+    expect(useCanvasStore.getState().nodes[0]?.data.flags).toEqual([f]);
+  });
+
+  it('removerFlag limpa a definição, a marcação dos nós e o filtro', () => {
+    const n = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const f1 = useCanvasStore.getState().criarFlag('Triagem');
+    const f2 = useCanvasStore.getState().criarFlag('Cálculo');
+    useCanvasStore.getState().toggleFlagNoNo(n, f1);
+    useCanvasStore.getState().toggleFlagNoNo(n, f2);
+    useCanvasStore.getState().setFiltroFlags([f1, f2]);
+
+    useCanvasStore.getState().removerFlag(f1);
+
+    expect(useCanvasStore.getState().flags.map((f) => f.id)).toEqual([f2]);
+    expect(useCanvasStore.getState().nodes[0]?.data.flags).toEqual([f2]);
+    expect(useCanvasStore.getState().filtroFlags).toEqual([f2]);
+  });
+
+  it('loadPlano zera o filtro — os ids do plano anterior não valem no novo', () => {
+    useCanvasStore.getState().setFiltroFlags(['flag-espera']);
+    useCanvasStore.getState().loadPlano({
+      version: SCHEMA_VERSION,
+      planoNome: 'Outro',
+      flowMode: 'organic',
+      flags: [],
+      nodes: [],
+      edges: [],
+    });
+    expect(useCanvasStore.getState().filtroFlags).toEqual([]);
+  });
+});
+
 describe('persistência reativa', () => {
   it('mutações disparam debounced save após o delay (no plano ativo)', () => {
     vi.useFakeTimers();
@@ -376,6 +459,27 @@ describe('persistência reativa', () => {
   it('setSelectedId não dispara save (estado UI não persiste)', () => {
     vi.useFakeTimers();
     useCanvasStore.getState().setSelectedId('abc');
+
+    vi.advanceTimersByTime(1000);
+    expect(getActivePlanKey()).toBeNull();
+  });
+
+  // As flags são conteúdo do plano: sem elas na tupla observada, criar um setor
+  // ficaria só em memória e sumiria no F5 seguinte.
+  it('criarFlag dispara save e a lista chega ao storage', () => {
+    useCanvasStore.getState().criarFlag('Setor de Cálculo');
+    flushPersist();
+
+    const key = getActivePlanKey();
+    expect(key).not.toBeNull();
+    const persistido = JSON.parse(localStorage.getItem(key!) ?? '{}');
+    expect(persistido.flags).toHaveLength(1);
+    expect(persistido.flags[0].label).toBe('Setor de Cálculo');
+  });
+
+  it('setFiltroFlags não dispara save (é ajuste de visualização)', () => {
+    vi.useFakeTimers();
+    useCanvasStore.getState().setFiltroFlags(['flag-espera']);
 
     vi.advanceTimersByTime(1000);
     expect(getActivePlanKey()).toBeNull();
@@ -409,6 +513,7 @@ describe('somenteLeitura', () => {
       version: SCHEMA_VERSION,
       planoNome: 'Plano da lotação',
       flowMode: 'organic',
+      flags: [{ id: 'f-1', code: 'TR', label: 'Triagem', cor: 1 }],
       nodes: [
         { id: 'n1', position: { x: 0, y: 0 }, data: defaultLocalizadorData() },
         { id: 'n2', position: { x: 100, y: 0 }, data: defaultLocalizadorData() },
@@ -441,6 +546,10 @@ describe('somenteLeitura', () => {
     s.deleteEdge('e1');
     s.deleteNode('n1');
     s.onConnect({ source: 'n1', target: 'n2', sourceHandle: null, targetHandle: null });
+    s.criarFlag('Setor invasor');
+    s.atualizarFlag('f-1', { label: 'invadido' });
+    s.toggleFlagNoNo('n1', 'f-1');
+    s.removerFlag('f-1');
 
     expect(useCanvasStore.getState().getPlano()).toEqual(antes);
   });
@@ -450,13 +559,15 @@ describe('somenteLeitura', () => {
     expect(useCanvasStore.getState().createNode({ x: 5, y: 5 })).toBe('');
   });
 
-  it('selecionar e trocar o modo de desenho continuam valendo', () => {
+  it('selecionar, trocar o modo de desenho e filtrar continuam valendo', () => {
     comPlanoCarregado();
     useCanvasStore.getState().setSelectedId('n1');
     useCanvasStore.getState().setFlowMode('sharp');
+    useCanvasStore.getState().setFiltroFlags(['f-1']);
 
     expect(useCanvasStore.getState().selectedId).toBe('n1');
     expect(useCanvasStore.getState().flowMode).toBe('sharp');
+    expect(useCanvasStore.getState().filtroFlags).toEqual(['f-1']);
   });
 
   it('remoção vinda do ReactFlow (tecla Delete, drag) não passa', () => {

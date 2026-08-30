@@ -40,6 +40,7 @@ function planoExemplo(nome = 'Plano de teste'): Plano {
     version: SCHEMA_VERSION,
     planoNome: nome,
     flowMode: 'organic',
+    flags: [{ id: 'flag-espera', code: 'E', label: 'Espera', cor: 2 }],
     nodes: [
       {
         id: 'n-1',
@@ -48,7 +49,7 @@ function planoExemplo(nome = 'Plano de teste'): Plano {
           nome: 'Aguardando despacho',
           descricao: 'fila de processos prontos para o juiz',
           ja_criado: false,
-          flags: { espera: true },
+          flags: ['flag-espera'],
         },
       },
     ],

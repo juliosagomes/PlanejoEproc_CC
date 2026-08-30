@@ -13,7 +13,10 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 import {
   SCHEMA_VERSION,
+  proximaCor,
+  sugerirCode,
   type AtpRule,
+  type DefinicaoFlag,
   type DobraAresta,
   type EdgeData,
   type FlowMode,
@@ -34,8 +37,9 @@ import { uid } from '@/utils/uid';
  * `Plano` (domain) acontece em `getPlano()` / `loadPlano(plano)`.
  *
  * Persistência: uma única assinatura observa o slice persistível
- * `[nodes, edges, planoNome, flowMode]` (com igualdade rasa) e dispara
- * `criarSavePlanoDebounced()`. `selectedId` muda sem forçar gravação.
+ * `[nodes, edges, planoNome, flowMode, flags]` (com igualdade rasa) e dispara
+ * `criarSavePlanoDebounced()`. `selectedId` e `filtroFlags` mudam sem forçar
+ * gravação.
  * ========================================================================== */
 
 export type FlowNode = RFNode<LocalizadorData>;
@@ -47,6 +51,16 @@ interface CanvasState {
   selectedId: string | null;
   planoNome: string;
   flowMode: FlowMode;
+  /** Definições das flags deste plano — conteúdo, portanto persistido. */
+  flags: DefinicaoFlag[];
+  /**
+   * Quais flags estão realçadas no canvas agora. Vazio = nada esmaecido.
+   *
+   * Não é persistido nem entra no `Plano`: é ajuste de visualização desta aba,
+   * como o zoom. Gravá-lo faria "olhar o trabalho do Setor de Cálculo" virar
+   * uma alteração do plano da unidade inteira.
+   */
+  filtroFlags: string[];
   /**
    * Sessão de visualização (código de leitura de uma lotação). Toda ação que
    * muda o conteúdo do plano vira no-op, e a persistência é desligada.
@@ -85,6 +99,15 @@ interface CanvasActions {
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
 
+  // Flags do plano (decisoes.md#D-22)
+  /** Cria a flag com code e cor sugeridos. Devolve o id, ou `''` em visualização. */
+  criarFlag: (label: string) => string;
+  atualizarFlag: (id: string, patch: Partial<Omit<DefinicaoFlag, 'id'>>) => void;
+  /** Remove a definição **e** a marcação dela em todos os nós. */
+  removerFlag: (id: string) => void;
+  toggleFlagNoNo: (nodeId: string, flagId: string) => void;
+  setFiltroFlags: (ids: string[]) => void;
+
   // Setters de estado simples
   setSelectedId: (id: string | null) => void;
   setPlanoNome: (nome: string) => void;
@@ -109,7 +132,7 @@ export type CanvasStore = CanvasState & CanvasActions;
  * ========================================================================== */
 
 export function defaultLocalizadorData(): LocalizadorData {
-  return { nome: '', ja_criado: false, flags: {} };
+  return { nome: '', ja_criado: false, flags: [] };
 }
 
 export function defaultEdgeData(): EdgeData {
@@ -133,6 +156,7 @@ function planoParaFlow(plano: Plano): {
   edges: FlowEdge[];
   planoNome: string;
   flowMode: FlowMode;
+  flags: DefinicaoFlag[];
 } {
   return {
     nodes: plano.nodes.map((n) => ({
@@ -152,6 +176,7 @@ function planoParaFlow(plano: Plano): {
     })),
     planoNome: plano.planoNome,
     flowMode: plano.flowMode,
+    flags: plano.flags,
   };
 }
 
@@ -160,6 +185,7 @@ function flowParaPlano(state: CanvasState): Plano {
     version: SCHEMA_VERSION,
     planoNome: state.planoNome,
     flowMode: state.flowMode,
+    flags: state.flags,
     nodes: state.nodes.map((n) => ({
       id: n.id,
       position: n.position,
@@ -196,6 +222,8 @@ export const useCanvasStore = create<CanvasStore>()(
     selectedId: null,
     planoNome: inicial.planoNome,
     flowMode: inicial.flowMode,
+    flags: inicial.flags,
+    filtroFlags: [],
     somenteLeitura: false,
 
     // Em visualização, filtramos em vez de ignorar: `dimensions` e `select` são
@@ -295,6 +323,67 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
+    criarFlag: (label) => {
+      if (get().somenteLeitura) return '';
+      const nome = label.trim();
+      if (!nome) return '';
+      const id = uid('f');
+      set((s) => ({
+        flags: [
+          ...s.flags,
+          { id, code: sugerirCode(nome), label: nome, cor: proximaCor(s.flags) },
+        ],
+      }));
+      return id;
+    },
+
+    atualizarFlag: (id, patch) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        flags: s.flags.map((f) => (f.id === id ? { ...f, ...patch } : f)),
+      }));
+    },
+
+    // Limpar a marcação dos nós é parte da remoção, não faxina posterior: um id
+    // órfão não aparece no chip, mas voltaria a valer se alguém criasse uma
+    // flag nova reaproveitando o id — e a migração usa ids fixos justamente
+    // para os quatro nomes históricos.
+    removerFlag: (id) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        flags: s.flags.filter((f) => f.id !== id),
+        nodes: s.nodes.map((n) =>
+          n.data.flags.includes(id)
+            ? { ...n, data: { ...n.data, flags: n.data.flags.filter((x) => x !== id) } }
+            : n,
+        ),
+        filtroFlags: s.filtroFlags.filter((x) => x !== id),
+      }));
+    },
+
+    toggleFlagNoNo: (nodeId, flagId) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          if (n.id !== nodeId) return n;
+          const tem = n.data.flags.includes(flagId);
+          return {
+            ...n,
+            data: {
+              ...n.data,
+              flags: tem
+                ? n.data.flags.filter((x) => x !== flagId)
+                : [...n.data.flags, flagId],
+            },
+          };
+        }),
+      }));
+    },
+
+    // Sem guarda: filtrar é olhar, não editar. Vale em visualização, como o
+    // `flowMode`, e não é persistido.
+    setFiltroFlags: (ids) => set({ filtroFlags: ids }),
+
     setSelectedId: (id) => set({ selectedId: id }),
 
     setPlanoNome: (nome) => {
@@ -358,6 +447,9 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
+    // `filtroFlags` zera junto: as flags do plano que entra são outras, e um id
+    // que sobrasse do plano anterior esmaeceria o canvas inteiro sem que nada
+    // na tela explicasse por quê.
     loadPlano: (plano) => {
       const flow = planoParaFlow(plano);
       set({
@@ -365,6 +457,8 @@ export const useCanvasStore = create<CanvasStore>()(
         edges: flow.edges,
         planoNome: flow.planoNome,
         flowMode: flow.flowMode,
+        flags: flow.flags,
+        filtroFlags: [],
         selectedId: null,
       });
     },
@@ -385,7 +479,7 @@ export const useCanvasStore = create<CanvasStore>()(
 const debouncedSave = criarSavePlanoDebounced();
 
 useCanvasStore.subscribe(
-  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode] as const,
+  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags] as const,
   () => {
     // Em visualização, o que sobra de mutação são as medições do ReactFlow e o
     // modo de desenho — nada que valha gravar, e gravar carimbaria

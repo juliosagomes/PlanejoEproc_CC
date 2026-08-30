@@ -12,6 +12,22 @@ import type { Config } from 'tailwindcss';
  */
 export default {
   content: ['./index.html', './popup.html', './src/**/*.{ts,tsx}'],
+  /**
+   * As classes de cor das flags são montadas em runtime (`flag-cor-${f.cor}`),
+   * então o scanner do Tailwind nunca as encontra no código e as removia do
+   * bundle — os chips saíam sem cor nenhuma, sem erro nenhum. A paleta é fixa
+   * em oito (`CORES_FLAG` em `domain/flags.ts`); mexeu lá, mexa aqui.
+   */
+  safelist: [
+    'flag-cor-1',
+    'flag-cor-2',
+    'flag-cor-3',
+    'flag-cor-4',
+    'flag-cor-5',
+    'flag-cor-6',
+    'flag-cor-7',
+    'flag-cor-8',
+  ],
   theme: {
     extend: {
       colors: {
