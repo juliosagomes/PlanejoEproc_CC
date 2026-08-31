@@ -55,6 +55,27 @@ describe('loadCatalogoOrgao', () => {
     expect(localStorage.getItem(CATALOGO_KEY)).toBeNull();
   });
 
+  it('catálogo gravado antes do D-23 (sem `sistema`) continua carregando', () => {
+    // A regressão que este teste guarda: tornar `sistema` obrigatório reprova o
+    // catálogo de quem já usava o app e o manda para a quarentena — ou seja,
+    // apaga o catálogo do usuário numa atualização de versão.
+    const antigo = catalogoExemplo();
+    localStorage.setItem(CATALOGO_KEY, JSON.stringify(antigo));
+
+    const carregado = loadCatalogoOrgao();
+    expect(carregado).toEqual(antigo);
+    expect(carregado?.itens[0]?.sistema).toBeUndefined();
+  });
+
+  it('preserva a marca de sistema no round-trip', () => {
+    const cat: CatalogoOrgao = {
+      ...catalogoExemplo(),
+      itens: [{ id: 'lo-3', nome: 'ISENTO DE CUSTAS INICIAIS', sistema: true }],
+    };
+    saveCatalogoOrgao(cat);
+    expect(loadCatalogoOrgao()?.itens[0]?.sistema).toBe(true);
+  });
+
   it('versão futura é tratada como shape inválido', () => {
     const futuro = JSON.stringify({ ...catalogoExemplo(), version: 999 });
     localStorage.setItem(CATALOGO_KEY, futuro);

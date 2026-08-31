@@ -209,6 +209,11 @@ export function deriveChecklist(
   const groups = novoGrupo();
 
   for (const n of nodes) {
+    // Localizador de sistema fica de fora: o checklist é a lista do que a
+    // secretaria precisa configurar no Eproc, e um padrão do sistema nunca entra
+    // nessa lista. Incluí-lo o mostraria como tarefa pendente e ainda puxaria a
+    // contagem de progresso para baixo (decisoes.md#D-23).
+    if (n.data.sistema) continue;
     groups['Localizador'].push({
       kind: 'node',
       nodeId: n.id,

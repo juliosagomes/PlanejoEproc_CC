@@ -181,12 +181,13 @@ describe('parseSelectLocalizadores', () => {
 });
 
 describe('parseLocalizadorOrgao', () => {
-  it('filtra os localizadores de sistema (D-7)', () => {
+  it('importa os localizadores de sistema, marcados (D-23)', () => {
     const r = parseLocalizadorOrgao(ORGAO);
-    expect(r.ignoradosSistema).toBe(2);
-    expect(r.itens).toHaveLength(5);
-    expect(r.itens.every((i) => i.sistema === false)).toBe(true);
-    expect(r.itens.map((i) => i.sigla)).not.toContain('AlvEletr60Dias');
+    expect(r.sistema).toBe(2);
+    expect(r.itens).toHaveLength(7);
+    expect(r.itens.filter((i) => i.sistema)).toHaveLength(2);
+    expect(r.itens.map((i) => i.sigla)).toContain('AlvEletr60Dias');
+    expect(r.itens.find((i) => i.sigla === 'AlvEletr60Dias')?.sistema).toBe(true);
   });
 
   it('extrai descrição, data e total de processos', () => {

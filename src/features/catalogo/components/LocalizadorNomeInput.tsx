@@ -23,6 +23,7 @@ interface Option {
   descricao?: string;
   /** Presente apenas em opções vindas do catálogo. Texto livre não tem id. */
   localizadorId?: string;
+  sistema?: boolean;
 }
 
 interface LocalizadorNomeInputProps {
@@ -57,16 +58,18 @@ export function LocalizadorNomeInput({
     setInputValue(value);
   }, [value]);
 
+  // A ordem é a que `useSugestoesLocalizador` entrega — os da unidade primeiro,
+  // os de sistema depois, alfabéticos dentro de cada grupo. Reordenar aqui por
+  // label desfaria o agrupamento.
   const options = useMemo<Option[]>(
     () =>
-      itens
-        .map<Option>((it) => ({
-          value: it.nome,
-          label: it.nome,
-          ...(it.descricao ? { descricao: it.descricao } : {}),
-          localizadorId: it.id,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label, 'pt-BR')),
+      itens.map<Option>((it) => ({
+        value: it.nome,
+        label: it.nome,
+        ...(it.descricao ? { descricao: it.descricao } : {}),
+        ...(it.sistema ? { sistema: true } : {}),
+        localizadorId: it.id,
+      })),
     [itens],
   );
 
@@ -131,7 +134,10 @@ export function LocalizadorNomeInput({
           <span>{opt.label}</span>
         ) : (
           <div>
-            <div>{opt.label}</div>
+            <div className="flex items-baseline gap-1.5">
+              <span>{opt.label}</span>
+              {opt.sistema && <BadgeSistema />}
+            </div>
             {opt.descricao && (
               <div
                 style={{
@@ -160,6 +166,32 @@ export function LocalizadorNomeInput({
       menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
       menuPosition="fixed"
     />
+  );
+}
+
+/**
+ * Marca das opções que são padrão do Eproc (decisoes.md#D-23).
+ *
+ * Âmbar e não azul: `--destaque` é a cor do estado focado do próprio combobox, e
+ * um badge azul na lista se confundiria com "esta é a opção sob o cursor".
+ */
+function BadgeSistema() {
+  return (
+    <span
+      style={{
+        fontSize: 10,
+        lineHeight: 1.4,
+        padding: '0 5px',
+        borderRadius: 4,
+        flexShrink: 0,
+        color: 'var(--aviso)',
+        background: 'var(--aviso-suave)',
+        border: '1px solid var(--aviso)',
+      }}
+      title="Localizador padrão do Eproc, não criado pela unidade"
+    >
+      Sistema
+    </span>
   );
 }
 

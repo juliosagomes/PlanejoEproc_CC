@@ -32,7 +32,7 @@ function buildFixture(): Uint8Array {
   ];
 
   // 188 linhas Sistema=Sim. A primeira é a "ISENTO DE CUSTAS INICIAIS"
-  // que o teste verifica explicitamente como filtrada.
+  // que o teste verifica explicitamente como importada e marcada.
   linhas.push([
     'ISENTO DE CUSTAS INICIAIS POR DECISÃO',
     '',
@@ -95,12 +95,25 @@ describe('parseLocalizadoresXls — fixture sintética com estrutura do Eproc', 
     expect(stats.totalLinhas).toBe(365);
   });
 
-  it('filtra Localizador Sistema = Sim (188 no fixture; 177 não-sistema entram)', () => {
+  it('importa Localizador Sistema = Sim e marca (188 dos 365 no fixture)', () => {
     const { catalogo, stats } = parseLocalizadoresXls(carregarFixture());
 
-    expect(stats.ignoradosSistema).toBe(188);
-    expect(catalogo.itens).toHaveLength(177);
-    expect(stats.importados).toBe(177);
+    expect(catalogo.itens).toHaveLength(365);
+    expect(stats.importados).toBe(365);
+    expect(stats.sistema).toBe(188);
+    expect(catalogo.itens.filter((i) => i.sistema)).toHaveLength(188);
+  });
+
+  it('não marca `sistema` nos localizadores da unidade', () => {
+    const { catalogo } = parseLocalizadoresXls(carregarFixture());
+
+    const naoSistema = catalogo.itens.filter((i) => !i.sistema);
+    expect(naoSistema).toHaveLength(177);
+    // Ausente, não `false`: o spread condicional evita 177 chaves inúteis no
+    // JSON gravado, e `sistema?: boolean` é o que o schema aceita.
+    for (const item of naoSistema) {
+      expect(item).not.toHaveProperty('sistema');
+    }
   });
 
   it('decodifica emojis no nome (ZWJ multi-código)', () => {
@@ -124,13 +137,14 @@ describe('parseLocalizadoresXls — fixture sintética com estrutura do Eproc', 
     expect(comDesc.length).toBeGreaterThan(10);
   });
 
-  it('exclui itens cujo Localizador Sistema = Sim', () => {
+  it('inclui itens cujo Localizador Sistema = Sim, marcados', () => {
     const { catalogo } = parseLocalizadoresXls(carregarFixture());
-    // "ISENTO DE CUSTAS INICIAIS …" no fixture é Sistema=Sim → não pode entrar.
+    // "ISENTO DE CUSTAS INICIAIS …" no fixture é Sistema=Sim.
     const sistemaConhecido = catalogo.itens.find((i) =>
       i.nome.toLowerCase().includes('isento de custas iniciais'),
     );
-    expect(sistemaConhecido).toBeUndefined();
+    expect(sistemaConhecido).toBeDefined();
+    expect(sistemaConhecido?.sistema).toBe(true);
   });
 
   it('cada item ganha id único', () => {

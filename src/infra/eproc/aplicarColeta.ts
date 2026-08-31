@@ -26,9 +26,10 @@ import type { ColetaUnidade, FonteBruta } from './tipos';
  * a impossibilidade de identificar a unidade impedem gravar.
  */
 export interface ResumoColeta {
-  /** Localizadores gravados, já sem os de sistema. */
+  /** Localizadores gravados, incluindo os de sistema. */
   localizadores: number;
-  ignoradosSistema: number;
+  /** Quantos deles são localizadores de sistema (decisoes.md#D-23). */
+  sistema: number;
   /** Quantos casaram com um id do Eproc vindo do `<select>`. */
   comId: number;
   duplicados: number;
@@ -80,14 +81,11 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
 
   const brutaOrgao = coleta.fontes.localizadoresOrgao;
   let daListagem: LocalizadorUnidade[] = [];
-  let ignoradosSistema = 0;
 
   if (brutaOrgao?.status === 'ok') {
     try {
       for (const fragmento of brutaOrgao.fragmentos) {
-        const r = parseLocalizadorOrgao(fragmento);
-        daListagem = daListagem.concat(r.itens);
-        ignoradosSistema += r.ignoradosSistema;
+        daListagem = daListagem.concat(parseLocalizadorOrgao(fragmento).itens);
       }
     } catch (err) {
       return {
@@ -141,7 +139,9 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
     }),
     resumo: {
       localizadores: itens.length,
-      ignoradosSistema,
+      // Contado do resultado final, não somado dos parsers: só assim o número
+      // corresponde ao que foi de fato gravado, depois da dedupe.
+      sistema: itens.filter((i) => i.sistema).length,
       comId: casados,
       duplicados: semDuplicados.duplicados,
       modelos: modelos.length,

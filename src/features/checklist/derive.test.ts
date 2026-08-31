@@ -33,6 +33,35 @@ describe('deriveChecklist', () => {
     expect(g.Localizador[1]?.nome).toBe('(sem nome)');
   });
 
+  it('localizador de sistema fica fora do checklist, mas segue servindo de contexto', () => {
+    const sistema: Localizador = {
+      id: 'n2',
+      position: { x: 0, y: 0 },
+      data: { nome: 'ISENTO DE CUSTAS', ja_criado: false, sistema: true, flags: [] },
+    };
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'manual',
+          resumo: '',
+          observacao: '',
+          subitems: [{ id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false }],
+        },
+      },
+    ];
+
+    const g = deriveChecklist([noLocalizador('n1', 'Despachos'), sistema], edges);
+
+    // Não é tarefa da secretaria: não entra na lista nem conta no progresso.
+    expect(g.Localizador).toHaveLength(1);
+    expect(g.Localizador[0]?.nome).toBe('Despachos');
+    // Mas continua nomeando a ponta da aresta — o fluxo passa por ele.
+    expect(g['Modelo'][0]).toMatchObject({ contexto: 'Despachos → ISENTO DE CUSTAS' });
+  });
+
   it('subitens de aresta manual caem nas próprias categorias com contexto', () => {
     const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
     const edges: Edge[] = [

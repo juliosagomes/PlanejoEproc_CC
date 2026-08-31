@@ -86,11 +86,8 @@ export function SincronizacaoUnidadeModal({ onFechar }: SincronizacaoUnidadeModa
           ) : resumo ? (
             <ul className="text-[12.5px] text-texto-2 flex flex-col gap-1">
               <Linha rotulo="Localizadores importados" valor={resumo.localizadores} />
-              {resumo.ignoradosSistema > 0 && (
-                <Linha
-                  rotulo="Ignorados (localizadores de sistema)"
-                  valor={resumo.ignoradosSistema}
-                />
+              {resumo.sistema > 0 && (
+                <Linha rotulo="De sistema (marcados)" valor={resumo.sistema} />
               )}
               {resumo.duplicados > 0 && (
                 <Linha rotulo="Ignorados (repetidos)" valor={resumo.duplicados} />

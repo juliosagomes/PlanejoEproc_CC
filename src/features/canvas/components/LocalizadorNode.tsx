@@ -11,6 +11,11 @@ import { useCanvasStore } from '../store';
  * tracejada quando ainda **não foi criado** no Eproc; sólida quando criado,
  * com badge verde no canto superior direito. Selo de seleção quando ativo.
  *
+ * Localizador **padrão do Eproc** ganha faixa âmbar à esquerda e sai do eixo
+ * `ja_criado` por completo — nem tracejado, nem badge verde. Não é algo que a
+ * secretaria crie, então nem "falta criar" nem "já criei" dizem a verdade sobre
+ * ele (decisoes.md#D-23).
+ *
  * Não tem estado próprio — toda mutação flui pela store (Fase 5). Lê `flags`
  * dali porque as definições são do plano, não do nó: o nó guarda só ids.
  */
@@ -26,13 +31,15 @@ export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorData>) 
     <div
       className={cn('pj-node', {
         selected: selected ?? false,
-        created: data.ja_criado,
-        'not-created': !data.ja_criado,
+        created: !data.sistema && data.ja_criado,
+        'not-created': !data.sistema && !data.ja_criado,
+        sistema: data.sistema ?? false,
       })}
+      {...(data.sistema ? { title: 'Localizador padrão do Eproc' } : {})}
     >
       <Handle type="target" position={Position.Left} />
 
-      {data.ja_criado && (
+      {data.ja_criado && !data.sistema && (
         <span className="ok-corner" title="Já criado no Eproc">
           <Icon.CheckCorner />
         </span>

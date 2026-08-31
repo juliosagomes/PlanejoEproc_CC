@@ -304,6 +304,15 @@ body {
       0 0 0 1px var(--destaque),
       0 4px 14px -6px oklch(0.55 0.15 265 / 0.35);
   }
+  /* Localizador padrão do Eproc (decisoes.md#D-23). Depois de `.selected` de
+     propósito: a marca é sobre o que o localizador É, e some-la ao selecionar
+     esconderia o dado justo quando o usuário está olhando para o nó. O
+     `border-left-style` fixo mantém a faixa sólida sob o tracejado de
+     `.not-created`, e o padding compensa os 2px extras para o texto não pular. */
+  .pj-node.sistema {
+    border-left: 3px solid var(--aviso);
+    padding-left: 9px;
+  }
   .pj-node-name {
     font-weight: 600;
     color: var(--texto);

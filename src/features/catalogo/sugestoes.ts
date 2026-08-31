@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type {
   ItemCatalogoUnidade,
   LocalizadorOrgao,
+  LocalizadorUnidade,
   SubitemCategoria,
 } from '@/domain';
 import { semDecoracao } from '@/infra/eproc/nomeLocalizador';
@@ -23,28 +24,48 @@ import { selectLocalizadoresUnidade, useUnidadeStore } from './storeUnidade';
  * é o que o Eproc mostra nas telas onde o usuário escolhe localizador, e é o que
  * o parser do XLS já vinha gravando em `nome` (coluna "Localizador"). Trocar
  * agora mudaria em silêncio o texto dos planos existentes.
+ *
+ * Os localizadores **de sistema** vêm junto, marcados e no fim da lista
+ * (decisoes.md#D-23).
  */
 export function useSugestoesLocalizador(): LocalizadorOrgao[] {
   const doXls = useCatalogoStore(selectItens);
   const daUnidade = useUnidadeStore(selectLocalizadoresUnidade);
 
-  return useMemo(() => {
-    const saida: LocalizadorOrgao[] = daUnidade.map((l) => ({
-      id: l.eprocId ?? `un-${l.sigla}`,
-      nome: l.sigla,
-      ...(l.descricao ? { descricao: l.descricao } : {}),
-    }));
+  return useMemo(() => unirSugestoes(daUnidade, doXls), [doXls, daUnidade]);
+}
 
-    const vistos = new Set(saida.map((i) => semDecoracao(i.nome)));
-    for (const item of doXls) {
-      const chave = semDecoracao(item.nome);
-      if (chave && vistos.has(chave)) continue;
-      if (chave) vistos.add(chave);
-      saida.push(item);
-    }
+/**
+ * A união em si, separada do hook para poder ser testada sem renderizar.
+ *
+ * A ordem de saída é a de apresentação — os da unidade primeiro, os de sistema
+ * depois, alfabéticos dentro de cada grupo, como `useSugestoesSubitem` faz com
+ * `outroOrgao`. Quem consome não reordena: a lista praticamente dobrou de
+ * tamanho com os de sistema, e o que a unidade criou é o que se procura antes.
+ */
+export function unirSugestoes(
+  daUnidade: LocalizadorUnidade[],
+  doXls: LocalizadorOrgao[],
+): LocalizadorOrgao[] {
+  const saida: LocalizadorOrgao[] = daUnidade.map((l) => ({
+    id: l.eprocId ?? `un-${l.sigla}`,
+    nome: l.sigla,
+    ...(l.descricao ? { descricao: l.descricao } : {}),
+    ...(l.sistema ? { sistema: true } : {}),
+  }));
 
-    return saida.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-  }, [doXls, daUnidade]);
+  const vistos = new Set(saida.map((i) => semDecoracao(i.nome)));
+  for (const item of doXls) {
+    const chave = semDecoracao(item.nome);
+    if (chave && vistos.has(chave)) continue;
+    if (chave) vistos.add(chave);
+    saida.push(item);
+  }
+
+  return saida.sort((a, b) => {
+    const proprio = Number(!!a.sistema) - Number(!!b.sistema);
+    return proprio !== 0 ? proprio : a.nome.localeCompare(b.nome, 'pt-BR');
+  });
 }
 
 /**

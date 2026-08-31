@@ -74,6 +74,11 @@
 
 ## D-7 · Catálogo do órgão é global por navegador, fora do plano
 
+> **Emendada por [D-23](#d-23--localizadores-de-sistema-entram-marcados-em-vez-de-filtrados).**
+> O filtro de `Localizador Sistema = Sim` deixou de existir: eles entram no
+> catálogo, marcados. O resto abaixo — chave própria, fora do JSON do plano —
+> continua valendo.
+
 **Decisão.** O catálogo de localizadores do órgão é persistido em chave própria do `localStorage` (`planejoeproc:catalogo:orgao`), independente dos planos. **Não** entra no JSON exportado de plano. Itens com `Localizador Sistema = Sim` são filtrados no parser e nunca chegam ao storage.
 
 **Por que.** O catálogo é uma propriedade do **usuário/órgão**, não do plano específico. Carregar uma vez deve valer para todos os planos. Se viajasse junto do JSON, planos antigos ficariam com catálogos desatualizados ao abrir noutra máquina, e duplicaríamos centenas de KB no payload de cada export. Filtrar Sistema=Sim no parser é alinhado ao propósito do app: incentivar o usuário a desenhar fluxos próprios; localizadores de sistema do Eproc são padrão e sugeri-los seria contraproducente.
@@ -869,6 +874,66 @@ o pedido for contagem de pendências por setor no cabeçalho, o cálculo do `sta
 em `App.tsx` é o ponto. E se a duplicação entre planos da mesma vara incomodar
 de verdade, o caminho **não** é mudar o escopo: é um botão de "copiar setores de
 outro plano", mantendo a lista dentro de cada plano.
+
+---
+
+## D-23 · Localizadores de sistema entram marcados, em vez de filtrados
+
+> **Emenda ao [D-7](#d-7--catálogo-do-órgão-é-global-por-navegador-fora-do-plano)**,
+> e vale igualmente para o caminho do D-16.
+
+**Decisão.** Os localizadores com `Localizador Sistema = Sim` **entram** nos dois
+catálogos — o do XLS e o lido da unidade — e aparecem na autocomplete, marcados
+como de sistema. Não há opt-in, checkbox nem filtro para escondê-los: o destaque
+substitui o filtro. A marca viaja do catálogo até o nó do plano
+(`LocalizadorData.sistema`) e é visível em quatro lugares — badge âmbar na lista
+de sugestões, contagem no resumo das duas importações, linha explicativa no
+painel do nó e faixa âmbar à esquerda no nó do canvas.
+
+**Por que.** O D-7 filtrava porque "sugeri-los seria contraproducente" para um
+app que existe para incentivar fluxos próprios. Medido contra um export real, o
+custo do argumento aparece: **188 de 365** itens sumiam. E o argumento confundia
+duas coisas — *criar* um localizador de sistema (o usuário não cria, e nem
+deveria) e *desenhar um fluxo que passa por ele* (o que acontece o tempo todo:
+os processos entram e saem dos localizadores padrão do Eproc). Quem desenhava
+esse trecho digitava o nome à mão, sem sugestão, sem descrição e sem o app saber
+que aquele localizador já existe no Eproc — exatamente o dado que o catálogo
+existe para trazer.
+
+Nenhum bump de versão acompanha a mudança. `LocalizadorOrgao.sistema` e
+`LocalizadorData.sistema` são **opcionais** de propósito: catálogos e planos já
+gravados não têm o campo, e exigi-lo os reprovaria no `safeParse` — que, nos dois
+casos, significa mandar para a quarentena o dado do usuário. `CatalogoOrgao`
+segue na v1 e `SCHEMA_VERSION` na v2, sem migração.
+
+A marca no nó **não** é `ja_criado` de outro nome. `ja_criado` é um checkbox do
+usuário e sobrevive à digitação livre; `sistema` é fato sobre o catálogo e é
+apagado quando o nome é editado à mão, senão a faixa âmbar continuaria afirmando
+algo sobre um nome que já não é o do catálogo.
+
+**Localizador de sistema sai do eixo `ja_criado` por inteiro.** Não recebe a
+marca ao ser escolhido do catálogo, não mostra borda verde nem o "certinho" no
+canto, não expõe o checkbox "Já existe no Eproc" no painel, e **não entra no
+checklist**. A razão é que as duas respostas daquele eixo são falsas para ele:
+desmarcado afirma que falta criá-lo, marcado afirma que alguém o criou, e ele
+simplesmente está lá em toda unidade. O efeito colateral que isso evita é o pior
+dos dois: incluído, ele apareceria no checklist — que é a lista do que a
+secretaria precisa configurar — como tarefa pendente, puxando a contagem de
+progresso para baixo por algo que ninguém vai fazer. Ele continua nomeando as
+pontas das arestas no checklist, porque ali é contexto do fluxo, não tarefa.
+
+**Custo assumido.** A lista de sugestões praticamente dobra. A mitigação é a
+ordenação — os da unidade primeiro, os de sistema depois, alfabéticos dentro de
+cada grupo, a mesma forma que `useSugestoesSubitem` já usava para itens de outro
+órgão. Quem digita filtra antes de chegar ao fim da lista; quem rola vê primeiro
+o que a unidade criou.
+
+**O que precisaria mudar para evoluir.** Se a lista incomodar mesmo assim, o
+próximo passo é um filtro na autocomplete (mostrar/esconder os de sistema), não
+voltar a filtrar na importação: o dado gravado passa a ser o conjunto completo, e
+esconder na apresentação é reversível — não importar não é. Se o Eproc passar a
+distinguir mais de duas categorias de localizador, `sistema: boolean` vira um
+campo de categoria, e os quatro pontos de destaque leem dele.
 
 ---
 

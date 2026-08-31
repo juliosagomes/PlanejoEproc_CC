@@ -180,6 +180,7 @@ const LocalizadorDataSchema = z.object({
   descricao: z.string().optional(),
   observacao: z.string().optional(),
   ja_criado: z.boolean(),
+  sistema: z.boolean().optional(),
   flags: z.array(z.string()),
 });
 
@@ -305,6 +306,9 @@ const LocalizadorOrgaoSchema = z.object({
   id: z.string(),
   nome: z.string(),
   descricao: z.string().optional(),
+  // `.optional()` porque catálogos gravados antes do D-23 não têm o campo, e
+  // reprová-los aqui equivaleria a apagar o catálogo do usuário.
+  sistema: z.boolean().optional(),
 }) satisfies z.ZodType<LocalizadorOrgao>;
 
 export const CatalogoOrgaoSchema = z.object({

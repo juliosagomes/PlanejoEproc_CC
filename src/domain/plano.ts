@@ -26,6 +26,15 @@ export interface LocalizadorData {
   /** Marcado quando o localizador já existe no Eproc. */
   ja_criado: boolean;
   /**
+   * `true` quando o nome veio do catálogo e é um localizador **padrão do
+   * Eproc**. Diferente de `ja_criado`, não é escolha do usuário: é fato sobre o
+   * catálogo, e some quando o nome é editado à mão (decisoes.md#D-23).
+   *
+   * Opcional, e por isso aditivo — planos v2 sem o campo seguem validando, sem
+   * migração.
+   */
+  sistema?: boolean;
+  /**
    * Ids das flags do plano que valem neste localizador. Id sem definição
    * correspondente é ignorado na renderização, não é erro: outra aba pode ter
    * apagado a definição entre um render e outro.

@@ -48,7 +48,10 @@ export interface LocalizadorUnidade {
   sigla: string;
   nome: string;
   descricao?: string;
-  /** Coluna "Localizador Sistema". Itens de sistema são filtrados (D-7). */
+  /**
+   * Coluna "Localizador Sistema". Itens de sistema entram no catálogo e são
+   * marcados, não filtrados (decisoes.md#D-23).
+   */
   sistema: boolean;
   /** Como o Eproc mostra: `dd/MM/yyyy HH:mm:ss`. Não normalizado de propósito. */
   dataInclusao?: string;

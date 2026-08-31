@@ -255,10 +255,12 @@ describe('coletor do Eproc', () => {
 
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    // 7 linhas na fixture, 2 de sistema filtradas (D-7).
-    expect(r.resumo.localizadores).toBe(5);
-    expect(r.resumo.ignoradosSistema).toBe(2);
-    expect(r.resumo.comId).toBe(5);
+    // 7 linhas na fixture, 2 delas de sistema — todas entram, marcadas (D-23).
+    expect(r.resumo.localizadores).toBe(7);
+    expect(r.resumo.sistema).toBe(2);
+    // 7, não 5: o `<select>` da fixture também lista os dois de sistema, então
+    // eles chegam ao catálogo com o id do Eproc como qualquer outro.
+    expect(r.resumo.comId).toBe(7);
     expect(r.catalogo.unidade.chave).toContain('::x0000000::ULA 2ª V.FAM.SUC');
     expect(r.catalogo.localizadores[0]?.eprocId).toBe('11772027734669582002217986416');
     expect(r.resumo.textosPadrao).toBe(3);
@@ -302,7 +304,7 @@ describe('coletor do Eproc', () => {
 
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(r.resumo.localizadores).toBe(5);
+    expect(r.resumo.localizadores).toBe(7);
     expect(r.resumo.modelos).toBe(0);
     expect(r.catalogo.fontes.modelos?.status).toBe('semPermissao');
   });

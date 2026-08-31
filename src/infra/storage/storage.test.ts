@@ -164,6 +164,20 @@ describe('savePlano lazy-cria entrada no índice', () => {
     expect(loadPlano().edges[0]?.data.dobra).toEqual({ fracaoX: 0.2, desvioY: -40 });
   });
 
+  // Mesmo par do teste da dobra: `planoExemplo` não tem `data.sistema`, então o
+  // round-trip acima já prova que planos anteriores ao D-23 seguem válidos —
+  // este fecha o outro lado.
+  it('round-trip preserva a marca de localizador de sistema no nó', () => {
+    const original = planoExemplo();
+    const [no] = original.nodes;
+    if (!no) throw new Error('fixture sem nó');
+    no.data.sistema = true;
+
+    savePlano(original);
+
+    expect(loadPlano().nodes[0]?.data.sistema).toBe(true);
+  });
+
   // `z.number()` sozinho barra NaN mas deixa passar Infinity, que viraria uma
   // coordenada de path inválida. Um plano assim é dado corrompido: vai para o
   // backup e o app abre vazio, em vez de desenhar lixo.

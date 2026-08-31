@@ -19,8 +19,9 @@ import { uid } from '@/utils/uid';
  *    numéricas (`&#128221;`), inclusive em sequências ZWJ multi-código.
  *
  * Comportamento:
- *  - Filtra fora os "Localizador Sistema = Sim" — são padrões do Eproc, e o
- *    objetivo do PlanejoEproc é incentivar fluxos próprios.
+ *  - Importa também os "Localizador Sistema = Sim", marcando-os com `sistema`
+ *    para que a apresentação os distinga dos criados pela unidade
+ *    (decisoes.md#D-23).
  *  - Decodifica entidades HTML em nome e descrição.
  *  - Deduplica por nome (case-insensitive).
  *  - Lança `XlsParseError` se o cabeçalho esperado não for encontrado ou o
@@ -37,7 +38,8 @@ export interface ParseStats {
   /** Linhas de dado examinadas (após o cabeçalho). */
   totalLinhas: number;
   importados: number;
-  ignoradosSistema: number;
+  /** Quantos dos importados são localizadores de sistema. */
+  sistema: number;
   ignoradosVazios: number;
   ignoradosDuplicados: number;
 }
@@ -98,7 +100,7 @@ export function parseLocalizadoresXls(
   const stats: ParseStats = {
     totalLinhas: 0,
     importados: 0,
-    ignoradosSistema: 0,
+    sistema: 0,
     ignoradosVazios: 0,
     ignoradosDuplicados: 0,
   };
@@ -111,11 +113,7 @@ export function parseLocalizadoresXls(
     if (!row) continue;
     stats.totalLinhas += 1;
 
-    const rawSistema = String(row[COL_SISTEMA] ?? '').trim().toLowerCase();
-    if (rawSistema === 'sim') {
-      stats.ignoradosSistema += 1;
-      continue;
-    }
+    const sistema = String(row[COL_SISTEMA] ?? '').trim().toLowerCase() === 'sim';
 
     const nome = decodeHtmlEntities(String(row[COL_LOCALIZADOR] ?? ''))
       .replace(/\s+/g, ' ')
@@ -132,10 +130,12 @@ export function parseLocalizadoresXls(
     vistos.add(chave);
 
     const descricao = decodeHtmlEntities(String(row[COL_DESCRICAO] ?? '')).trim();
+    if (sistema) stats.sistema += 1;
     itens.push({
       id: uid('lo'),
       nome,
       ...(descricao ? { descricao } : {}),
+      ...(sistema ? { sistema: true } : {}),
     });
   }
 

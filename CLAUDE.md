@@ -248,6 +248,9 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
   `ilustracoes/pecas.tsx`; renomeou uma delas, passe o grep lá.
 - Flags do localizador customizáveis por setor/servidor (decisoes.md#D-22), em
   `features/flags/`. Trouxeram a `SCHEMA_VERSION = 2` e a primeira migração.
+- Localizadores de sistema entram nos dois catálogos, marcados em vez de
+  filtrados (decisoes.md#D-23). Sem bump de versão: os campos `sistema` novos são
+  opcionais justamente para não mandar catálogo e plano gravados à quarentena.
 
 ## Regras de ouro
 

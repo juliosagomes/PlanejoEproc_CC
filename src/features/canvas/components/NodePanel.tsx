@@ -22,8 +22,22 @@ export function NodePanel({ node, onGerenciarFlags }: NodePanelProps) {
   const itensCatalogo = useSugestoesLocalizador();
   const data = node.data;
 
+  // Localizador de sistema não recebe `ja_criado`: o eixo "a secretaria já criou
+  // isto no Eproc?" não se aplica a um padrão que existe em todas as unidades, e
+  // marcá-lo o mandaria para o checklist como tarefa concluída de algo que nunca
+  // foi tarefa.
   const onPickFromCatalogo = (item: LocalizadorOrgao) =>
-    updateNode(node.id, { nome: item.nome, ja_criado: true });
+    updateNode(node.id, {
+      nome: item.nome,
+      ja_criado: !item.sistema,
+      sistema: item.sistema ?? false,
+    });
+
+  // Digitar à mão limpa a marca de sistema. Diferente de `ja_criado`, que é um
+  // checkbox do usuário e por isso sobrevive à digitação livre, `sistema` é fato
+  // sobre o catálogo: mantê-lo com o nome já editado seria uma marca mentindo.
+  const onChangeNome = (nome: string) =>
+    updateNode(node.id, data.sistema ? { nome, sistema: false } : { nome });
 
   return (
     <div className="flex flex-col h-full">
@@ -55,10 +69,16 @@ export function NodePanel({ node, onGerenciarFlags }: NodePanelProps) {
             value={data.nome}
             itens={itensCatalogo}
             autoFocus={!somenteLeitura}
-            onChangeNome={(nome) => updateNode(node.id, { nome })}
+            onChangeNome={onChangeNome}
             onPickFromCatalogo={onPickFromCatalogo}
             onDeleteEmpty={() => deleteNode(node.id)}
           />
+          {data.sistema && (
+            <div className="text-[11.5px] text-texto-3 leading-snug mt-1.5">
+              Localizador padrão do Eproc — existe em todas as unidades e não é
+              criado pela secretaria.
+            </div>
+          )}
         </div>
 
         <AcoesPreferenciaisNoEproc nome={data.nome} />
@@ -74,30 +94,35 @@ export function NodePanel({ node, onGerenciarFlags }: NodePanelProps) {
           />
         </div>
 
-        <div
-          className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg"
-          style={{
-            background: data.ja_criado ? 'var(--ok-suave)' : 'var(--superficie-2)',
-            border: `1px solid ${data.ja_criado ? 'var(--ok-borda)' : 'var(--borda)'}`,
-          }}
-        >
-          <input
-            type="checkbox"
-            className="pj-check"
-            checked={data.ja_criado}
-            onChange={(e) => updateNode(node.id, { ja_criado: e.target.checked })}
-            id={`chk-${node.id}`}
-          />
-          <label
-            htmlFor={`chk-${node.id}`}
-            className="flex-1 text-[12.5px] font-medium cursor-pointer"
+        {/* Sem "Já existe no Eproc" para localizador de sistema: a caixa
+            desmarcada afirmaria que falta criá-lo, e a marcada, que alguém o
+            criou. Nenhuma das duas é verdade — ele simplesmente está lá. */}
+        {!data.sistema && (
+          <div
+            className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg"
+            style={{
+              background: data.ja_criado ? 'var(--ok-suave)' : 'var(--superficie-2)',
+              border: `1px solid ${data.ja_criado ? 'var(--ok-borda)' : 'var(--borda)'}`,
+            }}
           >
-            Já existe no Eproc
-            <div className="text-[11px] text-texto-3 font-normal mt-px">
-              Marque quando o localizador estiver criado.
-            </div>
-          </label>
-        </div>
+            <input
+              type="checkbox"
+              className="pj-check"
+              checked={data.ja_criado}
+              onChange={(e) => updateNode(node.id, { ja_criado: e.target.checked })}
+              id={`chk-${node.id}`}
+            />
+            <label
+              htmlFor={`chk-${node.id}`}
+              className="flex-1 text-[12.5px] font-medium cursor-pointer"
+            >
+              Já existe no Eproc
+              <div className="text-[11px] text-texto-3 font-normal mt-px">
+                Marque quando o localizador estiver criado.
+              </div>
+            </label>
+          </div>
+        )}
 
         <div>
           <div className="flex items-baseline justify-between gap-2">

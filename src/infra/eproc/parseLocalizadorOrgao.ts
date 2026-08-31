@@ -28,7 +28,8 @@ const OBRIGATORIAS: readonly Campo[] = ['sigla', 'nome', 'sistema'];
 
 export interface LinhasOrgao {
   itens: LocalizadorUnidade[];
-  ignoradosSistema: number;
+  /** Quantos dos itens são localizadores de sistema. */
+  sistema: number;
   ignoradosVazios: number;
 }
 
@@ -36,7 +37,7 @@ export function parseLocalizadorOrgao(fragmento: string): LinhasOrgao {
   const grade = abrirGrade<Campo>(fragmento, SINONIMOS, OBRIGATORIAS);
 
   const itens: LocalizadorUnidade[] = [];
-  let ignoradosSistema = 0;
+  let sistema = 0;
   let ignoradosVazios = 0;
 
   for (const linha of grade.linhas) {
@@ -46,13 +47,11 @@ export function parseLocalizadorOrgao(fragmento: string): LinhasOrgao {
       continue;
     }
 
-    // D-7: localizadores de sistema são padrões do Eproc e sugeri-los vai contra
-    // o propósito do app, que é incentivar o desenho de fluxos próprios.
-    const sistema = /^sim$/i.test(grade.celula(linha, 'sistema'));
-    if (sistema) {
-      ignoradosSistema += 1;
-      continue;
-    }
+    // D-23: localizadores de sistema entram no catálogo marcados. Eles são
+    // padrões do Eproc, mas os fluxos da unidade passam por eles, e escondê-los
+    // tirava da autocomplete metade dos nomes que o usuário precisa escrever.
+    const ehSistema = /^sim$/i.test(grade.celula(linha, 'sistema'));
+    if (ehSistema) sistema += 1;
 
     const nome = grade.celula(linha, 'nome') || sigla;
     const descricao = grade.celula(linha, 'descricao');
@@ -62,14 +61,14 @@ export function parseLocalizadorOrgao(fragmento: string): LinhasOrgao {
     itens.push({
       sigla,
       nome,
-      sistema: false,
+      sistema: ehSistema,
       ...(descricao ? { descricao } : {}),
       ...(dataInclusao ? { dataInclusao } : {}),
       ...(Number.isFinite(qtd) ? { qtdProcessos: qtd } : {}),
     });
   }
 
-  return { itens, ignoradosSistema, ignoradosVazios };
+  return { itens, sistema, ignoradosVazios };
 }
 
 /**

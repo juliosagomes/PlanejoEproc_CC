@@ -154,8 +154,8 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
               </div>
               <div className="text-[12px] text-texto-3 leading-snug">
                 Exporte os localizadores do seu órgão pelo Eproc (XLS) e
-                importe aqui. Apenas localizadores que não são do sistema
-                entram no catálogo.
+                importe aqui. Os localizadores padrão do Eproc entram junto,
+                marcados como <strong>Sistema</strong> nas sugestões.
               </div>
             </div>
           )}
@@ -171,10 +171,9 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
               <div className="font-semibold text-[13px] mb-1">Resumo da importação</div>
               <ul className="list-disc pl-4 text-texto-2">
                 <li>{ultimasStats.importados} importados</li>
-                {ultimasStats.ignoradosSistema > 0 && (
+                {ultimasStats.sistema > 0 && (
                   <li>
-                    {ultimasStats.ignoradosSistema} ignorados (Localizador
-                    Sistema = Sim)
+                    {ultimasStats.sistema} de sistema (importados e marcados)
                   </li>
                 )}
                 {ultimasStats.ignoradosDuplicados > 0 && (
