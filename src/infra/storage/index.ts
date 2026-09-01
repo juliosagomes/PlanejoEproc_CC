@@ -46,6 +46,12 @@ export {
   clearCatalogoOrgao,
 } from './catalogo';
 export {
+  ANOTACOES_KEY,
+  loadAnotacoesCatalogo,
+  saveAnotacoesCatalogo,
+  clearAnotacoesCatalogo,
+} from './anotacoesCatalogo';
+export {
   CATALOGO_UNIDADE_PREFIXO,
   catalogoUnidadeKey,
   getUnidadeAtiva,
@@ -62,5 +68,6 @@ export {
   PlansIndexSchema,
   CatalogoOrgaoSchema,
   CatalogoUnidadeSchema,
+  AnotacoesCatalogoSchema,
   type PlanoBundle,
 } from './schema';

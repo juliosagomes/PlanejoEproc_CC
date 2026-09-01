@@ -937,6 +937,131 @@ campo de categoria, e os quatro pontos de destaque leem dele.
 
 ---
 
+## D-24 · Regra de ATP/Preferência vira recurso da aresta
+
+**Decisão.** `AtpRule` e `PrefRule` saem de `EdgeData` e passam a viver dentro de
+um `Subitem`, discriminadas pela `categoria` que já existia (`Regra de ATP` /
+`Preferência`). Com isso uma aresta comporta **quantas regras o usuário quiser** —
+duas ATPs, ou uma ATP e uma preferência —, e o botão "Detalhar" deixa de ser um
+só no topo do painel para virar um por recurso. `SCHEMA_VERSION` vai a 3, com
+migração.
+
+Três coisas **não** mudam, e é isso que mantém a mudança barata:
+
+- **`kind` continua sendo escolha do usuário e mandando na cor da aresta.** A
+  alternativa — derivar o traço das regras presentes — foi considerada e
+  descartada: uma transição com duas ATPs e uma preferência ainda tem um caráter
+  dominante, e quem sabe qual é é quem está desenhando o fluxo, não o app
+  contando campos. `PjEdge`, `KIND_LABELS` e o seletor de três swatches ficam
+  intactos.
+- **O clique único para detalhar sobrevive.** Enquanto não existe recurso da
+  categoria correspondente ao `kind`, o painel mostra o mesmo botão largo de
+  antes; ele cria a regra e abre o modal de uma vez. A lista só cresce quando o
+  usuário pede a segunda.
+- **`implantar` continua sendo o portão do checklist.** Recurso-regra sem a caixa
+  marcada não aparece lá — é o que a caixa sempre significou.
+
+**Por que.** O modelo antigo dizia que uma transição tem *uma* automação, e o
+Eproc não diz isso. O sintoma já estava no próprio app: as categorias `Regra de
+ATP` e `Preferência` existiam na lista "Recursos atrelados" desde o começo, então
+o usuário que precisava de uma segunda regra já a escrevia lá — só que como nome
+solto com checkbox, sem gatilho, sem filtros, sem ação, e sem entrar detalhada no
+checklist. A modelagem existia na cabeça do usuário e não no plano.
+
+**A regra perde `nome` e `ja_criado`; os dois são do recurso.** Manter cópias
+deixaria dois campos para a mesma coisa — um na linha da lista, outro no modal —,
+e eles divergiriam no primeiro descuido: o checkbox da linha e o do checklist
+mexem no do recurso e só nele, então a cópia da regra envelheceria calada.
+Consequência direta: `hasAtpDetail` / `hasPrefDetail` deixam de contar os dois, o
+que é mais correto do que era — um recurso batizado, ou marcado como já criado,
+ainda não é um recurso modelado.
+
+**O checklist agrupa por número de regras.** Antes, os recursos comuns da aresta
+ficavam aninhados como subitens da regra. Com duas ou mais regras não há a quem
+pendurá-los sem inventar um vínculo que o usuário nunca declarou, então: com uma
+regra só, o aninhamento é o de sempre; com duas ou mais, as regras viram itens
+irmãos e os recursos comuns vão para as próprias seções, com o contexto
+`"L1 → L2"` — exatamente a saída que já existia quando nenhuma regra pedia
+implantação. Como a migração produz no máximo uma regra por aresta, nenhum plano
+existente vê diferença.
+
+`toggleEdgeRuleCreated` some da store. Regra e recurso comum são o mesmo subitem
+agora, e `toggleSubitemCreated` dá conta dos dois.
+
+**Virar Manual passou a pedir confirmação.** O gesto sempre zerou `subitems`, mas
+antes a regra sobrevivia em `EdgeData.atp` e só ficava escondida. Agora ele apaga
+modelagem de verdade.
+
+**As formas v1 e v2 do schema foram congeladas.** Isto não é zelo: `PlanoV1Schema`
+reusava o `EdgeSchema` **corrente**, de modo que toda mudança na aresta mudava em
+silêncio o formato antigo que ele aceitava. Na v3 isso reprovaria plano v1 real —
+e reprovar, no `loadPlano`, significa mandar o plano do usuário para a quarentena.
+Cada versão passada agora tem cópia própria do schema da aresta, e as migrações
+se encadeiam (v1 → v2 → v3), cada passo com teste seu.
+
+**O que precisaria mudar para evoluir.** Se um dia fizer sentido dizer *qual*
+recurso pertence a *qual* regra numa aresta com várias, o caminho é um campo de
+vínculo no `Subitem` (o id da regra dona), não voltar a aninhar por adivinhação.
+E se o `kind` passar a incomodar como campo redundante, a pergunta a responder
+antes é o que a aresta mista deve parecer no canvas — a resposta a essa pergunta
+é que autoriza derivá-lo.
+
+---
+
+## D-25 · Catálogo consultável, com anotações do usuário
+
+**Decisão.** O modal "Catálogo órgão" deixa de ser só a tela de importar XLS e
+passa a **listar todos os recursos mapeados**, em quatro abas — Localizadores,
+Preferências, Modelos, Textos padrão — com busca. Cada linha abre dois campos
+livres: **descrição** e **orientações de uso**. As anotações moram numa chave
+própria do navegador, fora dos dois catálogos.
+
+**Por que listar.** O app já conhecia os quatro tipos — os três últimos vêm da
+sincronização com a unidade (D-16) —, mas eles só existiam como sugestão de
+autocomplete dentro de um campo de texto. Não havia como responder "o que a
+unidade tem?" sem começar a digitar um nome no lugar certo. O modal mostrava
+apenas um contador de localizadores, ignorando a lista que já tinha em mãos.
+
+As abas leem exatamente os mesmos hooks que alimentam a autocomplete —
+`useSugestoesLocalizador` e `useSugestoesSubitem`. Uma segunda régua de união e
+ordenação seria uma segunda verdade sobre o mesmo dado, livre para divergir da
+primeira; deste jeito, o que se vê no catálogo é o que vai ser sugerido no painel.
+
+**Por que anotar, e por que fora do catálogo.** O catálogo diz *o que existe*; a
+anotação diz *o que fazer com aquilo* — para que serve este modelo, quando usar
+aquela preferência, com o que não confundir. É conhecimento da secretaria, não do
+Eproc, e nenhuma coleta traz. Guardá-la dentro de `CatalogoOrgao` ou
+`CatalogoUnidade` a faria durar até a próxima atualização, porque reimportar o
+XLS e ressincronizar **sobrescrevem o catálogo inteiro**. Chave separada, e o
+"Limpar" do XLS diz explicitamente que as anotações ficam.
+
+**Chaveada por nome, não por id.** Não há id para usar: o XLS não traz um id
+estável e `eprocId` é opcional nos itens coletados. Para localizador a
+canonização é `semDecoracao` — a mesma que `unirSugestoes` usa para deduplicar os
+dois catálogos e que casa `📝 Minutar` com `MINUTAR`. Usar outra régua faria o app
+discordar de si mesmo sobre o que é "o mesmo localizador". Para os outros três a
+canonização é mais tímida (caixa e espaço, só): nomes de modelo e texto padrão se
+distinguem por pontuação e acento com frequência demais para colapsá-los.
+
+**Anotação esvaziada é anotação apagada**, e não registro em branco — senão o
+storage acumularia chaves mortas e o catálogo marcaria como "anotado" um recurso
+sem nada escrito.
+
+**O que ficou de fora.** *Criar* no catálogo um recurso que ainda não existe no
+Eproc — um modelo a redigir, uma preferência a cadastrar. É o passo natural
+seguinte, mas muda o que o catálogo é: hoje ele é o retrato do que está lá, e a
+lista de recursos a criar já tem lugar próprio, que é o checklist. Decidir antes
+de codar, como no item análogo do D-16.
+
+**O que precisaria mudar para evoluir.** A lista não é virtualizada, e não
+precisa: 365 localizadores é o pior caso medido (D-23) e a busca corta antes. Se
+o catálogo crescer uma ordem de grandeza, virtualizar a lista é mudança local,
+sem dependência nova. Se a anotação passar a valer entre pessoas da mesma
+unidade, ela precisa viajar na sincronização por lotação — e aí a chave por nome
+vira acerto, não acaso: é o único identificador que duas máquinas compartilham.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

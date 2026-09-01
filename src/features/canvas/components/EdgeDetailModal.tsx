@@ -72,6 +72,7 @@ export function EdgeDetailModal({
     return (
       <AtpModal
         nome={subitem.nome}
+        jaCriado={subitem.ja_criado}
         rule={subitem.atp}
         resumo={resumo}
         recursosComuns={recursosComuns}
@@ -86,6 +87,7 @@ export function EdgeDetailModal({
     return (
       <PrefModal
         nome={subitem.nome}
+        jaCriado={subitem.ja_criado}
         rule={subitem.pref}
         resumo={resumo}
         recursosComuns={recursosComuns}
@@ -103,6 +105,7 @@ export function EdgeDetailModal({
 
 interface PrefModalProps {
   nome: string;
+  jaCriado: boolean;
   rule: PrefRule | undefined;
   resumo: string;
   recursosComuns: number;
@@ -127,6 +130,7 @@ const MINUTA_MODO_LABEL: Record<PrefMinutaModo, string> = {
 
 function PrefModal({
   nome,
+  jaCriado,
   rule,
   resumo,
   recursosComuns,
@@ -135,14 +139,8 @@ function PrefModal({
   onClose,
   onChange,
 }: PrefModalProps) {
-  const r: PrefRule = rule ?? { implantar: false, ja_criado: false };
-  // `ja_criado` mora nos dois: na regra, porque é campo dela desde sempre; no
-  // recurso, porque é o checkbox da linha e do checklist. Escrever nos dois
-  // juntos é o que os mantém falando a mesma coisa.
-  const setR = (patch: Partial<PrefRule>) => {
-    const pref = { ...r, ...patch };
-    onChange({ pref, ...(patch.ja_criado === undefined ? {} : { ja_criado: patch.ja_criado }) });
-  };
+  const r: PrefRule = rule ?? { implantar: false };
+  const setR = (patch: Partial<PrefRule>) => onChange({ pref: { ...r, ...patch } });
 
   // Toggle do modo: clicar no já ativo desmarca; clicar no outro troca.
   // Manter `minutaConteudo` ao trocar — o texto digitado em "Modelo" pode
@@ -158,7 +156,13 @@ function PrefModal({
       somenteLeitura={somenteLeitura}
       onClose={onClose}
     >
-      <ImplantarRow rule={r} setR={setR} cat="Preferência" />
+      <ImplantarRow
+        implantar={r.implantar}
+        jaCriado={jaCriado}
+        setImplantar={(v) => setR({ implantar: v })}
+        setJaCriado={(v) => onChange({ ja_criado: v })}
+        cat="Preferência"
+      />
 
       <Field label="Nome da preferência">
         <input
@@ -252,6 +256,7 @@ function PrefModal({
 
 interface AtpModalProps {
   nome: string;
+  jaCriado: boolean;
   rule: AtpRule | undefined;
   resumo: string;
   recursosComuns: number;
@@ -263,6 +268,7 @@ interface AtpModalProps {
 
 function AtpModal({
   nome,
+  jaCriado,
   rule,
   resumo,
   recursosComuns,
@@ -271,11 +277,8 @@ function AtpModal({
   onClose,
   onChange,
 }: AtpModalProps) {
-  const r: AtpRule = rule ?? { implantar: false, ja_criado: false };
-  const setR = (patch: Partial<AtpRule>) => {
-    const atp = { ...r, ...patch };
-    onChange({ atp, ...(patch.ja_criado === undefined ? {} : { ja_criado: patch.ja_criado }) });
-  };
+  const r: AtpRule = rule ?? { implantar: false };
+  const setR = (patch: Partial<AtpRule>) => onChange({ atp: { ...r, ...patch } });
   const setTrigger = (patch: AtpTrigger) => setR({ trigger: patch });
   const setFiltros = (patch: Partial<AtpFiltros>) =>
     setR({ filtros: { ...(r.filtros ?? {}), ...patch } });
@@ -287,7 +290,13 @@ function AtpModal({
       somenteLeitura={somenteLeitura}
       onClose={onClose}
     >
-      <ImplantarRow rule={r} setR={setR} cat="Regra de ATP" />
+      <ImplantarRow
+        implantar={r.implantar}
+        jaCriado={jaCriado}
+        setImplantar={(v) => setR({ implantar: v })}
+        setJaCriado={(v) => onChange({ ja_criado: v })}
+        cat="Regra de ATP"
+      />
 
       <Field label="Nome da regra">
         <input
@@ -559,13 +568,26 @@ function FiltrosBloco({ filtros, setFiltros }: FiltrosBlocoProps) {
 
 void TIPO_CONTROLE_VALUES; // referenciado em tipos; importação não pode ser apagada
 
+/**
+ * As duas caixas moram na mesma linha mas em lugares diferentes do dado:
+ * `implantar` é da regra, e "já criado" é do recurso — é o mesmo checkbox da
+ * linha do painel e do checklist (decisoes.md#D-24).
+ */
 interface ImplantarRowProps {
-  rule: { implantar: boolean; ja_criado: boolean };
-  setR: (patch: { implantar?: boolean; ja_criado?: boolean }) => void;
+  implantar: boolean;
+  jaCriado: boolean;
+  setImplantar: (valor: boolean) => void;
+  setJaCriado: (valor: boolean) => void;
   cat: 'Regra de ATP' | 'Preferência';
 }
 
-function ImplantarRow({ rule, setR, cat }: ImplantarRowProps) {
+function ImplantarRow({
+  implantar,
+  jaCriado,
+  setImplantar,
+  setJaCriado,
+  cat,
+}: ImplantarRowProps) {
   return (
     <label
       className="flex items-center gap-2 cursor-pointer"
@@ -579,8 +601,8 @@ function ImplantarRow({ rule, setR, cat }: ImplantarRowProps) {
       <input
         type="checkbox"
         className="pj-check"
-        checked={rule.implantar}
-        onChange={(e) => setR({ implantar: e.target.checked })}
+        checked={implantar}
+        onChange={(e) => setImplantar(e.target.checked)}
       />
       <div className="flex-1">
         <div className="text-[13px] font-semibold">Implantar no checklist</div>
@@ -593,8 +615,8 @@ function ImplantarRow({ rule, setR, cat }: ImplantarRowProps) {
         type="checkbox"
         className="pj-check ml-auto"
         title="Já criado no Eproc"
-        checked={rule.ja_criado}
-        onChange={(e) => setR({ ja_criado: e.target.checked })}
+        checked={jaCriado}
+        onChange={(e) => setJaCriado(e.target.checked)}
       />
       <span className="mono text-[10.5px] text-texto-3">já criado</span>
     </label>

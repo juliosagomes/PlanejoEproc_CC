@@ -63,15 +63,16 @@ export interface AtpFiltros {
 }
 
 /**
- * O detalhamento de uma ATP. **Não tem nome**: quem nomeia é o `Subitem` que a
- * carrega (decisoes.md#D-24). Dois campos de nome para a mesma regra — um na
- * linha da lista, outro no modal — divergiriam no primeiro descuido.
+ * O detalhamento de uma ATP.
+ *
+ * **Não tem nome nem `ja_criado`**: os dois são do `Subitem` que a carrega
+ * (decisoes.md#D-24). Duplicá-los daria dois campos para a mesma coisa — um na
+ * linha da lista, outro no modal —, e eles divergiriam no primeiro descuido: o
+ * checkbox do checklist mexe no do recurso, e só nele.
  */
 export interface AtpRule {
   /** Se `true`, a regra vira item próprio na seção "Regra de ATP" do checklist. */
   implantar: boolean;
-  /** Marcado quando a regra já existe no Eproc. */
-  ja_criado: boolean;
   /** Bloco 1 do Eproc — discriminado por `tipo`. Pode ficar `undefined` até o usuário escolher. */
   trigger?: AtpTrigger;
   /** Bloco 3 do Eproc. Ver decisoes.md#D-2. */
@@ -108,10 +109,9 @@ export type PrefTipo = (typeof PREF_TIPOS)[number];
  */
 export type PrefMinutaModo = 'modelo' | 'texto_padrao';
 
-/** Detalhamento de uma preferência. Sem nome, pelo mesmo motivo de `AtpRule`. */
+/** Detalhamento de uma preferência. Sem nome e sem `ja_criado`, como `AtpRule`. */
 export interface PrefRule {
   implantar: boolean;
-  ja_criado: boolean;
   tipo?: PrefTipo;
   /** Efeito da preferência (texto livre). */
   acao?: string;
@@ -126,14 +126,14 @@ export interface PrefRule {
  * Predicados "tem detalhamento" usados pela UI pra destacar o botão "Detalhar"
  * quando o usuário já preencheu algo. Conta qualquer campo significativo:
  * texto não-vazio (após `trim`), `tipo`/`trigger` escolhidos, listas de
- * filtros não-vazias, ou as flags `implantar`/`ja_criado` ativadas.
+ * filtros não-vazias, ou a flag `implantar` ativada.
  *
- * O **nome** de propósito não conta: ele é do recurso, e um recurso batizado
- * "Regra de ATP" sem nada preenchido ainda não foi modelado.
+ * O **nome** e o **já criado** de propósito não contam: são do recurso, e um
+ * recurso batizado ou marcado ainda não é um recurso modelado.
  */
 export function hasAtpDetail(rule: AtpRule | undefined): boolean {
   if (!rule) return false;
-  if (rule.implantar || rule.ja_criado) return true;
+  if (rule.implantar) return true;
   if (rule.trigger) return true;
   if (rule.acaoTipo) return true;
   if (rule.acao?.trim()) return true;
@@ -150,7 +150,7 @@ export function hasAtpDetail(rule: AtpRule | undefined): boolean {
 
 export function hasPrefDetail(rule: PrefRule | undefined): boolean {
   if (!rule) return false;
-  if (rule.implantar || rule.ja_criado) return true;
+  if (rule.implantar) return true;
   if (rule.tipo) return true;
   if (rule.acao?.trim()) return true;
   if (rule.observacoes?.trim()) return true;

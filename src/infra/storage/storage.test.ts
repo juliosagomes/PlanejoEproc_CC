@@ -70,7 +70,6 @@ function planoExemplo(nome = 'Plano de teste'): Plano {
               ja_criado: false,
               atp: {
                 implantar: true,
-                ja_criado: false,
                 trigger: { tipo: 'L', diasNoLocalizador: 3 },
               },
             },

@@ -93,28 +93,17 @@ export function migrarPlanoV1(v1: PlanoV1): PlanoV2 {
 function subitensDaAresta(data: PlanoV2['edges'][number]['data']): Subitem[] {
   const regras: Subitem[] = [];
 
-  // `nome` sai da regra e vira o nome do recurso, então também conta como
-  // "tem detalhamento" aqui — `hasAtpDetail` já não o considera, e sem este
-  // `||` uma regra que só tinha nome seria descartada com ele.
-  if (data.atp && (hasAtpDetail(data.atp) || data.atp.nome.trim())) {
-    const { nome, ...rule } = data.atp;
-    regras.push({
-      id: uid('si'),
-      categoria: 'Regra de ATP',
-      nome,
-      ja_criado: rule.ja_criado,
-      atp: rule,
-    });
+  // `nome` e `ja_criado` saem da regra e passam a ser do recurso. Os dois
+  // também contam como "tem detalhamento" aqui — `hasAtpDetail` já não os
+  // considera, e sem isto uma regra batizada ou marcada seria descartada com
+  // eles.
+  if (data.atp && (hasAtpDetail(data.atp) || data.atp.nome.trim() || data.atp.ja_criado)) {
+    const { nome, ja_criado, ...atp } = data.atp;
+    regras.push({ id: uid('si'), categoria: 'Regra de ATP', nome, ja_criado, atp });
   }
-  if (data.pref && (hasPrefDetail(data.pref) || data.pref.nome.trim())) {
-    const { nome, ...rule } = data.pref;
-    regras.push({
-      id: uid('si'),
-      categoria: 'Preferência',
-      nome,
-      ja_criado: rule.ja_criado,
-      pref: rule,
-    });
+  if (data.pref && (hasPrefDetail(data.pref) || data.pref.nome.trim() || data.pref.ja_criado)) {
+    const { nome, ja_criado, ...pref } = data.pref;
+    regras.push({ id: uid('si'), categoria: 'Preferência', nome, ja_criado, pref });
   }
 
   return [...regras, ...data.subitems];

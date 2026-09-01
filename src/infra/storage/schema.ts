@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  ANOTACOES_CATALOGO_VERSION,
   CATALOGO_ORGAO_VERSION,
   CATALOGO_UNIDADE_VERSION,
   CORES_FLAG,
@@ -8,6 +9,8 @@ import {
   SUBITEM_CATS,
   TIPO_CONTROLE_VALUES,
   type AcaoPreferencialUnidade,
+  type AnotacaoRecurso,
+  type AnotacoesCatalogo,
   type CatalogoOrgao,
   type CatalogoUnidade,
   type DefinicaoFlag,
@@ -125,7 +128,6 @@ const AtpFiltrosSchema = z.object({
 
 const AtpRuleSchema = z.object({
   implantar: z.boolean(),
-  ja_criado: z.boolean(),
   trigger: AtpTriggerSchema.optional(),
   filtros: AtpFiltrosSchema.optional(),
   condicoes: z.string().optional(),
@@ -136,7 +138,6 @@ const AtpRuleSchema = z.object({
 
 const PrefRuleSchema = z.object({
   implantar: z.boolean(),
-  ja_criado: z.boolean(),
   tipo: z.enum(PREF_TIPOS).optional(),
   acao: z.string().optional(),
   observacoes: z.string().optional(),
@@ -228,8 +229,15 @@ const PlanoV3Schema = z.object({
  * plano v1 real passaria a ser reprovado, ou seja, mandado para a quarentena.
  * ------------------------------------------------------------------------ */
 
-const AtpRuleSchemaV2 = AtpRuleSchema.extend({ nome: z.string() });
-const PrefRuleSchemaV2 = PrefRuleSchema.extend({ nome: z.string() });
+// Até a v2, nome e "já criado" moravam na regra; na v3 são do recurso.
+const AtpRuleSchemaV2 = AtpRuleSchema.extend({
+  nome: z.string(),
+  ja_criado: z.boolean(),
+});
+const PrefRuleSchemaV2 = PrefRuleSchema.extend({
+  nome: z.string(),
+  ja_criado: z.boolean(),
+});
 
 const SubitemSchemaV2 = z.object({
   id: z.string(),
@@ -378,6 +386,24 @@ export const CatalogoOrgaoSchema = z.object({
   importadoEm: z.string(),
   itens: z.array(LocalizadorOrgaoSchema),
 }) satisfies z.ZodType<CatalogoOrgao>;
+
+/* ---------------------------------------------------------------------------
+ * Anotações do catálogo (decisoes.md#D-25)
+ *
+ * `z.record` e não um array: a chave é o que casa a anotação com o recurso, e
+ * um array exigiria varrer a lista a cada linha renderizada do catálogo.
+ * ------------------------------------------------------------------------ */
+
+const AnotacaoRecursoSchema = z.object({
+  descricao: z.string().optional(),
+  orientacoes: z.string().optional(),
+  atualizadoEm: z.string(),
+}) satisfies z.ZodType<AnotacaoRecurso>;
+
+export const AnotacoesCatalogoSchema = z.object({
+  version: z.literal(ANOTACOES_CATALOGO_VERSION),
+  itens: z.record(z.string(), AnotacaoRecursoSchema),
+}) satisfies z.ZodType<AnotacoesCatalogo>;
 
 /* ---------------------------------------------------------------------------
  * Catálogo lido direto da unidade no Eproc.

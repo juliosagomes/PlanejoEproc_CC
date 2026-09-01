@@ -269,7 +269,7 @@ describe('toggles', () => {
           categoria: 'Regra de ATP',
           nome: 'r',
           ja_criado: false,
-          atp: { implantar: true, ja_criado: false },
+          atp: { implantar: true },
         },
       ],
     });
@@ -329,7 +329,7 @@ describe('loadPlano / getPlano', () => {
               categoria: 'Preferência',
               nome: 'p1',
               ja_criado: false,
-              pref: { implantar: true, ja_criado: false, tipo: 'Minuta' },
+              pref: { implantar: true, tipo: 'Minuta' },
             },
           ],
           dobra: { fracaoX: 0.75 },

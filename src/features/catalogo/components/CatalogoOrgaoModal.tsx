@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { Icon } from '@/components/Icon';
 import { useCatalogoStore } from '../store';
+import { selectTotalAnotacoes, useAnotacoesStore } from '../storeAnotacoes';
+import { CatalogoRecursos } from './CatalogoRecursos';
 
 interface CatalogoOrgaoModalProps {
   open: boolean;
@@ -22,17 +24,25 @@ function dataHoraBR(iso: string): string {
 }
 
 /**
- * Modal de gestão do catálogo de localizadores do órgão.
+ * Modal do catálogo — a tela de consulta dos recursos mapeados
+ * (decisoes.md#D-25).
  *
- * Mostra o estado atual (importado em / quantos itens), permite importar um
- * XLS exportado do Eproc e limpar. Reimportar sobrescreve, com confirmação
- * via `window.confirm` (consistente com excluir plano).
+ * Faz três coisas: gerencia o XLS de localizadores do órgão (importar,
+ * reimportar, limpar), **lista** tudo o que o app conhece da unidade — os
+ * localizadores mais as preferências, modelos e textos padrão coletados —, e
+ * deixa o usuário anotar descrição e orientações de uso em cada recurso.
+ *
+ * Reimportar sobrescreve o catálogo, com confirmação via `window.confirm`
+ * (consistente com excluir plano); as anotações não são tocadas, e têm botão
+ * próprio para apagar.
  *
  * Mensagens (`ultimoErro`, `ultimasStats`) vêm da store e são resetadas ao
  * fechar, para o modal não "lembrar" estado entre aberturas distintas.
  */
 export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
   const catalogo = useCatalogoStore((s) => s.catalogo);
+  const totalAnotacoes = useAnotacoesStore(selectTotalAnotacoes);
+  const limparAnotacoes = useAnotacoesStore((s) => s.limparTudo);
   const ultimoErro = useCatalogoStore((s) => s.ultimoErro);
   const ultimasStats = useCatalogoStore((s) => s.ultimasStats);
   const importarXls = useCatalogoStore((s) => s.importarXls);
@@ -68,10 +78,18 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
 
   const handleLimpar = () => {
     const ok = window.confirm(
-      'Remover o catálogo do órgão?\n\nAs sugestões de localizador deixarão de aparecer até você reimportar.',
+      'Remover o catálogo do órgão?\n\nAs sugestões de localizador deixarão de aparecer até você reimportar. Suas anotações ficam.',
     );
     if (!ok) return;
     limpar();
+  };
+
+  const handleLimparAnotacoes = () => {
+    const ok = window.confirm(
+      `Apagar as ${totalAnotacoes} anotações do catálogo?\n\nAs descrições e orientações que você escreveu somem. O catálogo em si não é tocado.`,
+    );
+    if (!ok) return;
+    limparAnotacoes();
   };
 
   const totalItens = catalogo?.itens.length ?? 0;
@@ -84,7 +102,7 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
         role="dialog"
         aria-modal="true"
         aria-label="Catálogo do órgão"
-        style={{ width: 'min(560px, 92vw)' }}
+        style={{ width: 'min(720px, 94vw)' }}
       >
         <div
           className="px-5 pt-4 pb-3 flex items-start gap-3"
@@ -105,7 +123,8 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
           <div className="flex-1">
             <div className="section-h">Catálogo do órgão</div>
             <div className="text-[12px] text-texto-3 mt-0.5">
-              Sugestões de localizadores ao criar nós no canvas.
+              Tudo o que o app conhece do Eproc — e o que você anotou sobre cada
+              recurso.
             </div>
           </div>
           <button
@@ -127,36 +146,32 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
                 border: '1px solid var(--ok-borda)',
               }}
             >
-              <div className="flex items-baseline justify-between gap-3">
-                <div className="font-semibold text-[14px]">
-                  {totalItens} localizador{totalItens === 1 ? '' : 'es'} carregado
-                  {totalItens === 1 ? '' : 's'}
+              {/* Fala só do XLS: a contagem das abas é a união com o que veio
+                  da unidade, e repeti-la aqui daria dois números diferentes
+                  para a mesma palavra. */}
+              <div className="flex items-baseline justify-between gap-3 text-[12.5px]">
+                <div className="font-semibold">
+                  XLS do órgão: {totalItens} localizador{totalItens === 1 ? '' : 'es'}
                 </div>
                 <div className="mono text-[11px] text-texto-3">
                   importado em {dataHoraBR(catalogo.importadoEm)}
                 </div>
               </div>
-              <div className="text-[12px] text-texto-2 mt-1 leading-snug">
-                Os nomes aparecerão como sugestão ao preencher um localizador, e
-                serão marcados como <strong>já criado</strong> quando escolhidos.
-              </div>
             </div>
           ) : (
             <div
-              className="px-4 py-5 rounded-lg text-center"
+              className="px-4 py-3 rounded-lg text-[12px] text-texto-3 leading-snug"
               style={{
                 border: '1px dashed var(--borda-forte)',
                 background: 'var(--superficie-2)',
               }}
             >
-              <div className="font-semibold text-[14px] mb-1">
-                Nenhum catálogo importado
+              <div className="font-semibold text-texto mb-0.5 text-[12.5px]">
+                Nenhum XLS importado
               </div>
-              <div className="text-[12px] text-texto-3 leading-snug">
-                Exporte os localizadores do seu órgão pelo Eproc (XLS) e
-                importe aqui. Os localizadores padrão do Eproc entram junto,
-                marcados como <strong>Sistema</strong> nas sugestões.
-              </div>
+              Exporte os localizadores do seu órgão pelo Eproc (XLS) e importe
+              aqui — é o caminho que funciona offline. Os localizadores padrão do
+              Eproc entram junto, marcados como <strong>Sistema</strong>.
             </div>
           )}
 
@@ -201,6 +216,8 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
             </div>
           )}
 
+          <CatalogoRecursos />
+
           <div className="text-[11.5px] text-texto-3 leading-snug">
             <strong>Onde exportar:</strong> no Eproc, em Localizadores &rarr;
             Localizadores do Órgão, use exportar/imprimir para gerar o{' '}
@@ -225,9 +242,19 @@ export function CatalogoOrgaoModal({ open, onClose }: CatalogoOrgaoModalProps) {
               type="button"
               className="btn"
               onClick={handleLimpar}
-              title="Remove o catálogo do navegador"
+              title="Remove o catálogo do navegador. As anotações ficam."
             >
-              <Icon.Trash /> Limpar
+              <Icon.Trash /> Limpar XLS
+            </button>
+          )}
+          {totalAnotacoes > 0 && (
+            <button
+              type="button"
+              className="btn"
+              onClick={handleLimparAnotacoes}
+              title="Apaga as descrições e orientações que você escreveu"
+            >
+              <Icon.Trash /> Anotações ({totalAnotacoes})
             </button>
           )}
           <div className="flex-1" />

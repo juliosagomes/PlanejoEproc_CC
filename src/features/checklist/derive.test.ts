@@ -128,7 +128,6 @@ describe('deriveChecklist', () => {
           subitems: [
             regraAtp('ATP citação', {
               implantar: true,
-              ja_criado: false,
               acao: 'mover para conclusão',
             }),
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
@@ -167,7 +166,6 @@ describe('deriveChecklist', () => {
           subitems: [
             regraAtp('R', {
               implantar: true,
-              ja_criado: false,
               trigger: { tipo: 'L', diasNoLocalizador: 5 },
               acaoTipo: 'CMA',
               condicoes: 'condição livre',
@@ -211,7 +209,6 @@ describe('deriveChecklist', () => {
           subitems: [
             regraPref('P', {
               implantar: true,
-              ja_criado: false,
               tipo: 'Minuta',
               minutaModo: 'texto_padrao',
               minutaConteudo: 'linha 1\nlinha 2',
@@ -242,7 +239,7 @@ describe('deriveChecklist', () => {
           resumo: 'r',
           observacao: '',
           subitems: [
-            regraPref('Pref X', { implantar: true, ja_criado: true, tipo: 'Minuta' }, true),
+            regraPref('Pref X', { implantar: true, tipo: 'Minuta' }, true),
           ],
         },
       },
@@ -265,9 +262,9 @@ describe('deriveChecklist', () => {
           resumo: '',
           observacao: '',
           subitems: [
-            regraAtp('ATP 1', { implantar: true, ja_criado: false }),
-            regraAtp('ATP 2', { implantar: true, ja_criado: true }, true),
-            regraPref('Pref', { implantar: true, ja_criado: false }),
+            regraAtp('ATP 1', { implantar: true }),
+            regraAtp('ATP 2', { implantar: true }, true),
+            regraPref('Pref', { implantar: true }),
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
           ],
         },
@@ -297,7 +294,7 @@ describe('deriveChecklist', () => {
           observacao: '',
           subitems: [
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
-            regraAtp('R', { implantar: true, ja_criado: false }),
+            regraAtp('R', { implantar: true }),
           ],
         },
       },
@@ -341,7 +338,7 @@ describe('deriveChecklist', () => {
           resumo: '',
           observacao: '',
           subitems: [
-            regraAtp('', { implantar: false, ja_criado: false }),
+            regraAtp('', { implantar: false }),
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
           ],
         },
@@ -371,7 +368,7 @@ describe('contarChecklist', () => {
           subitems: [
             { id: 's1', categoria: 'Modelo', nome: 'm1', ja_criado: true },
             { id: 's2', categoria: 'Modelo', nome: 'm2', ja_criado: false },
-            regraAtp('r', { implantar: true, ja_criado: false }),
+            regraAtp('r', { implantar: true }),
           ],
         },
       },
@@ -396,7 +393,7 @@ describe('checklistToMarkdown', () => {
           resumo: '',
           observacao: '',
           subitems: [
-            regraAtp('R1', { implantar: true, ja_criado: false }),
+            regraAtp('R1', { implantar: true }),
             { id: 's1', categoria: 'Modelo', nome: 'm1', ja_criado: false },
           ],
         },
@@ -425,7 +422,6 @@ describe('checklistToMarkdown', () => {
           subitems: [
             regraPref('P', {
               implantar: true,
-              ja_criado: false,
               tipo: 'Minuta',
               minutaModo: 'modelo',
               minutaConteudo: 'L1\nL2',

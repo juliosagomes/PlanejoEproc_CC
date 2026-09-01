@@ -231,13 +231,14 @@ describe('migrarPlanoV2', () => {
     // O nome sai da regra e passa a ser o do recurso.
     expect(regra?.nome).toBe('Avança após perícia');
     expect(regra?.ja_criado).toBe(true);
+    // Nome e "já criado" ficaram no recurso; a regra guarda só a modelagem.
     expect(regra?.atp).toEqual({
       implantar: true,
-      ja_criado: true,
       trigger: { tipo: 'E', eventoIds: ['123'] },
       observacoes: 'obs da regra',
     });
     expect('nome' in (regra?.atp ?? {})).toBe(false);
+    expect('ja_criado' in (regra?.atp ?? {})).toBe(false);
 
     // Os recursos que já existiam continuam depois, na ordem original.
     expect(subs.slice(1).map((s) => s.nome)).toEqual(['Sentença', 'TP']);
@@ -264,6 +265,14 @@ describe('migrarPlanoV2', () => {
     const subs = migrar2(cru).edges[0]?.data.subitems ?? [];
     expect(subs).toHaveLength(2);
     expect(subs.map((s) => s.categoria)).toEqual(['Modelo', 'Texto padrão']);
+  });
+
+  it('regra que só estava marcada como criada sobrevive', () => {
+    const cru = planoV2Cru() as { edges: { data: { atp: unknown } }[] };
+    cru.edges[0]!.data.atp = { implantar: false, ja_criado: true, nome: '' };
+
+    const subs = migrar2(cru).edges[0]?.data.subitems ?? [];
+    expect(subs[0]).toMatchObject({ categoria: 'Regra de ATP', ja_criado: true });
   });
 
   it('regra que só tinha nome sobrevive — o nome é o detalhamento dela', () => {

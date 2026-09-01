@@ -139,11 +139,11 @@ export function defaultEdgeData(): EdgeData {
 }
 
 export function defaultAtpRule(): AtpRule {
-  return { implantar: false, ja_criado: false };
+  return { implantar: false };
 }
 
 export function defaultPrefRule(): PrefRule {
-  return { implantar: false, ja_criado: false };
+  return { implantar: false };
 }
 
 /* ============================================================================

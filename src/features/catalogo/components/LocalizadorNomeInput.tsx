@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import type { ActionMeta, InputActionMeta, StylesConfig } from 'react-select';
 import type { LocalizadorOrgao } from '@/domain';
+import { buscarAnotacao, useAnotacoesStore } from '../storeAnotacoes';
+import { BadgeSistema } from './BadgeSistema';
 
 /**
  * Combobox para o campo "nome do localizador" no NodePanel.
@@ -58,19 +60,27 @@ export function LocalizadorNomeInput({
     setInputValue(value);
   }, [value]);
 
+  const anotacoes = useAnotacoesStore((s) => s.anotacoes);
+
   // A ordem é a que `useSugestoesLocalizador` entrega — os da unidade primeiro,
   // os de sistema depois, alfabéticos dentro de cada grupo. Reordenar aqui por
   // label desfaria o agrupamento.
   const options = useMemo<Option[]>(
     () =>
-      itens.map<Option>((it) => ({
-        value: it.nome,
-        label: it.nome,
-        ...(it.descricao ? { descricao: it.descricao } : {}),
-        ...(it.sistema ? { sistema: true } : {}),
-        localizadorId: it.id,
-      })),
-    [itens],
+      itens.map<Option>((it) => {
+        // A anotação do usuário ganha da descrição do Eproc: foi escrita depois,
+        // sabendo o que a outra dizia (decisoes.md#D-25).
+        const anotada = buscarAnotacao(anotacoes, 'Localizador', it.nome);
+        const descricao = anotada?.descricao?.trim() || it.descricao;
+        return {
+          value: it.nome,
+          label: it.nome,
+          ...(descricao ? { descricao } : {}),
+          ...(it.sistema ? { sistema: true } : {}),
+          localizadorId: it.id,
+        };
+      }),
+    [itens, anotacoes],
   );
 
   // Renderiza o `value` como uma Option fictícia para o Creatable mostrar
@@ -166,32 +176,6 @@ export function LocalizadorNomeInput({
       menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
       menuPosition="fixed"
     />
-  );
-}
-
-/**
- * Marca das opções que são padrão do Eproc (decisoes.md#D-23).
- *
- * Âmbar e não azul: `--destaque` é a cor do estado focado do próprio combobox, e
- * um badge azul na lista se confundiria com "esta é a opção sob o cursor".
- */
-function BadgeSistema() {
-  return (
-    <span
-      style={{
-        fontSize: 10,
-        lineHeight: 1.4,
-        padding: '0 5px',
-        borderRadius: 4,
-        flexShrink: 0,
-        color: 'var(--aviso)',
-        background: 'var(--aviso-suave)',
-        border: '1px solid var(--aviso)',
-      }}
-      title="Localizador padrão do Eproc, não criado pela unidade"
-    >
-      Sistema
-    </span>
   );
 }
 

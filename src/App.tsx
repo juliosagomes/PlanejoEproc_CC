@@ -11,6 +11,7 @@ import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
 import { SincronizacaoUnidadeModal } from '@/features/catalogo/components/SincronizacaoUnidadeModal';
+import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
@@ -129,6 +130,7 @@ function Editor() {
 
   const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
   const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
+  const hidratarAnotacoes = useAnotacoesStore((s) => s.hidratar);
   const sincronizarUnidade = useUnidadeStore((s) => s.sincronizar);
   const sincronizandoUnidade = useUnidadeStore((s) => s.sincronizando);
   const resetMensagensUnidade = useUnidadeStore((s) => s.resetMensagens);
@@ -149,13 +151,14 @@ function Editor() {
     refreshPlanos();
   }, [refreshPlanos]);
 
-  // Os dois catálogos só podem ser lidos DEPOIS que `main.tsx` hidratou a
-  // plataforma — na extensão, o espelho do `chrome.storage` nasce vazio, e
-  // qualquer leitura em tempo de módulo cairia no localStorage.
+  // Os catálogos e as anotações só podem ser lidos DEPOIS que `main.tsx`
+  // hidratou a plataforma — na extensão, o espelho do `chrome.storage` nasce
+  // vazio, e qualquer leitura em tempo de módulo cairia no localStorage.
   useEffect(() => {
     hidratarCatalogoOrgao();
     hidratarCatalogoUnidade();
-  }, [hidratarCatalogoOrgao, hidratarCatalogoUnidade]);
+    hidratarAnotacoes();
+  }, [hidratarCatalogoOrgao, hidratarCatalogoUnidade, hidratarAnotacoes]);
 
   const selectedNode = useMemo(
     () => (selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null),
