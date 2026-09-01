@@ -248,7 +248,9 @@ describe('toggles', () => {
     expect(subs[1]?.ja_criado).toBe(true);
   });
 
-  it('toggleEdgeRuleCreated alterna ja_criado da regra correspondente ao kind', () => {
+  // Desde o D-24 a regra é um recurso da aresta, então `toggleSubitemCreated`
+  // cobre os dois casos — não há mais um toggle só para regra.
+  it('toggleSubitemCreated alterna ja_criado de um recurso-regra', () => {
     const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
     const b = useCanvasStore.getState().createNode({ x: 100, y: 0 });
     useCanvasStore.getState().onConnect({
@@ -261,33 +263,22 @@ describe('toggles', () => {
     if (!id) throw new Error('aresta não criada');
     useCanvasStore.getState().updateEdge(id, {
       kind: 'atp',
-      atp: { implantar: true, ja_criado: false, nome: 'r' },
+      subitems: [
+        {
+          id: 'si-1',
+          categoria: 'Regra de ATP',
+          nome: 'r',
+          ja_criado: false,
+          atp: { implantar: true, ja_criado: false },
+        },
+      ],
     });
 
-    useCanvasStore.getState().toggleEdgeRuleCreated(id);
-    expect(useCanvasStore.getState().edges[0]?.data?.atp?.ja_criado).toBe(true);
+    useCanvasStore.getState().toggleSubitemCreated(id, 0);
+    expect(useCanvasStore.getState().edges[0]?.data?.subitems[0]?.ja_criado).toBe(true);
 
-    useCanvasStore.getState().toggleEdgeRuleCreated(id);
-    expect(useCanvasStore.getState().edges[0]?.data?.atp?.ja_criado).toBe(false);
-  });
-
-  it('toggleEdgeRuleCreated é no-op em aresta manual', () => {
-    const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
-    const b = useCanvasStore.getState().createNode({ x: 100, y: 0 });
-    useCanvasStore.getState().onConnect({
-      source: a,
-      target: b,
-      sourceHandle: null,
-      targetHandle: null,
-    });
-    const antes = useCanvasStore.getState().edges[0];
-
-    useCanvasStore.getState().toggleEdgeRuleCreated(antes?.id ?? '');
-
-    const depois = useCanvasStore.getState().edges[0];
-    expect(depois?.data?.kind).toBe('manual');
-    expect(depois?.data?.atp).toBeUndefined();
-    expect(depois?.data?.pref).toBeUndefined();
+    useCanvasStore.getState().toggleSubitemCreated(id, 0);
+    expect(useCanvasStore.getState().edges[0]?.data?.subitems[0]?.ja_criado).toBe(false);
   });
 });
 
@@ -332,8 +323,15 @@ describe('loadPlano / getPlano', () => {
           kind: 'pref',
           resumo: 'r',
           observacao: '',
-          subitems: [],
-          pref: { implantar: true, ja_criado: false, nome: 'p1', tipo: 'Minuta' },
+          subitems: [
+            {
+              id: 'si-1',
+              categoria: 'Preferência',
+              nome: 'p1',
+              ja_criado: false,
+              pref: { implantar: true, ja_criado: false, tipo: 'Minuta' },
+            },
+          ],
           dobra: { fracaoX: 0.75 },
         },
       },
@@ -541,7 +539,6 @@ describe('somenteLeitura', () => {
     s.updateEdge('e1', { resumo: 'invadido' });
     s.toggleNodeCreated('n1');
     s.toggleSubitemCreated('e1', 0);
-    s.toggleEdgeRuleCreated('e1');
     s.setPlanoNome('outro nome');
     s.deleteEdge('e1');
     s.deleteNode('n1');

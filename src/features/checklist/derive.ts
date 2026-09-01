@@ -1,9 +1,12 @@
 import {
   SUBITEM_CATS,
+  ehRecursoRegra,
+  regraDoSubitem,
   type AtpRule,
   type EdgeData,
   type LocalizadorData,
   type PrefRule,
+  type Subitem,
   type SubitemCategoria,
 } from '@/domain';
 import {
@@ -25,15 +28,16 @@ import {
  * Regras de agrupamento (portadas do BETA_2):
  *
  *  - Cada nó vira um item na seção "Localizador".
- *  - Para cada aresta:
- *    - Se `kind` é `atp` ou `pref` E a regra tem `implantar: true`, a regra
- *      vira item próprio na seção "Regra de ATP" / "Preferência", e os
- *      subitens da aresta ficam aninhados como filhos dela. Os campos
- *      preenchidos da regra (gatilho, ação programada, filtros, conteúdo
- *      da minuta, etc.) viram `detalhes` rotulados — é o que mostra "todos
- *      os detalhes preenchidos" no modal de checklist.
- *    - Caso contrário, os subitens são distribuídos pelas suas próprias
- *      categorias.
+ *  - Para cada aresta, os recursos de categoria `Regra de ATP`/`Preferência`
+ *    que têm `implantar: true` viram itens próprios na seção da sua categoria.
+ *    Os campos preenchidos da regra (gatilho, ação programada, filtros,
+ *    conteúdo da minuta, etc.) viram `detalhes` rotulados — é o que mostra
+ *    "todos os detalhes preenchidos" no modal de checklist.
+ *  - Os **demais** recursos da aresta ficam aninhados como filhos da regra
+ *    **quando ela é a única** com `implantar`. Com duas ou mais, não há a quem
+ *    pendurá-los sem inventar um vínculo que o usuário nunca declarou, então
+ *    cada um vai para a própria categoria, com o contexto "L1 → L2" — a mesma
+ *    saída de quando nenhuma regra pede implantação.
  *  - Categoria desconhecida (improvável) cai em "Outro".
  */
 
@@ -82,6 +86,8 @@ export interface ChecklistDetail {
 export interface RuleChecklistItem extends ItemBase {
   kind: 'rule';
   edgeId: string;
+  /** Posição do recurso-regra em `edge.data.subitems` — é por ela que o modal alterna `ja_criado`. */
+  index: number;
   contexto: string;
   children: SubChecklistItem[];
   detalhes: ChecklistDetail[];
@@ -114,6 +120,15 @@ function nomeOuPlaceholder(nome: string | undefined): string {
 }
 
 const SUBITEM_CATS_SET: ReadonlySet<SubitemCategoria> = new Set(SUBITEM_CATS);
+
+/**
+ * Recurso-regra que o usuário marcou para virar item próprio do checklist.
+ * Sem `implantar`, a regra existe no plano mas não é tarefa da secretaria — cai
+ * como recurso comum na seção da sua categoria.
+ */
+function implantavel(s: Subitem): boolean {
+  return regraDoSubitem(s)?.rule.implantar === true;
+}
 
 function categoriaValida(c: string): c is SubitemCategoria {
   return SUBITEM_CATS_SET.has(c as SubitemCategoria);
@@ -231,39 +246,54 @@ export function deriveChecklist(
     const tgt = nomeOuPlaceholder(nodes.find((n) => n.id === e.target)?.data.nome);
     const contexto = `${src} → ${tgt}`;
 
-    if (data.kind !== 'manual') {
-      const rule = data.kind === 'atp' ? data.atp : data.pref;
-      const ruleCat: ChecklistGroupKey = data.kind === 'pref' ? 'Preferência' : 'Regra de ATP';
-      if (rule?.implantar) {
-        // `detalhes` cobre acao/observacoes rotulados (e mais), então
-        // `descricao` fica vazio para regras — evita duplicar info.
-        const detalhes =
-          data.kind === 'atp'
-            ? detalhesAtp(rule as AtpRule)
-            : detalhesPref(rule as PrefRule);
-        groups[ruleCat].push({
-          kind: 'rule',
-          edgeId: e.id,
-          nome: nomeOuPlaceholder(rule.nome || data.resumo),
-          contexto,
-          ja_criado: rule.ja_criado,
-          detalhes,
-          children: subs.map((s, idx) => ({
-            kind: 'sub',
-            edgeId: e.id,
-            index: idx,
-            nome: nomeOuPlaceholder(s.nome),
-            descricao: s.descricao,
-            categoria: s.categoria,
-            ja_criado: s.ja_criado,
-          })),
-        });
-        // Subitens aninhados não aparecem nas próprias categorias.
-        continue;
-      }
+    const aImplantar = subs
+      .map((s, idx) => ({ s, idx }))
+      .filter(({ s }) => implantavel(s));
+    const comuns = subs
+      .map((s, idx) => ({ s, idx }))
+      .filter(({ s }) => !ehRecursoRegra(s));
+    // Só faz sentido aninhar quando há uma regra e uma só; ver o cabeçalho.
+    const aninhar = aImplantar.length === 1;
+
+    for (const { s, idx } of aImplantar) {
+      const regra = regraDoSubitem(s);
+      if (!regra) continue;
+      // `detalhes` cobre acao/observacoes rotulados (e mais), então
+      // `descricao` fica vazio para regras — evita duplicar info.
+      const detalhes =
+        regra.kind === 'atp'
+          ? detalhesAtp(regra.rule as AtpRule)
+          : detalhesPref(regra.rule as PrefRule);
+      groups[regra.kind === 'pref' ? 'Preferência' : 'Regra de ATP'].push({
+        kind: 'rule',
+        edgeId: e.id,
+        index: idx,
+        nome: nomeOuPlaceholder(s.nome || data.resumo),
+        contexto,
+        ja_criado: s.ja_criado,
+        detalhes,
+        children: aninhar
+          ? comuns.map(({ s: c, idx: cIdx }) => ({
+              kind: 'sub',
+              edgeId: e.id,
+              index: cIdx,
+              nome: nomeOuPlaceholder(c.nome),
+              descricao: c.descricao,
+              categoria: c.categoria,
+              ja_criado: c.ja_criado,
+            }))
+          : [],
+      });
     }
 
     for (const [idx, s] of subs.entries()) {
+      // Recurso com regra fica de fora: implantado, já entrou como item
+      // próprio; não implantado, é escolha explícita do usuário de não pedir
+      // essa configuração no checklist — é para isso que a caixa existe. Um
+      // recurso de categoria `Preferência` **sem** regra nenhuma segue listado,
+      // que é o caso de quem só anotou o nome de uma preferência a criar.
+      if (regraDoSubitem(s)) continue;
+      if (aninhar) continue;
       const cat: ChecklistGroupKey = categoriaValida(s.categoria) ? s.categoria : 'Outro';
       groups[cat].push({
         kind: 'sub',

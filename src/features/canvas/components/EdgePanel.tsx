@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import {
+  KIND_CATEGORIA,
   KIND_LABELS,
   SUBITEM_CATS,
-  hasAtpDetail,
-  hasPrefDetail,
+  ehRecursoRegra,
+  hasDetalheSubitem,
   type EdgeData,
   type EdgeKind,
   type Subitem,
@@ -15,7 +16,13 @@ import { SubitemNomeInput } from '@/features/catalogo/components/SubitemNomeInpu
 import { cn } from '@/utils/cn';
 import { uid } from '@/utils/uid';
 import { temDobraManual } from '../dobra';
-import { defaultEdgeData, useCanvasStore, type FlowEdge } from '../store';
+import {
+  defaultAtpRule,
+  defaultEdgeData,
+  defaultPrefRule,
+  useCanvasStore,
+  type FlowEdge,
+} from '../store';
 import { EdgeDetailModal } from './EdgeDetailModal';
 
 interface EdgePanelProps {
@@ -33,14 +40,24 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   const kind = data.kind;
   const subitems = data.subitems;
 
-  const [detalheAberto, setDetalheAberto] = useState(false);
+  const [detalheAbertoId, setDetalheAbertoId] = useState<string | null>(null);
+  const emDetalhe = subitems.find((s) => s.id === detalheAbertoId);
 
   const setKind = (novo: EdgeKind) => {
-    if (novo === 'manual') {
-      updateEdge(edge.id, { kind: 'manual', subitems: [] });
-    } else {
+    if (novo !== 'manual') {
       updateEdge(edge.id, { kind: novo });
+      return;
     }
+    // Virar manual descarta os recursos — e, desde que a regra passou a ser um
+    // deles (decisoes.md#D-24), isso apaga modelagem de verdade, não só
+    // esconde. Daí a confirmação, que antes não fazia falta.
+    if (subitems.some(hasDetalheSubitem)) {
+      const ok = window.confirm(
+        'Esta transição tem regra detalhada.\n\nVirar Manual remove os recursos atrelados, com o detalhamento junto. Continuar?',
+      );
+      if (!ok) return;
+    }
+    updateEdge(edge.id, { kind: 'manual', subitems: [] });
   };
 
   const updateSub = (idx: number, patch: Partial<Subitem>) => {
@@ -58,6 +75,29 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   };
   const removeSub = (idx: number) =>
     updateEdge(edge.id, { subitems: subitems.filter((_, i) => i !== idx) });
+
+  /**
+   * Cria a regra correspondente ao tipo da aresta e já abre o detalhamento —
+   * o mesmo clique único que existia quando a regra morava na aresta. Só
+   * aparece enquanto não houver nenhuma; a partir daí, quem quer uma segunda
+   * usa "Adicionar" e escolhe a categoria.
+   */
+  const addRegraDoKind = () => {
+    if (kind === 'manual') return;
+    const categoria = KIND_CATEGORIA[kind];
+    const novo: Subitem = {
+      id: uid('si'),
+      categoria,
+      nome: '',
+      ja_criado: false,
+      ...(kind === 'atp' ? { atp: defaultAtpRule() } : { pref: defaultPrefRule() }),
+    };
+    updateEdge(edge.id, { subitems: [...subitems, novo] });
+    setDetalheAbertoId(novo.id);
+  };
+
+  const temRegraDoKind =
+    kind !== 'manual' && subitems.some((s) => s.categoria === KIND_CATEGORIA[kind]);
 
   return (
     <>
@@ -117,30 +157,18 @@ export function EdgePanel({ edge }: EdgePanelProps) {
           </div>
           </fieldset>
 
-          {kind !== 'manual' && (() => {
-            const preenchido =
-              kind === 'atp' ? hasAtpDetail(data.atp) : hasPrefDetail(data.pref);
-            return (
+          {kind !== 'manual' && !temRegraDoKind && (
+            <fieldset disabled={somenteLeitura} className="contents">
               <button
                 type="button"
-                className={cn(
-                  'btn btn-sm w-full justify-center',
-                  preenchido && 'btn-primary',
-                )}
-                onClick={() => setDetalheAberto(true)}
-                title={
-                  somenteLeitura
-                    ? `Ver o detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`
-                    : preenchido
-                      ? `Detalhamento preenchido — clique para editar`
-                      : `Abrir detalhamento da ${kind === 'pref' ? 'preferência' : 'ATP'}`
-                }
+                className="btn btn-sm w-full justify-center"
+                onClick={addRegraDoKind}
+                title={`Cria a ${kind === 'pref' ? 'preferência' : 'regra de ATP'} desta transição e abre o detalhamento`}
               >
-                <Icon.Bolt /> {somenteLeitura ? 'Ver' : 'Detalhar'}{' '}
-                {kind === 'pref' ? 'Preferência' : 'ATP'}
+                <Icon.Bolt /> Detalhar {kind === 'pref' ? 'Preferência' : 'ATP'}
               </button>
-            );
-          })()}
+            </fieldset>
+          )}
 
           <fieldset disabled={somenteLeitura} className="contents">
           <div>
@@ -183,8 +211,9 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                     background: 'var(--superficie-2)',
                   }}
                 >
-                  Liste aqui os recursos do Eproc que esta transição precisa. Marque ✓
-                  conforme criar cada um.
+                  Liste aqui os recursos do Eproc que esta transição precisa —
+                  inclusive mais de uma regra de ATP, ou uma ATP e uma
+                  preferência. Marque ✓ conforme criar cada um.
                 </div>
               )}
               <div>
@@ -234,14 +263,35 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                         onChange={(e) => updateSub(i, { descricao: e.target.value })}
                       />
                     </div>
-                    <button
-                      type="button"
-                      className="btn btn-icon btn-sm btn-ghost"
-                      onClick={() => removeSub(i)}
-                      title="Remover"
-                    >
-                      <Icon.X />
-                    </button>
+                    <div className="flex items-center gap-0.5">
+                      {ehRecursoRegra(s) && (
+                        <button
+                          type="button"
+                          className={cn(
+                            'btn btn-icon btn-sm',
+                            hasDetalheSubitem(s) ? 'btn-primary' : 'btn-ghost',
+                          )}
+                          onClick={() => setDetalheAbertoId(s.id)}
+                          title={
+                            somenteLeitura
+                              ? `Ver o detalhamento d${s.categoria === 'Preferência' ? 'esta preferência' : 'esta regra'}`
+                              : hasDetalheSubitem(s)
+                                ? 'Detalhamento preenchido — clique para editar'
+                                : `Abrir detalhamento d${s.categoria === 'Preferência' ? 'esta preferência' : 'esta regra'}`
+                          }
+                        >
+                          <Icon.Bolt />
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="btn btn-icon btn-sm btn-ghost"
+                        onClick={() => removeSub(i)}
+                        title="Remover"
+                      >
+                        <Icon.X />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -276,12 +326,25 @@ export function EdgePanel({ edge }: EdgePanelProps) {
         </div>
       </div>
 
-      <EdgeDetailModal
-        open={detalheAberto && kind !== 'manual'}
-        onClose={() => setDetalheAberto(false)}
-        edgeData={data}
-        onChange={(patch) => updateEdge(edge.id, patch)}
-      />
+      {emDetalhe && (
+        <EdgeDetailModal
+          open
+          onClose={() => setDetalheAbertoId(null)}
+          subitem={emDetalhe}
+          resumo={data.resumo}
+          recursosComuns={subitems.filter((s) => !ehRecursoRegra(s)).length}
+          outrasRegras={
+            subitems.filter((s) => ehRecursoRegra(s) && s.id !== emDetalhe.id).length
+          }
+          onChange={(patch) =>
+            updateEdge(edge.id, {
+              subitems: subitems.map((s) =>
+                s.id === emDetalhe.id ? { ...s, ...patch } : s,
+              ),
+            })
+          }
+        />
+      )}
     </>
   );
 }

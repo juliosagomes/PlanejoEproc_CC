@@ -117,7 +117,6 @@ interface CanvasActions {
   // Toggles de "já criado"
   toggleNodeCreated: (id: string) => void;
   toggleSubitemCreated: (edgeId: string, index: number) => void;
-  toggleEdgeRuleCreated: (edgeId: string) => void;
 
   // Plano (domain) <-> store
   loadPlano: (plano: Plano) => void;
@@ -139,12 +138,12 @@ export function defaultEdgeData(): EdgeData {
   return { kind: 'manual', resumo: '', observacao: '', subitems: [] };
 }
 
-function defaultAtpRule(): AtpRule {
-  return { implantar: false, ja_criado: false, nome: '' };
+export function defaultAtpRule(): AtpRule {
+  return { implantar: false, ja_criado: false };
 }
 
-function defaultPrefRule(): PrefRule {
-  return { implantar: false, ja_criado: false, nome: '' };
+export function defaultPrefRule(): PrefRule {
+  return { implantar: false, ja_criado: false };
 }
 
 /* ============================================================================
@@ -420,29 +419,6 @@ export const useCanvasStore = create<CanvasStore>()(
             i === index ? { ...sub, ja_criado: !sub.ja_criado } : sub,
           );
           return { ...e, data: { ...data, subitems } };
-        }),
-      }));
-    },
-
-    toggleEdgeRuleCreated: (edgeId) => {
-      if (get().somenteLeitura) return;
-      set((s) => ({
-        edges: s.edges.map((e) => {
-          if (e.id !== edgeId) return e;
-          const data = e.data ?? defaultEdgeData();
-          if (data.kind === 'manual') return e;
-          if (data.kind === 'atp') {
-            const rule = data.atp ?? defaultAtpRule();
-            return {
-              ...e,
-              data: { ...data, atp: { ...rule, ja_criado: !rule.ja_criado } },
-            };
-          }
-          const rule = data.pref ?? defaultPrefRule();
-          return {
-            ...e,
-            data: { ...data, pref: { ...rule, ja_criado: !rule.ja_criado } },
-          };
         }),
       }));
     },

@@ -63,14 +63,19 @@ function planoExemplo(nome = 'Plano de teste'): Plano {
           resumo: 'autoavanço',
           observacao: '',
           subitems: [
+            {
+              id: 'si-0',
+              categoria: 'Regra de ATP',
+              nome: 'ATP de teste',
+              ja_criado: false,
+              atp: {
+                implantar: true,
+                ja_criado: false,
+                trigger: { tipo: 'L', diasNoLocalizador: 3 },
+              },
+            },
             { id: 'si-1', categoria: 'Modelo', nome: 'minuta', ja_criado: false },
           ],
-          atp: {
-            implantar: true,
-            ja_criado: false,
-            nome: 'ATP de teste',
-            trigger: { tipo: 'L', diasNoLocalizador: 3 },
-          },
         },
       },
     ],

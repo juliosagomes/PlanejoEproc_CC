@@ -12,16 +12,19 @@ import {
   type CatalogoUnidade,
   type DefinicaoFlag,
   type DobraAresta,
+  type AtpRule,
   type Edge,
+  type EdgeData,
   type ItemCatalogoUnidade,
   type Localizador,
   type LocalizadorOrgao,
   type LocalizadorUnidade,
   type Plano,
+  type PrefRule,
   type Subitem,
   type UnidadeEproc,
 } from '@/domain';
-import { migrarPlanoV1 } from './migracoes';
+import { migrarPlanoV1, migrarPlanoV2 } from './migracoes';
 
 /**
  * Schemas Zod que validam dados externos contra o domain v1.
@@ -61,14 +64,6 @@ const DefinicaoFlagSchema = z.object({
   label: z.string(),
   cor: CorFlagSchema,
 }) satisfies z.ZodType<DefinicaoFlag>;
-
-const SubitemSchema = z.object({
-  id: z.string(),
-  categoria: z.enum(SUBITEM_CATS),
-  nome: z.string(),
-  descricao: z.string().optional(),
-  ja_criado: z.boolean(),
-}) satisfies z.ZodType<Subitem>;
 
 const AtpTriggerSchema = z.discriminatedUnion('tipo', [
   z.object({
@@ -131,25 +126,37 @@ const AtpFiltrosSchema = z.object({
 const AtpRuleSchema = z.object({
   implantar: z.boolean(),
   ja_criado: z.boolean(),
-  nome: z.string(),
   trigger: AtpTriggerSchema.optional(),
   filtros: AtpFiltrosSchema.optional(),
   condicoes: z.string().optional(),
   acaoTipo: z.string().optional(),
   acao: z.string().optional(),
   observacoes: z.string().optional(),
-});
+}) satisfies z.ZodType<AtpRule>;
 
 const PrefRuleSchema = z.object({
   implantar: z.boolean(),
   ja_criado: z.boolean(),
-  nome: z.string(),
   tipo: z.enum(PREF_TIPOS).optional(),
   acao: z.string().optional(),
   observacoes: z.string().optional(),
   minutaModo: z.enum(['modelo', 'texto_padrao']).optional(),
   minutaConteudo: z.string().optional(),
-});
+}) satisfies z.ZodType<PrefRule>;
+
+/**
+ * O detalhamento da regra viaja dentro do recurso (decisoes.md#D-24), por isso
+ * este schema vem depois de `AtpRuleSchema`/`PrefRuleSchema`.
+ */
+const SubitemSchema = z.object({
+  id: z.string(),
+  categoria: z.enum(SUBITEM_CATS),
+  nome: z.string(),
+  descricao: z.string().optional(),
+  ja_criado: z.boolean(),
+  atp: AtpRuleSchema.optional(),
+  pref: PrefRuleSchema.optional(),
+}) satisfies z.ZodType<Subitem>;
 
 const EdgeKindSchema = z.enum(['atp', 'pref', 'manual']);
 
@@ -165,10 +172,8 @@ const EdgeDataSchema = z.object({
   resumo: z.string(),
   observacao: z.string(),
   subitems: z.array(SubitemSchema),
-  atp: AtpRuleSchema.optional(),
-  pref: PrefRuleSchema.optional(),
   dobra: DobraArestaSchema.optional(),
-});
+}) satisfies z.ZodType<EdgeData>;
 
 const PositionSchema = z.object({
   x: z.number(),
@@ -201,7 +206,7 @@ const EdgeSchema = z.object({
 
 const FlowModeSchema = z.enum(['organic', 'sharp']);
 
-const PlanoV2Schema = z.object({
+const PlanoV3Schema = z.object({
   version: z.literal(SCHEMA_VERSION),
   planoNome: z.string(),
   flowMode: FlowModeSchema,
@@ -210,6 +215,60 @@ const PlanoV2Schema = z.object({
   edges: z.array(EdgeSchema),
   exportedAt: z.string().optional(),
 }) satisfies z.ZodType<Plano>;
+
+/* ---------------------------------------------------------------------------
+ * Arestas v1/v2 — congeladas.
+ *
+ * Até a v2 a aresta guardava **uma** regra, em `data.atp`/`data.pref`; na v3
+ * cada regra é um recurso da própria aresta (decisoes.md#D-24). Estas cópias
+ * existem para que as migrações continuem lendo o que está gravado em disco.
+ *
+ * Congelar é o ponto: enquanto a v1 reusou o `EdgeSchema` corrente, qualquer
+ * mudança na aresta silenciosamente mudava também o formato antigo — e um
+ * plano v1 real passaria a ser reprovado, ou seja, mandado para a quarentena.
+ * ------------------------------------------------------------------------ */
+
+const AtpRuleSchemaV2 = AtpRuleSchema.extend({ nome: z.string() });
+const PrefRuleSchemaV2 = PrefRuleSchema.extend({ nome: z.string() });
+
+const SubitemSchemaV2 = z.object({
+  id: z.string(),
+  categoria: z.enum(SUBITEM_CATS),
+  nome: z.string(),
+  descricao: z.string().optional(),
+  ja_criado: z.boolean(),
+});
+
+const EdgeDataSchemaV2 = z.object({
+  kind: EdgeKindSchema,
+  resumo: z.string(),
+  observacao: z.string(),
+  subitems: z.array(SubitemSchemaV2),
+  atp: AtpRuleSchemaV2.optional(),
+  pref: PrefRuleSchemaV2.optional(),
+  dobra: DobraArestaSchema.optional(),
+});
+
+const EdgeSchemaV2 = z.object({
+  id: z.string(),
+  source: z.string(),
+  target: z.string(),
+  sourceHandle: z.string().nullable().optional(),
+  targetHandle: z.string().nullable().optional(),
+  data: EdgeDataSchemaV2,
+});
+
+export const PlanoV2Schema = z.object({
+  version: z.literal(2),
+  planoNome: z.string(),
+  flowMode: FlowModeSchema,
+  flags: z.array(DefinicaoFlagSchema),
+  nodes: z.array(LocalizadorSchema),
+  edges: z.array(EdgeSchemaV2),
+  exportedAt: z.string().optional(),
+});
+
+export type PlanoV2 = z.infer<typeof PlanoV2Schema>;
 
 /* ---------------------------------------------------------------------------
  * Plano v1 — congelado.
@@ -244,23 +303,26 @@ export const PlanoV1Schema = z.object({
       }),
     }),
   ),
-  edges: z.array(EdgeSchema),
+  edges: z.array(EdgeSchemaV2),
   exportedAt: z.string().optional(),
 });
 
 export type PlanoV1 = z.infer<typeof PlanoV1Schema>;
 
 /**
- * O schema público sempre **devolve v2**, migrando o que chegar em v1.
+ * O schema público sempre **devolve a versão corrente**, migrando o que chegar
+ * mais velho. As migrações se encadeiam: a v1 passa pela v2 antes de chegar na
+ * v3, para que cada passo continue tendo um teste só seu.
  *
  * A migração mora aqui, e não em cada chamador, porque `safeParse` é chamado em
  * sete pontos (storage, import de arquivo, pull da lotação) e um deles —
  * `loadPlano` — manda para a quarentena tudo que não valida. Um schema que
- * apenas rejeitasse a v1 faria todo plano já salvo sumir da tela.
+ * apenas rejeitasse o formato antigo faria todo plano já salvo sumir da tela.
  */
 export const PlanoSchema = z.union([
-  PlanoV2Schema,
-  PlanoV1Schema.transform(migrarPlanoV1),
+  PlanoV3Schema,
+  PlanoV2Schema.transform(migrarPlanoV2),
+  PlanoV1Schema.transform((v1) => migrarPlanoV2(migrarPlanoV1(v1))),
 ]) satisfies z.ZodType<Plano, z.ZodTypeDef, unknown>;
 
 /**

@@ -1,5 +1,6 @@
 export * from './flags';
 export * from './subitems';
+export * from './regras';
 export * from './edges';
 export * from './plano';
 export * from './catalogoOrgao';

@@ -5,10 +5,10 @@ import {
   type AtpFiltros,
   type AtpRule,
   type AtpTrigger,
-  type EdgeData,
   type PrefMinutaModo,
   type PrefRule,
   type PrefTipo,
+  type Subitem,
   type TipoControle,
 } from '@/domain';
 import {
@@ -27,60 +27,89 @@ import { useCanvasStore } from '../store';
 /* ============================================================================
  * Modal de detalhamento de ATP / Preferência.
  *
- * Recebe `edgeData.atp` ou `edgeData.pref` e devolve patches via `onChange`.
- * Os campos do bloco do gatilho (trigger) variam conforme o `tipo` escolhido:
- * só o subset relevante é exibido.
+ * Recebe o recurso da aresta que carrega a regra e devolve patches sobre ele
+ * via `onChange`. Os campos do bloco do gatilho (trigger) variam conforme o
+ * `tipo` escolhido: só o subset relevante é exibido.
  * ========================================================================== */
 
 interface EdgeDetailModalProps {
   open: boolean;
   onClose: () => void;
-  edgeData: EdgeData;
-  /** Patch parcial sobre EdgeData (em geral mudando atp/pref). */
-  onChange: (patch: Partial<EdgeData>) => void;
+  /** O recurso em edição — dele saem o nome e a regra. */
+  subitem: Subitem;
+  /** Resumo da aresta, usado como título quando o recurso ainda não tem nome. */
+  resumo: string;
+  /** Recursos comuns da mesma aresta (nem ATP, nem Preferência). */
+  recursosComuns: number;
+  /** Outras regras da mesma aresta — mudam como o checklist agrupa. */
+  outrasRegras: number;
+  onChange: (patch: Partial<Subitem>) => void;
 }
 
-export function EdgeDetailModal({ open, onClose, edgeData, onChange }: EdgeDetailModalProps) {
+/**
+ * Modal de detalhamento de um recurso do tipo ATP ou Preferência.
+ *
+ * Uma aresta pode ter vários (decisoes.md#D-24), então o modal recebe **o
+ * recurso**, e não a aresta: quem decide qual abrir é o `EdgePanel`.
+ */
+export function EdgeDetailModal({
+  open,
+  onClose,
+  subitem,
+  resumo,
+  recursosComuns,
+  outrasRegras,
+  onChange,
+}: EdgeDetailModalProps) {
   // Numa sessão de visualização o modal continua abrindo: o detalhamento é
   // conteúdo do plano, e esconder é pior do que mostrar travado. O que muda é
   // que os campos vêm desabilitados (ver `ModalShell`).
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
 
-  if (!open || edgeData.kind === 'manual') return null;
+  if (!open) return null;
 
-  if (edgeData.kind === 'atp') {
+  if (subitem.categoria === 'Regra de ATP') {
     return (
       <AtpModal
-        rule={edgeData.atp}
-        resumo={edgeData.resumo}
-        subitemsCount={edgeData.subitems.length}
+        nome={subitem.nome}
+        rule={subitem.atp}
+        resumo={resumo}
+        recursosComuns={recursosComuns}
+        outrasRegras={outrasRegras}
         somenteLeitura={somenteLeitura}
         onClose={onClose}
-        onChange={(rule) => onChange({ atp: rule })}
+        onChange={(patch) => onChange(patch)}
       />
     );
   }
-  return (
-    <PrefModal
-      rule={edgeData.pref}
-      resumo={edgeData.resumo}
-      subitemsCount={edgeData.subitems.length}
-      somenteLeitura={somenteLeitura}
-      onClose={onClose}
-      onChange={(rule) => onChange({ pref: rule })}
-    />
-  );
+  if (subitem.categoria === 'Preferência') {
+    return (
+      <PrefModal
+        nome={subitem.nome}
+        rule={subitem.pref}
+        resumo={resumo}
+        recursosComuns={recursosComuns}
+        outrasRegras={outrasRegras}
+        somenteLeitura={somenteLeitura}
+        onClose={onClose}
+        onChange={(patch) => onChange(patch)}
+      />
+    );
+  }
+  return null;
 }
 
 /* ====================== Pref ============================================== */
 
 interface PrefModalProps {
+  nome: string;
   rule: PrefRule | undefined;
   resumo: string;
-  subitemsCount: number;
+  recursosComuns: number;
+  outrasRegras: number;
   somenteLeitura: boolean;
   onClose: () => void;
-  onChange: (rule: PrefRule) => void;
+  onChange: (patch: Partial<Subitem>) => void;
 }
 
 /** Mapeia cada tipo à variável CSS de cor (definida em index.css). */
@@ -97,15 +126,23 @@ const MINUTA_MODO_LABEL: Record<PrefMinutaModo, string> = {
 };
 
 function PrefModal({
+  nome,
   rule,
   resumo,
-  subitemsCount,
+  recursosComuns,
+  outrasRegras,
   somenteLeitura,
   onClose,
   onChange,
 }: PrefModalProps) {
-  const r: PrefRule = rule ?? { implantar: false, ja_criado: false, nome: '' };
-  const setR = (patch: Partial<PrefRule>) => onChange({ ...r, ...patch });
+  const r: PrefRule = rule ?? { implantar: false, ja_criado: false };
+  // `ja_criado` mora nos dois: na regra, porque é campo dela desde sempre; no
+  // recurso, porque é o checkbox da linha e do checklist. Escrever nos dois
+  // juntos é o que os mantém falando a mesma coisa.
+  const setR = (patch: Partial<PrefRule>) => {
+    const pref = { ...r, ...patch };
+    onChange({ pref, ...(patch.ja_criado === undefined ? {} : { ja_criado: patch.ja_criado }) });
+  };
 
   // Toggle do modo: clicar no já ativo desmarca; clicar no outro troca.
   // Manter `minutaConteudo` ao trocar — o texto digitado em "Modelo" pode
@@ -116,7 +153,7 @@ function PrefModal({
 
   return (
     <ModalShell
-      titulo={r.nome || resumo || 'Preferência'}
+      titulo={nome || resumo || 'Preferência'}
       subtitulo="Preferência"
       somenteLeitura={somenteLeitura}
       onClose={onClose}
@@ -127,8 +164,8 @@ function PrefModal({
         <input
           className="input"
           placeholder="Ex.: Preferência de processos com prioridade legal"
-          value={r.nome}
-          onChange={(e) => setR({ nome: e.target.value })}
+          value={nome}
+          onChange={(e) => onChange({ nome: e.target.value })}
         />
       </Field>
 
@@ -206,7 +243,7 @@ function PrefModal({
         />
       </Field>
 
-      <RecursosResumo n={subitemsCount} cat="Preferência" />
+      <RecursosResumo comuns={recursosComuns} outrasRegras={outrasRegras} cat="Preferência" />
     </ModalShell>
   );
 }
@@ -214,31 +251,38 @@ function PrefModal({
 /* ====================== ATP =============================================== */
 
 interface AtpModalProps {
+  nome: string;
   rule: AtpRule | undefined;
   resumo: string;
-  subitemsCount: number;
+  recursosComuns: number;
+  outrasRegras: number;
   somenteLeitura: boolean;
   onClose: () => void;
-  onChange: (rule: AtpRule) => void;
+  onChange: (patch: Partial<Subitem>) => void;
 }
 
 function AtpModal({
+  nome,
   rule,
   resumo,
-  subitemsCount,
+  recursosComuns,
+  outrasRegras,
   somenteLeitura,
   onClose,
   onChange,
 }: AtpModalProps) {
-  const r: AtpRule = rule ?? { implantar: false, ja_criado: false, nome: '' };
-  const setR = (patch: Partial<AtpRule>) => onChange({ ...r, ...patch });
+  const r: AtpRule = rule ?? { implantar: false, ja_criado: false };
+  const setR = (patch: Partial<AtpRule>) => {
+    const atp = { ...r, ...patch };
+    onChange({ atp, ...(patch.ja_criado === undefined ? {} : { ja_criado: patch.ja_criado }) });
+  };
   const setTrigger = (patch: AtpTrigger) => setR({ trigger: patch });
   const setFiltros = (patch: Partial<AtpFiltros>) =>
     setR({ filtros: { ...(r.filtros ?? {}), ...patch } });
 
   return (
     <ModalShell
-      titulo={r.nome || resumo || 'Regra de ATP'}
+      titulo={nome || resumo || 'Regra de ATP'}
       subtitulo="ATP"
       somenteLeitura={somenteLeitura}
       onClose={onClose}
@@ -249,8 +293,8 @@ function AtpModal({
         <input
           className="input"
           placeholder="Ex.: Após citação válida, mover para conclusão"
-          value={r.nome}
-          onChange={(e) => setR({ nome: e.target.value })}
+          value={nome}
+          onChange={(e) => onChange({ nome: e.target.value })}
         />
       </Field>
 
@@ -325,7 +369,7 @@ function AtpModal({
         />
       </Field>
 
-      <RecursosResumo n={subitemsCount} cat="Regra de ATP" />
+      <RecursosResumo comuns={recursosComuns} outrasRegras={outrasRegras} cat="Regra de ATP" />
     </ModalShell>
   );
 }
@@ -572,12 +616,20 @@ function Field({ label, children }: FieldProps) {
 }
 
 interface RecursosResumoProps {
-  n: number;
+  comuns: number;
+  outrasRegras: number;
   cat: 'Regra de ATP' | 'Preferência';
 }
 
-function RecursosResumo({ n, cat }: RecursosResumoProps) {
-  if (n === 0) return null;
+/**
+ * Diz o que o checklist vai fazer com os outros recursos da mesma aresta. A
+ * resposta depende de haver ou não outra regra: com uma só, os recursos são
+ * subitens dela; com duas ou mais, não há a quem pendurá-los, e cada um vai
+ * para a própria seção (ver `features/checklist/derive.ts`).
+ */
+function RecursosResumo({ comuns, outrasRegras, cat }: RecursosResumoProps) {
+  if (comuns === 0 && outrasRegras === 0) return null;
+  const esta = cat === 'Preferência' ? 'esta preferência' : 'esta regra';
   return (
     <div
       className="text-[11.5px] text-texto-2"
@@ -589,10 +641,19 @@ function RecursosResumo({ n, cat }: RecursosResumoProps) {
       }}
     >
       <div className="font-semibold mb-1 text-texto">
-        {n} recurso{n === 1 ? '' : 's'} atrelado{n === 1 ? '' : 's'}
+        {comuns} recurso{comuns === 1 ? '' : 's'} atrelado{comuns === 1 ? '' : 's'}
+        {outrasRegras > 0 && (
+          <>
+            {' '}
+            e mais {outrasRegras} regra{outrasRegras === 1 ? '' : 's'} nesta transição
+          </>
+        )}
       </div>
-      No checklist, aparecerão como subitens d
-      {cat === 'Preferência' ? 'esta preferência' : 'esta regra'}.
+      {outrasRegras > 0
+        ? `Como a transição tem mais de uma regra, o checklist lista cada uma como item próprio e os demais recursos nas seções deles.`
+        : comuns > 0
+          ? `No checklist, aparecerão como subitens d${esta}.`
+          : null}
     </div>
   );
 }
@@ -646,8 +707,7 @@ function ModalShell({
                 <>
                   Marque <span className="mono">Implantar no checklist</span> para que
                   esta {subtitulo === 'Preferência' ? 'preferência' : 'regra'} apareça
-                  como item a ser criado no Eproc, com seus recursos atrelados como
-                  subitens.
+                  como item a ser criado no Eproc.
                 </>
               )}
             </div>
