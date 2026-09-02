@@ -6,6 +6,7 @@ import {
   CORES_FLAG,
   PREF_TIPOS,
   SCHEMA_VERSION,
+  SETORES_VERSION,
   SUBITEM_CATS,
   TIPO_CONTROLE_VALUES,
   type AcaoPreferencialUnidade,
@@ -24,6 +25,7 @@ import {
   type LocalizadorUnidade,
   type Plano,
   type PrefRule,
+  type SetoresUnidade,
   type Subitem,
   type UnidadeEproc,
 } from '@/domain';
@@ -67,6 +69,16 @@ const DefinicaoFlagSchema = z.object({
   label: z.string(),
   cor: CorFlagSchema,
 }) satisfies z.ZodType<DefinicaoFlag>;
+
+/**
+ * Setores da unidade (decisoes.md#D-26). Mora numa chave por escopo, fora do
+ * plano; `Plano.flags` guarda um retrato da mesma forma, e por isso os dois
+ * reusam o `DefinicaoFlagSchema`.
+ */
+export const SetoresUnidadeSchema = z.object({
+  version: z.literal(SETORES_VERSION),
+  itens: z.array(DefinicaoFlagSchema),
+}) satisfies z.ZodType<SetoresUnidade>;
 
 const AtpTriggerSchema = z.discriminatedUnion('tipo', [
   z.object({
