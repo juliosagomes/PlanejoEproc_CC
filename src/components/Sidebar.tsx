@@ -14,15 +14,15 @@ interface SidebarProps {
   /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
   onVerTutorial: () => void;
 
-  /* --- Setores e marcadores (decisoes.md#D-22) ---
-     Chegam por prop, e não da store do canvas, porque `components/` não importa
-     de `features/` — quem costura as duas pontas é o App. */
+  /* --- Setores da unidade (decisoes.md#D-22, D-26) ---
+     Chegam por prop, e não da store, porque `components/` não importa de
+     `features/` — quem costura as duas pontas é o App. */
   flags: DefinicaoFlag[];
   /** Ids realçados agora; vazio = nada esmaecido no canvas. */
   filtroFlags: string[];
   onAlternarFiltroFlag: (id: string) => void;
-  /** Abre o modal de gestão. Escondido em visualização. */
-  onGerenciarFlags: () => void;
+  /** Abre a tela geral de setores. */
+  onGerenciarSetores: () => void;
 }
 
 /**
@@ -43,7 +43,7 @@ export function Sidebar({
   flags,
   filtroFlags,
   onAlternarFiltroFlag,
-  onGerenciarFlags,
+  onGerenciarSetores,
 }: SidebarProps) {
   const onDragStart = (e: DragEvent<HTMLDivElement>) => {
     e.dataTransfer.setData(NEW_NODE_DATATYPE, '1');
@@ -135,22 +135,21 @@ export function Sidebar({
 
         <div className="flex items-baseline justify-between gap-2 mb-2">
           <div className="section-h">Setores</div>
-          {/* Filtrar continua valendo em visualização — é olhar, não editar.
-              Só a gestão da lista some. */}
-          {!somenteLeitura && (
-            <button
-              type="button"
-              className="text-[10.5px] text-texto-3 hover:text-texto underline"
-              onClick={onGerenciarFlags}
-            >
-              Gerenciar
-            </button>
-          )}
+          {/* Vale em visualização também: a tela é o inventário de quem trabalha
+              o quê, e olhar não é editar — a edição da lista é que fica travada
+              lá dentro. */}
+          <button
+            type="button"
+            className="text-[10.5px] text-texto-3 hover:text-texto underline"
+            onClick={onGerenciarSetores}
+          >
+            Gerenciar
+          </button>
         </div>
         {flags.length === 0 ? (
           <div className="text-[10.5px] text-texto-3 leading-snug mb-3.5">
             {somenteLeitura
-              ? 'Este plano não define setores.'
+              ? 'Esta unidade não define setores.'
               : 'Defina setores ou servidores para marcar quem trabalha cada localizador.'}
           </div>
         ) : (

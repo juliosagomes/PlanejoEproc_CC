@@ -49,6 +49,8 @@ export interface HeaderProps {
   onCatalogoOrgao: () => void;
   onSincronizarUnidade: () => void;
   sincronizandoUnidade: boolean;
+  /** Abre a tela geral dos setores da unidade (decisoes.md#D-26). */
+  onSetores: () => void;
   onChecklist: () => void;
   flowMode: FlowMode;
   onFlowModeChange: (mode: FlowMode) => void;
@@ -95,6 +97,7 @@ export function Header({
   onCatalogoOrgao,
   onSincronizarUnidade,
   sincronizandoUnidade,
+  onSetores,
   onChecklist,
   flowMode,
   onFlowModeChange,
@@ -273,6 +276,16 @@ export function Header({
           title="Importa os localizadores do órgão a partir do XLS exportado do Eproc"
         >
           <Icon.Library /> Catálogo órgão
+        </button>
+        {/* Vale em visualização: a tela é o inventário de quem trabalha o quê,
+            e a edição da lista é que fica travada lá dentro. */}
+        <button
+          type="button"
+          className="btn btn-sm"
+          onClick={onSetores}
+          title="Mostra os setores da unidade e o que cada um trabalha, em todos os planos"
+        >
+          <Icon.Etiqueta /> Setores
         </button>
         <button type="button" className="btn btn-sm btn-accent" onClick={onChecklist}>
           <Icon.Bolt /> Gerar Checklist

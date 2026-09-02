@@ -9,11 +9,11 @@ import { useCanvasStore, type FlowNode } from '../store';
 
 interface NodePanelProps {
   node: FlowNode;
-  /** Abre o modal de gerenciamento das flags do plano. */
-  onGerenciarFlags: () => void;
+  /** Abre a tela geral dos setores da unidade. */
+  onGerenciarSetores: () => void;
 }
 
-export function NodePanel({ node, onGerenciarFlags }: NodePanelProps) {
+export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
@@ -127,19 +127,17 @@ export function NodePanel({ node, onGerenciarFlags }: NodePanelProps) {
         <div>
           <div className="flex items-baseline justify-between gap-2">
             <label className="label">Setores e marcadores (opcional)</label>
-            {!somenteLeitura && (
-              <button
-                type="button"
-                className="text-[11px] text-texto-3 hover:text-texto underline"
-                onClick={onGerenciarFlags}
-              >
-                Gerenciar
-              </button>
-            )}
+            <button
+              type="button"
+              className="text-[11px] text-texto-3 hover:text-texto underline"
+              onClick={onGerenciarSetores}
+            >
+              Gerenciar
+            </button>
           </div>
           {flags.length === 0 ? (
             <div className="text-[11.5px] text-texto-3 leading-snug">
-              Nenhum marcador definido neste plano.
+              Nenhum setor definido nesta unidade.
             </div>
           ) : (
             <div className="flex flex-wrap gap-1.5">
