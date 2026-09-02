@@ -1,4 +1,5 @@
 export * from './flags';
+export * from './setores';
 export * from './subitems';
 export * from './regras';
 export * from './edges';
