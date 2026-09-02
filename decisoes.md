@@ -1062,6 +1062,95 @@ vira acerto, não acaso: é o único identificador que duas máquinas compartilh
 
 ---
 
+## D-26 · Setores passam a ser da unidade, com tela geral
+
+> **Emenda ao [D-22](#d-22--flags-do-localizador-viram-lista-do-plano-definida-pelo-usuário)**,
+> que decidiu o contrário. Leia os dois: o D-22 continua explicando *o que* o
+> marcador é, e este muda apenas *de quem ele é*.
+
+**Decisão.** A lista de setores deixa de ser do plano e passa a ser da
+**unidade** — uma chave por escopo de armazenamento (`planejoeproc:setores` no
+modo local, `planejoeproc:lot:<wsId>:setores` na lotação), ao lado do índice de
+planos. `Plano.flags` **continua existindo**, agora como retrato gravado junto do
+plano, e é o que faz a lista viajar no JSON exportado e na publicação. Um modal
+de duas colunas passa a responder "o que este setor trabalha?" listando, por
+setor, os localizadores marcados em **todos** os planos do silo. Sem bump de
+`SCHEMA_VERSION` e sem migração de plano.
+
+**Por que.**
+
+- **A pergunta que o usuário faz atravessa planos.** "O que o Setor de Cálculo
+  trabalha nesta unidade?" não tem resposta enquanto a lista for vocabulário de
+  um desenho só: sem id compartilhado entre planos, não há o que cruzar. Era uma
+  tela de gerenciamento que faltava, e ela exige a identidade compartilhada —
+  não é apresentação em cima do que já existia.
+- **O D-22 previu a duplicação e errou o remédio.** Ele registrou que "dois
+  planos da mesma vara mantêm listas independentes" como custo aceito, e apontou
+  "copiar setores de outro plano" como saída caso incomodasse. Copiar resolve o
+  digitar de novo, não o cruzar: duas cópias com ids diferentes continuam sendo
+  dois setores para qualquer consulta. O D-22 escreveu aquilo sem o requisito da
+  tela geral em vista.
+- **A unidade é o silo, não a chave do Eproc.** `UnidadeEproc.chave` (D-16) é
+  `host::login::sigla` — inclui o login, existe só depois de sincronizar com o
+  Eproc, e não é compartilhada entre colegas. O silo, sim: é exatamente o
+  conjunto de planos que a tela varre, e numa lotação já é a unidade que as
+  pessoas dividem. Reusar `prefixo()` fez o isolamento continuar sendo
+  estrutural, como no D-9 — entrar em outra lotação nunca vê os setores da
+  anterior.
+- **Sem bump de schema, porque o plano continua levando uma cópia.** Tirar
+  `flags` do plano exigiria `SCHEMA_VERSION = 4` e entregaria, ao colega que
+  recebe o plano publicado, um desenho cheio de chips órfãos até ele recadastrar
+  a lista à mão. Mantido como retrato, o campo tem uso novo: **é por ele que a
+  lista se propaga**. `consolidarSetores` absorve, na lista da unidade, todo
+  setor desconhecido que chega dentro de um plano — importado de arquivo ou
+  baixado do servidor. Nenhum endpoint novo no Apps Script.
+- **Uma função só faz a migração e a absorção**, porque são o mesmo trabalho.
+  Na primeira execução não há chave de setores e cada plano traz a lista que era
+  dele; depois, o que chega são planos de fora. Nos dois casos a operação é
+  fundir por rótulo normalizado e remapear as marcações dos nós. Ela é idempotente
+  e **só grava quando algo mudou** — reescrever plano à toa carimbaria
+  `atualizadoEm` no índice e faria a publicação seguinte anunciar mudança em
+  tudo.
+- **Fusão por rótulo, e o preexistente sobrevive.** "Setor de Cálculo" e "SETOR
+  DE CALCULO" viram um setor só, com o id, o rótulo e a cor de quem já estava
+  aqui: um plano que chega de fora não repinta os chips de quem o abriu. Os ids
+  fixos `flag-espera`/`flag-fixo` casam por id antes disso, então continuam
+  valendo mesmo com o rótulo editado.
+- **Remover um setor varre o silo inteiro.** O motivo é o do D-22 — id órfão não
+  aparece no chip, mas voltaria a valer se alguém reaproveitasse o id —, só que
+  agora "todos os nós" quer dizer todos os planos. O plano aberto passa pela
+  store do canvas, e não por `sobrescreverPlano`: ele pode ter edição ainda não
+  gravada, e escrever por baixo dele a perderia no save seguinte.
+- **Em visualização, calcula e não grava.** A consolidação roda igual numa sessão
+  de leitura (D-19), mas em memória: ver quem trabalha o quê é inofensivo,
+  consolidar a lista da lotação de outra pessoa seria a primeira escrita de um
+  modo que promete não escrever.
+
+**O que continua valendo do D-22.** A lista é plana — setor e servidor são o
+mesmo tipo de marcador, sem hierarquia. O nó guarda id, não rótulo. Cor é índice
+`1..8`, resolvido em `.flag-cor-N` no CSS. Realçar não é filtrar, e `filtroFlags`
+não é persistido.
+
+**Custo assumido.** A lista da unidade **absorve** os setores de todo plano que
+chega de fora, então um plano de outra vara pode engordá-la com vocabulário
+alheio. É o preço de a propagação entre colegas não custar endpoint novo, e a
+lista é editável — o que sobra, o usuário remove. O outro custo é a varredura de
+todos os planos do silo a cada entrada e a cada importação; são dezenas de
+planos, leitura síncrona, e um marcador de "já consolidei" não evitaria a
+varredura seguinte, que existe justamente para absorver o que chegou depois.
+
+**O que precisaria mudar para evoluir.** As três coisas que ficaram fora da tela
+por serem outra decisão, não continuação: **pular** da linha do inventário para o
+nó no canvas (trocar de plano e selecionar — reusa `onSwitchPlano` e
+`setSelectedId`); **editar a marcação ali mesmo**, que exige gravar em plano que
+não é o ativo; e **pendências por setor**, o "checklist por setor" que o D-22
+antecipou, cujo lugar é `features/checklist/derive.ts`. Se um dia a lista
+precisar ser a mesma entre pessoas da lotação **sem** depender de alguém publicar
+um plano, ela vira um campo próprio do payload de sincronização — e aí o Apps
+Script muda junto.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

@@ -155,9 +155,12 @@ existem em nenhum outro arquivo do projeto:
 - **Flag do localizador** — marcador definido pelo usuário dizendo **quem
   trabalha** aquele localizador: um **setor** ("Setor de Cálculo") ou um
   **servidor** ("Joana Silva"), como a unidade preferir recortar. Os dois são o
-  mesmo tipo de marcador, numa lista plana. A lista é do **plano**
-  (`Plano.flags`); o nó guarda ids. Plano novo nasce com `E` Espera e `F` Fixo de
-  fluxo, e o usuário edita à vontade (decisoes.md#D-22).
+  mesmo tipo de marcador, numa lista plana. A lista é da **unidade** — uma chave
+  por silo de armazenamento, ao lado do índice de planos (decisoes.md#D-26); o nó
+  guarda ids. `Plano.flags` continua existindo, como **retrato** que viaja com o
+  plano exportado ou publicado, e é por ele que a lista se propaga entre colegas.
+  Unidade nova nasce com `E` Espera e `F` Fixo de fluxo, e o usuário edita à
+  vontade (decisoes.md#D-22).
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -251,8 +254,13 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
   `features/tutorial/`. As ilustrações reusam as **classes** do app, nunca os
   componentes — a lista de classes emprestadas está no topo de
   `ilustracoes/pecas.tsx`; renomeou uma delas, passe o grep lá.
-- Flags do localizador customizáveis por setor/servidor (decisoes.md#D-22), em
-  `features/flags/`. Trouxeram a `SCHEMA_VERSION = 2` e a primeira migração.
+- Flags do localizador customizáveis por setor/servidor (decisoes.md#D-22).
+  Trouxeram a `SCHEMA_VERSION = 2` e a primeira migração.
+- Os setores viraram lista da **unidade**, com tela geral de gerenciamento
+  (decisoes.md#D-26), em `features/setores/`. Sem bump de versão: `Plano.flags`
+  ficou como retrato, e `infra/storage/consolidarSetores.ts` funde por rótulo o
+  que cada plano trazia — a mesma função absorve os setores dos planos que chegam
+  de fora. Se você for mexer nas flags, é lá, não no `Plano`.
 - Localizadores de sistema entram nos dois catálogos, marcados em vez de
   filtrados (decisoes.md#D-23). Sem bump de versão: os campos `sistema` novos são
   opcionais justamente para não mandar catálogo e plano gravados à quarentena.
