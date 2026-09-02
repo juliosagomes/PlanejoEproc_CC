@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Sessao } from '@/domain';
 import { flushPersist, useCanvasStore } from '@/features/canvas/store';
+import { useSetoresStore } from '@/features/setores/store';
 import { aplicarSincronizacao, garantirAtivoValido } from '@/infra/sync/aplicar';
 import {
   criarPlano,
@@ -93,10 +94,16 @@ function nowIso(): string {
  *
  * O `setSomenteLeitura` vem **antes** do `loadPlano`: a assinatura de
  * persistência dispara no carregamento, e ela decide olhando essa flag.
+ *
+ * Os setores são hidratados aqui, e não no `App`: a lista é do silo
+ * (decisoes.md#D-26), então trocar de sessão troca a lista, e o único lugar que
+ * sabe disso é quem acabou de chamar `setEscopo`. Vem depois do
+ * `setSomenteLeitura` porque a consolidação decide gravar olhando essa flag.
  */
 function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
   const canvas = useCanvasStore.getState();
   canvas.setSomenteLeitura(somenteLeitura);
+  useSetoresStore.getState().hidratar(somenteLeitura);
 
   garantirAtivoValido();
   if (listPlanos().length === 0) {
@@ -256,6 +263,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     // trás da tela de login.
     useCanvasStore.getState().setSomenteLeitura(false);
     useCanvasStore.getState().loadPlano(planoVazio());
+    useSetoresStore.getState().limpar();
     set({
       sessao: null,
       erro: null,

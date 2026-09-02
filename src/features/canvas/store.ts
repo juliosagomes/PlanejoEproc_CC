@@ -13,8 +13,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import { shallow } from 'zustand/shallow';
 import {
   SCHEMA_VERSION,
-  proximaCor,
-  sugerirCode,
+  flagsPadrao,
   type AtpRule,
   type DefinicaoFlag,
   type DobraAresta,
@@ -51,7 +50,15 @@ interface CanvasState {
   selectedId: string | null;
   planoNome: string;
   flowMode: FlowMode;
-  /** Definições das flags deste plano — conteúdo, portanto persistido. */
+  /**
+   * Espelho da lista de setores da **unidade** (decisoes.md#D-26). Quem é dona
+   * dela é `features/setores/store.ts`; aqui ela existe para os componentes do
+   * canvas lerem num lugar só, e para `getPlano()` gravar o retrato que viaja
+   * dentro do plano exportado ou publicado.
+   *
+   * Continua no slice persistido de propósito: renomear um setor precisa
+   * regravar o plano ativo com o retrato novo.
+   */
   flags: DefinicaoFlag[];
   /**
    * Quais flags estão realçadas no canvas agora. Vazio = nada esmaecido.
@@ -99,12 +106,11 @@ interface CanvasActions {
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
 
-  // Flags do plano (decisoes.md#D-22)
-  /** Cria a flag com code e cor sugeridos. Devolve o id, ou `''` em visualização. */
-  criarFlag: (label: string) => string;
-  atualizarFlag: (id: string, patch: Partial<Omit<DefinicaoFlag, 'id'>>) => void;
-  /** Remove a definição **e** a marcação dela em todos os nós. */
-  removerFlag: (id: string) => void;
+  // Setores (decisoes.md#D-22, D-26)
+  /** Atualiza o espelho. Chamada pela store de setores, dona da lista. */
+  setFlags: (flags: DefinicaoFlag[]) => void;
+  /** Tira o setor removido dos nós do plano aberto e do realce. */
+  removerMarcacaoDeFlag: (id: string) => void;
   toggleFlagNoNo: (nodeId: string, flagId: string) => void;
   setFiltroFlags: (ids: string[]) => void;
 
@@ -150,12 +156,15 @@ export function defaultPrefRule(): PrefRule {
  * Conversores entre o shape do domain e o shape que ReactFlow consome.
  * ========================================================================== */
 
+/**
+ * `flags` fica de fora: a lista é da unidade, não do plano, e o retrato que vem
+ * dentro dele já foi absorvido por `consolidarSetores` antes de chegar aqui.
+ */
 function planoParaFlow(plano: Plano): {
   nodes: FlowNode[];
   edges: FlowEdge[];
   planoNome: string;
   flowMode: FlowMode;
-  flags: DefinicaoFlag[];
 } {
   return {
     nodes: plano.nodes.map((n) => ({
@@ -175,7 +184,6 @@ function planoParaFlow(plano: Plano): {
     })),
     planoNome: plano.planoNome,
     flowMode: plano.flowMode,
-    flags: plano.flags,
   };
 }
 
@@ -221,7 +229,7 @@ export const useCanvasStore = create<CanvasStore>()(
     selectedId: null,
     planoNome: inicial.planoNome,
     flowMode: inicial.flowMode,
-    flags: inicial.flags,
+    flags: flagsPadrao(),
     filtroFlags: [],
     somenteLeitura: false,
 
@@ -322,35 +330,19 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
-    criarFlag: (label) => {
-      if (get().somenteLeitura) return '';
-      const nome = label.trim();
-      if (!nome) return '';
-      const id = uid('f');
-      set((s) => ({
-        flags: [
-          ...s.flags,
-          { id, code: sugerirCode(nome), label: nome, cor: proximaCor(s.flags) },
-        ],
-      }));
-      return id;
-    },
-
-    atualizarFlag: (id, patch) => {
-      if (get().somenteLeitura) return;
-      set((s) => ({
-        flags: s.flags.map((f) => (f.id === id ? { ...f, ...patch } : f)),
-      }));
-    },
+    // Sem guarda de `somenteLeitura`: é a store de setores que decide se pode
+    // mexer na lista; aqui o espelho só reflete o que ela resolveu, e em
+    // visualização a lista chega calculada em memória, sem gravação.
+    setFlags: (flags) => set({ flags }),
 
     // Limpar a marcação dos nós é parte da remoção, não faxina posterior: um id
     // órfão não aparece no chip, mas voltaria a valer se alguém criasse uma
     // flag nova reaproveitando o id — e a migração usa ids fixos justamente
-    // para os quatro nomes históricos.
-    removerFlag: (id) => {
+    // para os quatro nomes históricos. Os outros planos do silo são varridos
+    // pela store de setores, que é quem enxerga o silo inteiro.
+    removerMarcacaoDeFlag: (id) => {
       if (get().somenteLeitura) return;
       set((s) => ({
-        flags: s.flags.filter((f) => f.id !== id),
         nodes: s.nodes.map((n) =>
           n.data.flags.includes(id)
             ? { ...n, data: { ...n.data, flags: n.data.flags.filter((x) => x !== id) } }
@@ -423,9 +415,10 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
-    // `filtroFlags` zera junto: as flags do plano que entra são outras, e um id
-    // que sobrasse do plano anterior esmaeceria o canvas inteiro sem que nada
-    // na tela explicasse por quê.
+    // `flags` fica intacta: a lista é da unidade e vale para todos os planos do
+    // silo, então trocar de plano não a troca. `filtroFlags` zera, sim — o
+    // realce é sobre os nós que saíram da tela, e mantê-lo esmaeceria o plano
+    // novo sem que nada explicasse por quê.
     loadPlano: (plano) => {
       const flow = planoParaFlow(plano);
       set({
@@ -433,7 +426,6 @@ export const useCanvasStore = create<CanvasStore>()(
         edges: flow.edges,
         planoNome: flow.planoNome,
         flowMode: flow.flowMode,
-        flags: flow.flags,
         filtroFlags: [],
         selectedId: null,
       });
