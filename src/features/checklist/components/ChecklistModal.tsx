@@ -28,7 +28,6 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const edges = useCanvasStore((s) => s.edges);
   const toggleNodeCreated = useCanvasStore((s) => s.toggleNodeCreated);
   const toggleSubitemCreated = useCanvasStore((s) => s.toggleSubitemCreated);
-  const toggleEdgeRuleCreated = useCanvasStore((s) => s.toggleEdgeRuleCreated);
   // O checklist é útil como leitura numa sessão de visualização; só as marcações
   // de "já criado" ficam travadas — elas são edição do plano.
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
@@ -155,8 +154,9 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                       ? it.children.filter((c) => c.ja_criado).length
                       : 0;
                     const onToggle = () => {
+                      // Regra e recurso comum são ambos subitens da aresta
+                      // desde o D-24, então um toggle só dá conta dos dois.
                       if (it.kind === 'node') toggleNodeCreated(it.nodeId);
-                      else if (it.kind === 'rule') toggleEdgeRuleCreated(it.edgeId);
                       else toggleSubitemCreated(it.edgeId, it.index);
                     };
                     return (

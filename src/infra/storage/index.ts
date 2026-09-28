@@ -40,11 +40,25 @@ export {
   type PlansIndex,
 } from './storage';
 export {
+  SETORES_KEY_SUFIXO,
+  setoresKey,
+  loadSetores,
+  saveSetores,
+  clearSetores,
+} from './setores';
+export { consolidarSetores } from './consolidarSetores';
+export {
   CATALOGO_KEY,
   loadCatalogoOrgao,
   saveCatalogoOrgao,
   clearCatalogoOrgao,
 } from './catalogo';
+export {
+  ANOTACOES_KEY,
+  loadAnotacoesCatalogo,
+  saveAnotacoesCatalogo,
+  clearAnotacoesCatalogo,
+} from './anotacoesCatalogo';
 export {
   CATALOGO_UNIDADE_PREFIXO,
   catalogoUnidadeKey,
@@ -62,5 +76,7 @@ export {
   PlansIndexSchema,
   CatalogoOrgaoSchema,
   CatalogoUnidadeSchema,
+  AnotacoesCatalogoSchema,
+  SetoresUnidadeSchema,
   type PlanoBundle,
 } from './schema';

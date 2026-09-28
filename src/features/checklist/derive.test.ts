@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Edge, Localizador } from '@/domain';
+import type { AtpRule, Edge, Localizador, PrefRule, Subitem } from '@/domain';
 import {
   checklistToMarkdown,
   contarChecklist,
@@ -10,6 +10,24 @@ const noLocalizador = (id: string, nome: string, ja_criado = false): Localizador
   id,
   position: { x: 0, y: 0 },
   data: { nome, ja_criado, flags: [] },
+});
+
+// Desde o D-24 a regra é um recurso da aresta, e é o recurso que carrega nome e
+// `ja_criado` — daí os dois construtores em vez de um literal em cada fixture.
+const regraAtp = (nome: string, atp: AtpRule, ja_criado = false): Subitem => ({
+  id: `si-${nome}`,
+  categoria: 'Regra de ATP',
+  nome,
+  ja_criado,
+  atp,
+});
+
+const regraPref = (nome: string, pref: PrefRule, ja_criado = false): Subitem => ({
+  id: `si-${nome}`,
+  categoria: 'Preferência',
+  nome,
+  ja_criado,
+  pref,
 });
 
 describe('deriveChecklist', () => {
@@ -108,14 +126,12 @@ describe('deriveChecklist', () => {
           resumo: 'após citação',
           observacao: '',
           subitems: [
+            regraAtp('ATP citação', {
+              implantar: true,
+              acao: 'mover para conclusão',
+            }),
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
           ],
-          atp: {
-            implantar: true,
-            ja_criado: false,
-            nome: 'ATP citação',
-            acao: 'mover para conclusão',
-          },
         },
       },
     ];
@@ -147,17 +163,16 @@ describe('deriveChecklist', () => {
           kind: 'atp',
           resumo: '',
           observacao: '',
-          subitems: [],
-          atp: {
-            implantar: true,
-            ja_criado: false,
-            nome: 'R',
-            trigger: { tipo: 'L', diasNoLocalizador: 5 },
-            acaoTipo: 'CMA',
-            condicoes: 'condição livre',
-            filtros: { competenciaIds: ['__cod_inexistente__'] },
-            observacoes: 'obs',
-          },
+          subitems: [
+            regraAtp('R', {
+              implantar: true,
+              trigger: { tipo: 'L', diasNoLocalizador: 5 },
+              acaoTipo: 'CMA',
+              condicoes: 'condição livre',
+              filtros: { competenciaIds: ['__cod_inexistente__'] },
+              observacoes: 'obs',
+            }),
+          ],
         },
       },
     ];
@@ -191,16 +206,15 @@ describe('deriveChecklist', () => {
           kind: 'pref',
           resumo: '',
           observacao: '',
-          subitems: [],
-          pref: {
-            implantar: true,
-            ja_criado: false,
-            nome: 'P',
-            tipo: 'Minuta',
-            minutaModo: 'texto_padrao',
-            minutaConteudo: 'linha 1\nlinha 2',
-            acao: 'conclusão p/ despacho',
-          },
+          subitems: [
+            regraPref('P', {
+              implantar: true,
+              tipo: 'Minuta',
+              minutaModo: 'texto_padrao',
+              minutaConteudo: 'linha 1\nlinha 2',
+              acao: 'conclusão p/ despacho',
+            }),
+          ],
         },
       },
     ];
@@ -224,13 +238,9 @@ describe('deriveChecklist', () => {
           kind: 'pref',
           resumo: 'r',
           observacao: '',
-          subitems: [],
-          pref: {
-            implantar: true,
-            ja_criado: true,
-            nome: 'Pref X',
-            tipo: 'Minuta',
-          },
+          subitems: [
+            regraPref('Pref X', { implantar: true, tipo: 'Minuta' }, true),
+          ],
         },
       },
     ];
@@ -238,6 +248,82 @@ describe('deriveChecklist', () => {
     expect(g['Preferência']).toHaveLength(1);
     expect(g['Preferência'][0]?.kind).toBe('rule');
     expect(g['Preferência'][0]?.ja_criado).toBe(true);
+  });
+
+  it('duas regras na mesma aresta viram itens irmãos, e os recursos comuns ficam soltos', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'atp',
+          resumo: '',
+          observacao: '',
+          subitems: [
+            regraAtp('ATP 1', { implantar: true }),
+            regraAtp('ATP 2', { implantar: true }, true),
+            regraPref('Pref', { implantar: true }),
+            { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
+          ],
+        },
+      },
+    ];
+    const g = deriveChecklist(nodes, edges);
+
+    expect(g['Regra de ATP'].map((i) => i.nome)).toEqual(['ATP 1', 'ATP 2']);
+    expect(g['Regra de ATP'].every((i) => i.kind === 'rule')).toBe(true);
+    expect(g['Preferência']).toHaveLength(1);
+    // Sem aninhamento: nenhuma regra pode reivindicar o modelo sozinha.
+    expect(g['Regra de ATP'][0]?.kind === 'rule' && g['Regra de ATP'][0].children).toEqual([]);
+    expect(g['Modelo']).toHaveLength(1);
+    expect(g['Modelo'][0]).toMatchObject({ kind: 'sub', contexto: 'A → B', index: 3 });
+  });
+
+  it('o índice do item de regra aponta para o recurso na aresta', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'atp',
+          resumo: '',
+          observacao: '',
+          subitems: [
+            { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
+            regraAtp('R', { implantar: true }),
+          ],
+        },
+      },
+    ];
+    const rule = deriveChecklist(nodes, edges)['Regra de ATP'][0];
+    if (rule?.kind !== 'rule') throw new Error('esperava rule');
+    expect(rule.index).toBe(1);
+  });
+
+  it('recurso de categoria Preferência sem regra continua listado como recurso comum', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'atp',
+          resumo: '',
+          observacao: '',
+          subitems: [
+            { id: 's1', categoria: 'Preferência', nome: 'pref a criar', ja_criado: false },
+          ],
+        },
+      },
+    ];
+    const g = deriveChecklist(nodes, edges);
+    expect(g['Preferência']).toHaveLength(1);
+    expect(g['Preferência'][0]?.kind).toBe('sub');
   });
 
   it('regra ATP sem implantar mantém subitens nas próprias categorias (sem item de regra)', () => {
@@ -252,9 +338,9 @@ describe('deriveChecklist', () => {
           resumo: '',
           observacao: '',
           subitems: [
+            regraAtp('', { implantar: false }),
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
           ],
-          atp: { implantar: false, ja_criado: false, nome: '' },
         },
       },
     ];
@@ -282,8 +368,8 @@ describe('contarChecklist', () => {
           subitems: [
             { id: 's1', categoria: 'Modelo', nome: 'm1', ja_criado: true },
             { id: 's2', categoria: 'Modelo', nome: 'm2', ja_criado: false },
+            regraAtp('r', { implantar: true }),
           ],
-          atp: { implantar: true, ja_criado: false, nome: 'r' },
         },
       },
     ];
@@ -306,8 +392,10 @@ describe('checklistToMarkdown', () => {
           kind: 'atp',
           resumo: '',
           observacao: '',
-          subitems: [{ id: 's1', categoria: 'Modelo', nome: 'm1', ja_criado: false }],
-          atp: { implantar: true, ja_criado: false, nome: 'R1' },
+          subitems: [
+            regraAtp('R1', { implantar: true }),
+            { id: 's1', categoria: 'Modelo', nome: 'm1', ja_criado: false },
+          ],
         },
       },
     ];
@@ -331,15 +419,14 @@ describe('checklistToMarkdown', () => {
           kind: 'pref',
           resumo: '',
           observacao: '',
-          subitems: [],
-          pref: {
-            implantar: true,
-            ja_criado: false,
-            nome: 'P',
-            tipo: 'Minuta',
-            minutaModo: 'modelo',
-            minutaConteudo: 'L1\nL2',
-          },
+          subitems: [
+            regraPref('P', {
+              implantar: true,
+              tipo: 'Minuta',
+              minutaModo: 'modelo',
+              minutaConteudo: 'L1\nL2',
+            }),
+          ],
         },
       },
     ];

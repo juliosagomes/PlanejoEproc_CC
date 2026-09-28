@@ -11,11 +11,13 @@ import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
 import { SincronizacaoUnidadeModal } from '@/features/catalogo/components/SincronizacaoUnidadeModal';
+import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
-import { FlagsModal } from '@/features/flags/components/FlagsModal';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
+import { SetoresModal } from '@/features/setores/components/SetoresModal';
+import { useSetoresStore } from '@/features/setores/store';
 import { TelaLogin } from '@/features/sessao/components/TelaLogin';
 import { useSessaoStore } from '@/features/sessao/store';
 import { SyncResultadoModal } from '@/features/sync/components/SyncResultadoModal';
@@ -91,7 +93,7 @@ function Editor() {
 
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
-  const [showFlags, setShowFlags] = useState(false);
+  const [showSetores, setShowSetores] = useState(false);
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
@@ -127,8 +129,15 @@ function Editor() {
     setTutorialManual(false);
   }, []);
 
+  // A lista de setores é da unidade (decisoes.md#D-26): todo plano que entra de
+  // fora traz um retrato dela, e reidratar é o que absorve os setores que a
+  // unidade ainda não conhecia. Quem entra na sessão já hidrata em
+  // `features/sessao/store.ts`; aqui cobrimos import de arquivo e pull.
+  const hidratarSetores = useSetoresStore((s) => s.hidratar);
+
   const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
   const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
+  const hidratarAnotacoes = useAnotacoesStore((s) => s.hidratar);
   const sincronizarUnidade = useUnidadeStore((s) => s.sincronizar);
   const sincronizandoUnidade = useUnidadeStore((s) => s.sincronizando);
   const resetMensagensUnidade = useUnidadeStore((s) => s.resetMensagens);
@@ -149,13 +158,14 @@ function Editor() {
     refreshPlanos();
   }, [refreshPlanos]);
 
-  // Os dois catálogos só podem ser lidos DEPOIS que `main.tsx` hidratou a
-  // plataforma — na extensão, o espelho do `chrome.storage` nasce vazio, e
-  // qualquer leitura em tempo de módulo cairia no localStorage.
+  // Os catálogos e as anotações só podem ser lidos DEPOIS que `main.tsx`
+  // hidratou a plataforma — na extensão, o espelho do `chrome.storage` nasce
+  // vazio, e qualquer leitura em tempo de módulo cairia no localStorage.
   useEffect(() => {
     hidratarCatalogoOrgao();
     hidratarCatalogoUnidade();
-  }, [hidratarCatalogoOrgao, hidratarCatalogoUnidade]);
+    hidratarAnotacoes();
+  }, [hidratarCatalogoOrgao, hidratarCatalogoUnidade, hidratarAnotacoes]);
 
   const selectedNode = useMemo(
     () => (selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null),
@@ -342,6 +352,7 @@ function Editor() {
           }
           flushPersist();
           importarPlanos(bundleResult.data.plans);
+          hidratarSetores(somenteLeitura);
           const novoAtivoId = getAtivoId();
           loadPlanoAcao(
             novoAtivoId !== null ? loadPlano(novoAtivoId) : planoVazio(),
@@ -354,6 +365,7 @@ function Editor() {
         if (planoResult.success) {
           flushPersist();
           importarPlano(planoResult.data);
+          hidratarSetores(somenteLeitura);
           loadPlanoAcao(planoResult.data);
           refreshPlanos();
           return;
@@ -411,9 +423,10 @@ function Editor() {
     flushPersist();
     await baixarDoServidor();
     refreshPlanos();
+    hidratarSetores(somenteLeitura);
     const atual = getAtivoId();
     loadPlanoAcao(atual !== null ? loadPlano(atual) : planoVazio());
-  }, [baixarDoServidor, refreshPlanos, loadPlanoAcao]);
+  }, [baixarDoServidor, refreshPlanos, hidratarSetores, somenteLeitura, loadPlanoAcao]);
 
   const onPush = async () => {
     flushPersist();
@@ -431,9 +444,10 @@ function Editor() {
 
   const recarregarDoStorage = useCallback(() => {
     refreshPlanos();
+    hidratarSetores(somenteLeitura);
     const atual = getAtivoId();
     loadPlanoAcao(atual !== null ? loadPlano(atual) : planoVazio());
-  }, [refreshPlanos, loadPlanoAcao]);
+  }, [refreshPlanos, hidratarSetores, somenteLeitura, loadPlanoAcao]);
 
   useSincronizacaoExterna({ aoMudarPlanos: recarregarDoStorage });
 
@@ -487,6 +501,7 @@ function Editor() {
         onAbrirArquivo={onAbrirArquivo}
         onSalvarCopiaAtivo={onSalvarCopiaAtivo}
         onSalvarTodos={onSalvarTodos}
+        onSetores={() => setShowSetores(true)}
         onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
         onSincronizarUnidade={() => void sincronizarUnidade()}
         sincronizandoUnidade={sincronizandoUnidade}
@@ -505,7 +520,7 @@ function Editor() {
             flags={flags}
             filtroFlags={filtroFlags}
             onAlternarFiltroFlag={alternarFiltroFlag}
-            onGerenciarFlags={() => setShowFlags(true)}
+            onGerenciarSetores={() => setShowSetores(true)}
           />
         )}
 
@@ -525,7 +540,7 @@ function Editor() {
             <NodePanel
               key={selectedNode.id}
               node={selectedNode}
-              onGerenciarFlags={() => setShowFlags(true)}
+              onGerenciarSetores={() => setShowSetores(true)}
             />
           )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}
@@ -538,7 +553,7 @@ function Editor() {
       />
       <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
-      <FlagsModal open={showFlags} onClose={() => setShowFlags(false)} />
+      <SetoresModal open={showSetores} onClose={() => setShowSetores(false)} />
       <SyncResultadoModal onFechar={resetMensagensSync} />
       <CodigosLotacaoModal />
       <TutorialModal open={tutorialAberto} onFechar={fecharTutorial} />

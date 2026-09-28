@@ -6,7 +6,7 @@
 
 Aplicação web React + TypeScript chamada **PlanejoEproc**, derivada do protótipo monolítico `PlanejoEproc__BETA_2.html.html` na raiz. O protótipo é a **fonte da verdade do domínio, dos fluxos de UI e do comportamento esperado**, mas o produto final é um projeto Vite estruturado, com testes, validação de schemas, e arquitetura por camadas.
 
-Estágio: **beta**, sem usuários reais. `SCHEMA_VERSION = 2` (as flags customizáveis do D-22 trouxeram a v2). A migração v1→v2 mora em `infra/storage/migracoes.ts` e é aplicada **dentro do `PlanoSchema`**, para que os sete pontos que chamam `safeParse` a herdem — em especial `loadPlano`, que manda para a quarentena tudo que não valida. Toda versão nova segue esse molde, com teste de regressão.
+Estágio: **beta**, sem usuários reais. `SCHEMA_VERSION = 3` (as flags customizáveis do D-22 trouxeram a v2; a regra virando recurso da aresta, no D-24, trouxe a v3). As migrações moram em `infra/storage/migracoes.ts`, se **encadeiam** (v1→v2→v3) e são aplicadas **dentro do `PlanoSchema`**, para que os sete pontos que chamam `safeParse` as herdem — em especial `loadPlano`, que manda para a quarentena tudo que não valida. Toda versão nova segue esse molde, com teste de regressão — e **congelando** a forma anterior do schema: a v1 reusava o `EdgeSchema` corrente e por isso mudava junto com ele.
 
 ## Para quem
 
@@ -40,7 +40,9 @@ existindo (decisoes.md#D-16):
 - **"Sincronizar com a unidade"** lê direto do Eproc, na aba onde o usuário já
   está logado. Exige extensão instalada e sessão viva.
 - **"Catálogo órgão"** importa o XLS pelo file picker. É o caminho offline, e o
-  app **não consegue** ler esse arquivo sozinho — sempre pelo botão.
+  app **não consegue** ler esse arquivo sozinho — sempre pelo botão. O mesmo
+  modal é a tela de **consulta** dos recursos mapeados dos dois caminhos, com as
+  anotações do usuário (decisoes.md#D-25).
 
 ## Stack obrigatória
 
@@ -141,7 +143,10 @@ existem em nenhum outro arquivo do projeto:
 - **Manual** — transição sem automação. Aresta cinza tracejada.
 - **Modelo** — minuta/template de texto.
 - **Texto padrão** — trecho reutilizável de redação.
-- **Regra de ATP** — gatilho + condição + ação.
+- **Regra de ATP** — gatilho + condição + ação. É um **recurso da aresta**, como
+  Modelo ou Texto padrão, e por isso uma transição comporta várias — duas ATPs,
+  ou uma ATP e uma preferência (decisoes.md#D-24). Quem nomeia é o recurso; a
+  regra guarda só o detalhamento.
 - **Gatilho** — evento que dispara automação. Espelha `selTipoControle` (9 tipos).
 - **Unidade** — vara, cartório, gabinete.
 - **Ações Preferenciais Vinculadas** — rótulo do bloco que lista, no painel do
@@ -150,9 +155,12 @@ existem em nenhum outro arquivo do projeto:
 - **Flag do localizador** — marcador definido pelo usuário dizendo **quem
   trabalha** aquele localizador: um **setor** ("Setor de Cálculo") ou um
   **servidor** ("Joana Silva"), como a unidade preferir recortar. Os dois são o
-  mesmo tipo de marcador, numa lista plana. A lista é do **plano**
-  (`Plano.flags`); o nó guarda ids. Plano novo nasce com `E` Espera e `F` Fixo de
-  fluxo, e o usuário edita à vontade (decisoes.md#D-22).
+  mesmo tipo de marcador, numa lista plana. A lista é da **unidade** — uma chave
+  por silo de armazenamento, ao lado do índice de planos (decisoes.md#D-26); o nó
+  guarda ids. `Plano.flags` continua existindo, como **retrato** que viaja com o
+  plano exportado ou publicado, e é por ele que a lista se propaga entre colegas.
+  Unidade nova nasce com `E` Espera e `F` Fixo de fluxo, e o usuário edita à
+  vontade (decisoes.md#D-22).
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -160,8 +168,8 @@ existem em nenhum outro arquivo do projeto:
 
 A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por enquanto (texto/string), e ficarão tipados quando o catálogo entrar.
 
-- **Aresta** tem `rule` discriminado por `kind` (`'atp' | 'pref' | 'manual'`); ATP tem `trigger` discriminado por `tipo` (9 valores espelhando `selTipoControle`).
-- **Schema versionado:** `SCHEMA_VERSION = 2`. Toda chave de localStorage e arquivo exportado carrega `version`. Cada migração vem com **teste de regressão** (abrir um plano da versão anterior e conferir que nada se perdeu) — ver `infra/storage/migracoes.test.ts`.
+- **Aresta** tem `kind` (`'atp' | 'pref' | 'manual'`), que é escolha do usuário e manda no traço no canvas. As regras são `Subitem`s dela, discriminados pela `categoria`; ATP tem `trigger` discriminado por `tipo` (9 valores espelhando `selTipoControle`).
+- **Schema versionado:** `SCHEMA_VERSION = 3`. Toda chave de localStorage e arquivo exportado carrega `version`. Cada migração vem com **teste de regressão** (abrir um plano da versão anterior e conferir que nada se perdeu) — ver `infra/storage/migracoes.test.ts`.
 - Decisões deliberadas de simplificação: ver `decisoes.md`.
 
 ## Catálogo do Eproc embutido (Caminho A)
@@ -246,11 +254,21 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
   `features/tutorial/`. As ilustrações reusam as **classes** do app, nunca os
   componentes — a lista de classes emprestadas está no topo de
   `ilustracoes/pecas.tsx`; renomeou uma delas, passe o grep lá.
-- Flags do localizador customizáveis por setor/servidor (decisoes.md#D-22), em
-  `features/flags/`. Trouxeram a `SCHEMA_VERSION = 2` e a primeira migração.
+- Flags do localizador customizáveis por setor/servidor (decisoes.md#D-22).
+  Trouxeram a `SCHEMA_VERSION = 2` e a primeira migração.
+- Os setores viraram lista da **unidade**, com tela geral de gerenciamento
+  (decisoes.md#D-26), em `features/setores/`. Sem bump de versão: `Plano.flags`
+  ficou como retrato, e `infra/storage/consolidarSetores.ts` funde por rótulo o
+  que cada plano trazia — a mesma função absorve os setores dos planos que chegam
+  de fora. Se você for mexer nas flags, é lá, não no `Plano`.
 - Localizadores de sistema entram nos dois catálogos, marcados em vez de
   filtrados (decisoes.md#D-23). Sem bump de versão: os campos `sistema` novos são
   opcionais justamente para não mandar catálogo e plano gravados à quarentena.
+- A regra de ATP/Preferência virou recurso da aresta (decisoes.md#D-24), em
+  `domain/regras.ts`. Trouxe a `SCHEMA_VERSION = 3` e a segunda migração.
+- O modal do catálogo lista os recursos mapeados e aceita anotação do usuário
+  (decisoes.md#D-25), em `features/catalogo/`. Anotação mora em chave própria,
+  fora dos catálogos, porque reimportar sobrescreve os dois.
 
 ## Regras de ouro
 

@@ -1,11 +1,15 @@
 /**
- * Flags do localizador — a lista é do **plano**, definida pelo usuário
+ * Flags do localizador — o marcador em si, definido pelo usuário
  * (decisoes.md#D-22).
  *
  * O que era uma tabela fixa de quatro tipos (T/E/G/F) virou marcador livre: cada
  * unidade recorta o trabalho do seu jeito — por setor ("Setor de Cálculo") ou por
  * servidor ("Joana Silva") —, e os dois são o mesmo tipo de marcador, numa lista
  * plana. Só `Espera` e `Fixo de fluxo` sobraram como valores iniciais.
+ *
+ * **De quem é a lista** mudou desde então: era do plano, hoje é da unidade
+ * (decisoes.md#D-26) — ver `setores.ts`. `Plano.flags` continua existindo, como
+ * retrato que viaja com o plano exportado ou publicado.
  */
 
 /**
@@ -41,7 +45,7 @@ export const FLAG_FIXO_ID = 'flag-fixo';
 export const FLAG_TRABALHADO_ID = 'flag-trabalhado';
 export const FLAG_GATILHO_ID = 'flag-gatilho';
 
-/** Com o que todo plano novo nasce. */
+/** Com o que uma unidade sem lista gravada nasce. Também alimenta a v1→v2. */
 export function flagsPadrao(): DefinicaoFlag[] {
   return [
     { id: FLAG_ESPERA_ID, code: 'E', label: 'Espera', cor: 2 },

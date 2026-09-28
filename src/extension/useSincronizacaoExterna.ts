@@ -16,9 +16,15 @@ import { assinarMudancaExterna, ehExtensao } from '@/infra/plataforma';
  * nos testes não há service worker nem outras abas com a mesma origem.
  * ========================================================================== */
 
-/** Chaves cuja mudança externa deve fazer a UI recarregar a lista de planos. */
+/**
+ * Chaves cuja mudança externa deve fazer a UI recarregar.
+ *
+ * `setores` entra junto porque a lista é da unidade (decisoes.md#D-26): outra
+ * aba criando um setor precisa aparecer aqui, e o recarregamento já reidrata a
+ * store de setores no mesmo caminho dos planos.
+ */
 function afetaPlanos(chaves: string[]): boolean {
-  return chaves.some((c) => c.includes(':plan'));
+  return chaves.some((c) => c.includes(':plan') || c.endsWith(':setores'));
 }
 
 export interface OpcoesSincronizacaoExterna {

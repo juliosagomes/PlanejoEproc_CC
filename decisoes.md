@@ -937,6 +937,220 @@ campo de categoria, e os quatro pontos de destaque leem dele.
 
 ---
 
+## D-24 · Regra de ATP/Preferência vira recurso da aresta
+
+**Decisão.** `AtpRule` e `PrefRule` saem de `EdgeData` e passam a viver dentro de
+um `Subitem`, discriminadas pela `categoria` que já existia (`Regra de ATP` /
+`Preferência`). Com isso uma aresta comporta **quantas regras o usuário quiser** —
+duas ATPs, ou uma ATP e uma preferência —, e o botão "Detalhar" deixa de ser um
+só no topo do painel para virar um por recurso. `SCHEMA_VERSION` vai a 3, com
+migração.
+
+Três coisas **não** mudam, e é isso que mantém a mudança barata:
+
+- **`kind` continua sendo escolha do usuário e mandando na cor da aresta.** A
+  alternativa — derivar o traço das regras presentes — foi considerada e
+  descartada: uma transição com duas ATPs e uma preferência ainda tem um caráter
+  dominante, e quem sabe qual é é quem está desenhando o fluxo, não o app
+  contando campos. `PjEdge`, `KIND_LABELS` e o seletor de três swatches ficam
+  intactos.
+- **O clique único para detalhar sobrevive.** Enquanto não existe recurso da
+  categoria correspondente ao `kind`, o painel mostra o mesmo botão largo de
+  antes; ele cria a regra e abre o modal de uma vez. A lista só cresce quando o
+  usuário pede a segunda.
+- **`implantar` continua sendo o portão do checklist.** Recurso-regra sem a caixa
+  marcada não aparece lá — é o que a caixa sempre significou.
+
+**Por que.** O modelo antigo dizia que uma transição tem *uma* automação, e o
+Eproc não diz isso. O sintoma já estava no próprio app: as categorias `Regra de
+ATP` e `Preferência` existiam na lista "Recursos atrelados" desde o começo, então
+o usuário que precisava de uma segunda regra já a escrevia lá — só que como nome
+solto com checkbox, sem gatilho, sem filtros, sem ação, e sem entrar detalhada no
+checklist. A modelagem existia na cabeça do usuário e não no plano.
+
+**A regra perde `nome` e `ja_criado`; os dois são do recurso.** Manter cópias
+deixaria dois campos para a mesma coisa — um na linha da lista, outro no modal —,
+e eles divergiriam no primeiro descuido: o checkbox da linha e o do checklist
+mexem no do recurso e só nele, então a cópia da regra envelheceria calada.
+Consequência direta: `hasAtpDetail` / `hasPrefDetail` deixam de contar os dois, o
+que é mais correto do que era — um recurso batizado, ou marcado como já criado,
+ainda não é um recurso modelado.
+
+**O checklist agrupa por número de regras.** Antes, os recursos comuns da aresta
+ficavam aninhados como subitens da regra. Com duas ou mais regras não há a quem
+pendurá-los sem inventar um vínculo que o usuário nunca declarou, então: com uma
+regra só, o aninhamento é o de sempre; com duas ou mais, as regras viram itens
+irmãos e os recursos comuns vão para as próprias seções, com o contexto
+`"L1 → L2"` — exatamente a saída que já existia quando nenhuma regra pedia
+implantação. Como a migração produz no máximo uma regra por aresta, nenhum plano
+existente vê diferença.
+
+`toggleEdgeRuleCreated` some da store. Regra e recurso comum são o mesmo subitem
+agora, e `toggleSubitemCreated` dá conta dos dois.
+
+**Virar Manual passou a pedir confirmação.** O gesto sempre zerou `subitems`, mas
+antes a regra sobrevivia em `EdgeData.atp` e só ficava escondida. Agora ele apaga
+modelagem de verdade.
+
+**As formas v1 e v2 do schema foram congeladas.** Isto não é zelo: `PlanoV1Schema`
+reusava o `EdgeSchema` **corrente**, de modo que toda mudança na aresta mudava em
+silêncio o formato antigo que ele aceitava. Na v3 isso reprovaria plano v1 real —
+e reprovar, no `loadPlano`, significa mandar o plano do usuário para a quarentena.
+Cada versão passada agora tem cópia própria do schema da aresta, e as migrações
+se encadeiam (v1 → v2 → v3), cada passo com teste seu.
+
+**O que precisaria mudar para evoluir.** Se um dia fizer sentido dizer *qual*
+recurso pertence a *qual* regra numa aresta com várias, o caminho é um campo de
+vínculo no `Subitem` (o id da regra dona), não voltar a aninhar por adivinhação.
+E se o `kind` passar a incomodar como campo redundante, a pergunta a responder
+antes é o que a aresta mista deve parecer no canvas — a resposta a essa pergunta
+é que autoriza derivá-lo.
+
+---
+
+## D-25 · Catálogo consultável, com anotações do usuário
+
+**Decisão.** O modal "Catálogo órgão" deixa de ser só a tela de importar XLS e
+passa a **listar todos os recursos mapeados**, em quatro abas — Localizadores,
+Preferências, Modelos, Textos padrão — com busca. Cada linha abre dois campos
+livres: **descrição** e **orientações de uso**. As anotações moram numa chave
+própria do navegador, fora dos dois catálogos.
+
+**Por que listar.** O app já conhecia os quatro tipos — os três últimos vêm da
+sincronização com a unidade (D-16) —, mas eles só existiam como sugestão de
+autocomplete dentro de um campo de texto. Não havia como responder "o que a
+unidade tem?" sem começar a digitar um nome no lugar certo. O modal mostrava
+apenas um contador de localizadores, ignorando a lista que já tinha em mãos.
+
+As abas leem exatamente os mesmos hooks que alimentam a autocomplete —
+`useSugestoesLocalizador` e `useSugestoesSubitem`. Uma segunda régua de união e
+ordenação seria uma segunda verdade sobre o mesmo dado, livre para divergir da
+primeira; deste jeito, o que se vê no catálogo é o que vai ser sugerido no painel.
+
+**Por que anotar, e por que fora do catálogo.** O catálogo diz *o que existe*; a
+anotação diz *o que fazer com aquilo* — para que serve este modelo, quando usar
+aquela preferência, com o que não confundir. É conhecimento da secretaria, não do
+Eproc, e nenhuma coleta traz. Guardá-la dentro de `CatalogoOrgao` ou
+`CatalogoUnidade` a faria durar até a próxima atualização, porque reimportar o
+XLS e ressincronizar **sobrescrevem o catálogo inteiro**. Chave separada, e o
+"Limpar" do XLS diz explicitamente que as anotações ficam.
+
+**Chaveada por nome, não por id.** Não há id para usar: o XLS não traz um id
+estável e `eprocId` é opcional nos itens coletados. Para localizador a
+canonização é `semDecoracao` — a mesma que `unirSugestoes` usa para deduplicar os
+dois catálogos e que casa `📝 Minutar` com `MINUTAR`. Usar outra régua faria o app
+discordar de si mesmo sobre o que é "o mesmo localizador". Para os outros três a
+canonização é mais tímida (caixa e espaço, só): nomes de modelo e texto padrão se
+distinguem por pontuação e acento com frequência demais para colapsá-los.
+
+**Anotação esvaziada é anotação apagada**, e não registro em branco — senão o
+storage acumularia chaves mortas e o catálogo marcaria como "anotado" um recurso
+sem nada escrito.
+
+**O que ficou de fora.** *Criar* no catálogo um recurso que ainda não existe no
+Eproc — um modelo a redigir, uma preferência a cadastrar. É o passo natural
+seguinte, mas muda o que o catálogo é: hoje ele é o retrato do que está lá, e a
+lista de recursos a criar já tem lugar próprio, que é o checklist. Decidir antes
+de codar, como no item análogo do D-16.
+
+**O que precisaria mudar para evoluir.** A lista não é virtualizada, e não
+precisa: 365 localizadores é o pior caso medido (D-23) e a busca corta antes. Se
+o catálogo crescer uma ordem de grandeza, virtualizar a lista é mudança local,
+sem dependência nova. Se a anotação passar a valer entre pessoas da mesma
+unidade, ela precisa viajar na sincronização por lotação — e aí a chave por nome
+vira acerto, não acaso: é o único identificador que duas máquinas compartilham.
+
+---
+
+## D-26 · Setores passam a ser da unidade, com tela geral
+
+> **Emenda ao [D-22](#d-22--flags-do-localizador-viram-lista-do-plano-definida-pelo-usuário)**,
+> que decidiu o contrário. Leia os dois: o D-22 continua explicando *o que* o
+> marcador é, e este muda apenas *de quem ele é*.
+
+**Decisão.** A lista de setores deixa de ser do plano e passa a ser da
+**unidade** — uma chave por escopo de armazenamento (`planejoeproc:setores` no
+modo local, `planejoeproc:lot:<wsId>:setores` na lotação), ao lado do índice de
+planos. `Plano.flags` **continua existindo**, agora como retrato gravado junto do
+plano, e é o que faz a lista viajar no JSON exportado e na publicação. Um modal
+de duas colunas passa a responder "o que este setor trabalha?" listando, por
+setor, os localizadores marcados em **todos** os planos do silo. Sem bump de
+`SCHEMA_VERSION` e sem migração de plano.
+
+**Por que.**
+
+- **A pergunta que o usuário faz atravessa planos.** "O que o Setor de Cálculo
+  trabalha nesta unidade?" não tem resposta enquanto a lista for vocabulário de
+  um desenho só: sem id compartilhado entre planos, não há o que cruzar. Era uma
+  tela de gerenciamento que faltava, e ela exige a identidade compartilhada —
+  não é apresentação em cima do que já existia.
+- **O D-22 previu a duplicação e errou o remédio.** Ele registrou que "dois
+  planos da mesma vara mantêm listas independentes" como custo aceito, e apontou
+  "copiar setores de outro plano" como saída caso incomodasse. Copiar resolve o
+  digitar de novo, não o cruzar: duas cópias com ids diferentes continuam sendo
+  dois setores para qualquer consulta. O D-22 escreveu aquilo sem o requisito da
+  tela geral em vista.
+- **A unidade é o silo, não a chave do Eproc.** `UnidadeEproc.chave` (D-16) é
+  `host::login::sigla` — inclui o login, existe só depois de sincronizar com o
+  Eproc, e não é compartilhada entre colegas. O silo, sim: é exatamente o
+  conjunto de planos que a tela varre, e numa lotação já é a unidade que as
+  pessoas dividem. Reusar `prefixo()` fez o isolamento continuar sendo
+  estrutural, como no D-9 — entrar em outra lotação nunca vê os setores da
+  anterior.
+- **Sem bump de schema, porque o plano continua levando uma cópia.** Tirar
+  `flags` do plano exigiria `SCHEMA_VERSION = 4` e entregaria, ao colega que
+  recebe o plano publicado, um desenho cheio de chips órfãos até ele recadastrar
+  a lista à mão. Mantido como retrato, o campo tem uso novo: **é por ele que a
+  lista se propaga**. `consolidarSetores` absorve, na lista da unidade, todo
+  setor desconhecido que chega dentro de um plano — importado de arquivo ou
+  baixado do servidor. Nenhum endpoint novo no Apps Script.
+- **Uma função só faz a migração e a absorção**, porque são o mesmo trabalho.
+  Na primeira execução não há chave de setores e cada plano traz a lista que era
+  dele; depois, o que chega são planos de fora. Nos dois casos a operação é
+  fundir por rótulo normalizado e remapear as marcações dos nós. Ela é idempotente
+  e **só grava quando algo mudou** — reescrever plano à toa carimbaria
+  `atualizadoEm` no índice e faria a publicação seguinte anunciar mudança em
+  tudo.
+- **Fusão por rótulo, e o preexistente sobrevive.** "Setor de Cálculo" e "SETOR
+  DE CALCULO" viram um setor só, com o id, o rótulo e a cor de quem já estava
+  aqui: um plano que chega de fora não repinta os chips de quem o abriu. Os ids
+  fixos `flag-espera`/`flag-fixo` casam por id antes disso, então continuam
+  valendo mesmo com o rótulo editado.
+- **Remover um setor varre o silo inteiro.** O motivo é o do D-22 — id órfão não
+  aparece no chip, mas voltaria a valer se alguém reaproveitasse o id —, só que
+  agora "todos os nós" quer dizer todos os planos. O plano aberto passa pela
+  store do canvas, e não por `sobrescreverPlano`: ele pode ter edição ainda não
+  gravada, e escrever por baixo dele a perderia no save seguinte.
+- **Em visualização, calcula e não grava.** A consolidação roda igual numa sessão
+  de leitura (D-19), mas em memória: ver quem trabalha o quê é inofensivo,
+  consolidar a lista da lotação de outra pessoa seria a primeira escrita de um
+  modo que promete não escrever.
+
+**O que continua valendo do D-22.** A lista é plana — setor e servidor são o
+mesmo tipo de marcador, sem hierarquia. O nó guarda id, não rótulo. Cor é índice
+`1..8`, resolvido em `.flag-cor-N` no CSS. Realçar não é filtrar, e `filtroFlags`
+não é persistido.
+
+**Custo assumido.** A lista da unidade **absorve** os setores de todo plano que
+chega de fora, então um plano de outra vara pode engordá-la com vocabulário
+alheio. É o preço de a propagação entre colegas não custar endpoint novo, e a
+lista é editável — o que sobra, o usuário remove. O outro custo é a varredura de
+todos os planos do silo a cada entrada e a cada importação; são dezenas de
+planos, leitura síncrona, e um marcador de "já consolidei" não evitaria a
+varredura seguinte, que existe justamente para absorver o que chegou depois.
+
+**O que precisaria mudar para evoluir.** As três coisas que ficaram fora da tela
+por serem outra decisão, não continuação: **pular** da linha do inventário para o
+nó no canvas (trocar de plano e selecionar — reusa `onSwitchPlano` e
+`setSelectedId`); **editar a marcação ali mesmo**, que exige gravar em plano que
+não é o ativo; e **pendências por setor**, o "checklist por setor" que o D-22
+antecipou, cujo lugar é `features/checklist/derive.ts`. Se um dia a lista
+precisar ser a mesma entre pessoas da lotação **sem** depender de alguém publicar
+um plano, ela vira um campo próprio do payload de sincronização — e aí o Apps
+Script muda junto.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

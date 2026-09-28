@@ -1,6 +1,7 @@
 import { useId } from 'react';
-import type { SubitemCategoria } from '@/domain';
+import type { SubitemCategoria, TipoRecurso } from '@/domain';
 import { useSugestoesSubitem } from '../sugestoes';
+import { useAnotacao } from '../storeAnotacoes';
 
 interface SubitemNomeInputProps {
   value: string;
@@ -25,10 +26,27 @@ interface SubitemNomeInputProps {
  * o mesmo texto. Em vez de tentar detectar o clique, o componente informa se o
  * texto **bate** com o catálogo — o que é a informação que interessa de fato, e
  * vale igual nos dois caminhos.
+ *
+ * A orientação de uso anotada no catálogo (decisoes.md#D-25) aparece abaixo do
+ * campo, e não dentro do `<datalist>`: `<option>` não comporta duas linhas, e o
+ * navegador ignora marcação lá dentro.
  */
+
+/** As categorias que têm catálogo — e, portanto, podem ter anotação. */
+const TIPO_DA_CATEGORIA: Partial<Record<SubitemCategoria, TipoRecurso>> = {
+  Preferência: 'Preferência',
+  Modelo: 'Modelo',
+  'Texto padrão': 'Texto padrão',
+};
+
 export function SubitemNomeInput({ value, categoria, onChange }: SubitemNomeInputProps) {
   const sugestoes = useSugestoesSubitem(categoria);
   const listId = useId();
+  const tipo = TIPO_DA_CATEGORIA[categoria];
+  // Hook chamado sempre, com nome vazio quando a categoria não tem catálogo —
+  // condicionar a chamada quebraria a ordem dos hooks.
+  const anotacao = useAnotacao(tipo ?? 'Modelo', tipo ? value : '');
+  const orientacoes = tipo ? anotacao?.orientacoes?.trim() : undefined;
 
   const alterar = (nome: string) => {
     const alvo = nome.trim().toLocaleLowerCase('pt-BR');
@@ -56,6 +74,14 @@ export function SubitemNomeInput({ value, categoria, onChange }: SubitemNomeInpu
             </option>
           ))}
         </datalist>
+      )}
+      {orientacoes && (
+        <div
+          className="text-[10.5px] text-texto-3 leading-snug"
+          title="Orientação anotada no catálogo do órgão"
+        >
+          {orientacoes}
+        </div>
       )}
     </>
   );

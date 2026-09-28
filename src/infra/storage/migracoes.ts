@@ -5,19 +5,29 @@ import {
   FLAG_TRABALHADO_ID,
   SCHEMA_VERSION,
   flagsPadrao,
+  hasAtpDetail,
+  hasPrefDetail,
   type DefinicaoFlag,
-  type Localizador,
+  type Edge,
   type Plano,
+  type Subitem,
 } from '@/domain';
-import type { PlanoV1 } from './schema';
+import { uid } from '@/utils/uid';
+import type { PlanoV1, PlanoV2 } from './schema';
 
 /**
- * Migração v1 → v2: as quatro flags fixas viram a lista editável do plano
- * (decisoes.md#D-22).
+ * Migrações entre versões do plano. Funções puras, separadas do schema, porque
+ * são elas que carregam a decisão de produto — o que preservar e o que
+ * descartar —, e isso precisa de teste próprio.
  *
- * Função pura, separada do schema, porque é ela que carrega a decisão de
- * produto — o que preservar e o que descartar — e isso precisa de teste próprio.
+ * Encadeáveis: o `PlanoSchema` passa um plano v1 por `migrarPlanoV1` e depois
+ * por `migrarPlanoV2`, para que cada passo continue com um teste só seu.
  */
+
+/* ===========================================================================
+ * v1 → v2: as quatro flags fixas viram a lista editável do plano
+ * (decisoes.md#D-22).
+ * ========================================================================= */
 
 /**
  * Ordem canônica das chaves antigas. Fixa o resultado da migração: um nó com
@@ -43,8 +53,8 @@ const EXTRAS: readonly DefinicaoFlag[] = [
   { id: FLAG_GATILHO_ID, code: 'G', label: 'Gatilho', cor: 3 },
 ];
 
-export function migrarPlanoV1(v1: PlanoV1): Plano {
-  const nodes: Localizador[] = v1.nodes.map((n) => ({
+export function migrarPlanoV1(v1: PlanoV1): PlanoV2 {
+  const nodes: PlanoV2['nodes'] = v1.nodes.map((n) => ({
     ...n,
     data: {
       ...n.data,
@@ -59,8 +69,56 @@ export function migrarPlanoV1(v1: PlanoV1): Plano {
 
   return {
     ...v1,
-    version: SCHEMA_VERSION,
+    version: 2,
     flags: [...flagsPadrao(), ...extras],
     nodes,
   };
+}
+
+/* ===========================================================================
+ * v2 → v3: a regra sai da aresta e vira recurso dela (decisoes.md#D-24).
+ * ========================================================================= */
+
+/**
+ * A regra vira o **primeiro** recurso da aresta, antes dos que já existiam.
+ * Primeiro porque era o conteúdo principal da transição — o que o botão
+ * "Detalhar" abria —, e ler a lista de cima para baixo deve continuar contando
+ * a mesma história.
+ *
+ * Regra sem detalhamento nenhum é descartada em vez de virar linha em branco:
+ * toda aresta ATP/Preferência tinha um `atp`/`pref` alocado pelo default da
+ * store, preenchido ou não, e materializar os vazios encheria de recursos sem
+ * nome as arestas de quem nunca abriu o modal.
+ */
+function subitensDaAresta(data: PlanoV2['edges'][number]['data']): Subitem[] {
+  const regras: Subitem[] = [];
+
+  // `nome` e `ja_criado` saem da regra e passam a ser do recurso. Os dois
+  // também contam como "tem detalhamento" aqui — `hasAtpDetail` já não os
+  // considera, e sem isto uma regra batizada ou marcada seria descartada com
+  // eles.
+  if (data.atp && (hasAtpDetail(data.atp) || data.atp.nome.trim() || data.atp.ja_criado)) {
+    const { nome, ja_criado, ...atp } = data.atp;
+    regras.push({ id: uid('si'), categoria: 'Regra de ATP', nome, ja_criado, atp });
+  }
+  if (data.pref && (hasPrefDetail(data.pref) || data.pref.nome.trim() || data.pref.ja_criado)) {
+    const { nome, ja_criado, ...pref } = data.pref;
+    regras.push({ id: uid('si'), categoria: 'Preferência', nome, ja_criado, pref });
+  }
+
+  return [...regras, ...data.subitems];
+}
+
+export function migrarPlanoV2(v2: PlanoV2): Plano {
+  const edges: Edge[] = v2.edges.map((e) => {
+    // Desestruturar é o que efetivamente apaga `atp`/`pref` do dado gravado;
+    // um spread simples os carregaria adiante, fora do schema da v3.
+    const { atp: _atp, pref: _pref, ...resto } = e.data;
+    return {
+      ...e,
+      data: { ...resto, subitems: subitensDaAresta(e.data) },
+    };
+  });
+
+  return { ...v2, version: SCHEMA_VERSION, edges };
 }
