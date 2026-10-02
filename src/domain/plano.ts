@@ -7,11 +7,13 @@ import type { EdgeData } from './edges';
  *
  * v2 trouxe as flags customizáveis (decisoes.md#D-22); v3 tirou a regra de
  * ATP/Preferência de dentro da aresta e a transformou em recurso dela
- * (decisoes.md#D-24). As migrações moram em `infra/storage/migracoes.ts` e são
- * aplicadas dentro do próprio `PlanoSchema`, para que todo call site as herde —
- * inclusive o `loadPlano`, que manda para a quarentena tudo que não valida.
+ * (decisoes.md#D-24); v4 refez a regra de ATP à imagem da tela de cadastro do
+ * Eproc (decisoes.md#D-27). As migrações moram em `infra/storage/migracoes.ts` e
+ * são aplicadas dentro do próprio `PlanoSchema`, para que todo call site as
+ * herde — inclusive o `loadPlano`, que manda para a quarentena tudo que não
+ * valida.
  */
-export const SCHEMA_VERSION = 3 as const;
+export const SCHEMA_VERSION = 4 as const;
 
 export type SchemaVersion = typeof SCHEMA_VERSION;
 

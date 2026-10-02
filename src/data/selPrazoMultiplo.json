@@ -1,0 +1,170 @@
+[
+  {
+    "value": "1",
+    "label": "Processos COM prazo aberto/ag. abertura"
+  },
+  {
+    "value": "2",
+    "label": "Processos SEM prazo aberto/ag. abertura"
+  },
+  {
+    "value": "3",
+    "label": "Processos COM prazo aberto/ag. abertura DO POLO PASSIVO"
+  },
+  {
+    "value": "4",
+    "label": "Processos COM prazo aberto/ag. abertura DO POLO ATIVO"
+  },
+  {
+    "value": "5",
+    "label": "Processos COM prazo aberto/ag. abertura DE ENTIDADES DO POLO PASSIVO"
+  },
+  {
+    "value": "6",
+    "label": "Processos COM prazo aberto/ag. abertura DE ENTIDADES DO POLO ATIVO"
+  },
+  {
+    "value": "7",
+    "label": "Processos COM prazo aberto/ag. abertura DE PERITOS"
+  },
+  {
+    "value": "8",
+    "label": "Processos COM prazo aberto/ag. abertura DE UNIDADES EXTERNAS/APS"
+  },
+  {
+    "value": "9",
+    "label": "Processos SEM prazo aberto/ag. abertura DO POLO PASSIVO"
+  },
+  {
+    "value": "10",
+    "label": "Processos SEM prazo aberto/ag. abertura DO POLO ATIVO"
+  },
+  {
+    "value": "11",
+    "label": "Processos SEM prazo aberto/ag. abertura DE ENTIDADES DO POLO PASSIVO"
+  },
+  {
+    "value": "12",
+    "label": "Processos SEM prazo aberto/ag. abertura DE ENTIDADES DO POLO ATIVO"
+  },
+  {
+    "value": "13",
+    "label": "Processos SEM prazo aberto/ag. abertura DE PERITOS"
+  },
+  {
+    "value": "14",
+    "label": "Processos SEM prazo aberto/ag. abertura DE UNIDADES EXTERNAS/APS"
+  },
+  {
+    "value": "15",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DO POLO PASSIVO"
+  },
+  {
+    "value": "16",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DO POLO ATIVO"
+  },
+  {
+    "value": "17",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE ENTIDADES DO POLO PASSIVO"
+  },
+  {
+    "value": "18",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE ENTIDADES DO POLO ATIVO"
+  },
+  {
+    "value": "19",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE PERITOS"
+  },
+  {
+    "value": "20",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE APS"
+  },
+  {
+    "value": "21",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE UNIDADE EXTERNA"
+  },
+  {
+    "value": "1",
+    "label": "Processos COM prazo aberto/ag. abertura"
+  },
+  {
+    "value": "2",
+    "label": "Processos SEM prazo aberto/ag. abertura"
+  },
+  {
+    "value": "3",
+    "label": "Processos COM prazo aberto/ag. abertura DO POLO PASSIVO"
+  },
+  {
+    "value": "4",
+    "label": "Processos COM prazo aberto/ag. abertura DO POLO ATIVO"
+  },
+  {
+    "value": "5",
+    "label": "Processos COM prazo aberto/ag. abertura DE ENTIDADES DO POLO PASSIVO"
+  },
+  {
+    "value": "6",
+    "label": "Processos COM prazo aberto/ag. abertura DE ENTIDADES DO POLO ATIVO"
+  },
+  {
+    "value": "7",
+    "label": "Processos COM prazo aberto/ag. abertura DE PERITOS"
+  },
+  {
+    "value": "8",
+    "label": "Processos COM prazo aberto/ag. abertura DE UNIDADES EXTERNAS/APS"
+  },
+  {
+    "value": "9",
+    "label": "Processos SEM prazo aberto/ag. abertura DO POLO PASSIVO"
+  },
+  {
+    "value": "10",
+    "label": "Processos SEM prazo aberto/ag. abertura DO POLO ATIVO"
+  },
+  {
+    "value": "11",
+    "label": "Processos SEM prazo aberto/ag. abertura DE ENTIDADES DO POLO PASSIVO"
+  },
+  {
+    "value": "12",
+    "label": "Processos SEM prazo aberto/ag. abertura DE ENTIDADES DO POLO ATIVO"
+  },
+  {
+    "value": "13",
+    "label": "Processos SEM prazo aberto/ag. abertura DE PERITOS"
+  },
+  {
+    "value": "14",
+    "label": "Processos SEM prazo aberto/ag. abertura DE UNIDADES EXTERNAS/APS"
+  },
+  {
+    "value": "15",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DO POLO PASSIVO"
+  },
+  {
+    "value": "16",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DO POLO ATIVO"
+  },
+  {
+    "value": "17",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE ENTIDADES DO POLO PASSIVO"
+  },
+  {
+    "value": "18",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE ENTIDADES DO POLO ATIVO"
+  },
+  {
+    "value": "19",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE PERITOS"
+  },
+  {
+    "value": "20",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE APS"
+  },
+  {
+    "value": "21",
+    "label": "Processos COM prazo FECHADO por evento/petição da regra (inclusive decurso de prazo) - prazo DE UNIDADE EXTERNA"
+  }
+]

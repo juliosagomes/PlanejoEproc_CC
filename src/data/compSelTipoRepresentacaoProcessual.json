@@ -1,0 +1,86 @@
+[
+  {
+    "value": "R-N",
+    "label": "COM procurador/advogado no PÓLO PASSIVO"
+  },
+  {
+    "value": "R-0",
+    "label": "SEM procurador/advogado no PÓLO PASSIVO"
+  },
+  {
+    "value": "R-N-T",
+    "label": "COM procurador/advogado em TODAS as partes do PÓLO PASSIVO"
+  },
+  {
+    "value": "R-0-T",
+    "label": "SEM procurador/advogado em TODAS as partes do PÓLO PASSIVO"
+  },
+  {
+    "value": "A-N",
+    "label": "COM procurador/advogado no PÓLO ATIVO"
+  },
+  {
+    "value": "A-0",
+    "label": "SEM procurador/advogado no PÓLO ATIVO (ou JUS POSTULANDI)"
+  },
+  {
+    "value": "I-N",
+    "label": "COM procurador/advogado no PÓLO INTERESSADO"
+  },
+  {
+    "value": "I-0",
+    "label": "SEM procurador/advogado no PÓLO INTERESSADO"
+  },
+  {
+    "value": "N-N",
+    "label": "COM procurador/advogado no PÓLO NEUTRO"
+  },
+  {
+    "value": "N-0",
+    "label": "SEM procurador/advogado no PÓLO NEUTRO"
+  },
+  {
+    "value": "R-N-D",
+    "label": "COM procurador/advogado DATIVO no PÓLO PASSIVO"
+  },
+  {
+    "value": "A-N-D",
+    "label": "COM procurador/advogado DATIVO no PÓLO ATIVO"
+  },
+  {
+    "value": "R-N-V",
+    "label": "COM procurador/advogado VOLUNTÁRIO no PÓLO PASSIVO"
+  },
+  {
+    "value": "A-N-V",
+    "label": "COM procurador/advogado VOLUNTÁRIO no PÓLO ATIVO"
+  },
+  {
+    "value": "R-N-DV",
+    "label": "COM procurador/advogado DATIVO e VOLUNTÁRIO no PÓLO PASSIVO"
+  },
+  {
+    "value": "A-N-DV",
+    "label": "COM procurador/advogado DATIVO e VOLUNTÁRIO no PÓLO ATIVO"
+  },
+  {
+    "value": "R-N-DP",
+    "label": "COM procurador/advogado DEFENSORIA PÚBLICA no PÓLO PASSIVO"
+  },
+  {
+    "value": "A-N-DP",
+    "label": "COM procurador/advogado DEFENSORIA PÚBLICA no PÓLO ATIVO"
+  },
+  {
+    "value": "R-N-EPJ",
+    "label": "COM procurador/advogado ESCRITÓRIO PRÁTICA JURÍDICA no PÓLO PASSIVO"
+  },
+  {
+    "value": "A-N-EPJ",
+    "label": "COM procurador/advogado ESCRITÓRIO PRÁTICA JURÍDICA no PÓLO ATIVO"
+  },
+  {
+    "value": "R-N-TP",
+    "label": "COM procurador/advogado TODOS DO MESMO TIPO no PÓLO PASSIVO (DATIVO, VOLUNTÁRIO, DEFENSORIA PÚBLICA E ESCRITÓRIO PRÁTICA JURÍDICA)"
+  }
+]

@@ -1,0 +1,54 @@
+[
+  {
+    "value": "Q",
+    "label": "QUALQUER PARTE"
+  },
+  {
+    "value": "S",
+    "label": "ENTIDADE ESPECÍFICA"
+  },
+  {
+    "value": "PER",
+    "label": "PERITO"
+  },
+  {
+    "value": "APS",
+    "label": "APS"
+  },
+  {
+    "value": "UEX",
+    "label": "UNIDADE EXTERNA"
+  },
+  {
+    "value": "P1",
+    "label": "POR PÓLO"
+  },
+  {
+    "value": "A",
+    "label": "PÓLO ATIVO"
+  },
+  {
+    "value": "R",
+    "label": "PÓLO PASSIVO"
+  },
+  {
+    "value": "P2",
+    "label": "POR TIPO DE PARTE"
+  },
+  {
+    "value": "E",
+    "label": "ENTIDADE"
+  },
+  {
+    "value": "N",
+    "label": "NÃO-ENTIDADE"
+  },
+  {
+    "value": "PF",
+    "label": "PESSOA FÍSICA"
+  },
+  {
+    "value": "PJ",
+    "label": "PESSOA JURÍDICA"
+  }
+]

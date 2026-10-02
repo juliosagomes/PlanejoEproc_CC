@@ -35,6 +35,14 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   const setDobra = useCanvasStore((s) => s.setDobra);
   const flowMode = useCanvasStore((s) => s.flowMode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
+  // As pontas da aresta são a origem e o destino da regra de ATP: o modal de
+  // detalhamento as mostra em vez de pedi-las de novo.
+  const origem = useCanvasStore(
+    (s) => s.nodes.find((n) => n.id === edge.source)?.data.nome ?? '',
+  );
+  const destino = useCanvasStore(
+    (s) => s.nodes.find((n) => n.id === edge.target)?.data.nome ?? '',
+  );
 
   const data: EdgeData = edge.data ?? defaultEdgeData();
   const kind = data.kind;
@@ -332,6 +340,8 @@ export function EdgePanel({ edge }: EdgePanelProps) {
           onClose={() => setDetalheAbertoId(null)}
           subitem={emDetalhe}
           resumo={data.resumo}
+          origem={origem}
+          destino={destino}
           recursosComuns={subitems.filter((s) => !ehRecursoRegra(s)).length}
           outrasRegras={
             subitems.filter((s) => ehRecursoRegra(s) && s.id !== emDetalhe.id).length

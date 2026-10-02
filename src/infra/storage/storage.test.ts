@@ -68,9 +68,29 @@ function planoExemplo(nome = 'Plano de teste'): Plano {
               categoria: 'Regra de ATP',
               nome: 'ATP de teste',
               ja_criado: false,
+              // Um valor de cada forma que `ValorCampo` admite — texto, número,
+              // booleano, lista de códigos e lista de objetos —, para que o
+              // round-trip cubra o `z.record` dos parâmetros e dos filtros.
               atp: {
                 implantar: true,
-                trigger: { tipo: 'L', diasNoLocalizador: 3 },
+                comportamentoOrigem: '0',
+                trigger: { tipo: 'L', dias: 3, diasUteis: true },
+                acoes: [
+                  {
+                    id: 'ac-0',
+                    tipo: 'CAR',
+                    parametros: { txtModeloAutomatico: 'Carta', Prazo: 15, CitarDJE: false },
+                    localizadorErro: 'ERRO',
+                  },
+                ],
+                filtros: {
+                  selPrazoMultiplo: { selPrazoMultiplo: ['2'] },
+                  txtParteRepresentante: {
+                    representantes: [
+                      { txtParteRepresentante: 'fulano', selSinPoloParteRepresentante: 'A' },
+                    ],
+                  },
+                },
               },
             },
             { id: 'si-1', categoria: 'Modelo', nome: 'minuta', ja_criado: false },
