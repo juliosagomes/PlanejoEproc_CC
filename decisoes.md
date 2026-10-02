@@ -18,6 +18,8 @@
 
 ## D-2 · Filtros opcionais (Bloco 3 do Eproc) — UI mostra subset, tipo comporta o todo
 
+> **Encerrado pelo [D-27](#d-27--a-regra-de-atp-espelha-a-tela-de-cadastro-do-eproc):** a UI passou a oferecer todos os filtros, por "Adicionar filtro".
+
 **Decisão.** A modelagem da ATP/Preferência expõe na UI apenas um subset dos 25+ campos de filtro do Bloco 3 do Eproc (gatilho/condição). O **tipo** do domínio, porém, comporta a estrutura completa, então adicionar mais campos na UI no futuro **não exige refatoração de tipo**.
 
 **Por que.** Mostrar todos os filtros de uma vez sobrecarrega a UI e a maioria nunca é usada. Mas se o tipo for restrito ao subset visual, qualquer expansão futura quebra arquivos exportados.
@@ -27,6 +29,8 @@
 ---
 
 ## D-3 · `condicoes` da ATP é textarea livre
+
+> **Substituído pelo [D-27](#d-27--a-regra-de-atp-espelha-a-tela-de-cadastro-do-eproc):** o campo deixou de existir; o texto antigo migra para Observações.
 
 **Decisão.** O campo `condicoes` (filtros/condições da regra de ATP) é uma `string` livre digitada num textarea, não uma estrutura `Array<{ campo, operador, valor }>` ou similar.
 
@@ -39,6 +43,8 @@
 ---
 
 ## D-4 · Ação da ATP cindida em código + descrição livre
+
+> **Substituído pelo [D-27](#d-27--a-regra-de-atp-espelha-a-tela-de-cadastro-do-eproc):** a ação virou lista de ações programadas, cada uma com os parâmetros do seu tipo.
 
 **Decisão.** `AtpRule` ganhou dois campos: `acaoTipo?: string` (código de `selTipoAcaoProgramada`, ex.: `'CAR'`) e `acao?: string` (descrição livre que suplementa o código). Antes, BETA_2 tinha só `acao` como textarea.
 
@@ -1148,6 +1154,110 @@ antecipou, cujo lugar é `features/checklist/derive.ts`. Se um dia a lista
 precisar ser a mesma entre pessoas da lotação **sem** depender de alguém publicar
 um plano, ela vira um campo próprio do payload de sincronização — e aí o Apps
 Script muda junto.
+
+---
+
+## D-27 · A regra de ATP espelha a tela de cadastro do Eproc
+
+> **Substitui o [D-3](#d-3--condicoes-da-atp-é-textarea-livre) e o
+> [D-4](#d-4--ação-da-atp-cindida-em-código--descrição-livre), e encerra o
+> [D-2](#d-2--filtros-opcionais-bloco-3-do-eproc--ui-mostra-subset-tipo-comporta-o-todo).**
+> O D-1 (assunto é texto livre) continua valendo, pelo mesmo motivo de sempre.
+
+**Decisão.** O "Detalhar ATP" passa a ter os três blocos da tela *Cadastrar Nova
+Regra de ATP* (`automatizar_localizadores_novo`), com os mesmos rótulos: **Regras**
+(origem, destino, comportamento do localizador de origem, tipo de controle e seus
+campos), **Executar Ação** (zero ou mais ações programadas, cada uma com os
+parâmetros do seu tipo e o localizador de erro) e **Filtros Opcionais**. Os campos
+livres `condicoes` e `acao` deixam de existir; sobra `observacoes`.
+`SCHEMA_VERSION` vai a 4, com migração.
+
+A tela foi levantada em 02/10/2026 no eproc1g/TJMG, somente leitura, percorrendo
+os 9 tipos de controle e as 24 ações.
+
+**Por que.** O modal anterior saiu do protótipo e de listas soltas, e divergia da
+tela em pontos que faziam o plano mentir para quem ia cadastrar:
+
+- O gatilho "Por Data" guardava `data` + `periodicidadeDias`. No Eproc não existe
+  periodicidade em dias: são quatro modos (todos os dias, data específica, dia do
+  mês, dia da semana).
+- "Por Tempo no Localizador" e "na Situação" não tinham *contar apenas dias úteis*;
+  "Por Ação Manual", "Por Documento" e "Por Tipo de Petição" não tinham campo
+  nenhum.
+- A ação era um código e um texto. No Eproc ela é opcional, pode ser várias em
+  ordem, e cada tipo tem parâmetros próprios — a citação por mandado tem doze.
+- Dos mais de quarenta filtros, o modal mostrava três e mandava o resto para um
+  textarea.
+- Não havia o *Comportamento do Localizador ORIGEM*, que é o que decide se o
+  processo sai da origem ou só ganha o destino.
+
+**Descritores, e não um componente por campo.** As ações e os filtros são dado
+puro em `domain/atp/` (`ACOES_PROGRAMADAS`, `FILTROS_DEF`), e a UI tem um
+renderizador só (`CampoDinamico`). O checklist lê os mesmos descritores. Campo
+novo no Eproc é uma linha a mais no descritor, sem tocar em React nem no schema.
+O gatilho ficou de fora disso de propósito: são nove variantes fixas, tipadas como
+união discriminada, e um descritor ali trocaria checagem de tipo por indireção.
+
+**As chaves gravadas são os ids dos campos do Eproc** (`PrazoCMA`,
+`selClassesJudiciaisMultiplo`). Evita inventar nome para o que o sistema já
+nomeou e mantém o plano alinhado com a tela.
+
+**O schema valida a forma, não a lista de chaves.** Parâmetros e filtros são
+`z.record`. Validar chave por chave faria um plano gravado hoje ir para a
+quarentena no dia em que o Eproc renomear um campo e o descritor acompanhar. Pelo
+mesmo motivo, código de ação, filtro ou opção que o build não conhece continua
+aparecendo — como veio —, em vez de sumir.
+
+**Filtros começam vazios.** A tela do Eproc mostra todos de uma vez; aqui o
+usuário adiciona os que a regra usa. O plano é lido por quem vai cadastrar, e
+quarenta campos em branco em volta dos três que importam é ruído. Os grupos do
+seletor ("Processo", "Partes"…) não existem no Eproc: são só organização.
+
+**O que não é embutido no build, e vira campo de digitação com sugestão:**
+
+- *Dado da unidade ou do tribunal* — localizadores, preferências de unidade,
+  modelos, juízo, classificador por conteúdo, assinante, órgão de destino do
+  lembrete, subseção, remessa. O build é o mesmo para todo mundo; a lista de uma
+  vara (e nome de servidor) não pode ir nele. Localizador, modelo e preferência
+  são sugeridos a partir do plano aberto e do catálogo sincronizado (D-16).
+- *Grande demais para o ganho* — assunto (D-1), precedente, entidade, órgão de
+  origem.
+- *Tipos de documento* (760 itens) — não está em `listas_json/` e não foi
+  capturado. É o único catálogo geral que ficou de fora por falta de coleta, não
+  por decisão; entra quando alguém exportar a lista.
+
+**Deliberadamente não modelado.** *Aplicar regra em processo específico* (número
+de processo é dado real, não plano); múltiplos localizadores de origem ou destino
+(o grafo já expressa: são mais arestas); grupo e prioridade da regra (são da
+listagem, não do cadastro).
+
+**"Nome da regra" continua**, embora o Eproc identifique a regra por número: o
+nome é do recurso (D-24) e é o que o checklist lista. O modal diz isso ao lado do
+campo. Só o tipo "Por Ação Manual" tem nome no Eproc ("Descrição da Regra"), e
+esse é campo do gatilho.
+
+**Sim/Não tem três estados.** No Eproc são selects com padrão; aqui o campo começa
+em "—". No plano, "não decidi" é diferente de "Não", e o checklist só lista o que
+foi decidido.
+
+**A migração não descarta nada.** Gatilho, código da ação e os três filtros vão
+para o lugar novo. O que não tem lugar — `acao`, `condicoes`, periodicidade
+diferente de um dia, situações além da primeira — vai para Observações com
+rótulo. "A cada 1 dia" vira "Todos os dias", que é o que significava. A forma v3
+do schema foi congelada, como manda o D-24.
+
+**Custo assumido.** Os rótulos, códigos e parâmetros são um retrato de uma
+instalação (TJMG, 1º grau) num dia. Outro tribunal pode ter ações a mais ou a
+menos; o app continua abrindo o plano, mas o descritor precisa de manutenção
+manual. Os códigos do dia da semana são nossos, não os do Eproc — não foram
+levantados.
+
+**O que precisaria mudar para evoluir.** Para importar regras já cadastradas
+(fora do roadmap), o caminho é um parser em `infra/eproc/` que produza `AtpRule`
+— as chaves já são as do Eproc. Para acompanhar mudanças da tela sem depender de
+alguém notar, um coletor que leia o formulário e compare com os descritores. E se
+a lista de filtros "comuns" ficar clara com o uso, o seletor pode abrir com eles
+já adicionados.
 
 ---
 
