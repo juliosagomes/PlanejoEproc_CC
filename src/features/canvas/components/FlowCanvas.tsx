@@ -12,7 +12,9 @@ import 'reactflow/dist/style.css';
 
 import { nomeEfetivo, type EdgeKind } from '@/domain';
 import { NEW_NODE_DATATYPE } from '@/components/Sidebar';
+import { useTemaStore } from '@/features/tema/store';
 import { loadCamera, saveCamera } from '@/infra/storage';
+import type { Tema } from '@/infra/storage/tema';
 import { cn } from '@/utils/cn';
 import { acharGemeos } from '../gemeos';
 import { useIrParaNo } from '../irParaNo';
@@ -32,10 +34,35 @@ const nodeTypes = { localizador: LocalizadorNode, grupo: GrupoNode };
 const Z_MOLDURA = -2000;
 const edgeTypes = { pj: PjEdge };
 
-const corDoMarcador = (kind: EdgeKind | undefined): string => {
-  if (kind === 'atp') return 'oklch(0.55 0.15 265)';
-  if (kind === 'pref') return 'oklch(0.55 0.14 155)';
-  return 'oklch(0.65 0.01 270)';
+/**
+ * O ReactFlow recebe estas cores como texto e monta o id do marcador com elas,
+ * então `var(--…)` não serve aqui. Os valores espelham os tokens `--aresta-*`
+ * de `index.css` em cada tema (decisoes.md#D-34); mexeu lá, mexa aqui.
+ */
+const CORES_CANVAS: Record<Tema, { atp: string; pref: string; manual: string; miniCriado: string; miniPlanejado: string; mascara: string }> = {
+  claro: {
+    atp: 'oklch(0.55 0.15 265)',
+    pref: 'oklch(0.55 0.14 155)',
+    manual: 'oklch(0.65 0.01 270)',
+    miniCriado: 'oklch(0.84 0.08 155)',
+    miniPlanejado: '#D4D6DC',
+    mascara: 'rgba(20,22,28,0.04)',
+  },
+  escuro: {
+    atp: 'oklch(0.66 0.14 265)',
+    pref: 'oklch(0.68 0.14 155)',
+    manual: 'oklch(0.58 0.01 270)',
+    miniCriado: 'oklch(0.5 0.1 155)',
+    miniPlanejado: '#3a404a',
+    mascara: 'rgba(0,0,0,0.25)',
+  },
+};
+
+const corDoMarcador = (kind: EdgeKind | undefined, tema: Tema): string => {
+  const c = CORES_CANVAS[tema];
+  if (kind === 'atp') return c.atp;
+  if (kind === 'pref') return c.pref;
+  return c.manual;
 };
 
 interface FlowCanvasProps {
@@ -54,6 +81,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
   const [arrastando, setArrastando] = useState(false);
+  const tema = useTemaStore((s) => s.tema);
 
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
@@ -205,13 +233,13 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
             : undefined,
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: corDoMarcador(e.data?.kind),
+          color: corDoMarcador(e.data?.kind, tema),
           width: 14,
           height: 14,
         },
       };
       }),
-    [edges, esmaecidos, recolhidoDe],
+    [edges, esmaecidos, recolhidoDe, tema],
   );
 
   const isEmpty = nodes.length === 0;
@@ -309,11 +337,11 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
             border: '1px solid var(--borda)',
             borderRadius: 6,
           }}
-          maskColor="rgba(20,22,28,0.04)"
+          maskColor={CORES_CANVAS[tema].mascara}
           nodeColor={(n) =>
             (n.data as { ja_criado?: boolean } | undefined)?.ja_criado
-              ? 'oklch(0.84 0.08 155)'
-              : '#D4D6DC'
+              ? CORES_CANVAS[tema].miniCriado
+              : CORES_CANVAS[tema].miniPlanejado
           }
         />
       </ReactFlow>

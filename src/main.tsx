@@ -10,6 +10,7 @@ import '@fontsource/inter/latin-600.css';
 import '@fontsource/inter/latin-700.css';
 
 import App from '@/App';
+import { useTemaStore } from '@/features/tema/store';
 import { inicializarPlataforma } from '@/infra/plataforma';
 import '@/index.css';
 
@@ -36,4 +37,8 @@ inicializarPlataforma()
   .catch((err: unknown) => {
     console.error('[main] falha ao inicializar a plataforma de armazenamento', err);
   })
-  .finally(render);
+  .finally(() => {
+    // O <html> já nasce escuro (index.html); aqui vale a preferência gravada.
+    useTemaStore.getState().hidratar();
+    render();
+  });

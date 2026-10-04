@@ -162,7 +162,11 @@ function LocalizadorPanel({ node, onGerenciarSetores }: NodePanelProps) {
                       className={`flag-chip flag-cor-${f.cor}`}
                       style={
                         ativa
-                          ? { background: 'rgba(255,255,255,.18)', color: '#fff' }
+                          ? // Herda a cor do botão primário, que se inverte com o tema.
+                            {
+                              background: 'color-mix(in srgb, currentColor 18%, transparent)',
+                              color: 'inherit',
+                            }
                           : undefined
                       }
                     >

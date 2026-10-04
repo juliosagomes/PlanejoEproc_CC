@@ -4,6 +4,7 @@ import { Icon } from '@/components/Icon';
 import { PlanSwitcher } from '@/features/plans/PlanSwitcher';
 import { SalvarCopiaButton } from '@/features/plans/SalvarCopiaButton';
 import { SessaoBadge } from '@/features/sessao/components/SessaoBadge';
+import { useTemaStore } from '@/features/tema/store';
 import type { PlanIndexEntry } from '@/infra/storage';
 import { cn } from '@/utils/cn';
 
@@ -64,6 +65,25 @@ const TELA_OPTIONS: ReadonlyArray<{ id: TelaEditor; label: string }> = [
   { id: 'fluxo', label: 'Fluxo' },
   { id: 'painel', label: 'Painel da unidade' },
 ];
+
+/** Mostra o tema para o qual o clique leva, não o atual. */
+function BotaoTema() {
+  const tema = useTemaStore((s) => s.tema);
+  const alternar = useTemaStore((s) => s.alternar);
+  const rotulo = tema === 'escuro' ? 'Usar tema claro' : 'Usar tema escuro';
+  return (
+    <button
+      type="button"
+      className="btn btn-sm btn-icon"
+      style={{ width: 24 }}
+      onClick={alternar}
+      title={rotulo}
+      aria-label={rotulo}
+    >
+      {tema === 'escuro' ? <Icon.Sol /> : <Icon.Lua />}
+    </button>
+  );
+}
 
 function Alternador<T extends string>({
   rotulo,
@@ -308,6 +328,7 @@ export function Header({
         >
           <Icon.Etiqueta /> Setores
         </button>
+        <BotaoTema />
         <button type="button" className="btn btn-sm btn-accent" onClick={onChecklist}>
           <Icon.Bolt /> Gerar Checklist
         </button>

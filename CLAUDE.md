@@ -324,6 +324,12 @@ opcionais, como no D-23:
   As barras de rolagem são globais (`::-webkit-scrollbar` em `index.css`); a
   classe `.scroll` não é mais necessária.
 - Sigla de setor com até 3 caracteres; a sugestão automática continua em 2.
+- Tema escuro por padrão, claro a um clique (D-34). **Cor nova sempre como
+  token**, nos dois blocos do topo de `index.css`; cor escrita direto numa
+  regra vale para um tema só. Cores que o ReactFlow recebe como texto ficam em
+  `CORES_CANVAS` (`FlowCanvas.tsx`).
+- O canvas desenha sempre em Diagrama (`FLOW_MODE_DESENHO`); `Plano.flowMode`
+  continua no schema, mas não é lido para desenhar (D-34).
 
 ## Regras de ouro
 

@@ -1557,6 +1557,42 @@ Se os filtros das consultas salvas um dia forem legíveis (D-32), a lista de
 localizadores de cada fila deixa de ser declarada e passa a ser lida.
 
 
+---
+
+## D-34 · Tema escuro por padrão, e o canvas só em Diagrama
+
+**Decisão.** O app ganha tema escuro, que é o **padrão**; o claro continua a um
+clique (sol/lua no cabeçalho). E o alternador Orgânico/Diagrama sai do
+cabeçalho: o canvas desenha sempre em Diagrama.
+
+**Por que.**
+
+- **Tema por atributo, não por media query.** `data-tema` no `<html>` escolhe
+  um de dois blocos de tokens em `index.css`. Seguir o sistema operacional
+  (`prefers-color-scheme`) não daria ao usuário o padrão que ele pediu.
+- **Toda cor de componente virou token.** Havia cerca de 40 cores escritas
+  direto nas regras (chips de setor, selos, molduras de grupo, perigo), e cada
+  uma valia para um tema só. As molduras de grupo tiram a luminosidade de
+  tokens (`--g-l-*`), porque matiz e croma continuam vindo da cor do grupo.
+- **O ReactFlow recebe algumas cores como texto** (ponta da seta, minimapa) e
+  monta id de marcador com elas, então `var(--…)` não serve ali.
+  `CORES_CANVAS`, em `FlowCanvas.tsx`, repete os valores dos tokens por tema.
+- **Chave global ao navegador** (`planejoeproc:tema`), como o "já vi o
+  tutorial": é preferência da pessoa, e a tela de entrada, antes de haver
+  sessão, também é pintada por ela. Só o claro precisa ser gravado. O HTML já
+  nasce com `data-tema="escuro"`, para a tela não piscar clara enquanto o
+  `chrome.storage` carrega. O popup, que não hidrata o espelho, lê a chave
+  direto.
+- **Orgânico fora da tela, não do schema.** `Plano.flowMode` continua gravado
+  e validando; o desenho lê `FLOW_MODE_DESENHO` e ignora o campo. Forçar o
+  campo para `sharp` ao abrir regravaria todo plano aberto e faria a próxima
+  publicação anunciar mudança em tudo. Plano novo já nasce `sharp`.
+
+**O que precisaria mudar para evoluir.** Um terceiro tema, ou "seguir o
+sistema", é um bloco de tokens a mais e um valor a mais em `Tema`. Para voltar
+com o Orgânico, basta ler `flowMode` de novo em `PjEdge`/`EdgePanel` e
+devolver o alternador ao cabeçalho; o `setFlowMode` da store continua lá.
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

@@ -19,6 +19,27 @@ const baseProps = {
 } as const;
 
 export const Icon = {
+  Sol: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="7" cy="7" r="2.6" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M7 1.2v1.4M7 11.4v1.4M1.2 7h1.4M11.4 7h1.4M2.9 2.9l1 1M10.1 10.1l1 1M2.9 11.1l1-1M10.1 3.9l1-1"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  Lua: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M11.8 8.6A5 5 0 0 1 5.4 2.2a5 5 0 1 0 6.4 6.4Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   Plus: (p: IconProps) => (
     <svg {...baseProps} {...p}>
       <path
