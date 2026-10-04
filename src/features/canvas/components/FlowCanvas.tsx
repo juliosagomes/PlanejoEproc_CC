@@ -18,6 +18,7 @@ import { acharGemeos } from '../gemeos';
 import { useCanvasStore } from '../store';
 import { LocalizadorNode } from './LocalizadorNode';
 import { PjEdge } from './PjEdge';
+import { SelecaoLoteBar } from './SelecaoLoteBar';
 
 const nodeTypes = { localizador: LocalizadorNode };
 const edgeTypes = { pj: PjEdge };
@@ -47,7 +48,6 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
 
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
-  const selectedId = useCanvasStore((s) => s.selectedId);
   const filtroFlags = useCanvasStore((s) => s.filtroFlags);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const onNodesChange = useCanvasStore((s) => s.onNodesChange);
@@ -128,20 +128,20 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
           // Só troca a identidade de `data` quando há o que acrescentar, para
           // não re-renderizar todos os nós a cada mudança da lista.
           ...(copias > 1 ? { data: { ...n.data, copias } } : {}),
-          selected: n.id === selectedId,
+          selected: !!n.selected,
           className: cn(
             esmaecidos?.has(n.id) && 'pj-esmaecido',
             grupoHover?.has(n.id) && 'pj-gemeo',
           ) || undefined,
         };
       }),
-    [nodes, selectedId, esmaecidos, gemeos, grupoHover],
+    [nodes, esmaecidos, gemeos, grupoHover],
   );
   const decoratedEdges = useMemo(
     () =>
       edges.map((e) => ({
         ...e,
-        selected: e.id === selectedId,
+        selected: !!e.selected,
         className:
           esmaecidos?.has(e.source) || esmaecidos?.has(e.target)
             ? 'pj-esmaecido'
@@ -153,7 +153,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
           height: 14,
         },
       })),
-    [edges, selectedId, esmaecidos],
+    [edges, esmaecidos],
   );
 
   const isEmpty = nodes.length === 0;
@@ -200,11 +200,12 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
-        onNodeClick={(_, n) => setSelectedId(n.id)}
+        // Selecionar é com o ReactFlow (clique, Ctrl+clique, Shift+arrastar em
+        // caixa); a store deriva `selectedId` das marcas que ele escreve. Um
+        // `onNodeClick` que selecionasse por conta própria desfaria o Ctrl+clique.
         onNodeMouseEnter={(_, n) => setHoverId(n.id)}
         onNodeMouseLeave={() => setHoverId(null)}
         onNodeDragStart={() => setHoverId(null)}
-        onEdgeClick={(_, e) => setSelectedId(e.id)}
         onPaneClick={() => setSelectedId(null)}
         onDoubleClick={onPaneDoubleClick}
         // Arrastar nó e puxar aresta são as duas edições que acontecem no
@@ -214,6 +215,11 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         // está. Com o zoom do ReactFlow ligado, o mesmo gesto também aproximava
         // a tela, e o nó recém-criado saía de onde o usuário mirou.
         zoomOnDoubleClick={false}
+        // O Delete é do App, que sabe confirmar apagar em lote e ignora o foco
+        // em campos de texto. O padrão do ReactFlow (Backspace) apagaria sem
+        // perguntar, e Backspace é "voltar" para quem vem do Mac.
+        deleteKeyCode={null}
+        multiSelectionKeyCode={['Control', 'Meta']}
         nodesDraggable={!somenteLeitura}
         nodesConnectable={!somenteLeitura}
         edgesUpdatable={!somenteLeitura}
@@ -245,6 +251,8 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
           }
         />
       </ReactFlow>
+
+      <SelecaoLoteBar />
 
       {isEmpty && (
         <div className="empty-state">

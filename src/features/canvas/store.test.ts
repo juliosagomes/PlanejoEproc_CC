@@ -617,3 +617,98 @@ describe('somenteLeitura', () => {
     expect(getActivePlanKey()).toBeNull();
   });
 });
+
+describe('seleção múltipla (Card 7)', () => {
+  const montar = () => {
+    const s = useCanvasStore.getState();
+    const a = s.createNode({ x: 0, y: 0 });
+    const b = s.createNode({ x: 100, y: 50 });
+    const c = s.createNode({ x: 300, y: 80 });
+    s.onConnect({ source: a, target: b, sourceHandle: null, targetHandle: null });
+    s.onConnect({ source: b, target: c, sourceHandle: null, targetHandle: null });
+    return { a, b, c };
+  };
+  const selecionar = (ids: string[]) =>
+    useCanvasStore.getState().onNodesChange(
+      useCanvasStore.getState().nodes.map((n) => ({
+        type: 'select' as const,
+        id: n.id,
+        selected: ids.includes(n.id),
+      })),
+    );
+
+  it('selectedId só existe com exatamente um item selecionado', () => {
+    const { a, b } = montar();
+    selecionar([a]);
+    expect(useCanvasStore.getState().selectedId).toBe(a);
+    selecionar([a, b]);
+    expect(useCanvasStore.getState().selectedId).toBeNull();
+    selecionar([b]);
+    expect(useCanvasStore.getState().selectedId).toBe(b);
+  });
+
+  it('criar um nó deixa só ele selecionado', () => {
+    const { a, b } = montar();
+    selecionar([a, b]);
+    const novo = useCanvasStore.getState().createNode({ x: 9, y: 9 });
+    const sel = useCanvasStore.getState().nodes.filter((n) => n.selected).map((n) => n.id);
+    expect(sel).toEqual([novo]);
+  });
+
+  it('setSelectedId acerta as marcas do ReactFlow', () => {
+    const { a, b, c } = montar();
+    selecionar([a, b]);
+    useCanvasStore.getState().setSelectedId(c);
+    const sel = useCanvasStore.getState().nodes.filter((n) => n.selected).map((n) => n.id);
+    expect(sel).toEqual([c]);
+  });
+
+  it('deleteSelecao leva os nós e as arestas que tocam neles', () => {
+    const { a, b, c } = montar();
+    selecionar([a, b]);
+    useCanvasStore.getState().deleteSelecao();
+    const s = useCanvasStore.getState();
+    expect(s.nodes.map((n) => n.id)).toEqual([c]);
+    expect(s.edges).toHaveLength(0);
+    expect(s.selectedId).toBeNull();
+  });
+
+  it('moverNos reposiciona só quem foi pedido', () => {
+    const { a, b, c } = montar();
+    useCanvasStore.getState().moverNos({ [a]: { x: 0, y: 500 }, [b]: { x: 100, y: 500 } });
+    const pos = Object.fromEntries(useCanvasStore.getState().nodes.map((n) => [n.id, n.position]));
+    expect(pos[a]).toEqual({ x: 0, y: 500 });
+    expect(pos[b]).toEqual({ x: 100, y: 500 });
+    expect(pos[c]).toEqual({ x: 300, y: 80 });
+  });
+
+  it('marcarFlagEmLote liga e desliga sem duplicar', () => {
+    const { a, b } = montar();
+    const s = useCanvasStore.getState();
+    s.toggleFlagNoNo(a, 'f1');
+    s.marcarFlagEmLote([a, b], 'f1', true);
+    const flags = () => useCanvasStore.getState().nodes.map((n) => n.data.flags);
+    expect(flags()[0]).toEqual(['f1']);
+    expect(flags()[1]).toEqual(['f1']);
+    useCanvasStore.getState().marcarFlagEmLote([a, b], 'f1', false);
+    expect(flags()[0]).toEqual([]);
+    expect(flags()[1]).toEqual([]);
+  });
+
+  it('em visualização, nada disso altera o plano', () => {
+    const { a, b } = montar();
+    useCanvasStore.setState({ somenteLeitura: true });
+    selecionar([a, b]);
+    useCanvasStore.getState().deleteSelecao();
+    useCanvasStore.getState().moverNos({ [a]: { x: 9, y: 9 } });
+    expect(useCanvasStore.getState().nodes).toHaveLength(3);
+    expect(useCanvasStore.getState().nodes[0]?.position).toEqual({ x: 0, y: 0 });
+  });
+
+  it('a marca de seleção não vai para o plano', () => {
+    const { a } = montar();
+    selecionar([a]);
+    const plano = useCanvasStore.getState().getPlano();
+    expect(JSON.stringify(plano)).not.toContain('selected');
+  });
+});

@@ -7,6 +7,7 @@ import { Sidebar } from '@/components/Sidebar';
 import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
+import { confirmarApagarSelecao } from '@/features/canvas/selecao';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
@@ -208,6 +209,13 @@ function Editor() {
       const tag = t.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || t.isContentEditable) return;
       const store = useCanvasStore.getState();
+      const nos = store.nodes.filter((n) => n.selected).length;
+      const arestas = store.edges.filter((edge) => edge.selected).length;
+      if (nos + arestas > 1) {
+        e.preventDefault();
+        if (confirmarApagarSelecao(nos, arestas)) store.deleteSelecao();
+        return;
+      }
       const id = store.selectedId;
       if (!id) return;
       e.preventDefault();

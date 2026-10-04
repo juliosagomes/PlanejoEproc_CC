@@ -10,7 +10,6 @@ import {
 } from 'reactflow';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { shallow } from 'zustand/shallow';
 import {
   SCHEMA_VERSION,
   flagsPadrao,
@@ -32,7 +31,13 @@ import { uid } from '@/utils/uid';
  * STORE DO CANVAS
  *
  * Holds the ReactFlow `Node`/`Edge` shapes (ReactFlow precisa deles assim) e
- * mantém também `selectedId`, `planoNome`, `flowMode`. Conversão para o tipo
+ * mantém também `selectedId`, `planoNome`, `flowMode`.
+ *
+ * Seleção: a verdade é o campo `selected` de cada nó e aresta, que o próprio
+ * ReactFlow escreve (clique, Ctrl+clique, Shift+arrastar em caixa).
+ * `selectedId` é derivado — o item quando há **exatamente um** selecionado, que
+ * é quando faz sentido abrir o painel de detalhes; com dois ou mais ele é
+ * `null` e o canvas mostra a barra de ações em lote. Conversão para o tipo
  * `Plano` (domain) acontece em `getPlano()` / `loadPlano(plano)`.
  *
  * Persistência: uma única assinatura observa o slice persistível
@@ -105,6 +110,14 @@ interface CanvasActions {
   setDobra: (id: string, dobra?: DobraAresta) => void;
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
+
+  // Seleção múltipla (Card 7)
+  /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
+  deleteSelecao: () => void;
+  /** Reposiciona vários nós de uma vez (alinhar). Ids ausentes são ignorados. */
+  moverNos: (posicoes: Record<string, Position>) => void;
+  /** Liga ou desliga um setor em vários nós de uma vez. */
+  marcarFlagEmLote: (nodeIds: string[], flagId: string, ligar: boolean) => void;
 
   // Setores (decisoes.md#D-22, D-26)
   /** Atualiza o espelho. Chamada pela store de setores, dona da lista. */
@@ -222,6 +235,21 @@ function flowParaPlano(state: CanvasState): Plano {
 
 const inicial = planoParaFlow(planoVazio());
 
+/** Marca como selecionados exatamente os itens de `ids`, preservando identidade dos que não mudam. */
+function comSelecao<T extends { id: string; selected?: boolean }>(
+  itens: T[],
+  ids: ReadonlySet<string>,
+): T[] {
+  return itens.map((i) => (!!i.selected === ids.has(i.id) ? i : { ...i, selected: ids.has(i.id) }));
+}
+
+function unicoSelecionado(nodes: FlowNode[], edges: FlowEdge[]): string | null {
+  const ns = nodes.filter((n) => n.selected);
+  const es = edges.filter((e) => e.selected);
+  if (ns.length + es.length !== 1) return null;
+  return ns[0]?.id ?? es[0]?.id ?? null;
+}
+
 export const useCanvasStore = create<CanvasStore>()(
   subscribeWithSelector((set, get) => ({
     nodes: inicial.nodes,
@@ -241,7 +269,11 @@ export const useCanvasStore = create<CanvasStore>()(
         ? changes.filter((c) => c.type === 'dimensions' || c.type === 'select')
         : changes;
       if (efetivas.length === 0) return;
-      set((s) => ({ nodes: applyNodeChanges(efetivas, s.nodes) as FlowNode[] }));
+      set((s) => {
+        const nodes = applyNodeChanges(efetivas, s.nodes) as FlowNode[];
+        if (!efetivas.some((c) => c.type === 'select')) return { nodes };
+        return { nodes, selectedId: unicoSelecionado(nodes, s.edges) };
+      });
     },
 
     onEdgesChange: (changes) => {
@@ -249,7 +281,11 @@ export const useCanvasStore = create<CanvasStore>()(
         ? changes.filter((c) => c.type === 'select')
         : changes;
       if (efetivas.length === 0) return;
-      set((s) => ({ edges: applyEdgeChanges(efetivas, s.edges) as FlowEdge[] }));
+      set((s) => {
+        const edges = applyEdgeChanges(efetivas, s.edges) as FlowEdge[];
+        if (!efetivas.some((c) => c.type === 'select')) return { edges };
+        return { edges, selectedId: unicoSelecionado(s.nodes, edges) };
+      });
     },
 
     onConnect: (connection) => {
@@ -272,9 +308,10 @@ export const useCanvasStore = create<CanvasStore>()(
       const id = uid('n');
       set((s) => ({
         nodes: [
-          ...s.nodes,
-          { id, type: 'localizador', position, data: defaultLocalizadorData() },
+          ...comSelecao(s.nodes, new Set()),
+          { id, type: 'localizador', position, data: defaultLocalizadorData(), selected: true },
         ],
+        edges: comSelecao(s.edges, new Set()),
         selectedId: id,
       }));
       return id;
@@ -330,6 +367,42 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
+    deleteSelecao: () => {
+      if (get().somenteLeitura) return;
+      set((s) => {
+        const nos = new Set(s.nodes.filter((n) => n.selected).map((n) => n.id));
+        return {
+          nodes: s.nodes.filter((n) => !nos.has(n.id)),
+          edges: s.edges.filter((e) => !e.selected && !nos.has(e.source) && !nos.has(e.target)),
+          selectedId: null,
+        };
+      });
+    },
+
+    moverNos: (posicoes) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          const p = posicoes[n.id];
+          return p ? { ...n, position: { x: p.x, y: p.y } } : n;
+        }),
+      }));
+    },
+
+    marcarFlagEmLote: (nodeIds, flagId, ligar) => {
+      if (get().somenteLeitura) return;
+      const alvo = new Set(nodeIds);
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          if (!alvo.has(n.id) || n.data.flags.includes(flagId) === ligar) return n;
+          const flags = ligar
+            ? [...n.data.flags, flagId]
+            : n.data.flags.filter((x) => x !== flagId);
+          return { ...n, data: { ...n.data, flags } };
+        }),
+      }));
+    },
+
     // Sem guarda de `somenteLeitura`: é a store de setores que decide se pode
     // mexer na lista; aqui o espelho só reflete o que ela resolveu, e em
     // visualização a lista chega calculada em memória, sem gravação.
@@ -375,7 +448,13 @@ export const useCanvasStore = create<CanvasStore>()(
     // `flowMode`, e não é persistido.
     setFiltroFlags: (ids) => set({ filtroFlags: ids }),
 
-    setSelectedId: (id) => set({ selectedId: id }),
+    // Também acerta as marcas do ReactFlow: quem seleciona por fora do canvas
+    // (checklist, criação de nó) não pode deixar a seleção anterior acesa.
+    setSelectedId: (id) =>
+      set((s) => {
+        const ids = new Set(id === null ? [] : [id]);
+        return { selectedId: id, nodes: comSelecao(s.nodes, ids), edges: comSelecao(s.edges, ids) };
+      }),
 
     setPlanoNome: (nome) => {
       if (get().somenteLeitura) return;
@@ -439,12 +518,40 @@ export const useCanvasStore = create<CanvasStore>()(
  * Persistência reativa.
  *
  * A assinatura observa apenas o slice persistível; mudanças de seleção não
- * disparam gravação. `shallow` compara o array elemento-a-elemento, então
- * trocar `nodes` ou `edges` por novas referências (o que toda mutação faz)
- * é detectado.
+ * disparam gravação. A comparação desce um nível em `nodes` e `edges` e ignora
+ * os campos de tela que o ReactFlow escreve (`CAMPOS_DE_TELA`): a seleção mora
+ * nos próprios nós (Card 7), e sem isso todo clique regravaria o plano.
  * ========================================================================== */
 
 const debouncedSave = criarSavePlanoDebounced();
+
+/**
+ * Campos que o ReactFlow escreve nos nós e arestas e que **não** vão para o
+ * `Plano` (`flowParaPlano` os descarta). Mudança só neles — selecionar, medir —
+ * não é motivo para gravar.
+ */
+const CAMPOS_DE_TELA = new Set(['selected', 'dragging', 'width', 'height', 'positionAbsolute']);
+
+function mesmoItemPersistido(a: object, b: object): boolean {
+  if (a === b) return true;
+  const ra = a as Record<string, unknown>;
+  const rb = b as Record<string, unknown>;
+  const chaves = new Set([...Object.keys(ra), ...Object.keys(rb)]);
+  for (const k of chaves) {
+    if (CAMPOS_DE_TELA.has(k)) continue;
+    if (!Object.is(ra[k], rb[k])) return false;
+  }
+  return true;
+}
+
+function mesmaListaPersistida(a: readonly object[], b: readonly object[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  return a.every((item, i) => {
+    const outro = b[i];
+    return outro !== undefined && mesmoItemPersistido(item, outro);
+  });
+}
 
 useCanvasStore.subscribe(
   (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags] as const,
@@ -456,7 +563,14 @@ useCanvasStore.subscribe(
     if (estado.somenteLeitura) return;
     debouncedSave(estado.getPlano());
   },
-  { equalityFn: shallow },
+  {
+    equalityFn: (a, b) =>
+      mesmaListaPersistida(a[0], b[0]) &&
+      mesmaListaPersistida(a[1], b[1]) &&
+      a[2] === b[2] &&
+      a[3] === b[3] &&
+      a[4] === b[4],
+  },
 );
 
 /**
