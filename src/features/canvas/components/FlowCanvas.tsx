@@ -19,7 +19,7 @@ import { cn } from '@/utils/cn';
 import { acharGemeos } from '../gemeos';
 import { useIrParaNo } from '../irParaNo';
 import { useCanvasStore } from '../store';
-import { tamanhoNaTela } from '../grupoMudancas';
+import { moldurasParaFlow } from '../grupoMudancas';
 import { GrupoNode } from './GrupoNode';
 import { LocalizadorNode } from './LocalizadorNode';
 import { PjEdge } from './PjEdge';
@@ -27,11 +27,6 @@ import { SelecaoLoteBar } from './SelecaoLoteBar';
 
 const nodeTypes = { localizador: LocalizadorNode, grupo: GrupoNode };
 
-/**
- * Molduras ficam atrás dos localizadores mesmo selecionadas: o ReactFlow soma
- * 1000 ao zIndex do selecionado, e uma moldura erguida cobriria os membros.
- */
-const Z_MOLDURA = -2000;
 const edgeTypes = { pj: PjEdge };
 
 /**
@@ -101,21 +96,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
     for (const g of grupos) if (g.recolhido) for (const id of g.membros) m.set(id, g.id);
     return m;
   }, [grupos]);
-  const molduras = useMemo(
-    () =>
-      grupos.map((g) => ({
-        id: g.id,
-        type: 'grupo',
-        position: g.position,
-        data: { grupo: g },
-        selected: !!g.selected,
-        style: tamanhoNaTela(g),
-        zIndex: Z_MOLDURA,
-        draggable: !somenteLeitura,
-        connectable: false,
-      })),
-    [grupos, somenteLeitura],
-  );
+  const molduras = useMemo(() => moldurasParaFlow(grupos, somenteLeitura), [grupos, somenteLeitura]);
 
   // Trocar de plano não remonta o ReactFlow, e o `defaultViewport` só vale na
   // montagem: sem isto o plano novo abria onde a câmera estava no anterior.

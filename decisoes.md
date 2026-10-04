@@ -1429,6 +1429,17 @@ precisaria lembrar de pular molduras. O `FlowCanvas` junta as duas listas só na
 hora de desenhar, com as molduras atrás (zIndex negativo — o ReactFlow ergue o
 selecionado em 1000, e uma moldura erguida cobriria os membros).
 
+**A moldura leva `width`/`height` no próprio nó** (correção de outubro/2026,
+em `moldurasParaFlow`). No ReactFlow 11 esses campos são a medida que a lib
+escreve, e só sobrevivem se a store guardar a mudança `dimensions` — o que ela
+faz para os localizadores, mas não para as molduras, cujo tamanho é nosso. O
+`FlowCanvas` passa um array novo de nós a cada render, e sem a medida no nó
+ela se apagava: a moldura piscava com `visibility: hidden`, as setas do grupo
+recolhido sumiam no primeiro hover e o redimensionar começava do zero. Todo
+nó que o app desenhar sem guardar a medição pela store precisa trazer a
+medida junto. Na mesma correção: recolher desmarca o que some (membros e
+setas internas), e a seta presa à moldura não oferece a alça de dobra.
+
 **O que precisaria mudar para evoluir.** Grupo dentro de grupo (hoje a moldura
 menor ganha, mas não há hierarquia) pediria `grupoPai` e propagar o arrasto.
 Setas que chegam na moldura recolhida são só desenho; se um dia for útil

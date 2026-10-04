@@ -70,6 +70,8 @@ interface Arrasto {
 
 export function PjEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -92,6 +94,12 @@ export function PjEdge({
 
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const setDobra = useCanvasStore((s) => s.setDobra);
+  // Com o grupo recolhido, a ponta da seta é a moldura (D-31). A dobra é
+  // guardada como fração do vão entre os localizadores; arrastá-la aqui
+  // gravaria uma fração medida no bloco, e a seta voltaria torta ao expandir.
+  const pontaNaMoldura = useCanvasStore((s) =>
+    s.grupos.some((g) => g.id === source || g.id === target),
+  );
 
   /**
    * Enquanto o ponteiro está pressionado a dobra vive aqui, não na store:
@@ -118,7 +126,7 @@ export function PjEdge({
   const dasharray = kind === 'atp' ? '6 4' : style.strokeDasharray;
   const strokeWidth = selected ? style.strokeWidth + 0.7 : style.strokeWidth;
 
-  const podeArrastar = isSharp && !somenteLeitura && dobraArrastavel(geo);
+  const podeArrastar = isSharp && !somenteLeitura && !pontaNaMoldura && dobraArrastavel(geo);
   const segmento = segmentoDaDobra(geo, dobra);
   const arrastando = preview !== null;
   const showTooltip = hovered && !arrastando && resumo.length > 0;

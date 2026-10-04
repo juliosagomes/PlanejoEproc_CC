@@ -830,6 +830,34 @@ describe('grupos (D-31)', () => {
     expect(grupo(g2).membros).toEqual([a]);
   });
 
+  it('recolher desmarca os membros e as setas entre eles, que somem da tela', () => {
+    const { a, b, c, g } = montar();
+    const st = useCanvasStore.getState();
+    st.onConnect({ source: a, target: b, sourceHandle: null, targetHandle: null });
+    st.onConnect({ source: b, target: c, sourceHandle: null, targetHandle: null });
+    const [interna, saida] = useCanvasStore.getState().edges.map((e) => e.id);
+    useCanvasStore.setState((s) => ({
+      grupos: s.grupos.map((x) => ({ ...x, selected: false })),
+      nodes: s.nodes.map((n) => ({ ...n, selected: n.id === a })),
+      edges: s.edges.map((e) => ({ ...e, selected: true })),
+    }));
+    useCanvasStore.getState().atualizarGrupo(g, { recolhido: true });
+    const depois = useCanvasStore.getState();
+    expect(depois.nodes.find((n) => n.id === a)!.selected).toBe(false);
+    expect(depois.edges.find((e) => e.id === interna)!.selected).toBe(false);
+    // A seta que sai do grupo continua na tela, presa à moldura: segue marcada.
+    expect(depois.edges.find((e) => e.id === saida)!.selected).toBe(true);
+    expect(depois.selectedId).toBe(saida);
+  });
+
+  it('expandir não mexe na seleção', () => {
+    const { a, g } = montar();
+    useCanvasStore.getState().atualizarGrupo(g, { recolhido: true });
+    useCanvasStore.setState((s) => ({ nodes: s.nodes.map((n) => ({ ...n, selected: n.id === a })) }));
+    useCanvasStore.getState().atualizarGrupo(g, { recolhido: false });
+    expect(useCanvasStore.getState().nodes.find((n) => n.id === a)!.selected).toBe(true);
+  });
+
   it('em visualização: seleciona, mas não arrasta nem cria', () => {
     const { a, g } = montar();
     useCanvasStore.setState({ somenteLeitura: true });

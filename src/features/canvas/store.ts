@@ -564,7 +564,22 @@ export const useCanvasStore = create<CanvasStore>()(
 
     atualizarGrupo: (id, patch) => {
       if (get().somenteLeitura) return;
-      set((s) => ({ grupos: s.grupos.map((g) => (g.id === id ? { ...g, ...patch } : g)) }));
+      set((s) => {
+        const grupos = s.grupos.map((g) => (g.id === id ? { ...g, ...patch } : g));
+        const alvo = grupos.find((g) => g.id === id);
+        if (!patch.recolhido || !alvo) return { grupos };
+        // Recolher esconde os membros e as setas entre eles. Seleção que fica
+        // escondida é armadilha: o Delete e a barra de lote agiriam sobre o que
+        // não está na tela.
+        const membros = new Set(alvo.membros);
+        const desmarcar = <T extends { id: string; selected?: boolean }>(
+          itens: T[],
+          some: (i: T) => boolean,
+        ): T[] => itens.map((i) => (i.selected && some(i) ? { ...i, selected: false } : i));
+        const nodes = desmarcar(s.nodes, (n) => membros.has(n.id));
+        const edges = desmarcar(s.edges, (e) => membros.has(e.source) && membros.has(e.target));
+        return { grupos, nodes, edges, selectedId: unicoSelecionado(nodes, edges, grupos) };
+      });
     },
 
     removerGrupo: (id) => {

@@ -103,3 +103,40 @@ export function tamanhoNaTela(g: GrupoLocalizadores): { width: number; height: n
     ? { width: GRUPO_RECOLHIDO.largura, height: GRUPO_RECOLHIDO.altura }
     : { width: g.largura, height: g.altura };
 }
+
+/**
+ * Molduras ficam atrás dos localizadores mesmo selecionadas: o ReactFlow soma
+ * 1000 ao zIndex do selecionado, e uma moldura erguida cobriria os membros.
+ */
+export const Z_MOLDURA = -2000;
+
+/**
+ * Os grupos como nós do ReactFlow.
+ *
+ * `width`/`height` vão no próprio nó, e não só no `style`. No ReactFlow 11 eles
+ * são a medida que a lib escreve, e ela só sobrevive se o dono do estado
+ * guardar a mudança `dimensions` — o que a store faz para os localizadores, mas
+ * não para as molduras, cujo tamanho é nosso. Sem eles, cada render (o
+ * `FlowCanvas` passa um array novo de nós) apagava a medida: a moldura ficava
+ * com `visibility: hidden` até a próxima medição, as setas do grupo recolhido
+ * sumiam (aresta sem medida não é desenhada) e o `NodeResizer` começava o
+ * arrasto do zero.
+ */
+export function moldurasParaFlow(grupos: readonly GrupoFlow[], somenteLeitura: boolean) {
+  return grupos.map((g) => {
+    const tamanho = tamanhoNaTela(g);
+    return {
+      id: g.id,
+      type: 'grupo' as const,
+      position: g.position,
+      data: { grupo: g },
+      selected: !!g.selected,
+      style: tamanho,
+      width: tamanho.width,
+      height: tamanho.height,
+      zIndex: Z_MOLDURA,
+      draggable: !somenteLeitura,
+      connectable: false,
+    };
+  });
+}
