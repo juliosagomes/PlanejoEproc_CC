@@ -1,10 +1,16 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
-import type { PlanIndexEntry } from '@/infra/storage';
+import {
+  getOrdemPlanos,
+  setOrdemPlanos,
+  type OrdemPlanos,
+  type PlanIndexEntry,
+} from '@/infra/storage';
 import { cn } from '@/utils/cn';
+import { ordenarPlanos } from './ordenarPlanos';
 
 export interface PlanSwitcherProps {
-  /** Lista de planos disponíveis. Renderiza ordenada por uso recente (desc). */
+  /** Lista de planos disponíveis. A ordem é escolha do usuário (recentes ou A–Z). */
   planos: PlanIndexEntry[];
   ativoId: string | null;
   /**
@@ -45,6 +51,7 @@ export function PlanSwitcher({
   onApagarTodos,
 }: PlanSwitcherProps) {
   const [open, setOpen] = useState(false);
+  const [ordem, setOrdem] = useState<OrdemPlanos>(getOrdemPlanos);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
@@ -65,11 +72,11 @@ export function PlanSwitcher({
     };
   }, [open]);
 
-  // Ordena por atualizadoEm desc; planos sem ativo ainda aparecem em ordem
-  // de listagem do índice.
-  const ordenados = [...planos].sort((a, b) =>
-    b.atualizadoEm.localeCompare(a.atualizadoEm),
-  );
+  const ordenados = ordenarPlanos(planos, ordem);
+  const trocarOrdem = (nova: OrdemPlanos) => {
+    setOrdem(nova);
+    setOrdemPlanos(nova);
+  };
 
   const labelBotao = ativoId
     ? ativoNomeLive || 'Plano sem título'
@@ -102,6 +109,34 @@ export function PlanSwitcher({
           role="menu"
           className="absolute z-50 mt-1 left-0 min-w-[280px] max-w-[360px] max-h-[60vh] overflow-auto bg-superficie border border-borda rounded-md shadow-lg scroll"
         >
+          {ordenados.length > 1 && (
+            <div
+              className="flex items-center justify-between gap-2 px-2 pt-1.5 pb-1 border-b border-borda"
+              role="group"
+              aria-label="Ordem da lista"
+            >
+              <span className="section-h">Ordenar</span>
+              <div className="flex gap-0.5">
+                {(
+                  [
+                    ['recentes', 'Recentes'],
+                    ['alfabetica', 'A–Z'],
+                  ] as const
+                ).map(([valor, rotulo]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    className={cn('btn btn-sm', ordem === valor ? 'btn-primary' : 'btn-ghost')}
+                    style={{ height: 20, fontSize: 11, padding: '0 7px' }}
+                    aria-pressed={ordem === valor}
+                    onClick={() => trocarOrdem(valor)}
+                  >
+                    {rotulo}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {ordenados.length === 0 ? (
             <div className="p-3 text-[12px] text-texto-3">
               Nenhum plano salvo ainda. Use{' '}

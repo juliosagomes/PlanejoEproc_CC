@@ -48,6 +48,12 @@ export {
 } from './setores';
 export { consolidarSetores } from './consolidarSetores';
 export {
+  ORDENS_PLANOS,
+  getOrdemPlanos,
+  setOrdemPlanos,
+  type OrdemPlanos,
+} from './ordemPlanos';
+export {
   CATALOGO_KEY,
   loadCatalogoOrgao,
   saveCatalogoOrgao,
