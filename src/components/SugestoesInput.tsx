@@ -17,11 +17,16 @@ export interface Sugestao {
   detalhe?: string;
 }
 
-interface SugestoesInputProps
+interface SugestoesInputProps<S extends Sugestao>
   extends Omit<InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'list'> {
   value: string;
   onValueChange: (valor: string) => void;
-  sugestoes: readonly Sugestao[];
+  sugestoes: readonly S[];
+  /**
+   * Chamado quando o usuário escolhe um item da lista (e não quando digita o
+   * mesmo texto). Serve a quem precisa do resto da sugestão além do texto.
+   */
+  onEscolher?: (sugestao: S) => void;
 }
 
 /** Acima disso a lista pesa no DOM sem ajudar ninguém: quem procura digita. */
@@ -45,15 +50,16 @@ function normalizar(t: string): string {
  * `LocalizadorNomeInput`: dentro de modais com rolagem, uma lista absoluta seria
  * cortada pela caixa que rola.
  */
-export function SugestoesInput({
+export function SugestoesInput<S extends Sugestao>({
   value,
   onValueChange,
   sugestoes,
+  onEscolher,
   onKeyDown,
   onFocus,
   onBlur,
   ...resto
-}: SugestoesInputProps) {
+}: SugestoesInputProps<S>) {
   const listaId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [aberto, setAberto] = useState(false);
@@ -107,8 +113,9 @@ export function SugestoesInput({
     document.getElementById(`${listaId}-${ativo}`)?.scrollIntoView({ block: 'nearest' });
   }, [mostrar, ativo, listaId]);
 
-  const escolher = (s: Sugestao) => {
+  const escolher = (s: S) => {
     onValueChange(s.valor);
+    onEscolher?.(s);
     setAberto(false);
   };
 

@@ -16,7 +16,7 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
   const [nome, setNome] = useState('');
   const [origem, setOrigem] = useState<OrigemFila>('preferencia');
   const [grupoId, setGrupoId] = useState('');
-  const sugestoes = useSugestoesFila(origem);
+  const sugestoes = useSugestoesFila();
 
   if (!aberto) {
     return (
@@ -38,13 +38,16 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
         e.preventDefault();
         if (!nome.trim()) return;
         const alvo = nome.trim().toLocaleLowerCase('pt-BR');
+        const doEproc = sugestoes.some(
+          (s) => s.origem === origem && s.valor.toLocaleLowerCase('pt-BR') === alvo,
+        );
         criarFila({
           nome,
           origem,
           setorId,
           ...(grupoId ? { grupoId } : {}),
-          // O nome já veio do Eproc: a fila existe lá.
-          ja_criado: sugestoes.some((s) => s.valor.toLocaleLowerCase('pt-BR') === alvo),
+          // O nome já veio do Eproc, na mesma tela: a fila existe lá.
+          ja_criado: doEproc,
         });
         fechar();
       }}
@@ -57,7 +60,12 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
           value={nome}
           onValueChange={setNome}
           sugestoes={sugestoes}
-          placeholder="Ex.: CUMPRIMENTO - Alvarás"
+          onEscolher={(s) => setOrigem(s.origem)}
+          placeholder={
+            sugestoes.length > 0
+              ? 'Digite ou escolha uma consulta da unidade'
+              : 'Ex.: CUMPRIMENTO - Alvarás'
+          }
           onKeyDown={(e) => e.key === 'Escape' && fechar()}
         />
       </label>

@@ -1,5 +1,10 @@
 import { useMemo } from 'react';
-import { localizadoresDaUnidade, type LocalizadorDaUnidade, type OrigemFila } from '@/domain';
+import {
+  ORIGENS_FILA,
+  localizadoresDaUnidade,
+  type LocalizadorDaUnidade,
+  type OrigemFila,
+} from '@/domain';
 import type { Sugestao } from '@/components/SugestoesInput';
 import { useCanvasStore } from '@/features/canvas/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
@@ -29,22 +34,34 @@ export function useLocalizadoresDaUnidade(): LocalizadorDaUnidade[] {
  */
 const TIPO_PREFERENCIA_CONSULTA = 'Movimentação';
 
+export interface SugestaoFila extends Sugestao {
+  origem: OrigemFila;
+}
+
 /**
- * Nomes que a sincronização com a unidade trouxe, para a origem escolhida. São
- * só sugestão: a unidade é quem diz qual fila pertence a qual setor e grupo.
+ * Tudo o que a sincronização com a unidade trouxe e pode virar fila: as
+ * consultas salvas das quatro telas de relatório (D-32) e as preferências de
+ * consulta. Cada uma diz de onde vem, e escolhê-la acerta o "Onde fica" — a
+ * lista não depende de o usuário ter escolhido a origem antes.
+ *
+ * São só sugestão: a unidade é quem diz qual fila pertence a qual setor e grupo.
  */
-export function useSugestoesFila(origem: OrigemFila): Sugestao[] {
+export function useSugestoesFila(): SugestaoFila[] {
   const catalogo = useUnidadeStore((s) => s.catalogo);
   return useMemo(() => {
     if (!catalogo) return [];
-    const nomes =
-      origem === 'preferencia'
-        ? (catalogo.preferencias ?? [])
-            .filter((p) => p.detalhe === TIPO_PREFERENCIA_CONSULTA)
-            .map((p) => p.nome)
-        : (catalogo.consultasSalvas ?? []).filter((c) => c.tela === origem).map((c) => c.nome);
-    return [...new Set(nomes)]
-      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
-      .map((valor) => ({ valor }));
-  }, [catalogo, origem]);
+    const vistas = new Set<string>();
+    const itens: SugestaoFila[] = [];
+    const por = (valor: string, origem: OrigemFila) => {
+      const chave = `${origem}::${valor}`;
+      if (vistas.has(chave)) return;
+      vistas.add(chave);
+      itens.push({ valor, origem, detalhe: ORIGENS_FILA[origem] });
+    };
+    for (const c of catalogo.consultasSalvas ?? []) por(c.nome, c.tela);
+    for (const p of catalogo.preferencias ?? []) {
+      if (p.detalhe === TIPO_PREFERENCIA_CONSULTA) por(p.nome, 'preferencia');
+    }
+    return itens.sort((a, b) => a.valor.localeCompare(b.valor, 'pt-BR'));
+  }, [catalogo]);
 }

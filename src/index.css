@@ -295,6 +295,7 @@ body {
     border-color: var(--texto);
   }
   .btn-primary:hover {
+    background: var(--texto);
     filter: brightness(0.9);
   }
   .btn-accent {
@@ -302,7 +303,10 @@ body {
     color: var(--sobre-destaque);
     border-color: var(--destaque);
   }
+  /* O fundo repetido aqui é necessário: `.btn:hover` tem especificidade maior e
+     trocaria o azul pela superfície, deixando o texto branco invisível. */
   .btn-accent:hover {
+    background: var(--destaque);
     filter: brightness(1.08);
   }
   .btn-ghost {
