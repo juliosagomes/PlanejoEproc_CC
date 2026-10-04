@@ -431,6 +431,121 @@ body {
     text-decoration: underline;
   }
 
+  /* ---------- Seletor de eventos com conjuntos (D-29) ---------- */
+  .eventos-resumo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    padding: 6px;
+    border: 1px solid var(--borda-forte);
+    border-radius: 6px;
+    background: var(--superficie);
+    min-height: 32px;
+  }
+  .eventos-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 4px 2px 8px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    line-height: 1.4;
+    border: 1px solid var(--borda);
+    background: var(--superficie-2);
+    color: var(--texto);
+    cursor: default;
+  }
+  button.eventos-chip {
+    cursor: pointer;
+    padding-right: 8px;
+  }
+  .eventos-chip.conjunto {
+    background: var(--destaque-suave);
+    border-color: var(--destaque-borda);
+    font-weight: 600;
+  }
+  .eventos-chip.excecao {
+    background: oklch(0.97 0.03 25);
+    border-color: oklch(0.88 0.06 25);
+    color: oklch(0.45 0.16 25);
+  }
+  .eventos-chip.avulso {
+    border-style: dashed;
+  }
+  .eventos-chip > button {
+    border: 0;
+    background: none;
+    padding: 0 3px;
+    font-size: 13px;
+    line-height: 1;
+    color: var(--texto-3);
+    cursor: pointer;
+  }
+  .eventos-chip > button:hover {
+    color: var(--texto);
+  }
+  .eventos-chip-n {
+    font-weight: 500;
+    color: var(--texto-3);
+    margin-left: 2px;
+  }
+  .eventos-total {
+    margin-left: auto;
+    font-size: 10.5px;
+    color: var(--texto-3);
+  }
+  .conjuntos-painel {
+    margin-top: 6px;
+    padding: 10px;
+    border: 1px solid var(--borda);
+    border-radius: 8px;
+    background: var(--superficie-2);
+    max-height: 340px;
+    overflow-y: auto;
+  }
+  .conjuntos-secao + .conjuntos-secao {
+    margin-top: 10px;
+  }
+  .conjuntos-secao .section-h {
+    margin-bottom: 3px;
+  }
+  .conjunto-linha {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 3px 0;
+    font-size: 12px;
+  }
+  .conjunto-linha + .conjunto-linha {
+    border-top: 1px solid var(--borda);
+  }
+  .conjunto-estado {
+    width: 12px;
+    flex-shrink: 0;
+    text-align: center;
+    font-weight: 700;
+    color: var(--destaque);
+  }
+  .conjunto-nome {
+    flex: 1;
+    min-width: 0;
+  }
+  .conjunto-n {
+    margin-left: 6px;
+    font-size: 10.5px;
+    color: var(--texto-3);
+  }
+  .conjunto-acoes {
+    display: inline-flex;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+  .conjunto-acoes .btn-sm {
+    height: 22px;
+    font-size: 11px;
+  }
+
   /* ---------- Barra de ações em lote (seleção múltipla) ---------- */
   .selecao-lote {
     position: absolute;

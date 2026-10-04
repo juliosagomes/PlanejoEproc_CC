@@ -12,6 +12,7 @@ import {
 import { CATALOGOS } from '@/data';
 import { CatalogMulti } from '@/components/CatalogMulti';
 import { Icon } from '@/components/Icon';
+import { EventosMulti } from '@/features/eventos/components/EventosMulti';
 import { cn } from '@/utils/cn';
 import { Field } from './pecas';
 import { useSugestoes } from './sugestoes';
@@ -152,6 +153,21 @@ function Controle({ campo, valor, onChange }: ControleProps) {
       );
     }
     case 'multi':
+      // Eventos ganham os conjuntos (decisoes.md#D-29): é a única lista em que
+      // "quase tudo" é uma seleção comum.
+      if (campo.catalogo === 'eventos') {
+        return (
+          <EventosMulti
+            values={
+              Array.isArray(valor)
+                ? (valor as unknown[]).filter((v): v is string => typeof v === 'string')
+                : []
+            }
+            onChange={onChange}
+            ariaLabel={campo.rotulo}
+          />
+        );
+      }
       return (
         <CatalogMulti
           values={

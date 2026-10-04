@@ -1306,6 +1306,56 @@ já chegam no formato que um nó novo receberia.
 
 ---
 
+## D-29 · Conjuntos de eventos: atalho de seleção e de leitura, não dado do plano
+
+**Decisão.** Onde a regra de ATP escolhe eventos — o gatilho "Por Evento" e os
+filtros de evento —, o seletor ganha **conjuntos**: 42 padrão, deduzidos da
+própria lista do Eproc e organizados em oito categorias, mais os que a unidade
+criar. O plano continua gravando a lista explícita de ids; o conjunto só ajuda a
+montá-la ("Selecionar todos", depois "Tirar" em Mera ciência) e a lê-la ("Todos
+os eventos, exceto Mera ciência — 1.013 de 1.077") no modal e no checklist.
+
+**Por que não gravar o conjunto no plano.** O que a secretaria marca no Eproc é
+evento por evento; o Eproc não tem "conjunto" no gatilho. Guardar "exceto Mera
+ciência" em vez dos ids faria o plano mudar de significado quando a definição do
+conjunto mudasse — a regra planejada hoje passaria a dizer outra coisa amanhã,
+sem ninguém editá-la. Com ids explícitos, o resumo é só uma leitura do que está
+gravado, e pode melhorar à vontade. Sem bump, sem migração.
+
+**Os padrão são regras sobre o rótulo, e não listas de ids.** A redação do
+catálogo é muito regular ("Audiência de X designada", "Juntada de Mandado -
+Cumprido Negativo", "Expedida/certificada a intimação eletrônica - …"), e regra
+continua valendo para o evento novo que siga a mesma forma. A comparação é sem
+acento porque a lista mistura "Decisao" com "Decisão". Medido contra o catálogo
+embutido (1.077 eventos), só três ficam fora de todo conjunto. O teste prende
+cada regra a exemplos reais que precisam — e não podem — estar dentro, incluindo
+as armadilhas encontradas ("Audiência pre*liminar*" não é liminar; "alvará de
+soltura" é prisão, não valores).
+
+**"Mera ciência" é a definição mais discutível, e está escrita.** Entram as
+intimações, citações e comunicações expedidas ou confirmadas e as publicações
+no Diário — o que a própria secretaria gera e que não pede providência. **Não**
+entra "Decorrido prazo": é exatamente o evento que dispara providência. Quem
+discordar cria o seu conjunto a partir da seleção.
+
+**Conjuntos da unidade, numa chave por silo.** Como os setores (D-26), e pelo
+mesmo motivo: é conhecimento de como aquela vara trabalha, não de um plano. Não
+viajam no export nem na sincronização — não precisam, porque o plano já leva os
+ids. Apagar um conjunto não muda regra nenhuma.
+
+**O checklist diz o que marcar.** A primeira linha é o resumo; a segunda é a
+lista que se confere no Eproc — os marcados, ou, quando é "todos menos alguns",
+os que ficam de fora ("Marcar todos e desmarcar: …"). Seleção pequena e sem
+conjunto sai em uma linha, como antes.
+
+**O que precisaria mudar para evoluir.** Se a unidade quiser compartilhar
+conjuntos entre colegas, eles entram na sincronização por lotação como os
+setores — a chave já é do silo. Se o Eproc passar a oferecer grupos de evento no
+gatilho (hoje só há quatro, e só nos filtros), o conjunto pode virar valor
+gravado, com migração que expanda os existentes.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

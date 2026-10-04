@@ -48,6 +48,7 @@ export {
 } from './setores';
 export { consolidarSetores } from './consolidarSetores';
 export { loadCamera, saveCamera, type Camera } from './cameras';
+export { loadConjuntosEvento, saveConjuntosEvento } from './conjuntosEvento';
 export {
   ORDENS_PLANOS,
   getOrdemPlanos,

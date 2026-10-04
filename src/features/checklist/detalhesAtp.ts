@@ -17,13 +17,13 @@ import {
 } from '@/domain';
 import {
   CATALOGOS,
-  EVENTOS,
   POLOS_PETICAO,
   STATUS_PROCESSO,
   TIPOS_CONTROLE,
   TIPOS_PETICAO,
   buscarLabel,
 } from '@/data';
+import { frasePorResumo, resumirEventos, rotuloEvento } from '@/features/eventos/conjuntos';
 
 /**
  * Linhas de detalhe de uma regra de ATP no checklist, na ordem dos três blocos
@@ -50,6 +50,30 @@ function rotular(opcoes: ReadonlyArray<OpcaoCampo>, codigo: string): string {
   return buscarLabel(opcoes, codigo) ?? codigo;
 }
 
+/**
+ * Eventos pelo resumo dos conjuntos (decisoes.md#D-29), mas sem esconder o que
+ * se marca no Eproc: a segunda linha é a lista que a secretaria precisa
+ * conferir — os marcados, ou, quando é "todos menos alguns", os que ficam de
+ * fora. Seleção pequena e sem conjunto sai como sempre saiu, em uma linha.
+ */
+export function fmtEventos(ids: readonly string[] | undefined): string {
+  if (!ids || ids.length === 0) return '';
+  const r = resumirEventos(ids);
+  if (r.modo === 'vazio') return '';
+  if (r.modo === 'inclusao' && r.conjuntos.length === 0) return ids.map(rotuloEvento).join(', ');
+  const frase = frasePorResumo(r);
+  if (r.modo === 'todos') return `${frase}
+Marcar todos.`;
+  if (r.modo === 'exclusao') {
+    const sel = new Set(ids);
+    const fora = CATALOGOS.eventos.filter((e) => !sel.has(e.value)).map((e) => e.label);
+    return `${frase}
+Marcar todos e desmarcar: ${fora.join(', ')}`;
+  }
+  return `${frase}
+Marcar: ${ids.map(rotuloEvento).join(', ')}`;
+}
+
 /** O valor de um campo como a secretaria o leria na tela. */
 export function fmtValorCampo(campo: CampoDef, v: ValorCampo): string {
   if (campo.tipo === 'lista') {
@@ -64,6 +88,9 @@ export function fmtValorCampo(campo: CampoDef, v: ValorCampo): string {
       .join('\n');
   }
   if (campo.tipo === 'simNao') return v === true ? 'Sim' : 'Não';
+  if (Array.isArray(v) && campo.tipo === 'multi' && campo.catalogo === 'eventos') {
+    return fmtEventos(v.filter((x): x is string => typeof x === 'string'));
+  }
   if (Array.isArray(v)) {
     const opcoes = opcoesDe(campo);
     return v.map((x) => (typeof x === 'string' ? rotular(opcoes, x) : '')).join(', ');
@@ -135,7 +162,7 @@ function detalhesGatilho(t: AtpTrigger): DetalheRegra[] {
     if (valor?.trim()) out.push({ label, valor: valor.trim() });
   };
 
-  if (t.tipo === 'A' || t.tipo === 'E') linha('Evento', lista(EVENTOS, t.eventoIds));
+  if (t.tipo === 'A' || t.tipo === 'E') linha('Evento', fmtEventos(t.eventoIds));
   if (t.tipo === 'A' || t.tipo === 'P') {
     linha('Tipo de Petição', lista(TIPOS_PETICAO, t.peticaoTipoIds));
   }

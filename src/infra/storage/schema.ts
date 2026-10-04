@@ -3,6 +3,7 @@ import {
   ANOTACOES_CATALOGO_VERSION,
   CATALOGO_ORGAO_VERSION,
   CATALOGO_UNIDADE_VERSION,
+  CONJUNTOS_EVENTO_VERSION,
   CORES_FLAG,
   PREF_TIPOS,
   SCHEMA_VERSION,
@@ -15,6 +16,7 @@ import {
   type AnotacoesCatalogo,
   type CatalogoOrgao,
   type CatalogoUnidade,
+  type ConjuntosEventoUnidade,
   type DefinicaoFlag,
   type DobraAresta,
   type AtpRule,
@@ -83,6 +85,12 @@ export const SetoresUnidadeSchema = z.object({
   version: z.literal(SETORES_VERSION),
   itens: z.array(DefinicaoFlagSchema),
 }) satisfies z.ZodType<SetoresUnidade>;
+
+/** Conjuntos de eventos criados pelo usuário (decisoes.md#D-29). Chave por escopo, como os setores. */
+export const ConjuntosEventoUnidadeSchema = z.object({
+  version: z.literal(CONJUNTOS_EVENTO_VERSION),
+  itens: z.array(z.object({ id: z.string(), rotulo: z.string(), ids: z.array(z.string()) })),
+}) satisfies z.ZodType<ConjuntosEventoUnidade>;
 
 /* ---------------------------------------------------------------------------
  * Regra de ATP — espelho da tela de cadastro do Eproc (decisoes.md#D-27).

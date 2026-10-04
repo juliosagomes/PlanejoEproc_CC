@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Sessao } from '@/domain';
 import { flushPersist, useCanvasStore } from '@/features/canvas/store';
+import { useConjuntosEventoStore } from '@/features/eventos/store';
 import { useSetoresStore } from '@/features/setores/store';
 import { aplicarSincronizacao, garantirAtivoValido } from '@/infra/sync/aplicar';
 import {
@@ -104,6 +105,7 @@ function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
   const canvas = useCanvasStore.getState();
   canvas.setSomenteLeitura(somenteLeitura);
   useSetoresStore.getState().hidratar(somenteLeitura);
+  useConjuntosEventoStore.getState().hidratar();
 
   garantirAtivoValido();
   if (listPlanos().length === 0) {
@@ -264,6 +266,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     useCanvasStore.getState().setSomenteLeitura(false);
     useCanvasStore.getState().loadPlano(planoVazio());
     useSetoresStore.getState().limpar();
+    useConjuntosEventoStore.getState().limpar();
     set({
       sessao: null,
       erro: null,
