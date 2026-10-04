@@ -1,4 +1,4 @@
-import { useId, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   campoVisivel,
   definirParametro,
@@ -11,6 +11,7 @@ import {
 } from '@/domain';
 import { CATALOGOS } from '@/data';
 import { CatalogMulti } from '@/components/CatalogMulti';
+import { SugestoesInput } from '@/components/SugestoesInput';
 import { Icon } from '@/components/Icon';
 import { EventosMulti } from '@/features/eventos/components/EventosMulti';
 import { cn } from '@/utils/cn';
@@ -48,7 +49,6 @@ interface ControleProps {
 }
 
 function Controle({ campo, valor, onChange }: ControleProps) {
-  const id = useId();
   const sugestoes = useSugestoes(
     campo.tipo === 'texto' || campo.tipo === 'multi' ? campo.sugestao : undefined,
   );
@@ -62,24 +62,15 @@ function Controle({ campo, valor, onChange }: ControleProps) {
 
   switch (campo.tipo) {
     case 'texto': {
-      const lista = [...opcoes.map((o) => o.label), ...sugestoes];
+      const lista = [...new Set([...opcoes.map((o) => o.label), ...sugestoes])];
       return (
-        <>
-          <input
-            className="input"
-            list={lista.length > 0 ? id : undefined}
-            value={typeof valor === 'string' ? valor : ''}
-            onChange={(e) => onChange(e.target.value)}
-            aria-label={campo.rotulo}
-          />
-          {lista.length > 0 && (
-            <datalist id={id}>
-              {lista.map((nome) => (
-                <option key={nome} value={nome} />
-              ))}
-            </datalist>
-          )}
-        </>
+        <SugestoesInput
+          className="input"
+          sugestoes={lista.map((nome) => ({ valor: nome }))}
+          value={typeof valor === 'string' ? valor : ''}
+          onValueChange={onChange}
+          aria-label={campo.rotulo}
+        />
       );
     }
     case 'textarea':

@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   atalhosPara,
   atpsManuaisSaindo,
@@ -8,6 +8,7 @@ import {
   type LinhaAcaoPreferencial,
 } from '@/domain';
 import { Icon } from '@/components/Icon';
+import { SugestoesInput } from '@/components/SugestoesInput';
 import {
   useAcoesPreferenciaisDoLocalizador,
   useSugestoesSubitem,
@@ -52,7 +53,13 @@ export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) 
   const [expandido, setExpandido] = useState(false);
   const [novo, setNovo] = useState('');
   const [aviso, setAviso] = useState<string | null>(null);
-  const listId = useId();
+  const opcoes = useMemo(
+    () =>
+      sugestoes.map((s) =>
+        s.outroOrgao ? { valor: s.nome, detalhe: `de ${s.outroOrgao}` } : { valor: s.nome },
+      ),
+    [sugestoes],
+  );
 
   const vincular = () => {
     const nome = novo.trim();
@@ -128,15 +135,15 @@ export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) 
       {!somenteLeitura && (
         <div className="mt-2">
           <div className="flex gap-1.5">
-            <input
+            <SugestoesInput
               className="input"
               style={{ height: 26, padding: '2px 7px', fontSize: 12 }}
               placeholder={sugestoes.length > 0 ? 'Vincular preferência (há sugestões)' : 'Vincular preferência'}
               aria-label="Nome da preferência a vincular"
               value={novo}
-              list={sugestoes.length > 0 ? listId : undefined}
-              onChange={(e) => {
-                setNovo(e.target.value);
+              sugestoes={opcoes}
+              onValueChange={(valor) => {
+                setNovo(valor);
                 setAviso(null);
               }}
               onKeyDown={(e) => {
@@ -150,15 +157,6 @@ export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) 
               <Icon.Plus /> Vincular
             </button>
           </div>
-          {sugestoes.length > 0 && (
-            <datalist id={listId}>
-              {sugestoes.map((s) => (
-                <option key={`${s.nome}-${s.outroOrgao ?? ''}`} value={s.nome}>
-                  {s.outroOrgao ? `de ${s.outroOrgao}` : ''}
-                </option>
-              ))}
-            </datalist>
-          )}
           {aviso && <div className="text-[11px] text-aviso mt-1">{aviso}</div>}
         </div>
       )}
