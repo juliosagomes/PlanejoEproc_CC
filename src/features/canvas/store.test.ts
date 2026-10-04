@@ -815,6 +815,18 @@ describe('grupos (D-31)', () => {
     expect(useCanvasStore.getState().nodes.map((n) => n.id)).toContain(b);
   });
 
+  it('a aresta liga direto à moldura, e sai junto quando o grupo é desfeito', () => {
+    const { a, c, g } = montar();
+    const s = useCanvasStore.getState();
+    s.onConnect({ source: c, target: g, sourceHandle: null, targetHandle: null });
+    s.onConnect({ source: g, target: c, sourceHandle: null, targetHandle: null });
+    s.onConnect({ source: a, target: c, sourceHandle: null, targetHandle: null });
+    expect(useCanvasStore.getState().edges).toHaveLength(3);
+    useCanvasStore.getState().removerGrupo(g);
+    const restantes = useCanvasStore.getState().edges;
+    expect(restantes.map((e) => [e.source, e.target])).toEqual([[a, c]]);
+  });
+
   it('o plano leva os grupos sem a marca de seleção, e omite a chave quando não há grupo', () => {
     expect('grupos' in useCanvasStore.getState().getPlano()).toBe(false);
     const { g } = montar();

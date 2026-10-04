@@ -1,7 +1,7 @@
 import {
   SUBITEM_CATS,
   ehAtalho,
-  nomeEfetivo,
+  nomeDaPonta,
   ehRecursoRegra,
   regraDoSubitem,
   type AtpRule,
@@ -116,6 +116,8 @@ export type ChecklistGroups = Record<ChecklistGroupKey, ChecklistItem[]>;
  */
 type NodeLike = { id: string; data: LocalizadorData };
 type EdgeLike = { id: string; source: string; target: string; data?: EdgeData };
+/** A aresta pode chegar num grupo (D-31): só o rótulo dele serve ao contexto. */
+type GrupoLike = { id: string; rotulo: string };
 
 function novoGrupo(): ChecklistGroups {
   return {
@@ -170,6 +172,7 @@ function detalhesPref(rule: PrefRule): ChecklistDetail[] {
 export function deriveChecklist(
   nodes: ReadonlyArray<NodeLike>,
   edges: ReadonlyArray<EdgeLike>,
+  grupos: ReadonlyArray<GrupoLike> = [],
 ): ChecklistGroups {
   const groups = novoGrupo();
 
@@ -211,8 +214,8 @@ export function deriveChecklist(
     const data = e.data;
     if (!data) continue;
     const subs = data.subitems;
-    const src = nomeOuPlaceholder(nomeEfetivo(nodes, e.source));
-    const tgt = nomeOuPlaceholder(nomeEfetivo(nodes, e.target));
+    const src = nomeOuPlaceholder(nomeDaPonta(nodes, grupos, e.source));
+    const tgt = nomeOuPlaceholder(nomeDaPonta(nodes, grupos, e.target));
     const contexto = `${src} → ${tgt}`;
 
     const aImplantar = subs

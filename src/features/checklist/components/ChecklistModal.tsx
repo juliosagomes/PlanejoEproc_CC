@@ -26,6 +26,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const planoNome = useCanvasStore((s) => s.planoNome);
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
+  const grupos = useCanvasStore((s) => s.grupos);
   const toggleNodeCreated = useCanvasStore((s) => s.toggleNodeCreated);
   const toggleSubitemCreated = useCanvasStore((s) => s.toggleSubitemCreated);
   const updateAcaoPreferencial = useCanvasStore((s) => s.updateAcaoPreferencial);
@@ -36,7 +37,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const [copiado, setCopiado] = useState(false);
 
   // `deriveChecklist` aceita o shape estrutural — passamos `nodes/edges` direto.
-  const groups = useMemo(() => deriveChecklist(nodes, edges), [nodes, edges]);
+  const groups = useMemo(() => deriveChecklist(nodes, edges, grupos), [nodes, edges, grupos]);
   const { total, done } = contarChecklist(groups);
 
   if (!open) return null;

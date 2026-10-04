@@ -6,7 +6,7 @@ import {
   SUBITEM_CATS,
   ehRecursoRegra,
   hasDetalheSubitem,
-  nomeEfetivo,
+  nomeDaPonta,
   type EdgeData,
   type EdgeKind,
   type Subitem,
@@ -39,10 +39,10 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   // As pontas da aresta são a origem e o destino da regra de ATP: o modal de
   // detalhamento as mostra em vez de pedi-las de novo.
   const origem = useCanvasStore(
-    (s) => nomeEfetivo(s.nodes, edge.source),
+    (s) => nomeDaPonta(s.nodes, s.grupos, edge.source),
   );
   const destino = useCanvasStore(
-    (s) => nomeEfetivo(s.nodes, edge.target),
+    (s) => nomeDaPonta(s.nodes, s.grupos, edge.target),
   );
 
   const data: EdgeData = edge.data ?? defaultEdgeData();

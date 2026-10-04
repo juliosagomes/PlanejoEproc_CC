@@ -571,7 +571,9 @@ export const useCanvasStore = create<CanvasStore>()(
         // Recolher esconde os membros e as setas entre eles. Seleção que fica
         // escondida é armadilha: o Delete e a barra de lote agiriam sobre o que
         // não está na tela.
-        const membros = new Set(alvo.membros);
+        // A seta entre um membro e o próprio grupo também some: as duas pontas
+        // viram a mesma moldura.
+        const membros = new Set([...alvo.membros, alvo.id]);
         const desmarcar = <T extends { id: string; selected?: boolean }>(
           itens: T[],
           some: (i: T) => boolean,
@@ -584,8 +586,10 @@ export const useCanvasStore = create<CanvasStore>()(
 
     removerGrupo: (id) => {
       if (get().somenteLeitura) return;
+      // Os localizadores ficam; as setas presas à moldura saem com ela.
       set((s) => ({
         grupos: s.grupos.filter((g) => g.id !== id),
+        edges: s.edges.filter((e) => e.source !== id && e.target !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
       }));
     },
@@ -594,10 +598,11 @@ export const useCanvasStore = create<CanvasStore>()(
       if (get().somenteLeitura) return;
       set((s) => {
         const nos = new Set(s.nodes.filter((n) => n.selected).map((n) => n.id));
+        const pontas = new Set([...nos, ...s.grupos.filter((g) => g.selected).map((g) => g.id)]);
         return {
           grupos: semMembros(s.grupos.filter((g) => !g.selected), nos),
           nodes: s.nodes.filter((n) => !nos.has(n.id)),
-          edges: s.edges.filter((e) => !e.selected && !nos.has(e.source) && !nos.has(e.target)),
+          edges: s.edges.filter((e) => !e.selected && !pontas.has(e.source) && !pontas.has(e.target)),
           selectedId: null,
         };
       });

@@ -205,8 +205,9 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         ...e,
         ...(origem ? { source: origem, sourceHandle: null } : {}),
         ...(destino ? { target: destino, targetHandle: null } : {}),
-        // Dentro do mesmo grupo recolhido a seta não tem onde aparecer.
-        hidden: origem !== undefined && origem === destino,
+        // Dentro do mesmo grupo recolhido a seta não tem onde aparecer — nem a
+        // que liga um membro à própria moldura.
+        hidden: (origem ?? e.source) === (destino ?? e.target),
         selected: !!e.selected,
         className:
           esmaecidos?.has(e.source) || esmaecidos?.has(e.target)

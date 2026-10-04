@@ -1,3 +1,4 @@
+import { nomeEfetivo } from './atalhos';
 import type { CorFlag } from './flags';
 import type { Position } from './plano';
 
@@ -99,4 +100,18 @@ export function reagruparSoltos(
       ? g
       : { ...g, membros };
   });
+}
+
+/**
+ * Nome de uma ponta de aresta. A seta pode chegar no grupo, e não num
+ * localizador dele: aí a ponta é a moldura, e o nome vem do rótulo.
+ */
+export function nomeDaPonta(
+  nodes: Parameters<typeof nomeEfetivo>[0],
+  grupos: readonly Pick<GrupoLocalizadores, 'id' | 'rotulo'>[],
+  id: string,
+): string {
+  const grupo = grupos.find((g) => g.id === id);
+  if (!grupo) return nomeEfetivo(nodes, id);
+  return `Grupo "${grupo.rotulo.trim() || 'sem nome'}"`;
 }

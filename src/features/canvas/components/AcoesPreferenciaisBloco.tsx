@@ -4,7 +4,7 @@ import {
   atpsManuaisSaindo,
   canonPreferencia,
   linhasAcoesPreferenciais,
-  nomeEfetivo,
+  nomeDaPonta,
   type LinhaAcaoPreferencial,
 } from '@/domain';
 import { Icon } from '@/components/Icon';
@@ -30,6 +30,7 @@ interface AcoesPreferenciaisBlocoProps {
 export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) {
   const edges = useCanvasStore((s) => s.edges);
   const nodes = useCanvasStore((s) => s.nodes);
+  const grupos = useCanvasStore((s) => s.grupos);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const addAcao = useCanvasStore((s) => s.addAcaoPreferencial);
   const updateAcao = useCanvasStore((s) => s.updateAcaoPreferencial);
@@ -113,7 +114,7 @@ export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) 
               key={chaveLinha(l)}
               linha={l}
               somenteLeitura={somenteLeitura}
-              nomeDestino={(id) => nomeEfetivo(nodes, id) || 'sem nome'}
+              nomeDestino={(id) => nomeDaPonta(nodes, grupos, id) || 'sem nome'}
               onMarcar={(id, ja) => updateAcao(node.id, id, { ja_criado: ja })}
               onRemover={(id) => removeAcao(node.id, id)}
               onVerAresta={(id) => setSelectedId(id)}

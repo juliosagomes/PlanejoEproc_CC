@@ -558,3 +558,21 @@ describe('atalhos (D-30)', () => {
     expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Aguardando prazo' });
   });
 });
+
+describe('aresta no grupo (D-31)', () => {
+  it('a ponta que é moldura aparece pelo rótulo do grupo', () => {
+    const aresta: Edge = {
+      id: 'e1',
+      source: 'n1',
+      target: 'g1',
+      data: {
+        kind: 'manual',
+        resumo: '',
+        observacao: '',
+        subitems: [{ id: 'x', categoria: 'Modelo', nome: 'Vista', ja_criado: false }],
+      },
+    };
+    const g = deriveChecklist([noLocalizador('n1', 'Minutar')], [aresta], [{ id: 'g1', rotulo: 'Cumprimento' }]);
+    expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Grupo "Cumprimento"' });
+  });
+});

@@ -11,7 +11,8 @@ export interface GrupoNodeData {
  * Moldura de grupo (decisoes.md#D-31). Arrastar pela moldura leva os membros —
  * isso é a store, ao receber a mudança de posição. Selecionada, ganha as alças
  * de redimensionar. Recolhida, vira um bloco com a contagem, e as setas dos
- * membros passam a chegar nas alças dela.
+ * membros passam a chegar nas alças dela. Aberta ou recolhida, a moldura também
+ * recebe e solta setas próprias: a aresta pode ligar direto ao grupo.
  */
 export function GrupoNode({ data, selected }: NodeProps<GrupoNodeData>) {
   const { grupo } = data;
@@ -53,9 +54,8 @@ export function GrupoNode({ data, selected }: NodeProps<GrupoNodeData>) {
           {n} localizador{n === 1 ? '' : 'es'}
         </div>
       )}
-      {/* Só recolhido as alças aparecem: é quando as setas dos membros chegam aqui. */}
-      <Handle type="target" position={Position.Left} isConnectable={false} className={cn(!grupo.recolhido && 'invisible')} />
-      <Handle type="source" position={Position.Right} isConnectable={false} className={cn(!grupo.recolhido && 'invisible')} />
+      <Handle type="target" position={Position.Left} />
+      <Handle type="source" position={Position.Right} />
     </div>
   );
 }

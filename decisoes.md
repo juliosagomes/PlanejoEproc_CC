@@ -1445,6 +1445,14 @@ menor ganha, mas não há hierarquia) pediria `grupoPai` e propagar o arrasto.
 Setas que chegam na moldura recolhida são só desenho; se um dia for útil
 "conectar ao grupo", é aí que um destino-grupo entraria no domínio da aresta.
 
+**Aresta no grupo (outubro/2026, a pedido do usuário).** A moldura ganhou alças
+de verdade, aberta ou recolhida: `source`/`target` da aresta podem ser o id de
+um grupo. Sem bump — o schema nunca conferiu que a ponta é nó. O nome da ponta
+vem de `nomeDaPonta` (`Grupo "rótulo"`), no painel da aresta, no checklist e na
+ATP manual. Desfazer o grupo, ou apagá-lo na seleção, leva junto as setas
+presas a ele; os localizadores ficam. Seta entre um membro e o próprio grupo
+some quando ele recolhe, como as internas.
+
 ---
 
 ## D-32 · Consultas salvas entram no catálogo só pelo nome
@@ -1566,6 +1574,13 @@ rótulo único como setores, e a fusão precisaria de regra própria. O caminho
 limpo é um campo no payload da sincronização, com o Apps Script mudando junto.
 Se os filtros das consultas salvas um dia forem legíveis (D-32), a lista de
 localizadores de cada fila deixa de ser declarada e passa a ser lida.
+
+**"Processos sem Movimentação" saiu das origens da fila (outubro/2026).** O
+usuário apontou que não é tela onde o setor trabalha. A fila nova oferece
+`ORIGENS_FILA_NOVA` (preferência de consulta, Relatório Geral, Área de Trabalho
+de Minutas, Lista de Processos por Localizador), e as consultas salvas dessa tela
+não viram sugestão de fila. A origem continua em `ORIGENS_FILA` e no schema, para
+fila já gravada com ela abrir; a coleta do D-32 não mudou.
 
 
 ---
