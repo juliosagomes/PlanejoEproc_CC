@@ -184,9 +184,9 @@ export function SetoresModal({ open, onClose }: SetoresModalProps) {
                       <div className="flex items-center gap-2">
                         <input
                           className="input mono text-center"
-                          style={{ width: 46, flexShrink: 0 }}
+                          style={{ width: 54, flexShrink: 0 }}
                           value={f.code}
-                          maxLength={2}
+                          maxLength={3}
                           aria-label={`Sigla de ${f.label}`}
                           onChange={(e) =>
                             atualizar(f.id, { code: e.target.value.toUpperCase() })

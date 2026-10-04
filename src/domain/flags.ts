@@ -26,7 +26,7 @@ export interface DefinicaoFlag {
    * não desfaz nenhuma marcação.
    */
   id: string;
-  /** 1–2 caracteres exibidos no chip. Não precisa ser único. */
+  /** 1–3 caracteres exibidos no chip. Não precisa ser único. */
   code: string;
   /** "Espera", "Setor de Cálculo", "Joana Silva". */
   label: string;
