@@ -549,7 +549,9 @@ body {
     display: grid;
     grid-template-columns: 22px 110px 1fr 28px;
     gap: 6px;
-    align-items: center;
+    /* Topo, e não centro: a descrição cresce com o texto, e checkbox, select e
+       botões precisam ficar na altura do nome, não flutuar no meio da linha. */
+    align-items: start;
     padding: 6px;
     border: 1px solid var(--borda);
     border-radius: 6px;
@@ -561,6 +563,22 @@ body {
   .subitem.created {
     background: var(--ok-suave);
     border-color: var(--ok-borda);
+  }
+  .subitem > .pj-check {
+    margin-top: 5px;
+  }
+  /* Descrição do recurso: uma linha vazia, cresce até seis com o texto. O app só
+     roda no Chrome (decisoes.md#D-15), que tem `field-sizing` desde a 123. */
+  .subitem-desc {
+    height: auto;
+    min-height: 22px;
+    max-height: calc(6 * 1.4em + 6px);
+    padding: 2px 6px;
+    font-size: 11px;
+    line-height: 1.4;
+    resize: none;
+    overflow-y: auto;
+    field-sizing: content;
   }
 
   /* ---------- Modal e scrim ---------- */

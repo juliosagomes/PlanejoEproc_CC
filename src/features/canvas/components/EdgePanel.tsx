@@ -263,9 +263,9 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                           })
                         }
                       />
-                      <input
-                        className="input text-texto-2"
-                        style={{ height: 22, padding: '2px 6px', fontSize: 11 }}
+                      <textarea
+                        className="input subitem-desc text-texto-2"
+                        rows={1}
                         placeholder="descrição (opcional)"
                         value={s.descricao ?? ''}
                         onChange={(e) => updateSub(i, { descricao: e.target.value })}

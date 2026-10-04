@@ -210,7 +210,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                             </div>
                             {(it.descricao || (it.kind !== 'node' && it.contexto)) && (
                               <div
-                                className="text-texto-3 mt-0.5"
+                                className="text-texto-3 mt-0.5 whitespace-pre-line"
                                 style={{ fontSize: 11.5, lineHeight: 1.4 }}
                               >
                                 {it.kind !== 'node' && it.contexto && (
@@ -324,7 +324,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                                   </div>
                                   {ch.descricao && (
                                     <div
-                                      className="text-texto-3 mt-px"
+                                      className="text-texto-3 mt-px whitespace-pre-line"
                                       style={{ fontSize: 11, lineHeight: 1.4 }}
                                     >
                                       {ch.descricao}
