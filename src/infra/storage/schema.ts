@@ -5,6 +5,8 @@ import {
   CATALOGO_UNIDADE_VERSION,
   CONJUNTOS_EVENTO_VERSION,
   CORES_FLAG,
+  ORIGENS_FILA,
+  PAINEL_VERSION,
   PREF_TIPOS,
   SCHEMA_VERSION,
   SETORES_VERSION,
@@ -28,6 +30,8 @@ import {
   type Localizador,
   type LocalizadorOrgao,
   type LocalizadorUnidade,
+  type OrigemFila,
+  type PainelUnidade,
   type Plano,
   type PrefRule,
   type SetoresUnidade,
@@ -86,6 +90,30 @@ export const SetoresUnidadeSchema = z.object({
   version: z.literal(SETORES_VERSION),
   itens: z.array(DefinicaoFlagSchema),
 }) satisfies z.ZodType<SetoresUnidade>;
+
+/**
+ * Painel da unidade (decisoes.md#D-33). Chave por escopo, como os setores. A
+ * origem é validada contra a lista do domínio: uma origem desconhecida não teria
+ * rótulo para mostrar.
+ */
+const ORIGENS = Object.keys(ORIGENS_FILA) as [OrigemFila, ...OrigemFila[]];
+
+export const PainelUnidadeSchema = z.object({
+  version: z.literal(PAINEL_VERSION),
+  filas: z.array(
+    z.object({
+      id: z.string(),
+      nome: z.string(),
+      origem: z.enum(ORIGENS),
+      setorId: z.string(),
+      grupoId: z.string().optional(),
+      localizadores: z.array(z.string()),
+      ja_criado: z.boolean(),
+    }),
+  ),
+  grupos: z.array(z.object({ id: z.string(), nome: z.string() })),
+  foraDasFilas: z.array(z.object({ nome: z.string(), motivo: z.string() })),
+}) satisfies z.ZodType<PainelUnidade>;
 
 /** Conjuntos de eventos criados pelo usuário (decisoes.md#D-29). Chave por escopo, como os setores. */
 export const ConjuntosEventoUnidadeSchema = z.object({

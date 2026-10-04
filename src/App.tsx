@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 
 import { somenteVisualizacao } from '@/domain';
-import { Header, type HeaderStats } from '@/components/Header';
+import { Header, type HeaderStats, type TelaEditor } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
@@ -17,6 +17,7 @@ import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
+import { PainelUnidade } from '@/features/painel/components/PainelUnidade';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { SetoresModal } from '@/features/setores/components/SetoresModal';
 import { useSetoresStore } from '@/features/setores/store';
@@ -99,6 +100,12 @@ function Editor() {
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
+  // Canvas do plano ou painel da unidade (decisoes.md#D-33). O ref serve ao
+  // atalho Delete, registrado uma vez só: com o painel na frente, a seleção do
+  // canvas continua existindo e não pode ser apagada às cegas.
+  const [tela, setTela] = useState<TelaEditor>('fluxo');
+  const telaRef = useRef(tela);
+  telaRef.current = tela;
 
   /* ==========================================================================
    * Tutorial (decisoes.md#D-20)
@@ -215,6 +222,7 @@ function Editor() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== 'Delete') return;
+      if (telaRef.current !== 'fluxo') return;
       if (useCanvasStore.getState().somenteLeitura) return;
       const t = e.target as HTMLElement | null;
       if (!t) return;
@@ -531,10 +539,14 @@ function Editor() {
         flowMode={flowMode}
         onFlowModeChange={setFlowMode}
         stats={stats}
+        tela={tela}
+        onTelaChange={setTela}
       />
 
       <div className="flex flex-1 min-h-0">
-        {sidebarVisivel && (
+        {tela === 'painel' && <PainelUnidade />}
+
+        {tela === 'fluxo' && sidebarVisivel && (
           <Sidebar
             onCreateNode={criarNoCentro}
             somenteLeitura={somenteLeitura}
@@ -548,6 +560,7 @@ function Editor() {
 
         {/* O provider envolve também o painel lateral: o atalho (D-30) leva a
             câmera até o localizador a partir de um botão do painel. */}
+        {tela === 'fluxo' && (
         <ReactFlowProvider>
         <FlowCanvas planoId={ativoId} />
 
@@ -570,6 +583,7 @@ function Editor() {
           {selectedGrupo && <GrupoPanel key={selectedGrupo.id} grupo={selectedGrupo} />}
         </aside>
         </ReactFlowProvider>
+        )}
       </div>
 
       <CatalogoOrgaoModal

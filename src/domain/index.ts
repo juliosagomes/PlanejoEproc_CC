@@ -11,3 +11,4 @@ export * from './catalogoOrgao';
 export * from './catalogoUnidade';
 export * from './anotacoesCatalogo';
 export * from './sessao';
+export * from './painel';

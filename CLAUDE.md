@@ -177,6 +177,13 @@ existem em nenhum outro arquivo do projeto:
   o plano continua gravando os eventos um a um (decisoes.md#D-29).
 - **Consulta salva** — filtro com nome salvo numa tela de relatório do Eproc (que
   o Eproc chama de preferência da tela). Coletada só pelo nome (decisoes.md#D-32).
+- **Fila de trabalho** — o que um setor abre no Eproc para saber o que fazer: uma
+  preferência de consulta ou uma consulta salva de relatório, com os
+  localizadores que ela olha. Mora no **painel da unidade**, que confere a
+  **cobertura** (todo localizador do setor numa fila, ou fora de propósito com
+  motivo). Não chamar de "consulta": é o termo do usuário (decisoes.md#D-33).
+- **Grupo de preferências** — agrupa só filas de **preferência de consulta**;
+  minuta e intimação em bloco não entram (decisoes.md#D-33).
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -308,6 +315,15 @@ opcionais, como no D-23:
   `CanvasState.grupos`, **fora** de `nodes`: o resto do app lê `nodes` como "os
   localizadores". O `ReactFlowProvider` envolve também o painel lateral.
 - Consultas salvas na sincronização (D-32).
+- Painel da unidade (D-33), em `features/painel/`: filas de trabalho por setor,
+  cobertura e grupos de preferências. Chave `painel` por silo, fora do plano; as
+  filas guardam localizadores **por nome**. O cabeçalho alterna "Fluxo | Painel
+  da unidade", e o atalho Delete fica desligado no painel.
+- `components/SugestoesInput.tsx` substitui o `<datalist>` em todo o app: o
+  Chrome o desenha escuro e sem estilo possível. Não volte a usar `<datalist>`.
+  As barras de rolagem são globais (`::-webkit-scrollbar` em `index.css`); a
+  classe `.scroll` não é mais necessária.
+- Sigla de setor com até 3 caracteres; a sugestão automática continua em 2.
 
 ## Regras de ouro
 

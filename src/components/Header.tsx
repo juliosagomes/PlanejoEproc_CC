@@ -55,12 +55,62 @@ export interface HeaderProps {
   flowMode: FlowMode;
   onFlowModeChange: (mode: FlowMode) => void;
   stats: HeaderStats;
+  /** O canvas do plano ou o painel da unidade (decisoes.md#D-33). */
+  tela: TelaEditor;
+  onTelaChange: (tela: TelaEditor) => void;
 }
+
+export type TelaEditor = 'fluxo' | 'painel';
 
 const FLOW_MODE_OPTIONS: ReadonlyArray<{ id: FlowMode; label: string }> = [
   { id: 'organic', label: 'Orgânico' },
   { id: 'sharp', label: 'Diagrama' },
 ];
+
+const TELA_OPTIONS: ReadonlyArray<{ id: TelaEditor; label: string }> = [
+  { id: 'fluxo', label: 'Fluxo' },
+  { id: 'painel', label: 'Painel da unidade' },
+];
+
+function Alternador<T extends string>({
+  rotulo,
+  opcoes,
+  valor,
+  onChange,
+}: {
+  rotulo: string;
+  opcoes: ReadonlyArray<{ id: T; label: string }>;
+  valor: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div
+      role="group"
+      aria-label={rotulo}
+      className="inline-flex p-0.5 rounded-md bg-superficie-2 border border-borda flex-shrink-0"
+    >
+      {opcoes.map((opt) => {
+        const ativo = valor === opt.id;
+        return (
+          <button
+            key={opt.id}
+            type="button"
+            onClick={() => onChange(opt.id)}
+            aria-pressed={ativo}
+            className={cn(
+              'px-2.5 py-0.5 text-[11.5px] font-medium rounded-[5px] border-0 cursor-pointer transition-all whitespace-nowrap',
+              ativo
+                ? 'bg-superficie text-texto shadow-sm ring-1 ring-borda'
+                : 'bg-transparent text-texto-2',
+            )}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 /**
  * Cabeçalho do app: marca + indicador de sessão + switcher de plano + nome
@@ -102,6 +152,8 @@ export function Header({
   flowMode,
   onFlowModeChange,
   stats,
+  tela,
+  onTelaChange,
 }: HeaderProps) {
   const emLotacao = sessao.tipo === 'lotacao';
   const podeEnviar = emLotacao && sessao.permissao === 'edicao';
@@ -164,31 +216,18 @@ export function Header({
 
       <div className="flex-1" />
 
-      <div
-        role="group"
-        aria-label="Modo de fluxo"
-        className="inline-flex p-0.5 rounded-md bg-superficie-2 border border-borda mr-2"
-      >
-        {FLOW_MODE_OPTIONS.map((opt) => {
-          const ativo = flowMode === opt.id;
-          return (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => onFlowModeChange(opt.id)}
-              aria-pressed={ativo}
-              className={cn(
-                'px-2.5 py-0.5 text-[11.5px] font-medium rounded-[5px] border-0 cursor-pointer transition-all',
-                ativo
-                  ? 'bg-superficie text-texto shadow-sm ring-1 ring-borda'
-                  : 'bg-transparent text-texto-2',
-              )}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
-      </div>
+      <Alternador rotulo="Tela" opcoes={TELA_OPTIONS} valor={tela} onChange={onTelaChange} />
+      {/* O traço das setas só existe no canvas. */}
+      {tela === 'fluxo' && (
+        <div className="mr-2">
+          <Alternador
+            rotulo="Modo de fluxo"
+            opcoes={FLOW_MODE_OPTIONS}
+            valor={flowMode}
+            onChange={onFlowModeChange}
+          />
+        </div>
+      )}
 
       {/* Informativo, não acionável: some primeiro quando a barra aperta, para
           o nome do plano e as ações manterem espaço utilizável. */}

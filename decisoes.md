@@ -1487,6 +1487,75 @@ do JSON em `infra/eproc/` daria os filtros, e daí o painel do localizador poder
 listar "consultas que olham para este localizador". O coletor já abre as telas
 certas; seria mais uma requisição por consulta, com pausa.
 
+---
+
+## D-33 · Painel da unidade: filas de trabalho por setor, e a cobertura dos localizadores
+
+**Decisão.** Uma segunda tela, alternada com o canvas no cabeçalho ("Fluxo |
+Painel da unidade"), planeja **como o trabalho chega a cada setor**. Cada setor
+tem **filas de trabalho** — o que ele abre no Eproc para saber o que fazer: uma
+preferência de consulta ou uma consulta salva numa das quatro telas de relatório
+(D-32). Cada fila diz quais localizadores olha, e a tela confere a
+**cobertura**: todo localizador do setor está em alguma fila ou foi deixado
+**fora de propósito**, com motivo. Uma segunda aba agrupa as filas de
+preferência em **grupos de preferências**. Tudo mora na **unidade**: chave
+`painel` por silo, como os setores (D-26). Sem bump de `SCHEMA_VERSION`, porque
+o plano não muda.
+
+**Por que.**
+
+- **O desenho do fluxo não respondia "quem vê o quê".** O canvas diz por onde o
+  processo passa; não diz se alguém o encontra quando ele para num localizador.
+  Localizador que nenhuma fila olha é processo esquecido, e é isso que a
+  cobertura acusa. A decisão de deixar um localizador de fora (arquivo, passagem
+  automática) é legítima, e por isso exige motivo em vez de sumir da conta.
+- **"Fila de trabalho", não "consulta".** O nome foi escolha do usuário, depois
+  de ver a demo. "Consulta salva" (D-32) continua sendo o termo do catálogo, e
+  "preferência de consulta" o tipo do Eproc; a fila é o papel que qualquer um
+  dos dois cumpre para o setor.
+- **Na unidade, não no plano.** Também escolha do usuário. As filas e os grupos
+  descrevem a vara, não um desenho; um plano novo ("como deveria ser") não
+  recomeça o painel do zero. Consequência: a fila guarda localizadores **por
+  nome**, não por id de nó — o mesmo localizador existe em vários planos com ids
+  diferentes. A comparação ignora maiúsculas, acentos e espaços (a mesma
+  normalização dos rótulos de setor).
+- **A cobertura olha todos os planos do silo**, com o ativo vivo, como o
+  inventário do `SetoresModal`. Os setores de um localizador são a união das
+  marcações dele em todos os planos. Atalhos (D-30) e nós sem nome não contam.
+- **Grupo só para preferência de consulta.** Preferências de minuta e de
+  intimação em bloco não entram: o grupo serve para organizar o que o servidor
+  abre para trabalhar. Consulta salva de relatório também não: ela fica na
+  própria tela do Eproc. Não há um grupo por setor obrigatório.
+- **O vínculo atual do Eproc não é importado.** A sincronização (D-16/D-32)
+  entra só como **sugestão de nome** ao criar a fila (preferências do tipo
+  `processo_movimento_consultar` e as consultas salvas da tela escolhida). Que
+  fila é de qual setor e de qual grupo é a unidade quem diz — o mesmo motivo do
+  D-16 para não gerar arestas.
+- **Nada vai ao checklist.** O selo "Planejada ↔ Já existe no Eproc" basta; o
+  usuário não quis as filas como tarefa.
+- **Tela enxuta, por pedido.** A demo tinha resumo em cartões, prévia do seletor
+  do Eproc, frases de explicação e uma matriz localizador × fila. Saiu tudo.
+
+**Custos assumidos.**
+
+- **Renomear um localizador no canvas desliga a fila dele.** O nome antigo
+  aparece riscado na fila ("Não está em nenhum plano"), e o localizador renomeado
+  aparece descoberto. É o preço de a fila não depender de um plano.
+- **O painel não viaja entre colegas.** Os setores se propagam pelo retrato
+  `Plano.flags` (D-26); o painel não tem retrato. Numa lotação, cada navegador
+  tem o seu.
+- **Setor apagado não apaga filas.** Elas aparecem em "Sem setor", com um
+  seletor para mover para outro setor — perder fila planejada por um clique em
+  outra tela seria pior que o resíduo.
+
+**O que precisaria mudar para evoluir.** Para o painel valer entre colegas da
+lotação, o caminho barato é o do D-26: um retrato do painel dentro do plano,
+absorvido por uma consolidação na entrada — com o problema de que filas não têm
+rótulo único como setores, e a fusão precisaria de regra própria. O caminho
+limpo é um campo no payload da sincronização, com o Apps Script mudando junto.
+Se os filtros das consultas salvas um dia forem legíveis (D-32), a lista de
+localizadores de cada fila deixa de ser declarada e passa a ser lida.
+
 
 
 1. Atribuir ID sequencial (`D-N`).
