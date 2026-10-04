@@ -1309,7 +1309,7 @@ já chegam no formato que um nó novo receberia.
 ## D-29 · Conjuntos de eventos: atalho de seleção e de leitura, não dado do plano
 
 **Decisão.** Onde a regra de ATP escolhe eventos — o gatilho "Por Evento" e os
-filtros de evento —, o seletor ganha **conjuntos**: 42 padrão, deduzidos da
+filtros de evento —, o seletor ganha **conjuntos**: 43 padrão, deduzidos da
 própria lista do Eproc e organizados em oito categorias, mais os que a unidade
 criar. O plano continua gravando a lista explícita de ids; o conjunto só ajuda a
 montá-la ("Selecionar todos", depois "Tirar" em Mera ciência) e a lê-la ("Todos
