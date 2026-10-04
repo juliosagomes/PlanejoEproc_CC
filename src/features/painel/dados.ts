@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import {
   ORIGENS_FILA,
+  ORIGENS_FILA_NOVA,
   localizadoresDaUnidade,
   type LocalizadorDaUnidade,
   type OrigemFila,
@@ -40,7 +41,7 @@ export interface SugestaoFila extends Sugestao {
 
 /**
  * Tudo o que a sincronização com a unidade trouxe e pode virar fila: as
- * consultas salvas das quatro telas de relatório (D-32) e as preferências de
+ * consultas salvas das telas de relatório que a fila oferece (D-32) e as preferências de
  * consulta. Cada uma diz de onde vem, e escolhê-la acerta o "Onde fica" — a
  * lista não depende de o usuário ter escolhido a origem antes.
  *
@@ -58,7 +59,9 @@ export function useSugestoesFila(): SugestaoFila[] {
       vistas.add(chave);
       itens.push({ valor, origem, detalhe: ORIGENS_FILA[origem] });
     };
-    for (const c of catalogo.consultasSalvas ?? []) por(c.nome, c.tela);
+    for (const c of catalogo.consultasSalvas ?? []) {
+      if (ORIGENS_FILA_NOVA.includes(c.tela)) por(c.nome, c.tela);
+    }
     for (const p of catalogo.preferencias ?? []) {
       if (p.detalhe === TIPO_PREFERENCIA_CONSULTA) por(p.nome, 'preferencia');
     }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ORIGENS_FILA, type GrupoPreferencias, type OrigemFila } from '@/domain';
+import { ORIGENS_FILA, ORIGENS_FILA_NOVA, type GrupoPreferencias, type OrigemFila } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { SugestoesInput } from '@/components/SugestoesInput';
 import { useSugestoesFila } from '../dados';
@@ -77,7 +77,7 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
             value={origem}
             onChange={(e) => setOrigem(e.target.value as OrigemFila)}
           >
-            {(Object.keys(ORIGENS_FILA) as OrigemFila[]).map((o) => (
+            {ORIGENS_FILA_NOVA.map((o) => (
               <option key={o} value={o}>
                 {ORIGENS_FILA[o]}
               </option>

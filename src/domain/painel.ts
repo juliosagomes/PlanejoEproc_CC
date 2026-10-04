@@ -27,6 +27,18 @@ export const ORIGENS_FILA: Record<OrigemFila, string> = {
   ...TELAS_CONSULTA,
 };
 
+/**
+ * As origens que a fila nova oferece. "Processos sem Movimentação" saiu a
+ * pedido do usuário: não é onde o setor trabalha no Eproc. Continua em
+ * `ORIGENS_FILA` para a fila já gravada com ela abrir e mostrar o rótulo.
+ */
+export const ORIGENS_FILA_NOVA: readonly OrigemFila[] = [
+  'preferencia',
+  'relatorioGeral',
+  'areaMinutas',
+  'processosPorLocalizador',
+];
+
 export interface FilaTrabalho {
   id: string;
   /** Como aparece no Eproc. */
