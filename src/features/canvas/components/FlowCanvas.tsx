@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react';
 import {
   Background,
   Controls,
@@ -6,11 +6,13 @@ import {
   MiniMap,
   ReactFlow,
   useReactFlow,
+  type Viewport,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
 import type { EdgeKind } from '@/domain';
 import { NEW_NODE_DATATYPE } from '@/components/Sidebar';
+import { loadCamera, saveCamera } from '@/infra/storage';
 import { cn } from '@/utils/cn';
 import { useCanvasStore } from '../store';
 import { LocalizadorNode } from './LocalizadorNode';
@@ -25,9 +27,21 @@ const corDoMarcador = (kind: EdgeKind | undefined): string => {
   return 'oklch(0.65 0.01 270)';
 };
 
-export function FlowCanvas() {
+interface FlowCanvasProps {
+  /** Plano aberto. A câmera é lembrada por plano (`infra/storage/cameras.ts`). */
+  planoId: string | null;
+}
+
+const ESPERA_SALVAR_CAMERA_MS = 300;
+/**
+ * O `fitView` só enquadra nós já medidos, e o plano recém-trocado ainda não foi
+ * desenhado no mesmo quadro em que o id muda.
+ */
+const ESPERA_MEDIR_NOS_MS = 60;
+
+export function FlowCanvas({ planoId }: FlowCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const { screenToFlowPosition } = useReactFlow();
+  const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
   const [arrastando, setArrastando] = useState(false);
 
   const nodes = useCanvasStore((s) => s.nodes);
@@ -40,6 +54,32 @@ export function FlowCanvas() {
   const onConnect = useCanvasStore((s) => s.onConnect);
   const setSelectedId = useCanvasStore((s) => s.setSelectedId);
   const createNode = useCanvasStore((s) => s.createNode);
+
+  // Trocar de plano não remonta o ReactFlow, e o `defaultViewport` só vale na
+  // montagem: sem isto o plano novo abria onde a câmera estava no anterior.
+  // Plano nunca aberto nesta máquina começa enquadrado.
+  useEffect(() => {
+    if (planoId === null) return;
+    const salva = loadCamera(planoId);
+    const t = window.setTimeout(() => {
+      if (salva) setViewport(salva);
+      else if (useCanvasStore.getState().nodes.length > 0) fitView({ padding: 0.2, maxZoom: 1 });
+      else setViewport({ x: 0, y: 0, zoom: 1 });
+    }, ESPERA_MEDIR_NOS_MS);
+    return () => window.clearTimeout(t);
+  }, [planoId, setViewport, fitView]);
+
+  const salvarCameraRef = useRef<number | undefined>(undefined);
+  useEffect(() => () => window.clearTimeout(salvarCameraRef.current), []);
+  const onMoveEnd = (_: unknown, viewport: Viewport) => {
+    if (planoId === null) return;
+    const id = planoId;
+    window.clearTimeout(salvarCameraRef.current);
+    salvarCameraRef.current = window.setTimeout(
+      () => saveCamera(id, viewport),
+      ESPERA_SALVAR_CAMERA_MS,
+    );
+  };
 
   /**
    * Realce por setor (decisoes.md#D-22): com o filtro ligado, o que não é do
@@ -152,6 +192,7 @@ export function FlowCanvas() {
         minZoom={0.4}
         maxZoom={1.8}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+        onMoveEnd={onMoveEnd}
       >
         <Background gap={20} size={1} color="var(--grade-ponto)" />
         <Controls showInteractive={false} position="bottom-left" />

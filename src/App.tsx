@@ -525,7 +525,7 @@ function Editor() {
         )}
 
         <ReactFlowProvider>
-          <FlowCanvas />
+          <FlowCanvas planoId={ativoId} />
         </ReactFlowProvider>
 
         <aside

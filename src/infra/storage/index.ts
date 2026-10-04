@@ -47,6 +47,7 @@ export {
   clearSetores,
 } from './setores';
 export { consolidarSetores } from './consolidarSetores';
+export { loadCamera, saveCamera, type Camera } from './cameras';
 export {
   ORDENS_PLANOS,
   getOrdemPlanos,

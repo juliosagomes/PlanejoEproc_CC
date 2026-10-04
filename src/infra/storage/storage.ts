@@ -1,6 +1,7 @@
 import { SCHEMA_VERSION, flagsPadrao, type Plano } from '@/domain';
 import { getStorage, type StorageLike } from '@/infra/plataforma/storageLike';
 import { activeKey, indexKey, isEscopoLocal, planKey } from './escopo';
+import { esquecerCamera, esquecerTodasCameras } from './cameras';
 import { PlanoSchema, PlansIndexSchema } from './schema';
 
 /* ============================================================================
@@ -545,6 +546,7 @@ export function excluirPlano(id: string): void {
   try {
     if (key !== null) c.storage.removeItem(key);
     writeIndex(c, novoIndex);
+    esquecerCamera(id);
 
     if (c.storage.getItem(c.activeK) === id) {
       const proximo = [...novoIndex].sort((a, b) =>
@@ -591,6 +593,7 @@ export function excluirTodosPlanos(): number {
   try {
     c.storage.removeItem(c.indexK);
     c.storage.removeItem(c.activeK);
+    esquecerTodasCameras();
   } catch (err) {
     console.warn('[storage] Falha ao limpar o índice de planos.', err);
   }
