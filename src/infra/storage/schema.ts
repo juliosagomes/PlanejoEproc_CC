@@ -270,6 +270,18 @@ const EdgeSchema = z.object({
 
 const FlowModeSchema = z.enum(['organic', 'sharp']);
 
+/** Moldura de grupo (decisoes.md#D-31). Medidas finitas: viram atributos de SVG/CSS. */
+const GrupoSchema = z.object({
+  id: z.string(),
+  rotulo: z.string(),
+  cor: CorFlagSchema,
+  position: z.object({ x: z.number().finite(), y: z.number().finite() }),
+  largura: z.number().positive().finite(),
+  altura: z.number().positive().finite(),
+  recolhido: z.boolean().optional(),
+  membros: z.array(z.string()),
+});
+
 const PlanoV4Schema = z.object({
   version: z.literal(SCHEMA_VERSION),
   planoNome: z.string(),
@@ -277,6 +289,7 @@ const PlanoV4Schema = z.object({
   flags: z.array(DefinicaoFlagSchema),
   nodes: z.array(LocalizadorSchema),
   edges: z.array(EdgeSchema),
+  grupos: z.array(GrupoSchema).optional(),
   exportedAt: z.string().optional(),
 }) satisfies z.ZodType<Plano>;
 

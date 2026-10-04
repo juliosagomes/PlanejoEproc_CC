@@ -11,9 +11,13 @@ import {
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import {
+  CORES_FLAG,
   SCHEMA_VERSION,
   alvoReal,
   flagsPadrao,
+  molduraEnvolvendo,
+  reagruparSoltos,
+  type GrupoLocalizadores,
   type AcaoPreferencialPlanejada,
   type AtpRule,
   type DefinicaoFlag,
@@ -28,6 +32,12 @@ import {
 import { flushPlataforma } from '@/infra/plataforma';
 import { criarSavePlanoDebounced, planoVazio } from '@/infra/storage';
 import { uid } from '@/utils/uid';
+import {
+  aplicarMudancasGrupos,
+  reagruparAposArrasto,
+  retanguloDoNo,
+  type GrupoFlow,
+} from './grupoMudancas';
 
 /* ============================================================================
  * STORE DO CANVAS
@@ -88,6 +98,13 @@ interface CanvasState {
    * escopo de armazenamento.
    */
   somenteLeitura: boolean;
+  /**
+   * Molduras de grupo (decisoes.md#D-31). Fora de `nodes` de propósito: o resto
+   * do app lê `nodes` como "os localizadores", e misturar molduras ali faria
+   * cada filtro precisar lembrar de pulá-las. O `FlowCanvas` junta as duas
+   * listas na hora de desenhar.
+   */
+  grupos: GrupoFlow[];
 }
 
 interface CanvasActions {
@@ -129,6 +146,16 @@ interface CanvasActions {
    * Devolve o id, ou `''` em visualização ou alvo inexistente.
    */
   criarAtalho: (alvoId: string) => string;
+
+  // Grupos (decisoes.md#D-31)
+  /** Cria uma moldura em volta dos nós e a seleciona. Devolve o id, ou `''`. */
+  criarGrupo: (nodeIds: string[]) => string;
+  atualizarGrupo: (
+    id: string,
+    patch: Partial<Pick<GrupoLocalizadores, 'rotulo' | 'cor' | 'recolhido'>>,
+  ) => void;
+  /** Desfaz a moldura; os localizadores ficam onde estão. */
+  removerGrupo: (id: string) => void;
 
   // Seleção múltipla (Card 7)
   /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
@@ -197,6 +224,7 @@ function planoParaFlow(plano: Plano): {
   edges: FlowEdge[];
   planoNome: string;
   flowMode: FlowMode;
+  grupos: GrupoFlow[];
 } {
   return {
     nodes: plano.nodes.map((n) => ({
@@ -216,6 +244,7 @@ function planoParaFlow(plano: Plano): {
     })),
     planoNome: plano.planoNome,
     flowMode: plano.flowMode,
+    grupos: plano.grupos ?? [],
   };
 }
 
@@ -238,6 +267,10 @@ function flowParaPlano(state: CanvasState): Plano {
       targetHandle: e.targetHandle ?? null,
       data: e.data ?? defaultEdgeData(),
     })),
+    // Ausente, e não `[]`, quando não há grupo: plano sem moldura não muda de forma.
+    ...(state.grupos.length > 0
+      ? { grupos: state.grupos.map(({ selected: _s, ...g }) => g) }
+      : {}),
   };
 }
 
@@ -262,11 +295,23 @@ function comSelecao<T extends { id: string; selected?: boolean }>(
   return itens.map((i) => (!!i.selected === ids.has(i.id) ? i : { ...i, selected: ids.has(i.id) }));
 }
 
-function unicoSelecionado(nodes: FlowNode[], edges: FlowEdge[]): string | null {
+/** Tira os ids de todo grupo, preservando a identidade dos grupos que não mudam. */
+function semMembros(grupos: GrupoFlow[], ids: ReadonlySet<string>): GrupoFlow[] {
+  return grupos.map((g) =>
+    g.membros.some((m) => ids.has(m)) ? { ...g, membros: g.membros.filter((m) => !ids.has(m)) } : g,
+  );
+}
+
+function unicoSelecionado(
+  nodes: FlowNode[],
+  edges: FlowEdge[],
+  grupos: GrupoFlow[] = [],
+): string | null {
   const ns = nodes.filter((n) => n.selected);
   const es = edges.filter((e) => e.selected);
-  if (ns.length + es.length !== 1) return null;
-  return ns[0]?.id ?? es[0]?.id ?? null;
+  const gs = grupos.filter((g) => g.selected);
+  if (ns.length + es.length + gs.length !== 1) return null;
+  return ns[0]?.id ?? es[0]?.id ?? gs[0]?.id ?? null;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -279,6 +324,7 @@ export const useCanvasStore = create<CanvasStore>()(
     flags: flagsPadrao(),
     filtroFlags: [],
     somenteLeitura: false,
+    grupos: [],
 
     // Em visualização, filtramos em vez de ignorar: `dimensions` e `select` são
     // o ReactFlow medindo e destacando o que já está na tela, e barrá-las
@@ -289,9 +335,19 @@ export const useCanvasStore = create<CanvasStore>()(
         : changes;
       if (efetivas.length === 0) return;
       set((s) => {
-        const nodes = applyNodeChanges(efetivas, s.nodes) as FlowNode[];
-        if (!efetivas.some((c) => c.type === 'select')) return { nodes };
-        return { nodes, selectedId: unicoSelecionado(nodes, s.edges) };
+        // As molduras chegam no mesmo fluxo que os localizadores; cada uma vai
+        // para o seu lado.
+        const idsGrupo = new Set(s.grupos.map((g) => g.id));
+        const deGrupo = efetivas.filter((c) => 'id' in c && idsGrupo.has(c.id));
+        const deNo = efetivas.filter((c) => !('id' in c && idsGrupo.has(c.id)));
+        let nodes = deNo.length > 0 ? (applyNodeChanges(deNo, s.nodes) as FlowNode[]) : s.nodes;
+        let grupos = s.grupos;
+        if (deGrupo.length > 0) ({ grupos, nodes } = aplicarMudancasGrupos(grupos, nodes, deGrupo));
+        grupos = reagruparAposArrasto(grupos, nodes, deNo);
+        if (!efetivas.some((c) => c.type === 'select' || c.type === 'remove')) {
+          return { nodes, grupos };
+        }
+        return { nodes, grupos, selectedId: unicoSelecionado(nodes, s.edges, grupos) };
       });
     },
 
@@ -303,7 +359,7 @@ export const useCanvasStore = create<CanvasStore>()(
       set((s) => {
         const edges = applyEdgeChanges(efetivas, s.edges) as FlowEdge[];
         if (!efetivas.some((c) => c.type === 'select')) return { edges };
-        return { edges, selectedId: unicoSelecionado(s.nodes, edges) };
+        return { edges, selectedId: unicoSelecionado(s.nodes, edges, s.grupos) };
       });
     },
 
@@ -325,14 +381,25 @@ export const useCanvasStore = create<CanvasStore>()(
     createNode: (position) => {
       if (get().somenteLeitura) return '';
       const id = uid('n');
-      set((s) => ({
-        nodes: [
-          ...comSelecao(s.nodes, new Set()),
-          { id, type: 'localizador', position, data: defaultLocalizadorData(), selected: true },
-        ],
-        edges: comSelecao(s.edges, new Set()),
-        selectedId: id,
-      }));
+      set((s) => {
+        const novo: FlowNode = {
+          id,
+          type: 'localizador',
+          position,
+          data: defaultLocalizadorData(),
+          selected: true,
+        };
+        return {
+          nodes: [...comSelecao(s.nodes, new Set()), novo],
+          edges: comSelecao(s.edges, new Set()),
+          // Nó criado dentro de uma moldura já nasce membro dela.
+          grupos: comSelecao(
+            reagruparSoltos(s.grupos, [retanguloDoNo(novo)]) as GrupoFlow[],
+            new Set(),
+          ),
+          selectedId: id,
+        };
+      });
       return id;
     },
 
@@ -371,7 +438,12 @@ export const useCanvasStore = create<CanvasStore>()(
 
     deleteNode: (id) => {
       if (get().somenteLeitura) return;
+      if (get().grupos.some((g) => g.id === id)) {
+        get().removerGrupo(id);
+        return;
+      }
       set((s) => ({
+        grupos: semMembros(s.grupos, new Set([id])),
         nodes: s.nodes.filter((n) => n.id !== id),
         edges: s.edges.filter((e) => e.source !== id && e.target !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
@@ -462,11 +534,53 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
+    criarGrupo: (nodeIds) => {
+      if (get().somenteLeitura) return '';
+      const alvo = new Set(nodeIds);
+      const membros = get().nodes.filter((n) => alvo.has(n.id));
+      const moldura = molduraEnvolvendo(membros.map(retanguloDoNo));
+      if (!moldura) return '';
+      const id = uid('g');
+      const cor = CORES_FLAG[get().grupos.length % CORES_FLAG.length] ?? CORES_FLAG[0];
+      const grupo: GrupoFlow = {
+        id,
+        rotulo: 'Novo grupo',
+        cor,
+        position: { x: moldura.x, y: moldura.y },
+        largura: moldura.largura,
+        altura: moldura.altura,
+        membros: membros.map((n) => n.id),
+        selected: true,
+      };
+      set((s) => ({
+        // Um localizador é membro de um grupo só: entrar neste o tira dos outros.
+        grupos: [...comSelecao(semMembros(s.grupos, alvo), new Set()), grupo],
+        nodes: comSelecao(s.nodes, new Set()),
+        edges: comSelecao(s.edges, new Set()),
+        selectedId: id,
+      }));
+      return id;
+    },
+
+    atualizarGrupo: (id, patch) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({ grupos: s.grupos.map((g) => (g.id === id ? { ...g, ...patch } : g)) }));
+    },
+
+    removerGrupo: (id) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        grupos: s.grupos.filter((g) => g.id !== id),
+        selectedId: s.selectedId === id ? null : s.selectedId,
+      }));
+    },
+
     deleteSelecao: () => {
       if (get().somenteLeitura) return;
       set((s) => {
         const nos = new Set(s.nodes.filter((n) => n.selected).map((n) => n.id));
         return {
+          grupos: semMembros(s.grupos.filter((g) => !g.selected), nos),
           nodes: s.nodes.filter((n) => !nos.has(n.id)),
           edges: s.edges.filter((e) => !e.selected && !nos.has(e.source) && !nos.has(e.target)),
           selectedId: null,
@@ -548,7 +662,12 @@ export const useCanvasStore = create<CanvasStore>()(
     setSelectedId: (id) =>
       set((s) => {
         const ids = new Set(id === null ? [] : [id]);
-        return { selectedId: id, nodes: comSelecao(s.nodes, ids), edges: comSelecao(s.edges, ids) };
+        return {
+          selectedId: id,
+          nodes: comSelecao(s.nodes, ids),
+          edges: comSelecao(s.edges, ids),
+          grupos: comSelecao(s.grupos, ids),
+        };
       }),
 
     setPlanoNome: (nome) => {
@@ -600,6 +719,7 @@ export const useCanvasStore = create<CanvasStore>()(
         edges: flow.edges,
         planoNome: flow.planoNome,
         flowMode: flow.flowMode,
+        grupos: flow.grupos,
         filtroFlags: [],
         selectedId: null,
       });
@@ -649,7 +769,7 @@ function mesmaListaPersistida(a: readonly object[], b: readonly object[]): boole
 }
 
 useCanvasStore.subscribe(
-  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags] as const,
+  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags, s.grupos] as const,
   () => {
     // Em visualização, o que sobra de mutação são as medições do ReactFlow e o
     // modo de desenho — nada que valha gravar, e gravar carimbaria
@@ -664,7 +784,8 @@ useCanvasStore.subscribe(
       mesmaListaPersistida(a[1], b[1]) &&
       a[2] === b[2] &&
       a[3] === b[3] &&
-      a[4] === b[4],
+      a[4] === b[4] &&
+      mesmaListaPersistida(a[5], b[5]),
   },
 );
 

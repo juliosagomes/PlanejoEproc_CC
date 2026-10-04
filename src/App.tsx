@@ -8,6 +8,7 @@ import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
 import { confirmarApagarSelecao } from '@/features/canvas/selecao';
+import { GrupoPanel } from '@/features/canvas/components/GrupoPanel';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
@@ -172,6 +173,11 @@ function Editor() {
     () => (selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null),
     [selectedId, nodes],
   );
+  const grupos = useCanvasStore((s) => s.grupos);
+  const selectedGrupo = useMemo(
+    () => (selectedId ? grupos.find((g) => g.id === selectedId) ?? null : null),
+    [selectedId, grupos],
+  );
   const selectedEdge = useMemo(
     () =>
       !selectedNode && selectedId
@@ -217,7 +223,8 @@ function Editor() {
       const store = useCanvasStore.getState();
       const nos = store.nodes.filter((n) => n.selected).length;
       const arestas = store.edges.filter((edge) => edge.selected).length;
-      if (nos + arestas > 1) {
+      const molduras = store.grupos.filter((g) => g.selected).length;
+      if (nos + arestas + molduras > 1) {
         e.preventDefault();
         if (confirmarApagarSelecao(nos, arestas)) store.deleteSelecao();
         return;
@@ -225,7 +232,8 @@ function Editor() {
       const id = store.selectedId;
       if (!id) return;
       e.preventDefault();
-      if (store.nodes.some((n) => n.id === id)) store.deleteNode(id);
+      if (store.grupos.some((g) => g.id === id)) store.removerGrupo(id);
+      else if (store.nodes.some((n) => n.id === id)) store.deleteNode(id);
       else if (store.edges.some((edge) => edge.id === id)) store.deleteEdge(id);
     };
     window.addEventListener('keydown', handler);
@@ -482,7 +490,7 @@ function Editor() {
     });
   };
 
-  const painelAberto = !!(selectedNode || selectedEdge);
+  const painelAberto = !!(selectedNode || selectedEdge || selectedGrupo);
 
   // `Editor` só é montado com sessão ativa (ver `App`), mas o seletor devolve
   // o tipo anulável — este guarda mantém o Header com prop não-anulável.
@@ -559,6 +567,7 @@ function Editor() {
             />
           )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}
+          {selectedGrupo && <GrupoPanel key={selectedGrupo.id} grupo={selectedGrupo} />}
         </aside>
         </ReactFlowProvider>
       </div>

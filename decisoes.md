@@ -1397,6 +1397,45 @@ caso do plano apagado.
 
 ---
 
+## D-31 · Grupos organizam o desenho, com membros explícitos e posição absoluta
+
+**Decisão.** `Plano.grupos?: GrupoLocalizadores[]` — molduras nomeadas e
+coloridas. Selecionar localizadores e "Agrupar" cria a moldura em volta deles;
+arrastar a moldura leva os membros; soltar um localizador dentro dela o torna
+membro, e fora, o tira; recolher troca os membros por um bloco "N localizadores",
+e as setas deles passam a chegar na moldura. Desfazer o grupo mantém os
+localizadores. Campo opcional, ausente quando não há grupo: sem bump.
+
+**Para organizar o desenho, não para dizer quem trabalha.** Isso é dos setores
+(D-22/D-26), que filtram em vez de agrupar. Por isso o grupo não aparece no
+checklist nem tem efeito no Eproc, que não conhece agrupamento de localizadores.
+
+**Sem `parentNode` do ReactFlow.** O ReactFlow agrupa com posição *relativa* ao
+pai, e isso faria o mesmo campo `position` mudar de significado conforme o nó
+está ou não num grupo — no domínio, no export e em todo cálculo de geometria
+(dobra da seta, atalho, alinhamento). As posições continuam absolutas, e a store
+aplica o deslocamento da moldura aos membros. O custo é tratar à mão as mudanças
+que o ReactFlow manda para o nó da moldura (`grupoMudancas.ts`): arrastar move
+os membros, redimensionar pelo canto não.
+
+**Membros explícitos, não geometria.** Grupo recolhido não tem onde "conter"
+ninguém, e o membro precisa continuar membro. A geometria só decide no momento
+em que um localizador é solto (o centro, e a menor moldura quando há uma dentro
+da outra). Um localizador é membro de um grupo só.
+
+**Fora de `nodes`.** A store guarda as molduras em `grupos`, não misturadas aos
+localizadores: todo o app lê `nodes` como "os localizadores", e cada filtro
+precisaria lembrar de pular molduras. O `FlowCanvas` junta as duas listas só na
+hora de desenhar, com as molduras atrás (zIndex negativo — o ReactFlow ergue o
+selecionado em 1000, e uma moldura erguida cobriria os membros).
+
+**O que precisaria mudar para evoluir.** Grupo dentro de grupo (hoje a moldura
+menor ganha, mas não há hierarquia) pediria `grupoPai` e propagar o arrasto.
+Setas que chegam na moldura recolhida são só desenho; se um dia for útil
+"conectar ao grupo", é aí que um destino-grupo entraria no domínio da aresta.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

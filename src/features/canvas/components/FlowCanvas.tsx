@@ -17,11 +17,19 @@ import { cn } from '@/utils/cn';
 import { acharGemeos } from '../gemeos';
 import { useIrParaNo } from '../irParaNo';
 import { useCanvasStore } from '../store';
+import { tamanhoNaTela } from '../grupoMudancas';
+import { GrupoNode } from './GrupoNode';
 import { LocalizadorNode } from './LocalizadorNode';
 import { PjEdge } from './PjEdge';
 import { SelecaoLoteBar } from './SelecaoLoteBar';
 
-const nodeTypes = { localizador: LocalizadorNode };
+const nodeTypes = { localizador: LocalizadorNode, grupo: GrupoNode };
+
+/**
+ * Molduras ficam atrás dos localizadores mesmo selecionadas: o ReactFlow soma
+ * 1000 ao zIndex do selecionado, e uma moldura erguida cobriria os membros.
+ */
+const Z_MOLDURA = -2000;
 const edgeTypes = { pj: PjEdge };
 
 const corDoMarcador = (kind: EdgeKind | undefined): string => {
@@ -56,6 +64,30 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
   const onConnect = useCanvasStore((s) => s.onConnect);
   const setSelectedId = useCanvasStore((s) => s.setSelectedId);
   const createNode = useCanvasStore((s) => s.createNode);
+  const grupos = useCanvasStore((s) => s.grupos);
+
+  // Membro de grupo recolhido some da tela; as setas dele passam a chegar na
+  // moldura (D-31).
+  const recolhidoDe = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const g of grupos) if (g.recolhido) for (const id of g.membros) m.set(id, g.id);
+    return m;
+  }, [grupos]);
+  const molduras = useMemo(
+    () =>
+      grupos.map((g) => ({
+        id: g.id,
+        type: 'grupo',
+        position: g.position,
+        data: { grupo: g },
+        selected: !!g.selected,
+        style: tamanhoNaTela(g),
+        zIndex: Z_MOLDURA,
+        draggable: !somenteLeitura,
+        connectable: false,
+      })),
+    [grupos, somenteLeitura],
+  );
 
   // Trocar de plano não remonta o ReactFlow, e o `defaultViewport` só vale na
   // montagem: sem isto o plano novo abria onde a câmera estava no anterior.
@@ -146,18 +178,26 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
           // não re-renderizar todos os nós a cada mudança da lista.
           ...(copias > 1 ? { data: { ...n.data, copias } } : {}),
           selected: !!n.selected,
+          hidden: recolhidoDe.has(n.id),
           className: cn(
             esmaecidos?.has(n.id) && 'pj-esmaecido',
             grupoHover?.has(n.id) && 'pj-gemeo',
           ) || undefined,
         };
       }),
-    [nodes, esmaecidos, gemeos, grupoHover],
+    [nodes, esmaecidos, gemeos, grupoHover, recolhidoDe],
   );
   const decoratedEdges = useMemo(
     () =>
-      edges.map((e) => ({
+      edges.map((e) => {
+        const origem = recolhidoDe.get(e.source);
+        const destino = recolhidoDe.get(e.target);
+        return {
         ...e,
+        ...(origem ? { source: origem, sourceHandle: null } : {}),
+        ...(destino ? { target: destino, targetHandle: null } : {}),
+        // Dentro do mesmo grupo recolhido a seta não tem onde aparecer.
+        hidden: origem !== undefined && origem === destino,
         selected: !!e.selected,
         className:
           esmaecidos?.has(e.source) || esmaecidos?.has(e.target)
@@ -169,8 +209,9 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
           width: 14,
           height: 14,
         },
-      })),
-    [edges, esmaecidos],
+      };
+      }),
+    [edges, esmaecidos, recolhidoDe],
   );
 
   const isEmpty = nodes.length === 0;
@@ -212,7 +253,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
       onDrop={onDrop}
     >
       <ReactFlow
-        nodes={decoratedNodes}
+        nodes={[...molduras, ...decoratedNodes]}
         edges={decoratedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -220,9 +261,14 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         // Selecionar é com o ReactFlow (clique, Ctrl+clique, Shift+arrastar em
         // caixa); a store deriva `selectedId` das marcas que ele escreve. Um
         // `onNodeClick` que selecionasse por conta própria desfaria o Ctrl+clique.
-        onNodeDoubleClick={(_, n) => {
+        onNodeDoubleClick={(e, n) => {
           const alvo = (n.data as { atalhoPara?: string } | undefined)?.atalhoPara;
           if (alvo) irParaNo(alvo);
+          // Dentro da moldura o fundo é dela, e o duplo clique que cria
+          // localizador no fundo do canvas criaria aqui também — já membro.
+          if (n.type === 'grupo' && !somenteLeitura && !(n.data as { grupo: { recolhido?: boolean } }).grupo.recolhido) {
+            createNode(screenToFlowPosition({ x: e.clientX, y: e.clientY }));
+          }
         }}
         onNodeMouseEnter={(_, n) => setHoverId(n.id)}
         onNodeMouseLeave={() => setHoverId(null)}

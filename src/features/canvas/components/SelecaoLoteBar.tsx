@@ -17,6 +17,7 @@ export function SelecaoLoteBar() {
   const moverNos = useCanvasStore((s) => s.moverNos);
   const marcarFlagEmLote = useCanvasStore((s) => s.marcarFlagEmLote);
   const deleteSelecao = useCanvasStore((s) => s.deleteSelecao);
+  const criarGrupo = useCanvasStore((s) => s.criarGrupo);
 
   const [setoresAberto, setSetoresAberto] = useState(false);
   const setoresRef = useRef<HTMLDivElement>(null);
@@ -62,6 +63,16 @@ export function SelecaoLoteBar() {
             Alinhar em linha
           </button>
         </>
+      )}
+      {!somenteLeitura && nos.length >= 1 && (
+        <button
+          type="button"
+          className="selecao-lote-btn"
+          onClick={() => criarGrupo(nos.map((n) => n.id))}
+          title="Cria uma moldura em volta dos localizadores selecionados"
+        >
+          Agrupar
+        </button>
       )}
       {!somenteLeitura && nos.length >= 1 && flags.length > 0 && (
         <div className="relative" ref={setoresRef}>

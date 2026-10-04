@@ -18,6 +18,7 @@ const ESTADO_INICIAL = {
   flags: [],
   filtroFlags: [],
   somenteLeitura: false,
+  grupos: [],
 };
 
 beforeEach(() => {
@@ -754,5 +755,88 @@ describe('atalhos (D-30)', () => {
     const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
     useCanvasStore.setState({ somenteLeitura: true });
     expect(useCanvasStore.getState().criarAtalho(a)).toBe('');
+  });
+});
+
+describe('grupos (D-31)', () => {
+  const montar = () => {
+    const s = useCanvasStore.getState();
+    const a = s.createNode({ x: 100, y: 100 });
+    const b = s.createNode({ x: 400, y: 100 });
+    const c = s.createNode({ x: 900, y: 600 });
+    const g = useCanvasStore.getState().criarGrupo([a, b]);
+    return { a, b, c, g };
+  };
+  const grupo = (id: string) => useCanvasStore.getState().grupos.find((x) => x.id === id)!;
+  const pos = (id: string) => useCanvasStore.getState().nodes.find((n) => n.id === id)!.position;
+
+  it('cria a moldura em volta dos nós, selecionada, com os dois como membros', () => {
+    const { a, b, g } = montar();
+    expect(grupo(g)).toMatchObject({ membros: [a, b], position: { x: 80, y: 60 }, selected: true });
+    expect(useCanvasStore.getState().selectedId).toBe(g);
+  });
+
+  it('arrastar a moldura leva os membros; redimensionar pelo canto não', () => {
+    const { a, b, c, g } = montar();
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: g, position: { x: 130, y: 90 }, dragging: true },
+    ]);
+    expect(pos(a)).toEqual({ x: 150, y: 130 });
+    expect(pos(b)).toEqual({ x: 450, y: 130 });
+    expect(pos(c)).toEqual({ x: 900, y: 600 });
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: g, position: { x: 100, y: 50 } },
+      { type: 'dimensions', id: g, dimensions: { width: 700, height: 400 }, resizing: true },
+    ]);
+    expect(pos(a)).toEqual({ x: 150, y: 130 });
+    expect(grupo(g)).toMatchObject({ position: { x: 100, y: 50 }, largura: 700, altura: 400 });
+  });
+
+  it('soltar um nó dentro da moldura o torna membro; fora, o tira', () => {
+    const { a, c, g } = montar();
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: c, position: { x: 200, y: 120 }, dragging: true },
+      { type: 'position', id: c, dragging: false },
+    ]);
+    expect(grupo(g).membros).toContain(c);
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: a, position: { x: 3000, y: 3000 }, dragging: true },
+      { type: 'position', id: a, dragging: false },
+    ]);
+    expect(grupo(g).membros).not.toContain(a);
+  });
+
+  it('apagar localizador o tira do grupo; desfazer o grupo mantém os localizadores', () => {
+    const { a, b, g } = montar();
+    useCanvasStore.getState().deleteNode(a);
+    expect(grupo(g).membros).toEqual([b]);
+    useCanvasStore.getState().removerGrupo(g);
+    expect(useCanvasStore.getState().grupos).toEqual([]);
+    expect(useCanvasStore.getState().nodes.map((n) => n.id)).toContain(b);
+  });
+
+  it('o plano leva os grupos sem a marca de seleção, e omite a chave quando não há grupo', () => {
+    expect('grupos' in useCanvasStore.getState().getPlano()).toBe(false);
+    const { g } = montar();
+    const plano = useCanvasStore.getState().getPlano();
+    expect(plano.grupos?.[0]?.id).toBe(g);
+    expect(JSON.stringify(plano.grupos)).not.toContain('selected');
+  });
+
+  it('um localizador é membro de um grupo só', () => {
+    const { a, g } = montar();
+    const g2 = useCanvasStore.getState().criarGrupo([a]);
+    expect(grupo(g).membros).not.toContain(a);
+    expect(grupo(g2).membros).toEqual([a]);
+  });
+
+  it('em visualização: seleciona, mas não arrasta nem cria', () => {
+    const { a, g } = montar();
+    useCanvasStore.setState({ somenteLeitura: true });
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: g, position: { x: 999, y: 999 }, dragging: true },
+    ]);
+    expect(pos(a)).toEqual({ x: 100, y: 100 });
+    expect(useCanvasStore.getState().criarGrupo([a])).toBe('');
   });
 });

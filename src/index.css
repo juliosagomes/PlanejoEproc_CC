@@ -583,6 +583,85 @@ body {
     border-color: var(--aviso);
   }
 
+  /* ---------- Moldura de grupo (D-31) ---------- */
+  .pj-grupo {
+    --g-h: 265;
+    --g-c: 0.06;
+    width: 100%;
+    height: 100%;
+    border: 1.5px solid oklch(0.82 var(--g-c) var(--g-h));
+    border-radius: 12px;
+    background: oklch(0.975 calc(var(--g-c) / 3) var(--g-h) / 0.6);
+    position: relative;
+  }
+  .pj-grupo.selected {
+    border-color: oklch(0.6 calc(var(--g-c) * 2) var(--g-h));
+    box-shadow: 0 0 0 1px oklch(0.6 calc(var(--g-c) * 2) var(--g-h));
+  }
+  .pj-grupo.recolhido {
+    background: oklch(0.95 calc(var(--g-c) / 2) var(--g-h));
+  }
+  .pj-grupo-rotulo {
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    max-width: calc(100% + 2px);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 6px;
+    border-radius: 12px 0 10px 0;
+    background: oklch(0.92 var(--g-c) var(--g-h));
+    color: oklch(0.38 calc(var(--g-c) * 2) var(--g-h));
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .pj-grupo-rotulo button {
+    border: 0;
+    background: none;
+    padding: 0 2px;
+    color: inherit;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .pj-grupo-resumo {
+    position: absolute;
+    left: 12px;
+    bottom: 10px;
+    font-size: 11.5px;
+    color: var(--texto-2);
+  }
+  .pj-grupo-resize-linha {
+    border-color: oklch(0.6 calc(var(--g-c) * 2) var(--g-h)) !important;
+  }
+  .pj-grupo-resize-alca {
+    width: 9px !important;
+    height: 9px !important;
+    border-radius: 2px;
+    background: var(--superficie) !important;
+    border: 1.5px solid oklch(0.6 calc(var(--g-c) * 2) var(--g-h)) !important;
+  }
+  .pj-grupo-cor-1 { --g-h: 265; --g-c: 0.06; }
+  .pj-grupo-cor-2 { --g-h: 75; --g-c: 0.07; }
+  .pj-grupo-cor-3 { --g-h: 25; --g-c: 0.07; }
+  .pj-grupo-cor-4 { --g-h: 250; --g-c: 0.03; }
+  .pj-grupo-cor-5 { --g-h: 155; --g-c: 0.06; }
+  .pj-grupo-cor-6 { --g-h: 330; --g-c: 0.06; }
+  .pj-grupo-cor-7 { --g-h: 195; --g-c: 0.06; }
+  .pj-grupo-cor-8 { --g-h: 120; --g-c: 0.06; }
+
+  .grupo-cor-amostra {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1.5px solid oklch(0.82 var(--g-c) var(--g-h));
+    background: oklch(0.93 var(--g-c) var(--g-h));
+    cursor: pointer;
+  }
+  .grupo-cor-amostra.ativa {
+    box-shadow: 0 0 0 2px var(--superficie), 0 0 0 4px oklch(0.6 calc(var(--g-c) * 2) var(--g-h));
+  }
+
   /* ---------- Barra de ações em lote (seleção múltipla) ---------- */
   .selecao-lote {
     position: absolute;

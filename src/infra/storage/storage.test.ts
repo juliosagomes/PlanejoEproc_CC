@@ -608,3 +608,21 @@ describe('isolamento entre silos', () => {
     expect(listPlanos()).toEqual([]);
   });
 });
+
+describe('grupos no plano (D-31)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    setEscopo({ tipo: 'local' });
+  });
+
+  it('round-trip preserva as molduras', () => {
+    const original: Plano = {
+      ...planoExemplo(),
+      grupos: [
+        { id: 'g1', rotulo: 'Gabinete', cor: 3, position: { x: 0, y: 0 }, largura: 400, altura: 200, membros: ['n1'], recolhido: true },
+      ],
+    };
+    savePlano(original);
+    expect(loadPlano().grupos).toEqual(original.grupos);
+  });
+});

@@ -6,6 +6,7 @@ export * from './edges';
 export * from './plano';
 export * from './acoesPreferenciais';
 export * from './atalhos';
+export * from './grupos';
 export * from './catalogoOrgao';
 export * from './catalogoUnidade';
 export * from './anotacoesCatalogo';

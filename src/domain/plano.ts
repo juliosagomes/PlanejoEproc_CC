@@ -1,5 +1,6 @@
 import type { DefinicaoFlag } from './flags';
 import type { EdgeData } from './edges';
+import type { GrupoLocalizadores } from './grupos';
 
 /**
  * Versão do schema do plano. Toda persistência (localStorage, JSON exportado)
@@ -118,5 +119,10 @@ export interface Plano {
   flags: DefinicaoFlag[];
   nodes: Localizador[];
   edges: Edge[];
+  /**
+   * Molduras que organizam o desenho (decisoes.md#D-31). Opcional e ausente
+   * quando não há nenhuma, para que plano sem grupo não mude de forma.
+   */
+  grupos?: GrupoLocalizadores[];
   exportedAt?: string;
 }

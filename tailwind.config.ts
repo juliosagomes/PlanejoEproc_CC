@@ -27,6 +27,16 @@ export default {
     'flag-cor-6',
     'flag-cor-7',
     'flag-cor-8',
+    // Mesma situação para a cor das molduras de grupo (decisoes.md#D-31), que
+    // reusam a paleta das flags.
+    'pj-grupo-cor-1',
+    'pj-grupo-cor-2',
+    'pj-grupo-cor-3',
+    'pj-grupo-cor-4',
+    'pj-grupo-cor-5',
+    'pj-grupo-cor-6',
+    'pj-grupo-cor-7',
+    'pj-grupo-cor-8',
   ],
   theme: {
     extend: {
