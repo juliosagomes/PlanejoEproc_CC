@@ -239,6 +239,9 @@ const LocalizadorDataSchema = z.object({
   ja_criado: z.boolean(),
   sistema: z.boolean().optional(),
   flags: z.array(z.string()),
+  acoesPreferenciais: z
+    .array(z.object({ id: z.string(), nome: z.string(), ja_criado: z.boolean() }))
+    .optional(),
 });
 
 const LocalizadorSchema = z.object({

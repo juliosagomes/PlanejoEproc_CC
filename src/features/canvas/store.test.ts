@@ -712,3 +712,25 @@ describe('seleção múltipla (Card 7)', () => {
     expect(JSON.stringify(plano)).not.toContain('selected');
   });
 });
+
+describe('ações preferenciais planejadas (D-28)', () => {
+  it('adiciona, marca e remove; a lista vazia some do nó', () => {
+    const s = useCanvasStore.getState();
+    const n = s.createNode({ x: 0, y: 0 });
+    const a = s.addAcaoPreferencial(n, 'Despacho — cite-se');
+    expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais).toEqual([
+      { id: a, nome: 'Despacho — cite-se', ja_criado: false },
+    ]);
+    useCanvasStore.getState().updateAcaoPreferencial(n, a, { ja_criado: true });
+    expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais?.[0]?.ja_criado).toBe(true);
+    useCanvasStore.getState().removeAcaoPreferencial(n, a);
+    expect('acoesPreferenciais' in (useCanvasStore.getState().nodes[0]?.data ?? {})).toBe(false);
+  });
+
+  it('em visualização não altera nada', () => {
+    const n = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    useCanvasStore.setState({ somenteLeitura: true });
+    expect(useCanvasStore.getState().addAcaoPreferencial(n, 'x')).toBe('');
+    expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais).toBeUndefined();
+  });
+});

@@ -4,6 +4,7 @@ export * from './subitems';
 export * from './regras';
 export * from './edges';
 export * from './plano';
+export * from './acoesPreferenciais';
 export * from './catalogoOrgao';
 export * from './catalogoUnidade';
 export * from './anotacoesCatalogo';

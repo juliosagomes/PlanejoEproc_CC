@@ -13,6 +13,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import {
   SCHEMA_VERSION,
   flagsPadrao,
+  type AcaoPreferencialPlanejada,
   type AtpRule,
   type DefinicaoFlag,
   type DobraAresta,
@@ -110,6 +111,16 @@ interface CanvasActions {
   setDobra: (id: string, dobra?: DobraAresta) => void;
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
+
+  // Ações preferenciais planejadas (decisoes.md#D-28)
+  /** Vincula uma preferência ao localizador. Devolve o id, ou `''` em visualização. */
+  addAcaoPreferencial: (nodeId: string, nome: string, ja_criado?: boolean) => string;
+  updateAcaoPreferencial: (
+    nodeId: string,
+    acaoId: string,
+    patch: Partial<Omit<AcaoPreferencialPlanejada, 'id'>>,
+  ) => void;
+  removeAcaoPreferencial: (nodeId: string, acaoId: string) => void;
 
   // Seleção múltipla (Card 7)
   /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
@@ -364,6 +375,59 @@ export const useCanvasStore = create<CanvasStore>()(
       set((s) => ({
         edges: s.edges.filter((e) => e.id !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
+      }));
+    },
+
+    addAcaoPreferencial: (nodeId, nome, ja_criado = false) => {
+      if (get().somenteLeitura) return '';
+      const id = uid('ap');
+      set((s) => ({
+        nodes: s.nodes.map((n) =>
+          n.id === nodeId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  acoesPreferenciais: [...(n.data.acoesPreferenciais ?? []), { id, nome, ja_criado }],
+                },
+              }
+            : n,
+        ),
+      }));
+      return id;
+    },
+
+    updateAcaoPreferencial: (nodeId, acaoId, patch) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) =>
+          n.id === nodeId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  acoesPreferenciais: (n.data.acoesPreferenciais ?? []).map((a) =>
+                    a.id === acaoId ? { ...a, ...patch } : a,
+                  ),
+                },
+              }
+            : n,
+        ),
+      }));
+    },
+
+    // A lista vazia some do nó em vez de ficar `[]`: o campo é opcional, e um
+    // plano que nunca planejou ação nenhuma não deveria mudar de forma por ter
+    // tido uma e apagado.
+    removeAcaoPreferencial: (nodeId, acaoId) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          if (n.id !== nodeId) return n;
+          const resto = (n.data.acoesPreferenciais ?? []).filter((a) => a.id !== acaoId);
+          const { acoesPreferenciais: _antigas, ...data } = n.data;
+          return { ...n, data: resto.length > 0 ? { ...data, acoesPreferenciais: resto } : data };
+        }),
       }));
     },
 

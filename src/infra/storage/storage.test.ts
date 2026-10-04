@@ -202,6 +202,21 @@ describe('savePlano lazy-cria entrada no índice', () => {
     expect(loadPlano().nodes[0]?.data.sistema).toBe(true);
   });
 
+  // Mesmo par, para as ações preferenciais planejadas (decisoes.md#D-28): sem o
+  // campo no schema, o Zod o descartaria em silêncio ao carregar.
+  it('round-trip preserva as ações preferenciais planejadas do nó', () => {
+    const original = planoExemplo();
+    const [no] = original.nodes;
+    if (!no) throw new Error('fixture sem nó');
+    no.data.acoesPreferenciais = [{ id: 'ap1', nome: 'Despacho — cite-se', ja_criado: false }];
+
+    savePlano(original);
+
+    expect(loadPlano().nodes[0]?.data.acoesPreferenciais).toEqual([
+      { id: 'ap1', nome: 'Despacho — cite-se', ja_criado: false },
+    ]);
+  });
+
   // `z.number()` sozinho barra NaN mas deixa passar Infinity, que viraria uma
   // coordenada de path inválida. Um plano assim é dado corrompido: vai para o
   // backup e o app abre vazio, em vez de desenhar lixo.

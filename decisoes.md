@@ -1261,6 +1261,51 @@ já adicionados.
 
 ---
 
+## D-28 · Ações preferenciais planejadas moram no nó, ao lado das do Eproc
+
+> **Emenda ao [D-16](#d-16--catálogo-lido-direto-da-unidade-no-eproc)**: o bloco
+> "Ações Preferenciais Vinculadas" deixa de ser só informação.
+
+**Decisão.** O localizador ganha `acoesPreferenciais?: AcaoPreferencialPlanejada[]`
+— preferências que o usuário quer que atuem ali, cada uma com ✓ de "já vinculada
+no Eproc". O bloco do painel junta três origens numa lista só, cada linha com
+selo próprio: **Eproc** (o que a sincronização trouxe, só leitura), **Planejada**
+(editável) e **ATP manual** (regras de ATP com tipo de controle "Por Ação Manual"
+nas arestas que **saem** do localizador, derivadas e nunca gravadas). Cada
+planejada vira tarefa numa seção nova do checklist, "Ação preferencial", com o
+localizador como contexto. Sem bump: o campo é opcional, como o `sistema` do
+D-23.
+
+**Por que no nó, e não na aresta.** O vínculo do Eproc é entre uma preferência e
+o localizador onde ela aparece para quem trabalha a fila. Até aqui a única forma
+de planejá-lo era desenhar uma aresta verde, que diz outra coisa — "esta
+preferência leva o processo de A para B". As duas continuam existindo e não se
+substituem: a preferência que *move* é recurso da aresta (D-24); a que está
+*disponível* no localizador é ação preferencial do nó.
+
+**Por que a ATP manual entra na mesma lista.** No Eproc, a regra "Por Ação
+Manual" só roda quando um servidor a aciona estando no localizador de origem — o
+próprio cadastro tem a opção "ação preferencial na capa". Para quem trabalha a
+fila ela é indistinguível de uma ação preferencial. Derivada, e não copiada, para
+que a regra tenha um lugar só: a aresta. Clicar na linha abre a transição.
+
+**Planejada e Eproc com o mesmo nome aparecem uma vez.** A régua é a da anotação
+de preferência (caixa e espaço, D-25). A linha fica como planejada, com selo
+"Planejada · Eproc", e vincular uma preferência que a sincronização já mostra
+nasce marcada — liga, nunca desliga, a mesma regra do `SubitemNomeInput`.
+
+**No checklist, mesmo localizador de sistema.** O nó de sistema fica fora do
+checklist (D-23), mas vincular uma preferência a ele é configuração que a
+secretaria faz. A ação entra.
+
+**O que precisaria mudar para evoluir.** Se a ação planejada precisar de mais do
+que nome — tipo, modelo usado —, o caminho é reaproveitar o `PrefRule` como
+detalhamento, como o recurso da aresta faz. E a mesma lista é o ponto de partida
+natural de um "rascunho como está" a partir da sincronização: as ações do Eproc
+já chegam no formato que um nó novo receberia.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

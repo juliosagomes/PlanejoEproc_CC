@@ -20,6 +20,8 @@ import { detalhesAtp } from './detalhesAtp';
  * Regras de agrupamento (portadas do BETA_2):
  *
  *  - Cada nó vira um item na seção "Localizador".
+ *  - Cada ação preferencial planejada vira um item em "Ação preferencial", com
+ *    o localizador como contexto (decisoes.md#D-28).
  *  - Para cada aresta, os recursos de categoria `Regra de ATP`/`Preferência`
  *    que têm `implantar: true` viram itens próprios na seção da sua categoria.
  *    Os campos preenchidos da regra (gatilho, ação programada, filtros,
@@ -33,12 +35,13 @@ import { detalhesAtp } from './detalhesAtp';
  *  - Categoria desconhecida (improvável) cai em "Outro".
  */
 
-export type ChecklistGroupKey = 'Localizador' | SubitemCategoria;
+export type ChecklistGroupKey = 'Localizador' | 'Ação preferencial' | SubitemCategoria;
 
 export const CHECKLIST_GROUP_ORDER: readonly ChecklistGroupKey[] = [
   'Localizador',
   'Texto padrão',
   'Preferência',
+  'Ação preferencial',
   'Modelo',
   'Regra de ATP',
   'Outro',
@@ -53,6 +56,18 @@ interface ItemBase {
 export interface NodeChecklistItem extends ItemBase {
   kind: 'node';
   nodeId: string;
+}
+
+/**
+ * Vínculo planejado de uma preferência a um localizador (decisoes.md#D-28). O
+ * contexto é o localizador: a mesma preferência planejada em dois lugares são
+ * duas tarefas.
+ */
+export interface AcaoChecklistItem extends ItemBase {
+  kind: 'acao';
+  nodeId: string;
+  acaoId: string;
+  contexto: string;
 }
 
 export interface SubChecklistItem extends ItemBase {
@@ -85,7 +100,11 @@ export interface RuleChecklistItem extends ItemBase {
   detalhes: ChecklistDetail[];
 }
 
-export type ChecklistItem = NodeChecklistItem | SubChecklistItem | RuleChecklistItem;
+export type ChecklistItem =
+  | NodeChecklistItem
+  | SubChecklistItem
+  | RuleChecklistItem
+  | AcaoChecklistItem;
 
 export type ChecklistGroups = Record<ChecklistGroupKey, ChecklistItem[]>;
 
@@ -101,6 +120,7 @@ function novoGrupo(): ChecklistGroups {
     Localizador: [],
     'Texto padrão': [],
     Preferência: [],
+    'Ação preferencial': [],
     Modelo: [],
     'Regra de ATP': [],
     Outro: [],
@@ -164,6 +184,22 @@ export function deriveChecklist(
       descricao: n.data.descricao,
       ja_criado: n.data.ja_criado,
     });
+  }
+
+  // Ao contrário do nó, a ação planejada entra mesmo em localizador de
+  // sistema: vincular uma preferência a um padrão do Eproc é configuração que a
+  // secretaria faz.
+  for (const n of nodes) {
+    for (const a of n.data.acoesPreferenciais ?? []) {
+      groups['Ação preferencial'].push({
+        kind: 'acao',
+        nodeId: n.id,
+        acaoId: a.id,
+        nome: nomeOuPlaceholder(a.nome),
+        contexto: nomeOuPlaceholder(n.data.nome),
+        ja_criado: a.ja_criado,
+      });
+    }
   }
 
   for (const e of edges) {
@@ -292,11 +328,7 @@ export function checklistToMarkdown(planoNome: string, groups: ChecklistGroups):
     for (const it of items) {
       const mark = it.ja_criado ? 'x' : ' ';
       const ctx =
-        it.kind === 'sub' && it.contexto
-          ? ` _(${it.contexto})_`
-          : it.kind === 'rule'
-            ? ` _(${it.contexto})_`
-            : '';
+        it.kind === 'node' || !it.contexto ? '' : ` _(${it.contexto})_`;
       const desc = it.descricao ? ` — ${it.descricao}` : '';
       linhas.push(`- [${mark}] ${it.nome}${ctx}${desc}`);
       if (it.kind === 'rule') {

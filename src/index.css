@@ -371,6 +371,66 @@ body {
     border-color: var(--aviso);
     box-shadow: 0 0 0 3px oklch(0.8 0.12 80 / 0.45);
   }
+  /* ---------- Ações preferenciais do localizador (D-28) ---------- */
+  .acao-pref {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 5px 0;
+    font-size: 11.5px;
+    color: var(--texto-2);
+    line-height: 1.35;
+  }
+  .acao-pref + .acao-pref {
+    border-top: 1px solid var(--borda);
+  }
+  .acao-pref > .pj-check {
+    margin-top: 1px;
+  }
+  .acao-pref-nome {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .acao-pref-tag {
+    flex-shrink: 0;
+    font-size: 9.5px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .acao-pref-tag.eproc {
+    background: var(--ok-suave);
+    color: oklch(0.42 0.12 155);
+    border: 1px solid var(--ok-borda);
+  }
+  .acao-pref-tag.planejada {
+    background: var(--superficie);
+    color: var(--texto-2);
+    border: 1px dashed var(--borda-forte);
+  }
+  .acao-pref-tag.atp {
+    background: var(--destaque-suave);
+    color: oklch(0.42 0.14 265);
+    border: 1px solid var(--destaque-borda);
+  }
+  .acao-pref-destino {
+    display: block;
+    margin-top: 1px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 10.5px;
+    color: var(--destaque);
+    cursor: pointer;
+    text-align: left;
+  }
+  .acao-pref-destino:hover {
+    text-decoration: underline;
+  }
+
   /* ---------- Barra de ações em lote (seleção múltipla) ---------- */
   .selecao-lote {
     position: absolute;

@@ -1,11 +1,11 @@
 import type { LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
-import { AcoesPreferenciaisNoEproc } from '@/features/catalogo/components/AcoesPreferenciaisNoEproc';
 import { LocalizadorNomeInput } from '@/features/catalogo/components/LocalizadorNomeInput';
 import { useSugestoesLocalizador } from '@/features/catalogo/sugestoes';
 import { cn } from '@/utils/cn';
 import { useCanvasStore, type FlowNode } from '../store';
+import { AcoesPreferenciaisBloco } from './AcoesPreferenciaisBloco';
 
 interface NodePanelProps {
   node: FlowNode;
@@ -81,7 +81,7 @@ export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
           )}
         </div>
 
-        <AcoesPreferenciaisNoEproc nome={data.nome} />
+        <AcoesPreferenciaisBloco node={node} />
 
         <div>
           <label className="label">Descrição</label>

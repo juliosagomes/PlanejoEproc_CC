@@ -493,3 +493,42 @@ describe('checklistToMarkdown', () => {
     expect(md).toContain('    L2');
   });
 });
+
+describe('ações preferenciais planejadas (D-28)', () => {
+  const comAcoes = (id: string, nome: string, sistema = false): Localizador => ({
+    id,
+    position: { x: 0, y: 0 },
+    data: {
+      nome,
+      ja_criado: true,
+      flags: [],
+      ...(sistema ? { sistema: true } : {}),
+      acoesPreferenciais: [
+        { id: `${id}-a1`, nome: 'Despacho — cite-se', ja_criado: true },
+        { id: `${id}-a2`, nome: 'Ofício INSS', ja_criado: false },
+      ],
+    },
+  });
+
+  it('cada vínculo planejado vira tarefa com o localizador de contexto', () => {
+    const g = deriveChecklist([comAcoes('n1', 'Minutar')], []);
+    expect(g['Ação preferencial']).toEqual([
+      { kind: 'acao', nodeId: 'n1', acaoId: 'n1-a1', nome: 'Despacho — cite-se', contexto: 'Minutar', ja_criado: true },
+      { kind: 'acao', nodeId: 'n1', acaoId: 'n1-a2', nome: 'Ofício INSS', contexto: 'Minutar', ja_criado: false },
+    ]);
+  });
+
+  it('entra mesmo quando o localizador é de sistema', () => {
+    const g = deriveChecklist([comAcoes('n1', 'CONCLUSOS', true)], []);
+    expect(g.Localizador).toEqual([]);
+    expect(g['Ação preferencial']).toHaveLength(2);
+  });
+
+  it('conta no progresso e sai no markdown com o contexto', () => {
+    const g = deriveChecklist([comAcoes('n1', 'Minutar')], []);
+    expect(contarChecklist(g)).toEqual({ total: 3, done: 2 });
+    const md = checklistToMarkdown('P', g);
+    expect(md).toContain('## Ação preferencial (1/2)');
+    expect(md).toContain('- [ ] Ofício INSS _(Minutar)_');
+  });
+});

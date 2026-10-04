@@ -182,7 +182,10 @@ function Editor() {
 
   const stats: HeaderStats = useMemo(() => {
     let pendentes = 0;
-    for (const n of nodes) if (!n.data.ja_criado) pendentes += 1;
+    for (const n of nodes) {
+      if (!n.data.ja_criado) pendentes += 1;
+      for (const a of n.data.acoesPreferenciais ?? []) if (!a.ja_criado) pendentes += 1;
+    }
     for (const e of edges) {
       const subs = e.data?.subitems ?? [];
       for (const s of subs) if (!s.ja_criado) pendentes += 1;

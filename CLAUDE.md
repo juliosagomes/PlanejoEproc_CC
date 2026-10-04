@@ -155,9 +155,11 @@ existem em nenhum outro arquivo do projeto:
   (`selTipoAcaoProgramada`, 24 tipos). Opcional, e pode ser mais de uma, em ordem.
 - **Localizador de Erro** — para onde o processo vai se a ação programada falhar.
 - **Unidade** — vara, cartório, gabinete.
-- **Ações Preferenciais Vinculadas** — rótulo do bloco que lista, no painel do
-  localizador, as preferências que já atuam nele segundo o Eproc. É informação,
-  não plano (`decisoes.md#D-16`).
+- **Ações Preferenciais Vinculadas** — rótulo do bloco, no painel do
+  localizador, que junta três origens com selo próprio: as que **já atuam** nele
+  segundo o Eproc (informação, `decisoes.md#D-16`), as **planejadas** pelo usuário
+  (`LocalizadorData.acoesPreferenciais`, viram tarefa no checklist) e as regras de
+  ATP **"Por Ação Manual"** que saem dele (derivadas da aresta) — decisoes.md#D-28.
 - **Flag do localizador** — marcador definido pelo usuário dizendo **quem
   trabalha** aquele localizador: um **setor** ("Setor de Cálculo") ou um
   **servidor** ("Joana Silva"), como a unidade preferir recortar. Os dois são o
