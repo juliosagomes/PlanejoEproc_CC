@@ -1436,7 +1436,58 @@ Setas que chegam na moldura recolhida são só desenho; se um dia for útil
 
 ---
 
-## Como adicionar uma decisão nova
+## D-32 · Consultas salvas entram no catálogo só pelo nome
+
+**Decisão.** A sincronização com a unidade ganha uma sétima fonte: as **consultas
+salvas** (o que o Eproc chama de preferência da tela) de quatro telas de
+relatório — Relatório Geral, Lista de Processos por Localizador, Área de
+Trabalho de Minutas e Processos sem Movimentação nos Últimos N Dias. Elas
+aparecem numa aba nova do catálogo ("Consultas salvas"), com a tela de origem, e
+aceitam a anotação do D-25. Só o **nome** é coletado; os filtros, não.
+`CatalogoUnidade.consultasSalvas` é opcional, sem versão nova.
+
+**Como cada tela entrega a lista** (levantado no eproc1g/TJMG em 03/10/2026,
+somente leitura):
+
+- As três primeiras usam o mesmo autocompletar das preferências
+  (`preferencia_auto_completar`), com `nomeAcao` igual à ação da tela. O `hash`
+  é **da tela**: o de uma devolve página de erro na outra, então o coletor abre
+  cada tela antes de perguntar.
+- O Relatório Geral usa um componente mais novo (`ui_preferencias`). A lista é um
+  POST de busca com termo vazio em `ui_preferencias/listar`, cuja URL não está
+  num link: vem no HTML dentro de um JSON, com a barra escapada. Resposta em JSON
+  (`Descricao`, `IdFormularioPersonalizacao`, `SinPreferenciaIndividual`).
+
+**Por que sem os filtros.** O card pedia, no fundo, saber que consulta olha para
+qual localizador ("contém localizador X", "sem movimentação há N dias"). Nenhuma
+das quatro telas entrega isso sem uma de duas coisas que a coleta não faz:
+
+- **Aplicar a consulta.** Nas telas antigas, escolher a preferência submete o
+  formulário de pesquisa: o servidor devolve a tela já filtrada — com a lista de
+  processos junto — e pode registrar a escolha como a última usada. Isso é
+  executar pesquisa e, possivelmente, escrever estado no Eproc.
+- **Avaliar código da página.** O conteúdo das preferências antigas está em
+  `arrCamposPersonalizados`, que só sai com `eval` — o mesmo bloqueio do item do
+  roadmap sobre o detalhe interno da preferência.
+
+O componente novo tem `ui_preferencias/buscar_request_por_id`, que devolve a
+pesquisa salva em JSON sem executá-la. Testado com as consultas desta unidade,
+devolveu lista vazia em todas as variações — o formulário traz um
+`conf_migracao`, e a leitura mais provável é que as consultas antigas não estão
+no formato novo. Fica registrado como o caminho a reexaminar.
+
+**O que se ganha mesmo assim.** O catálogo passa a responder "que relatórios a
+unidade usa?", e a anotação guarda o que cada um filtra — conhecimento que a
+secretaria tem e o Eproc não deixa ler. Os nomes podem conter nome de servidor;
+por isso as fixtures dos testes são sintéticas.
+
+**O que precisaria mudar para evoluir.** Se `buscar_request_por_id` passar a
+responder para as consultas da unidade (depois de migradas no Eproc), um parser
+do JSON em `infra/eproc/` daria os filtros, e daí o painel do localizador poderia
+listar "consultas que olham para este localizador". O coletor já abre as telas
+certas; seria mais uma requisição por consulta, com pausa.
+
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

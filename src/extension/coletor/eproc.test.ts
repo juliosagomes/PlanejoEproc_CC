@@ -309,3 +309,74 @@ describe('coletor do Eproc', () => {
     expect(r.catalogo.fontes.modelos?.status).toBe('semPermissao');
   });
 });
+
+describe('coletor do Eproc — consultas salvas (D-32)', () => {
+  const MENU_RELATORIOS = `
+    <div id="nav-profile"><span>FULANO DE TAL (x0000000)</span></div>
+    <select id="selInfraUnidades"><option selected title="Vara X - VX/GERENTE">VX/GERENTE</option></select>
+    <a href="controlador.php?acao=localizador_orgao_listar&hash=abc">Localizadores do Órgão</a>
+    <a aria-label="Lista de Processos por Localizador" href="controlador.php?acao=localizador_processos_lista&hash=def">Lista</a>
+    <a href="controlador.php?acao=minuta_area_trabalho&hash=ghi">Área de Trabalho</a>
+    <a href="controlador.php?acao=relatorio_geral_listar&hash=jkl">Relatório Geral</a>
+  `;
+  const HASH_LISTA = 'a'.repeat(32);
+  const HASH_MINUTAS = 'b'.repeat(32);
+  const tela = (hash: string) =>
+    `<html><body><script>var u = "controlador_ajax.php?acao_ajax=preferencia_auto_completar&hash=${hash}";</script></body></html>`;
+  const xml = (nome: string) => `<itens><item id="1|x" descricao="${nome}" complemento="N"/></itens>`;
+  // A URL do Relatório Geral vem escapada dentro de um JSON, como no Eproc.
+  const TELA_RG = `<html><body><script>UI.init({"url":"controlador.php?acao=ui_preferencias\/listar&acao_request=relatorio_geral_listar&hash=zzz"});</script></body></html>`;
+
+  it('coleta as quatro telas com a tela de cada fragmento no rótulo', async () => {
+    document.body.innerHTML = MENU_RELATORIOS;
+    const chamadas: { url: string; metodo: string }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((entrada: string, init?: RequestInit) => {
+        const url = String(entrada);
+        chamadas.push({ url, metodo: init?.method ?? 'GET' });
+        if (url.includes('acao_ajax=preferencia_auto_completar')) {
+          if (url.includes(`nomeAcao=localizador_processos_lista&hash=${HASH_LISTA}`)) {
+            return Promise.resolve(resposta(xml('Conclusos')));
+          }
+          if (url.includes(`nomeAcao=minuta_area_trabalho&hash=${HASH_MINUTAS}`)) {
+            return Promise.resolve(resposta(xml('Minutas urgentes')));
+          }
+          return Promise.resolve(resposta('<html>erro</html>'));
+        }
+        if (url.includes('ui_preferencias/listar')) {
+          return Promise.resolve(resposta(JSON.stringify([{ Descricao: 'Geral 1', IdFormularioPersonalizacao: '7', SinPreferenciaIndividual: 'N' }])));
+        }
+        if (url.includes('localizador_orgao_listar')) return Promise.resolve(resposta(PAGINA_ORGAO));
+        if (url.includes('localizador_processos_lista')) return Promise.resolve(resposta(tela(HASH_LISTA)));
+        if (url.includes('minuta_area_trabalho')) return Promise.resolve(resposta(tela(HASH_MINUTAS)));
+        if (url.includes('relatorio_geral_listar')) return Promise.resolve(resposta(TELA_RG));
+        return Promise.resolve(resposta('<html><body>tela desconhecida</body></html>'));
+      }),
+    );
+
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.consultasSalvas).toMatchObject({
+      status: 'ok',
+      rotulos: ['processosPorLocalizador', 'areaMinutas', 'relatorioGeral'],
+    });
+    // A lista do Relatório Geral é um POST de busca vazia, com a barra desescapada.
+    expect(chamadas.find((c) => c.url.includes('ui_preferencias/listar'))?.metodo).toBe('POST');
+
+    const r = aplicarColeta(coleta, '2026-10-03T00:00:00.000Z');
+    if (!r.ok) throw new Error(r.erro);
+    expect(r.ok && r.catalogo.consultasSalvas?.map((c) => `${c.tela}:${c.nome}`)).toEqual([
+      'processosPorLocalizador:Conclusos',
+      'areaMinutas:Minutas urgentes',
+      'relatorioGeral:Geral 1',
+    ]);
+    expect(r.ok && r.resumo.consultasSalvas).toBe(3);
+  });
+
+  it('sem nenhuma das telas no menu, a fonte é "sem permissão"', async () => {
+    document.body.innerHTML = MENU_RELATORIOS.replace(/<a href="controlador\.php\?acao=(minuta_area_trabalho|relatorio_geral_listar)[^<]*<\/a>/g, '').replace(/<a aria-label[^<]*<\/a>/, '');
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(resposta('<html><body></body></html>'))));
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.consultasSalvas?.status).toBe('semPermissao');
+  });
+});

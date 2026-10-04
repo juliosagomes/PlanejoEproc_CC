@@ -91,6 +91,33 @@ export interface AcaoPreferencialUnidade {
   preferencias: string[];
 }
 
+/**
+ * Telas do Eproc em que o usuário salva uma **consulta** — um conjunto de filtros
+ * com nome, que o Eproc chama de preferência da tela (decisoes.md#D-32). Os
+ * rótulos são os do menu.
+ */
+export const TELAS_CONSULTA = {
+  relatorioGeral: 'Relatório Geral',
+  processosPorLocalizador: 'Lista de Processos por Localizador',
+  areaMinutas: 'Área de Trabalho de Minutas',
+  semMovimentacao: 'Processos sem Movimentação nos Últimos N Dias',
+} as const;
+
+export type TelaConsulta = keyof typeof TELAS_CONSULTA;
+
+/**
+ * Uma consulta salva da unidade. Só o **nome**: os filtros dela não saem do
+ * Eproc sem aplicar a consulta (executar a pesquisa) ou avaliar código da
+ * página — as duas coisas a coleta não faz (D-32).
+ */
+export interface ConsultaSalvaUnidade {
+  tela: TelaConsulta;
+  nome: string;
+  eprocId?: string;
+  /** Relatório Geral distingue a consulta individual da compartilhada. */
+  individual?: boolean;
+}
+
 export type FonteStatus = 'ok' | 'vazio' | 'semPermissao' | 'falhou';
 
 export const FONTES = [
@@ -100,6 +127,7 @@ export const FONTES = [
   'modelos',
   'textosPadrao',
   'acoesPreferenciais',
+  'consultasSalvas',
 ] as const;
 
 export type FonteId = (typeof FONTES)[number];
@@ -131,5 +159,7 @@ export interface CatalogoUnidade {
   modelos?: ItemCatalogoUnidade[];
   textosPadrao?: ItemCatalogoUnidade[];
   acoesPreferenciais?: AcaoPreferencialUnidade[];
+  /** Opcional pelo mesmo motivo dos outros: catálogo gravado antes segue validando. */
+  consultasSalvas?: ConsultaSalvaUnidade[];
   fontes: Partial<Record<FonteId, FonteResultado>>;
 }

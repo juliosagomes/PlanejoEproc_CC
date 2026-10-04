@@ -9,6 +9,7 @@ const ROTULO_FONTE: Record<FonteId, string> = {
   modelos: 'Modelos',
   textosPadrao: 'Textos padrão',
   acoesPreferenciais: 'Ações preferenciais',
+  consultasSalvas: 'Consultas salvas',
 };
 
 interface SincronizacaoUnidadeModalProps {
@@ -100,6 +101,7 @@ export function SincronizacaoUnidadeModal({ onFechar }: SincronizacaoUnidadeModa
                 rotulo="Localizadores com ação preferencial"
                 valor={resumo.acoesPreferenciais}
               />
+              <Linha rotulo="Consultas salvas (relatórios)" valor={resumo.consultasSalvas} />
             </ul>
           ) : null}
 

@@ -527,5 +527,106 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
     };
   }
 
+  /* --- fonte 7: consultas salvas nas telas de relatório (D-32) ------------ */
+
+  try {
+    // Telas cujo componente de preferência é o mesmo autocompletar das
+    // preferências, com `nomeAcao` igual à ação da tela. O rótulo é a chave de
+    // `TELAS_CONSULTA` do domínio.
+    const TELAS_AUTOCOMPLETAR: ReadonlyArray<readonly [string, string]> = [
+      ['localizador_processos_lista', 'processosPorLocalizador'],
+      ['minuta_area_trabalho', 'areaMinutas'],
+      ['relatorio_sem_movimentacao_listar', 'semMovimentacao'],
+    ];
+    const fragmentos: string[] = [];
+    const rotulos: string[] = [];
+    let algumaTela = false;
+
+    for (const [acao, tela] of TELAS_AUTOCOMPLETAR) {
+      const link = acharLink(docMenu, (a) =>
+        new RegExp(`[?&]acao=${acao}(&|$|")`).test(a.getAttribute('href') ?? ''),
+      );
+      if (!link) continue;
+      algumaTela = true;
+      await dormir(PAUSA_MS);
+      const html = await lerHtml(await fetch(link.href, { credentials: 'same-origin' }));
+      // O hash do autocompletar é **da tela**: o de outra tela devolve uma
+      // página de erro, e não a lista (medido em 03/10/2026).
+      const hash = html.match(
+        /acao_ajax=preferencia_auto_completar[^"'<>]*?hash=([a-f0-9]{32})/i,
+      )?.[1];
+      if (!hash) continue;
+      await dormir(PAUSA_MS);
+      const res = await fetch(
+        `${base}controlador_ajax.php?acao_ajax=preferencia_auto_completar` +
+          `&nomeAcao=${acao}&hash=${hash}`,
+        { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } },
+      );
+      if (!res.ok) continue;
+      const xml = await lerHtml(res);
+      if (!xml.includes('<item')) continue;
+      fragmentos.push(xml);
+      rotulos.push(tela);
+    }
+
+    // O Relatório Geral usa o componente novo (`ui_preferencias`). A URL da
+    // lista não está num link: vem no HTML da tela dentro de um JSON, com a
+    // barra escapada (`ui_preferencias\/listar`). A lista é um POST de busca
+    // com termo vazio — só lê.
+    const linkRg = acharLink(docMenu, (a) =>
+      /[?&]acao=relatorio_geral_listar(&|$|")/.test(a.getAttribute('href') ?? ''),
+    );
+    if (linkRg) {
+      algumaTela = true;
+      await dormir(PAUSA_MS);
+      const html = await lerHtml(await fetch(linkRg.href, { credentials: 'same-origin' }));
+      const bruto = html.match(/controlador\.php\?acao=ui_preferencias\\?\/listar[^"'\s<>]*/)?.[0];
+      if (bruto) {
+        const caminho = bruto
+          .replace(/\\\//g, '/')
+          .replace(/\\u0026/g, '&')
+          .replace(/&amp;/g, '&');
+        await dormir(PAUSA_MS);
+        const res = await fetch(base + caminho, {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          body: 'q=',
+        });
+        if (res.ok) {
+          const json = await lerHtml(res);
+          if (json.trimStart().startsWith('[')) {
+            fragmentos.push(json);
+            rotulos.push('relatorioGeral');
+          }
+        }
+      }
+    }
+
+    fontes.consultasSalvas =
+      fragmentos.length > 0
+        ? { status: 'ok', fragmentos, rotulos }
+        : algumaTela
+          ? {
+              status: 'vazio',
+              fragmentos: [],
+              motivo: 'Nenhuma consulta salva nas telas de relatório deste perfil.',
+            }
+          : {
+              status: 'semPermissao',
+              fragmentos: [],
+              motivo: 'Nenhuma das telas de relatório está no menu deste perfil.',
+            };
+  } catch (err) {
+    fontes.consultasSalvas = {
+      status: 'falhou',
+      fragmentos: [],
+      motivo: err instanceof Error ? err.message : String(err),
+    };
+  }
+
   return { host, escopo: lerEscopo(), fontes };
 }

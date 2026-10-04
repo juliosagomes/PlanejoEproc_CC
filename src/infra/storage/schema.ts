@@ -17,6 +17,7 @@ import {
   type CatalogoOrgao,
   type CatalogoUnidade,
   type ConjuntosEventoUnidade,
+  type ConsultaSalvaUnidade,
   type DefinicaoFlag,
   type DobraAresta,
   type AtpRule,
@@ -630,6 +631,13 @@ const AcaoPreferencialUnidadeSchema = z.object({
   preferencias: z.array(z.string()),
 }) satisfies z.ZodType<AcaoPreferencialUnidade>;
 
+const ConsultaSalvaUnidadeSchema = z.object({
+  tela: z.enum(['relatorioGeral', 'processosPorLocalizador', 'areaMinutas', 'semMovimentacao']),
+  nome: z.string(),
+  eprocId: z.string().optional(),
+  individual: z.boolean().optional(),
+}) satisfies z.ZodType<ConsultaSalvaUnidade>;
+
 const FonteResultadoSchema = z.object({
   status: z.enum(['ok', 'vazio', 'semPermissao', 'falhou']),
   itens: z.number().optional(),
@@ -645,5 +653,6 @@ export const CatalogoUnidadeSchema = z.object({
   modelos: z.array(ItemCatalogoUnidadeSchema).optional(),
   textosPadrao: z.array(ItemCatalogoUnidadeSchema).optional(),
   acoesPreferenciais: z.array(AcaoPreferencialUnidadeSchema).optional(),
+  consultasSalvas: z.array(ConsultaSalvaUnidadeSchema).optional(),
   fontes: z.record(z.string(), FonteResultadoSchema),
 }) satisfies z.ZodType<CatalogoUnidade>;

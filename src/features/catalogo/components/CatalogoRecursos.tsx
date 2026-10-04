@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { TIPOS_RECURSO, type TipoRecurso } from '@/domain';
 import { semDecoracao } from '@/infra/eproc/nomeLocalizador';
 import { cn } from '@/utils/cn';
-import { useSugestoesLocalizador, useSugestoesSubitem } from '../sugestoes';
+import { useConsultasSalvas, useSugestoesLocalizador, useSugestoesSubitem } from '../sugestoes';
 import { buscarAnotacao, useAnotacoesStore } from '../storeAnotacoes';
 import { BadgeSistema } from './BadgeSistema';
 
@@ -23,6 +23,12 @@ interface Linha {
   detalhe?: string;
   sistema?: boolean;
   outroOrgao?: string;
+  /**
+   * Nome sob o qual a anotação é guardada, quando não é o próprio `nome`. A
+   * consulta salva leva a tela junto: duas telas podem ter consultas de mesmo
+   * nome, e são consultas diferentes.
+   */
+  chaveAnotacao?: string;
 }
 
 /** Aba vazia explica de onde o dado dela viria — o caminho não é o mesmo para os quatro. */
@@ -34,6 +40,8 @@ const ORIGEM: Record<TipoRecurso, string> = {
   Modelo: 'Vem de "Sincronizar com a unidade" — o XLS do órgão só traz localizadores.',
   'Texto padrão':
     'Vem de "Sincronizar com a unidade" — o XLS do órgão só traz localizadores.',
+  'Consulta salva':
+    'Vem de "Sincronizar com a unidade": as consultas salvas no Relatório Geral, na Lista de Processos por Localizador, na Área de Minutas e em Processos sem Movimentação. Só o nome vem — anote aqui o que cada uma filtra.',
 };
 
 const ROTULO_ABA: Record<TipoRecurso, string> = {
@@ -41,6 +49,7 @@ const ROTULO_ABA: Record<TipoRecurso, string> = {
   Preferência: 'Preferências',
   Modelo: 'Modelos',
   'Texto padrão': 'Textos padrão',
+  'Consulta salva': 'Consultas salvas',
 };
 
 export function CatalogoRecursos() {
@@ -51,6 +60,7 @@ export function CatalogoRecursos() {
   const preferencias = useSugestoesSubitem('Preferência');
   const modelos = useSugestoesSubitem('Modelo');
   const textosPadrao = useSugestoesSubitem('Texto padrão');
+  const consultas = useConsultasSalvas();
 
   const porTipo: Record<TipoRecurso, Linha[]> = useMemo(
     () => ({
@@ -62,8 +72,13 @@ export function CatalogoRecursos() {
       Preferência: preferencias,
       Modelo: modelos,
       'Texto padrão': textosPadrao,
+      'Consulta salva': consultas.map((c) => ({
+        nome: c.nome,
+        detalhe: c.individual ? `${c.tela} · individual` : c.tela,
+        chaveAnotacao: `${c.tela} · ${c.nome}`,
+      })),
     }),
-    [localizadores, preferencias, modelos, textosPadrao],
+    [localizadores, preferencias, modelos, textosPadrao, consultas],
   );
 
   const linhas = porTipo[aba];
@@ -121,7 +136,7 @@ export function CatalogoRecursos() {
           </div>
         ) : (
           filtradas.map((l) => (
-            <LinhaRecurso key={`${aba}-${l.nome}`} tipo={aba} linha={l} />
+            <LinhaRecurso key={`${aba}-${l.chaveAnotacao ?? l.nome}`} tipo={aba} linha={l} />
           ))
         )}
       </div>
@@ -138,7 +153,8 @@ function LinhaRecurso({ tipo, linha }: LinhaRecursoProps) {
   const [aberto, setAberto] = useState(false);
   const anotacoes = useAnotacoesStore((s) => s.anotacoes);
   const definir = useAnotacoesStore((s) => s.definir);
-  const anotacao = buscarAnotacao(anotacoes, tipo, linha.nome);
+  const chave = linha.chaveAnotacao ?? linha.nome;
+  const anotacao = buscarAnotacao(anotacoes, tipo, chave);
 
   // A anotação do usuário ganha da descrição do catálogo: ela foi escrita
   // depois, sabendo o que a outra dizia.
@@ -194,7 +210,7 @@ function LinhaRecurso({ tipo, linha }: LinhaRecursoProps) {
               className="input"
               placeholder={linha.descricao ?? 'O que este recurso é…'}
               value={anotacao?.descricao ?? ''}
-              onChange={(e) => definir(tipo, linha.nome, { descricao: e.target.value })}
+              onChange={(e) => definir(tipo, chave, { descricao: e.target.value })}
             />
           </div>
           <div>
@@ -204,7 +220,7 @@ function LinhaRecurso({ tipo, linha }: LinhaRecursoProps) {
               rows={3}
               placeholder="Quando usar, o que preencher, com o que não confundir…"
               value={anotacao?.orientacoes ?? ''}
-              onChange={(e) => definir(tipo, linha.nome, { orientacoes: e.target.value })}
+              onChange={(e) => definir(tipo, chave, { orientacoes: e.target.value })}
             />
           </div>
           <div className="text-[10.5px] text-texto-3 leading-snug">

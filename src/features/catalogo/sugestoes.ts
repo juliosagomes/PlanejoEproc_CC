@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import type {
-  ItemCatalogoUnidade,
-  LocalizadorOrgao,
-  LocalizadorUnidade,
-  SubitemCategoria,
+import {
+  TELAS_CONSULTA,
+  type ItemCatalogoUnidade,
+  type LocalizadorOrgao,
+  type LocalizadorUnidade,
+  type SubitemCategoria,
 } from '@/domain';
 import { semDecoracao } from '@/infra/eproc/nomeLocalizador';
 import { selectItens, useCatalogoStore } from './store';
@@ -139,4 +140,26 @@ export function useSugestoesSubitem(categoria: SubitemCategoria): SugestaoSubite
         return proprio !== 0 ? proprio : a.nome.localeCompare(b.nome, 'pt-BR');
       });
   }, [catalogo, categoria]);
+}
+
+export interface ConsultaSalvaLinha {
+  nome: string;
+  tela: string;
+  individual?: boolean;
+}
+
+/** Consultas salvas da unidade (decisoes.md#D-32), por tela e depois por nome. */
+export function useConsultasSalvas(): ConsultaSalvaLinha[] {
+  const catalogo = useUnidadeStore((s) => s.catalogo);
+  return useMemo(
+    () =>
+      (catalogo?.consultasSalvas ?? [])
+        .map((c) => ({
+          nome: c.nome,
+          tela: TELAS_CONSULTA[c.tela],
+          ...(c.individual !== undefined ? { individual: c.individual } : {}),
+        }))
+        .sort((a, b) => a.tela.localeCompare(b.tela, 'pt-BR') || a.nome.localeCompare(b.nome, 'pt-BR')),
+    [catalogo],
+  );
 }

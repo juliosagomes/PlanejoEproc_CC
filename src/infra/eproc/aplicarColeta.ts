@@ -1,6 +1,7 @@
 import type {
   AcaoPreferencialUnidade,
   CatalogoUnidade,
+  ConsultaSalvaUnidade,
   FonteId,
   FonteResultado,
   ItemCatalogoUnidade,
@@ -12,6 +13,7 @@ import { semDecoracao } from './nomeLocalizador';
 import { parseAcaoPreferencial } from './parseAcaoPreferencial';
 import { parseModeloPadrao, parseTextoPadrao } from './parseListasSimples';
 import { parseLocalizadorOrgao } from './parseLocalizadorOrgao';
+import { montarConsultasSalvas } from './parseConsultasSalvas';
 import { montarPreferencias, parsePreferenciasXml } from './parsePreferencias';
 import { parseSelectLocalizadores } from './parseSelectLocalizadores';
 import type { ColetaUnidade, FonteBruta } from './tipos';
@@ -38,6 +40,8 @@ export interface ResumoColeta {
   preferencias: number;
   /** Localizadores que já têm ao menos uma ação preferencial no Eproc. */
   acoesPreferenciais: number;
+  /** Consultas salvas nas telas de relatório (decisoes.md#D-32). */
+  consultasSalvas: number;
 }
 
 export type ResultadoColeta =
@@ -124,6 +128,7 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
   const textosPadrao = parseAcessoria(coleta, 'textosPadrao', parseTextoPadrao, fontes);
   const preferencias = aplicarPreferencias(coleta, fontes);
   const acoesPreferenciais = aplicarAcoesPreferenciais(coleta, fontes);
+  const consultasSalvas = aplicarConsultasSalvas(coleta, fontes);
 
   return {
     ok: true,
@@ -135,6 +140,7 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
       ...(textosPadrao.length > 0 ? { textosPadrao } : {}),
       ...(preferencias.length > 0 ? { preferencias } : {}),
       ...(acoesPreferenciais.length > 0 ? { acoesPreferenciais } : {}),
+      ...(consultasSalvas.length > 0 ? { consultasSalvas } : {}),
       ...(agora ? { agora } : {}),
     }),
     resumo: {
@@ -148,6 +154,7 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
       textosPadrao: textosPadrao.length,
       preferencias: preferencias.length,
       acoesPreferenciais: acoesPreferenciais.length,
+      consultasSalvas: consultasSalvas.length,
     },
   };
 }
@@ -176,6 +183,30 @@ function aplicarPreferencias(
     return itens;
   } catch (err) {
     fontes.preferencias = {
+      status: 'falhou',
+      itens: 0,
+      motivo: err instanceof Error ? err.message : String(err),
+    };
+    return [];
+  }
+}
+
+/** Consultas salvas: a tela de cada fragmento vem em `rotulos`, como nas preferências. */
+function aplicarConsultasSalvas(
+  coleta: ColetaUnidade,
+  fontes: Partial<Record<FonteId, FonteResultado>>,
+): ConsultaSalvaUnidade[] {
+  const bruta = coleta.fontes.consultasSalvas;
+  if (!bruta || bruta.status !== 'ok') {
+    if (bruta) fontes.consultasSalvas = resultadoDeFonte(bruta, 0);
+    return [];
+  }
+  try {
+    const itens = montarConsultasSalvas(bruta.fragmentos, bruta.rotulos ?? []);
+    fontes.consultasSalvas = resultadoDeFonte(bruta, itens.length);
+    return itens;
+  } catch (err) {
+    fontes.consultasSalvas = {
       status: 'falhou',
       itens: 0,
       motivo: err instanceof Error ? err.message : String(err),

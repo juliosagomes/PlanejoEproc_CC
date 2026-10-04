@@ -169,6 +169,14 @@ existem em nenhum outro arquivo do projeto:
   plano exportado ou publicado, e é por ele que a lista se propaga entre colegas.
   Unidade nova nasce com `E` Espera e `F` Fixo de fluxo, e o usuário edita à
   vontade (decisoes.md#D-22).
+- **Atalho** — nó que representa outro localizador do mesmo plano, para evitar
+  setas longas; não tem nome próprio nem entra no checklist (decisoes.md#D-30).
+- **Grupo** — moldura que organiza o desenho; não é setor, não vai ao Eproc nem
+  ao checklist (decisoes.md#D-31).
+- **Conjunto de eventos** — atalho para selecionar e ler eventos da regra de ATP;
+  o plano continua gravando os eventos um a um (decisoes.md#D-29).
+- **Consulta salva** — filtro com nome salvo numa tela de relatório do Eproc (que
+  o Eproc chama de preferência da tela). Coletada só pelo nome (decisoes.md#D-32).
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -200,6 +208,9 @@ Os JSONs originais ficam em `./listas_json/` na raiz. Vão para `src/data/` **s�
      avaliar `arrCamposPersonalizados` no MAIN world, ou seja `eval` — proibido
      pelo critério de "pronto" nº 7.
    - **ATPs cadastradas** (`automatizar_localizadores`).
+   - **Filtros das consultas salvas** nas telas de relatório. Os nomes já são
+     coletados (decisoes.md#D-32); os filtros só sairiam aplicando a consulta ou
+     com `eval`.
    - **Gerar arestas** a partir das ações preferenciais coletadas. Os vínculos já
      são sincronizados e aparecem como **informação** no painel do localizador
      ("Ações Preferenciais Vinculadas"). Convertê-los em arestas do plano é outra
@@ -278,6 +289,25 @@ Os JSONs originais ficam em `./listas_json/` na raiz. Vão para `src/data/` **s�
   (decisoes.md#D-27): domínio em `domain/atp/`, modal em
   `features/canvas/components/detalhe/`. Trouxe a `SCHEMA_VERSION = 4` e a
   terceira migração.
+
+### Cards de ideias (outubro/2026)
+
+Análise em `ideias/analise-cards.md`. Todos sem bump de schema — campos novos
+opcionais, como no D-23:
+
+- Descrição do recurso quebra linha; planos em ordem recente ou A–Z; câmera
+  lembrada por plano (`infra/storage/cameras.ts`, chave de UI por silo).
+- Cópias do mesmo localizador acendem juntas no hover (`features/canvas/gemeos.ts`).
+- Seleção múltipla: a verdade é o `selected` do ReactFlow nos nós e arestas;
+  `selectedId` é derivado. A assinatura de persistência ignora os campos de tela
+  (`CAMPOS_DE_TELA` em `features/canvas/store.ts`) — sem isso todo clique
+  regravaria o plano.
+- Ações preferenciais planejadas e ATP manual no painel do nó (D-28).
+- Conjuntos de eventos na regra de ATP (D-29), em `features/eventos/`.
+- Atalho de localizador (D-30) e grupos (D-31). As molduras ficam em
+  `CanvasState.grupos`, **fora** de `nodes`: o resto do app lê `nodes` como "os
+  localizadores". O `ReactFlowProvider` envolve também o painel lateral.
+- Consultas salvas na sincronização (D-32).
 
 ## Regras de ouro
 

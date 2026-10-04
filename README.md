@@ -330,7 +330,7 @@ mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
 ## Documentação relacionada
 
 - **`CLAUDE.md`** — guia de stack, arquitetura, glossário de domínio, padrões de código e regras de ouro. Lido por Claude e útil para qualquer dev novo no projeto.
-- **`decisoes.md`** — registro de decisões deliberadas (D-1: assunto livre; D-2: filtros como subset; D-3 e D-4: substituídos pelo D-27; D-8: backend Sheets+Drive; D-9: sessão por lotação; D-11: extensão como alvo principal; D-12: espelho síncrono do `chrome.storage`; D-13: sync de fundo só-pull; D-14: códigos via `chrome.storage.sync`; D-15: alvo único; D-27: a regra de ATP espelha a tela de cadastro do Eproc).
+- **`decisoes.md`** — registro de decisões deliberadas (D-1: assunto livre; D-2: filtros como subset; D-3 e D-4: substituídos pelo D-27; D-8: backend Sheets+Drive; D-9: sessão por lotação; D-11: extensão como alvo principal; D-12: espelho síncrono do `chrome.storage`; D-13: sync de fundo só-pull; D-14: códigos via `chrome.storage.sync`; D-15: alvo único; D-27: a regra de ATP espelha a tela de cadastro do Eproc; D-28 a D-32: ações preferenciais planejadas, conjuntos de eventos, atalhos, grupos e consultas salvas).
 - **`apps-script/README.md`** — deploy e republicação do backend de sincronização.
 - **`listas_json/`** — referência completa dos 48 JSONs do Eproc.
 
