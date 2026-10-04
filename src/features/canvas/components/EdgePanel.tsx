@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import {
+  FLOW_MODE_DESENHO,
   KIND_CATEGORIA,
   KIND_LABELS,
   SUBITEM_CATS,
@@ -34,7 +35,6 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   const updateEdge = useCanvasStore((s) => s.updateEdge);
   const deleteEdge = useCanvasStore((s) => s.deleteEdge);
   const setDobra = useCanvasStore((s) => s.setDobra);
-  const flowMode = useCanvasStore((s) => s.flowMode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   // As pontas da aresta são a origem e o destino da regra de ATP: o modal de
   // detalhamento as mostra em vez de pedi-las de novo.
@@ -310,7 +310,7 @@ export function EdgePanel({ edge }: EdgePanelProps) {
           {/* Só aparece quando há o que restaurar. O gesto de reset é o duplo
               clique na alça; este botão é a descoberta dele — sem ele, quem
               arrastou a dobra por engano não tem como saber que dá para voltar. */}
-          {flowMode === 'sharp' && temDobraManual(data.dobra) && (
+          {FLOW_MODE_DESENHO === 'sharp' && temDobraManual(data.dobra) && (
             <button
               type="button"
               className="btn btn-sm w-full justify-center"

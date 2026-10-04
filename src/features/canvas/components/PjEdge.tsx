@@ -1,7 +1,7 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { getBezierPath, getSmoothStepPath, useReactFlow, type EdgeProps } from 'reactflow';
-import type { DobraAresta, EdgeData, EdgeKind } from '@/domain';
+import { FLOW_MODE_DESENHO, type DobraAresta, type EdgeData, type EdgeKind } from '@/domain';
 import { cn } from '@/utils/cn';
 import { useCanvasStore } from '../store';
 import {
@@ -90,10 +90,6 @@ export function PjEdge({
   const [hovered, setHovered] = useState(false);
   const { flowToScreenPosition, getZoom } = useReactFlow();
 
-  // Lido da store, e não mais de `document.body.dataset.flowMode`: a alça
-  // precisa aparecer e sumir no instante em que o modo troca, e um atributo
-  // escrito fora do React não dispara re-render.
-  const flowMode = useCanvasStore((s) => s.flowMode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const setDobra = useCanvasStore((s) => s.setDobra);
 
@@ -108,7 +104,7 @@ export function PjEdge({
   const geo = { sourceX, sourceY, targetX, targetY };
   const dobra = preview ?? data?.dobra;
 
-  const isSharp = flowMode === 'sharp';
+  const isSharp = FLOW_MODE_DESENHO === 'sharp';
   const args = { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition };
   const [path, labelX, labelY] = isSharp
     ? getSmoothStepPath({

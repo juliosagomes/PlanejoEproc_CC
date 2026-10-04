@@ -101,6 +101,15 @@ export interface Edge {
 export type FlowMode = 'organic' | 'sharp';
 
 /**
+ * Como o canvas desenha as setas, para todo plano. O modo orgânico saiu da tela
+ * por simplicidade visual (out/2026); o `flowMode` gravado em cada plano
+ * continua existindo e validando, só não é mais lido para desenhar nem pode ser
+ * trocado. Voltar com a escolha é ler o campo de novo e devolver o alternador ao
+ * cabeçalho.
+ */
+export const FLOW_MODE_DESENHO: FlowMode = 'sharp';
+
+/**
  * Plano completo — unidade de persistência. É o que vai pro localStorage e
  * pro JSON exportado.
  *

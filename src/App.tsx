@@ -81,7 +81,6 @@ function Editor() {
   const resetMensagensSync = useSyncStore((s) => s.resetMensagens);
 
   const planoNome = useCanvasStore((s) => s.planoNome);
-  const flowMode = useCanvasStore((s) => s.flowMode);
   const selectedId = useCanvasStore((s) => s.selectedId);
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
@@ -89,7 +88,6 @@ function Editor() {
   const filtroFlags = useCanvasStore((s) => s.filtroFlags);
 
   const setPlanoNome = useCanvasStore((s) => s.setPlanoNome);
-  const setFlowMode = useCanvasStore((s) => s.setFlowMode);
   const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
   const loadPlanoAcao = useCanvasStore((s) => s.loadPlano);
   const createNode = useCanvasStore((s) => s.createNode);
@@ -536,8 +534,6 @@ function Editor() {
         onSincronizarUnidade={() => void sincronizarUnidade()}
         sincronizandoUnidade={sincronizandoUnidade}
         onChecklist={() => setShowChecklist(true)}
-        flowMode={flowMode}
-        onFlowModeChange={setFlowMode}
         stats={stats}
         tela={tela}
         onTelaChange={setTela}

@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION, flagsPadrao, type Plano } from '@/domain';
+import { FLOW_MODE_DESENHO, SCHEMA_VERSION, flagsPadrao, type Plano } from '@/domain';
 import { getStorage, type StorageLike } from '@/infra/plataforma/storageLike';
 import { activeKey, indexKey, isEscopoLocal, planKey } from './escopo';
 import { esquecerCamera, esquecerTodasCameras } from './cameras';
@@ -51,7 +51,7 @@ export function planoVazio(): Plano {
   return {
     version: SCHEMA_VERSION,
     planoNome: 'Plano sem título',
-    flowMode: 'organic',
+    flowMode: FLOW_MODE_DESENHO,
     flags: flagsPadrao(),
     nodes: [],
     edges: [],

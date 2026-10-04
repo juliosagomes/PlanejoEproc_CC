@@ -1,4 +1,4 @@
-import type { FlowMode, Sessao } from '@/domain';
+import type { Sessao } from '@/domain';
 import { GlifoMarca } from '@/components/BrandMark';
 import { Icon } from '@/components/Icon';
 import { PlanSwitcher } from '@/features/plans/PlanSwitcher';
@@ -52,8 +52,6 @@ export interface HeaderProps {
   /** Abre a tela geral dos setores da unidade (decisoes.md#D-26). */
   onSetores: () => void;
   onChecklist: () => void;
-  flowMode: FlowMode;
-  onFlowModeChange: (mode: FlowMode) => void;
   stats: HeaderStats;
   /** O canvas do plano ou o painel da unidade (decisoes.md#D-33). */
   tela: TelaEditor;
@@ -61,11 +59,6 @@ export interface HeaderProps {
 }
 
 export type TelaEditor = 'fluxo' | 'painel';
-
-const FLOW_MODE_OPTIONS: ReadonlyArray<{ id: FlowMode; label: string }> = [
-  { id: 'organic', label: 'Orgânico' },
-  { id: 'sharp', label: 'Diagrama' },
-];
 
 const TELA_OPTIONS: ReadonlyArray<{ id: TelaEditor; label: string }> = [
   { id: 'fluxo', label: 'Fluxo' },
@@ -114,7 +107,7 @@ function Alternador<T extends string>({
 
 /**
  * Cabeçalho do app: marca + indicador de sessão + switcher de plano + nome
- * editável do ativo + toggle de modo de fluxo + estatísticas + ações.
+ * editável do ativo + alternador Fluxo/Painel + estatísticas + ações.
  *
  * A ordem à esquerda responde perguntas cada vez mais específicas: o
  * `SessaoBadge` diz "de quem são estes planos", o switcher diz "qual deles
@@ -149,8 +142,6 @@ export function Header({
   sincronizandoUnidade,
   onSetores,
   onChecklist,
-  flowMode,
-  onFlowModeChange,
   stats,
   tela,
   onTelaChange,
@@ -216,18 +207,9 @@ export function Header({
 
       <div className="flex-1" />
 
-      <Alternador rotulo="Tela" opcoes={TELA_OPTIONS} valor={tela} onChange={onTelaChange} />
-      {/* O traço das setas só existe no canvas. */}
-      {tela === 'fluxo' && (
-        <div className="mr-2">
-          <Alternador
-            rotulo="Modo de fluxo"
-            opcoes={FLOW_MODE_OPTIONS}
-            valor={flowMode}
-            onChange={onFlowModeChange}
-          />
-        </div>
-      )}
+      <div className="mr-2">
+        <Alternador rotulo="Tela" opcoes={TELA_OPTIONS} valor={tela} onChange={onTelaChange} />
+      </div>
 
       {/* Informativo, não acionável: some primeiro quando a barra aperta, para
           o nome do plano e as ações manterem espaço utilizável. */}
