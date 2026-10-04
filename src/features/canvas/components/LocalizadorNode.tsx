@@ -19,7 +19,13 @@ import { useCanvasStore } from '../store';
  * Não tem estado próprio — toda mutação flui pela store (Fase 5). Lê `flags`
  * dali porque as definições são do plano, não do nó: o nó guarda só ids.
  */
-export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorData>) {
+/**
+ * `copias` não é do domínio: o `FlowCanvas` acrescenta na decoração quando o
+ * mesmo localizador aparece mais de uma vez no plano.
+ */
+export type LocalizadorNodeData = LocalizadorData & { copias?: number };
+
+export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorNodeData>) {
   const definicoes = useCanvasStore((s) => s.flags);
 
   // A ordem é a da lista do plano, não a de marcação — assim dois nós com as
@@ -42,6 +48,16 @@ export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorData>) 
       {data.ja_criado && !data.sistema && (
         <span className="ok-corner" title="Já criado no Eproc">
           <Icon.CheckCorner />
+        </span>
+      )}
+
+      {data.copias !== undefined && data.copias > 1 && (
+        <span
+          className="pj-node-copias mono"
+          title={`Este localizador aparece ${data.copias} vezes no plano`}
+          aria-label={`${data.copias} cópias no plano`}
+        >
+          ×{data.copias}
         </span>
       )}
 

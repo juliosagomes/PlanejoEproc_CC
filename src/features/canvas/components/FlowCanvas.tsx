@@ -14,6 +14,7 @@ import type { EdgeKind } from '@/domain';
 import { NEW_NODE_DATATYPE } from '@/components/Sidebar';
 import { loadCamera, saveCamera } from '@/infra/storage';
 import { cn } from '@/utils/cn';
+import { acharGemeos } from '../gemeos';
 import { useCanvasStore } from '../store';
 import { LocalizadorNode } from './LocalizadorNode';
 import { PjEdge } from './PjEdge';
@@ -91,7 +92,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
    * qualquer uma das pontas está fora, senão sobrariam setas nítidas ligando
    * cartões apagados.
    */
-  const esmaecidos = useMemo(() => {
+  const foraDoFiltro = useMemo(() => {
     if (filtroFlags.length === 0) return null;
     const fora = new Set<string>();
     for (const n of nodes) {
@@ -100,14 +101,41 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
     return fora;
   }, [nodes, filtroFlags]);
 
+  /**
+   * Cópias do mesmo localizador. Passar o mouse num nó que tem cópia acende as
+   * outras e recua o resto, pelo mesmo esmaecimento do filtro por setor —
+   * enquanto dura o hover, ele manda; ao sair, o filtro volta.
+   */
+  const gemeos = useMemo(() => acharGemeos(nodes), [nodes]);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const grupoHover = useMemo(() => {
+    const chave = hoverId === null ? undefined : gemeos.chaveDe.get(hoverId);
+    return chave === undefined ? null : new Set(gemeos.grupos.get(chave));
+  }, [hoverId, gemeos]);
+
+  const esmaecidos = useMemo(() => {
+    if (!grupoHover) return foraDoFiltro;
+    return new Set(nodes.filter((n) => !grupoHover.has(n.id)).map((n) => n.id));
+  }, [nodes, grupoHover, foraDoFiltro]);
+
   const decoratedNodes = useMemo(
     () =>
-      nodes.map((n) => ({
-        ...n,
-        selected: n.id === selectedId,
-        className: esmaecidos?.has(n.id) ? 'pj-esmaecido' : undefined,
-      })),
-    [nodes, selectedId, esmaecidos],
+      nodes.map((n) => {
+        const chave = gemeos.chaveDe.get(n.id);
+        const copias = chave === undefined ? 0 : (gemeos.grupos.get(chave)?.length ?? 0);
+        return {
+          ...n,
+          // Só troca a identidade de `data` quando há o que acrescentar, para
+          // não re-renderizar todos os nós a cada mudança da lista.
+          ...(copias > 1 ? { data: { ...n.data, copias } } : {}),
+          selected: n.id === selectedId,
+          className: cn(
+            esmaecidos?.has(n.id) && 'pj-esmaecido',
+            grupoHover?.has(n.id) && 'pj-gemeo',
+          ) || undefined,
+        };
+      }),
+    [nodes, selectedId, esmaecidos, gemeos, grupoHover],
   );
   const decoratedEdges = useMemo(
     () =>
@@ -173,6 +201,9 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={(_, n) => setSelectedId(n.id)}
+        onNodeMouseEnter={(_, n) => setHoverId(n.id)}
+        onNodeMouseLeave={() => setHoverId(null)}
+        onNodeDragStart={() => setHoverId(null)}
         onEdgeClick={(_, e) => setSelectedId(e.id)}
         onPaneClick={() => setSelectedId(null)}
         onDoubleClick={onPaneDoubleClick}

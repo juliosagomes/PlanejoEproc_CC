@@ -365,6 +365,26 @@ body {
   /* Realce por flag: o que está fora do filtro recua, mas continua na tela e
      continua clicável — some do foco, não do plano. */
   .pj-esmaecido { opacity: 0.22; transition: opacity 0.15s ease; }
+  /* Cópias do mesmo localizador sob o hover (Card 2). Âmbar, e não o azul da
+     seleção, para não parecer que todas ficaram selecionadas. */
+  .react-flow__node.pj-gemeo .pj-node {
+    border-color: var(--aviso);
+    box-shadow: 0 0 0 3px oklch(0.8 0.12 80 / 0.45);
+  }
+  .pj-node-copias {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 3px 6px;
+    border-radius: 999px;
+    color: oklch(0.45 0.1 75);
+    background: var(--aviso-suave);
+    border: 1px solid oklch(0.85 0.08 80);
+    box-shadow: 0 0 0 2px var(--superficie);
+  }
 
   /* ---------- Aresta (label e badge de progresso) ---------- */
   .edge-label {
