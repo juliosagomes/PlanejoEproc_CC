@@ -1050,6 +1050,63 @@ body {
     outline-offset: 2px;
   }
 
+  /* ---------- Cabeçalho: nome do plano e progresso ----------
+     O nome do plano é texto até o hover: é o título da tela, e só se revela
+     botão quando o mouse chega nele. */
+  .seletor-plano {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    max-width: 340px;
+    padding: 0 6px 0 9px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--texto);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .seletor-plano:hover,
+  .seletor-plano[aria-expanded='true'] {
+    background: var(--superficie-2);
+    border-color: var(--borda);
+  }
+  .progresso-implantacao {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 26px;
+    padding: 0 10px;
+    border: 1px solid var(--borda);
+    border-radius: 999px;
+    background: var(--superficie-2);
+    color: var(--texto-2);
+    font-size: 11.5px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .progresso-implantacao:hover {
+    border-color: var(--borda-forte);
+    color: var(--texto);
+  }
+  .progresso-implantacao .trilho {
+    width: 56px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--borda);
+    overflow: hidden;
+  }
+  .progresso-implantacao .trilho > span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--ok);
+    transition: width 0.2s ease;
+  }
+
   /* ---------- Edge swatch (radio cards do EdgePanel) ----------
      Layout vertical: o painel direito tem 380px e a grade de 3 colunas
      deixa ~112px por célula — não cabe "linha + gap + Preferência" em

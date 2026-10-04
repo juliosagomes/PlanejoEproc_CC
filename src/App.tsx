@@ -17,6 +17,7 @@ import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
+import { contarChecklist, deriveChecklist } from '@/features/checklist/derive';
 import { PainelUnidade } from '@/features/painel/components/PainelUnidade';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { SetoresModal } from '@/features/setores/components/SetoresModal';
@@ -191,20 +192,11 @@ function Editor() {
     [selectedId, edges, selectedNode],
   );
 
+  // A mesma conta do checklist: o número do cabeçalho e o do modal não podem
+  // discordar, e o checklist é quem sabe o que conta como item.
   const stats: HeaderStats = useMemo(() => {
-    let pendentes = 0;
-    for (const n of nodes) {
-      if (n.data.atalhoPara !== undefined) continue;
-      if (!n.data.ja_criado) pendentes += 1;
-      for (const a of n.data.acoesPreferenciais ?? []) if (!a.ja_criado) pendentes += 1;
-    }
-    for (const e of edges) {
-      const subs = e.data?.subitems ?? [];
-      for (const s of subs) if (!s.ja_criado) pendentes += 1;
-    }
-    // Atalho não é localizador a mais: conta só o que existe de fato (D-30).
-    const localizadores = nodes.filter((n) => n.data.atalhoPara === undefined).length;
-    return { nodes: localizadores, edges: edges.length, pendentes };
+    const { total, done } = contarChecklist(deriveChecklist(nodes, edges));
+    return { total, criados: done };
   }, [nodes, edges]);
 
   // Garante que qualquer save pendente seja gravado antes do tab fechar.
@@ -267,6 +259,14 @@ function Editor() {
     flushPersist();
     setAtivo(id);
     loadPlanoAcao(loadPlano(id));
+    refreshPlanos();
+  };
+
+  // Renomear o ativo no próprio cabeçalho: um nome inteiro de uma vez, não
+  // tecla a tecla — por isso grava e atualiza o índice na hora.
+  const onRenomearAtivo = (nome: string) => {
+    setPlanoNome(nome);
+    flushPersist();
     refreshPlanos();
   };
 
@@ -506,7 +506,7 @@ function Editor() {
     <div className="flex flex-col h-screen">
       <Header
         planoNome={planoNome}
-        onPlanoNomeChange={setPlanoNome}
+        onPlanoNomeChange={onRenomearAtivo}
         sidebarVisivel={sidebarVisivel}
         onAlternarSidebar={() => setSidebarVisivel((v) => !v)}
         sessao={sessao}
@@ -534,6 +534,7 @@ function Editor() {
         onSincronizarUnidade={() => void sincronizarUnidade()}
         sincronizandoUnidade={sincronizandoUnidade}
         onChecklist={() => setShowChecklist(true)}
+        onVerTutorial={() => setTutorialManual(true)}
         stats={stats}
         tela={tela}
         onTelaChange={setTela}

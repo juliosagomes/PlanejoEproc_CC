@@ -367,6 +367,36 @@ export const Icon = {
       <circle cx="7" cy="10.2" r="0.75" fill="currentColor" />
     </svg>
   ),
+  /**
+   * Duas setas em círculo — "Sincronizar com a unidade" (leitura do Eproc).
+   * A nuvem fica reservada ao servidor da lotação, para os dois não se
+   * confundirem no mesmo cabeçalho.
+   */
+  Sincronizar: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M11.6 6.2A4.7 4.7 0 0 0 3.3 4M2.4 7.8A4.7 4.7 0 0 0 10.7 10"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3.3 1.6V4h2.4M10.7 12.4V10H8.3"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  /** Três pontos — menu de opções gerais. */
+  Reticencias: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="3" cy="7" r="1.1" fill="currentColor" />
+      <circle cx="7" cy="7" r="1.1" fill="currentColor" />
+      <circle cx="11" cy="7" r="1.1" fill="currentColor" />
+    </svg>
+  ),
   /** Check do canto direito superior do nó "já criado". 10×10. */
   CheckCorner: (p: IconProps) => (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden {...p}>

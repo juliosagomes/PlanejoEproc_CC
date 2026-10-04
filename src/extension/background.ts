@@ -86,7 +86,7 @@ function notificar(nomeLotacao: string, resumo: ResumoSincronizacao): void {
     type: 'basic',
     iconUrl: chrome.runtime.getURL('icons/icon128.png'),
     title: `PlanejoEproc — ${nomeLotacao}`,
-    message: `${textoDoResumo(resumo)}. Abra o editor e clique em "Baixar do servidor" quando quiser trazer.`,
+    message: `${textoDoResumo(resumo)}. Abra o editor e use Plano → "Baixar do servidor" quando quiser trazer.`,
   });
 }
 

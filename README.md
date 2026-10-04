@@ -185,7 +185,7 @@ exceção deliberada — continua global ao navegador (`decisoes.md#D-7`).
 
 ### Baixar e enviar
 
-Dentro de uma lotação, o cabeçalho ganha dois botões:
+Dentro de uma lotação, o menu **Plano** do cabeçalho ganha a seção *Servidor da lotação*, com duas ações:
 
 - **Baixar do servidor** — traz a versão do servidor. Planos já conhecidos são
   atualizados no lugar; planos excluídos no servidor somem daqui também.
@@ -240,7 +240,7 @@ não** — só metadados (`decisoes.md#D-14`).
 
 ## Catálogo da unidade: sincronizar com o Eproc
 
-O botão **"Sincronizar com a unidade"**, no cabeçalho, lê da sua unidade no Eproc
+**"Sincronizar com a unidade"**, no menu **Unidade** do cabeçalho, lê da sua unidade no Eproc
 os **localizadores**, **preferências**, **modelos** e **textos padrão**, e passa a
 usá-los como sugestão no editor — no nome do localizador e nos recursos atrelados
 a uma transição.
@@ -282,7 +282,7 @@ sigla da unidade*. Trocar de unidade no Eproc e sincronizar de novo **não**
 sobrescreve o catálogo da anterior; trocar só de papel na mesma vara aproveita o
 mesmo catálogo.
 
-**O XLS continua funcionando.** O botão *Catálogo órgão* importa a planilha
+**O XLS continua funcionando.** *Catálogo do órgão*, no mesmo menu, importa a planilha
 exportada do Eproc, e é o caminho de quem não pode usar a coleta. As sugestões
 mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
 

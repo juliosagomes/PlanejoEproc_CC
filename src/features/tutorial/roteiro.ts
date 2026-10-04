@@ -27,8 +27,8 @@ export const PASSOS: readonly Passo[] = [
     id: 1,
     titulo: 'Comece trazendo os localizadores da sua vara',
     paragrafos: [
-      'O botão "Sincronizar com a unidade", no cabeçalho, lê os localizadores, modelos e textos padrão direto do Eproc — na aba em que você já está logado. Ele só lê: nada é escrito no Eproc, nunca.',
-      'Se preferir não depender do Eproc aberto, "Catálogo órgão" importa a mesma lista a partir do XLS exportado.',
+      '"Sincronizar com a unidade", no menu Unidade do cabeçalho, lê os localizadores, modelos e textos padrão direto do Eproc — na aba em que você já está logado. Ele só lê: nada é escrito no Eproc, nunca.',
+      'Se preferir não depender do Eproc aberto, "Catálogo do órgão", no mesmo menu, importa a mesma lista a partir do XLS exportado.',
     ],
     ilustrativo: true,
   },
@@ -88,7 +88,7 @@ export const PASSOS: readonly Passo[] = [
     id: 8,
     titulo: 'Gere o checklist e vá para o Eproc',
     paragrafos: [
-      '"Gerar Checklist", no cabeçalho, transforma o desenho na lista do que criar — localizadores, modelos, textos padrão, regras — agrupada por categoria.',
+      '"Checklist", no cabeçalho, transforma o desenho na lista do que criar — localizadores, modelos, textos padrão, regras — agrupada por categoria.',
       'Dá para imprimir ou copiar como texto, e as marcações voltam para o quadro. Pronto: é este o caminho inteiro.',
     ],
   },

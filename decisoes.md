@@ -1633,6 +1633,35 @@ codar, levantar se alguma dessas telas é leitura pura. O caminho de
 `atualizar_combo_preferencias` (ajax visto em `processo_movimentar`) recebe
 `id_preferencia_padrao` por POST e pode gravar estado: não usar sem levantar.
 
+---
+
+## D-36 · Cabeçalho enxuto: ações em dois menus, o nome do plano é o seletor
+
+**Decisão.** O cabeçalho passa de treze controles a nove: o nome do plano
+ativo vira o próprio seletor (duplo clique ou F2 renomeia), as ações de
+arquivo e de servidor entram no menu **Plano**, as da unidade (sincronizar,
+catálogo, setores) no menu **Unidade**, e tema e tutorial no menu ⋯. O
+progresso de implantação ("8 de 27 criados") fica sempre visível e abre o
+checklist.
+
+**Por que.** Em tela de notebook (1366 px) os botões da direita, entre eles o
+"Gerar Checklist", saíam da barra. O nome do plano aparecia duas vezes, no
+seletor e no campo ao lado. Três botões usavam a mesma nuvem para coisas
+diferentes (baixar e enviar ao servidor, ler do Eproc); a leitura do Eproc
+ganhou ícone próprio. O progresso só aparecia a partir de 2000 px, e contava
+de um jeito diferente do checklist; agora usa `contarChecklist`, para os dois
+números nunca discordarem. No painel da unidade somem o seletor, o progresso
+e o checklist, que são do plano ativo.
+
+O custo é um clique a mais para ações raras (abrir arquivo, salvar cópia,
+catálogo). O trabalho em curso com o servidor, que antes aparecia no próprio
+botão, passou para o rótulo do menu ("Baixando…").
+
+**O que precisaria mudar para evoluir.** O menu Unidade pode mostrar a hora
+da última sincronização; isso pede um carimbo no catálogo da unidade, num
+campo opcional, sem bump de schema. Um atalho de teclado para os menus
+entra junto com a busca por comandos, se ela vier.
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

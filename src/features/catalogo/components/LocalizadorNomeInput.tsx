@@ -134,7 +134,7 @@ export function LocalizadorNomeInput({
       noOptionsMessage={() =>
         itens.length === 0
           ? 'Nenhum localizador conhecido ainda. Use "Sincronizar com a unidade" ' +
-            '(com o Eproc aberto) ou "Catálogo órgão" (XLS), no header.'
+            '(com o Eproc aberto) ou "Catálogo do órgão" (XLS), no menu Unidade.'
           : 'Sem sugestões — Enter para usar como nome livre.'
       }
       formatCreateLabel={(input) => `Usar "${input}" como nome livre`}

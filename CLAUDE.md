@@ -39,7 +39,7 @@ existindo (decisoes.md#D-16):
 
 - **"Sincronizar com a unidade"** lê direto do Eproc, na aba onde o usuário já
   está logado. Exige extensão instalada e sessão viva.
-- **"Catálogo órgão"** importa o XLS pelo file picker. É o caminho offline, e o
+- **"Catálogo do órgão"** importa o XLS pelo file picker. É o caminho offline, e o
   app **não consegue** ler esse arquivo sozinho — sempre pelo botão. O mesmo
   modal é a tela de **consulta** dos recursos mapeados dos dois caminhos, com as
   anotações do usuário (decisoes.md#D-25).
@@ -335,6 +335,12 @@ opcionais, como no D-23:
   catálogo anterior e mantém a lista, somada aos nomes das ações
   preferenciais. Recusa de hash chega como HTTP 200 com HTML: trate como
   falha, nunca como lista vazia.
+- Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
+  clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
+  (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.
+  Botão novo no cabeçalho vira item de menu, não botão solto. Mudou um rótulo
+  de menu? O tutorial (`roteiro.ts`, `Passo1Sincronizar.tsx`) e o aviso do
+  service worker citam esses nomes.
 
 ## Regras de ouro
 

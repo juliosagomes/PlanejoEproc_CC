@@ -14,11 +14,15 @@ export interface PlanSwitcherProps {
   planos: PlanIndexEntry[];
   ativoId: string | null;
   /**
-   * Nome do plano ativo "ao vivo" — preferido sobre o nome do índice para
-   * evitar lag enquanto o usuário digita no input do header (índice só
-   * atualiza quando o debounced save dispara).
+   * Nome do plano ativo "ao vivo" — preferido sobre o nome do índice, que só
+   * atualiza quando o debounced save dispara.
    */
   ativoNomeLive: string;
+  /**
+   * Renomeia o ativo no próprio botão (duplo clique ou F2). Os outros planos
+   * continuam passando por `onRenomear`: não há onde editá-los no lugar.
+   */
+  onRenomearAtivo: (nome: string) => void;
   /** Sessão de visualização: trocar de plano continua, mexer neles não. */
   somenteLeitura?: boolean;
   onSwitch: (id: string) => void;
@@ -34,15 +38,16 @@ export interface PlanSwitcherProps {
 }
 
 /**
- * Dropdown de seleção de plano + ações por plano (renomear/duplicar/excluir).
- * Outside-click e Esc fecham. Ações de criar/abrir/exportar ficam nos botões
- * principais do Header — este componente só lida com o universo "qual plano
- * estou editando agora e o que quero fazer com cada um".
+ * O nome do plano ativo no cabeçalho, que é também o seletor: clique abre a
+ * lista com as ações por plano (renomear/duplicar/excluir), duplo clique ou F2
+ * renomeia ali mesmo. Antes eram duas peças — seletor e campo de nome — com o
+ * mesmo texto lado a lado. Criar, abrir e exportar ficam no menu "Plano".
  */
 export function PlanSwitcher({
   planos,
   ativoId,
   ativoNomeLive,
+  onRenomearAtivo,
   somenteLeitura = false,
   onSwitch,
   onRenomear,
@@ -51,6 +56,7 @@ export function PlanSwitcher({
   onApagarTodos,
 }: PlanSwitcherProps) {
   const [open, setOpen] = useState(false);
+  const [editando, setEditando] = useState(false);
   const [ordem, setOrdem] = useState<OrdemPlanos>(getOrdemPlanos);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -72,6 +78,23 @@ export function PlanSwitcher({
     };
   }, [open]);
 
+  const podeRenomearAtivo = !somenteLeitura && ativoId !== null;
+
+  // F2 é o atalho de renomear do Explorer e das planilhas; quem vem de lá tenta.
+  useEffect(() => {
+    if (!podeRenomearAtivo) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== 'F2') return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      e.preventDefault();
+      setOpen(false);
+      setEditando(true);
+    }
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [podeRenomearAtivo]);
+
   const ordenados = ordenarPlanos(planos, ordem);
   const trocarOrdem = (nova: OrdemPlanos) => {
     setOrdem(nova);
@@ -85,23 +108,41 @@ export function PlanSwitcher({
       : 'Nenhum plano salvo';
 
   return (
-    <div ref={wrapperRef} className="relative">
-      <button
-        type="button"
-        className="btn btn-sm"
-        style={{ minWidth: 200, maxWidth: 260, justifyContent: 'space-between' }}
-        onClick={() => setOpen((o) => !o)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={menuId}
-        title={labelBotao}
-      >
-        <span className="flex items-center gap-1.5 min-w-0">
-          <Icon.Folder />
+    <div ref={wrapperRef} className="relative min-w-0">
+      {editando ? (
+        <NomeEmEdicao
+          inicial={ativoNomeLive}
+          onConcluir={(nome) => {
+            setEditando(false);
+            if (nome !== null && nome !== ativoNomeLive) onRenomearAtivo(nome);
+          }}
+        />
+      ) : (
+        <button
+          type="button"
+          className="seletor-plano"
+          onClick={() => setOpen((o) => !o)}
+          onDoubleClick={() => {
+            if (!podeRenomearAtivo) return;
+            setOpen(false);
+            setEditando(true);
+          }}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-controls={menuId}
+          aria-label={`Plano: ${labelBotao}. Trocar de plano`}
+          title={
+            podeRenomearAtivo
+              ? `${labelBotao} — clique para trocar de plano, duplo clique ou F2 para renomear`
+              : labelBotao
+          }
+        >
           <span className="truncate">{labelBotao}</span>
-        </span>
-        <Icon.ChevronDown />
-      </button>
+          <span className="text-texto-3 flex-shrink-0">
+            <Icon.ChevronDown />
+          </span>
+        </button>
+      )}
 
       {open && (
         <div
@@ -142,7 +183,7 @@ export function PlanSwitcher({
               Nenhum plano salvo ainda. Use{' '}
               <span className="text-texto-2 font-medium">Novo plano</span> ou{' '}
               <span className="text-texto-2 font-medium">Abrir arquivo</span>{' '}
-              no cabeçalho.
+              no menu Plano.
             </div>
           ) : (
             <ul className="py-1">
@@ -182,7 +223,14 @@ export function PlanSwitcher({
                         <button
                           type="button"
                           className="btn btn-sm btn-icon btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100"
-                          onClick={() => onRenomear(p.id)}
+                          onClick={() => {
+                            if (!ativo) {
+                              onRenomear(p.id);
+                              return;
+                            }
+                            setOpen(false);
+                            setEditando(true);
+                          }}
                           title="Renomear"
                           aria-label={`Renomear ${nomeExibido}`}
                         >
@@ -232,5 +280,49 @@ export function PlanSwitcher({
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * O campo que toma o lugar do botão enquanto se renomeia. Enter ou sair do
+ * campo confirma; Esc desiste. Nome vazio também desiste — plano sem nome
+ * vira "Plano sem título" na lista e ninguém procura por isso.
+ */
+function NomeEmEdicao({
+  inicial,
+  onConcluir,
+}: {
+  inicial: string;
+  onConcluir: (nome: string | null) => void;
+}) {
+  const [valor, setValor] = useState(inicial);
+  const ref = useRef<HTMLInputElement>(null);
+  const concluido = useRef(false);
+
+  useEffect(() => {
+    ref.current?.focus();
+    ref.current?.select();
+  }, []);
+
+  const concluir = (nome: string | null) => {
+    if (concluido.current) return;
+    concluido.current = true;
+    onConcluir(nome);
+  };
+
+  return (
+    <input
+      ref={ref}
+      className="input"
+      style={{ height: 28, width: 280, padding: '4px 10px', fontWeight: 600 }}
+      value={valor}
+      onChange={(e) => setValor(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') concluir(valor.trim() || null);
+        if (e.key === 'Escape') concluir(null);
+      }}
+      onBlur={() => concluir(valor.trim() || null)}
+      aria-label="Novo nome do plano"
+    />
   );
 }

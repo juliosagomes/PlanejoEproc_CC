@@ -34,7 +34,7 @@ interface Linha {
 /** Aba vazia explica de onde o dado dela viria — o caminho não é o mesmo para os quatro. */
 const ORIGEM: Record<TipoRecurso, string> = {
   Localizador:
-    'Importe o XLS pelo botão abaixo, ou use "Sincronizar com a unidade" no cabeçalho.',
+    'Importe o XLS pelo botão abaixo, ou use "Sincronizar com a unidade", no menu Unidade do cabeçalho.',
   Preferência:
     'Vem de "Sincronizar com a unidade" — o XLS do órgão só traz localizadores.',
   Modelo: 'Vem de "Sincronizar com a unidade" — o XLS do órgão só traz localizadores.',
