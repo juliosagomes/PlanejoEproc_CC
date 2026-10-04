@@ -57,7 +57,16 @@ function resultadoDeFonte(bruta: FonteBruta | undefined, itens: number): FonteRe
   };
 }
 
-export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoColeta {
+/**
+ * `anterior` é o catálogo gravado antes desta coleta. Só as preferências o
+ * leem: o autocompletar delas é a fonte que o Eproc já quebrou uma vez
+ * (decisoes.md#D-35), e sem ele cada falha apagaria a lista.
+ */
+export function aplicarColeta(
+  coleta: ColetaUnidade,
+  agora?: string,
+  anterior?: CatalogoUnidade | null,
+): ResultadoColeta {
   if (coleta.erro) return { ok: false, erro: coleta.erro };
 
   if (!coleta.escopo) {
@@ -126,8 +135,11 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
 
   const modelos = parseAcessoria(coleta, 'modelos', parseModeloPadrao, fontes);
   const textosPadrao = parseAcessoria(coleta, 'textosPadrao', parseTextoPadrao, fontes);
-  const preferencias = aplicarPreferencias(coleta, fontes);
   const acoesPreferenciais = aplicarAcoesPreferenciais(coleta, fontes);
+  const preferencias = aplicarPreferencias(coleta, fontes, {
+    anteriores: anterior?.unidade.chave === unidade.chave ? anterior.preferencias ?? [] : [],
+    acoesPreferenciais,
+  });
   const consultasSalvas = aplicarConsultasSalvas(coleta, fontes);
 
   return {
@@ -163,15 +175,30 @@ export function aplicarColeta(coleta: ColetaUnidade, agora?: string): ResultadoC
  * Preferências têm caminho próprio porque o **tipo** de cada fragmento não está
  * dentro do XML — vem em `rotulos`, paralelo a `fragmentos`. Sem esse
  * pareamento, as 150 preferências viriam sem distinguir Minuta de Intimação.
+ *
+ * Quando a fonte não vem `ok`, o catálogo não perde a lista: ficam as da última
+ * sincronização, somadas aos nomes que as ações preferenciais desta coleta
+ * citam — esses sem tipo, porque o vínculo não o traz (decisoes.md#D-35).
  */
 function aplicarPreferencias(
   coleta: ColetaUnidade,
   fontes: Partial<Record<FonteId, FonteResultado>>,
+  reserva: { anteriores: ItemCatalogoUnidade[]; acoesPreferenciais: AcaoPreferencialUnidade[] },
 ): ItemCatalogoUnidade[] {
   const bruta = coleta.fontes.preferencias;
   if (!bruta || bruta.status !== 'ok') {
-    if (bruta) fontes.preferencias = resultadoDeFonte(bruta, 0);
-    return [];
+    const { itens, mantidas, dosVinculos } = preferenciasDeReserva(reserva);
+    if (bruta) {
+      const motivo = [bruta.motivo, descreverReserva(mantidas, dosVinculos)]
+        .filter(Boolean)
+        .join(' ');
+      fontes.preferencias = {
+        status: bruta.status,
+        itens: itens.length,
+        ...(motivo ? { motivo } : {}),
+      };
+    }
+    return itens;
   }
 
   try {
@@ -189,6 +216,27 @@ function aplicarPreferencias(
     };
     return [];
   }
+}
+
+function preferenciasDeReserva(reserva: {
+  anteriores: ItemCatalogoUnidade[];
+  acoesPreferenciais: AcaoPreferencialUnidade[];
+}): { itens: ItemCatalogoUnidade[]; mantidas: number; dosVinculos: number } {
+  const mantidas = montarPreferencias([reserva.anteriores]);
+  const citadas = reserva.acoesPreferenciais.flatMap((v) =>
+    v.preferencias.map((nome) => ({ nome: nome.trim() })).filter((p) => p.nome),
+  );
+  const itens = montarPreferencias([mantidas, citadas]);
+  return { itens, mantidas: mantidas.length, dosVinculos: itens.length - mantidas.length };
+}
+
+function descreverReserva(mantidas: number, dosVinculos: number): string {
+  if (mantidas === 0 && dosVinculos === 0) return '';
+  const partes: string[] = [];
+  if (mantidas > 0) partes.push(`${mantidas} mantidas da última sincronização`);
+  if (dosVinculos > 0) partes.push(`${dosVinculos} vindas das ações preferenciais (sem o tipo)`);
+  const frase = partes.join(' e ');
+  return `${frase.charAt(0).toUpperCase()}${frase.slice(1)}.`;
 }
 
 /** Consultas salvas: a tela de cada fragmento vem em `rotulos`, como nas preferências. */

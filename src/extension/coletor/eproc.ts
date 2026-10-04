@@ -471,9 +471,11 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
 
   try {
     // O `hash` do autocomplete não se inventa: é lido do HTML de uma tela que o
-    // carregue. Qualquer tela de lista do painel serve — medido em Modelos
-    // Padrão, Textos Padrão e Área de Trabalho de Minutas. Reaproveita-se o que
-    // as fontes anteriores já buscaram para não gastar mais uma volta.
+    // carregue. Até out/2026 qualquer tela de lista servia; desde 04/10/2026 o
+    // Eproc amarra o hash ao `nomeAcao` da tela, e nenhuma tela do menu traz o
+    // dos três tipos (decisoes.md#D-35). O caminho continua aqui para o caso de
+    // a chave voltar a valer, mas a recusa agora vira `falhou`, não `vazio` —
+    // e `aplicarColeta` cobre a falta com o que já se sabia.
     const linkTela = acharLink(docMenu, (a) =>
       /[?&]acao=(modelo_padrao_listar|minuta_area_trabalho)(&|$|")/.test(
         a.getAttribute('href') ?? '',
@@ -496,6 +498,9 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
     } else {
       const fragmentos: string[] = [];
       const rotulos: string[] = [];
+      // Hash recusado não dá erro HTTP: o Eproc responde 200 com uma página
+      // HTML. Só `<itens>` sem `<item>` é lista vazia de verdade.
+      let recusas = 0;
       for (const [nomeAcao, rotulo] of TIPOS_PREFERENCIA) {
         await dormir(PAUSA_MS);
         const res = await fetch(
@@ -503,8 +508,15 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
             `&nomeAcao=${nomeAcao}&hash=${hash}`,
           { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } },
         );
-        if (!res.ok) continue;
+        if (!res.ok) {
+          recusas++;
+          continue;
+        }
         const xml = await lerHtml(res);
+        if (!xml.includes('<itens')) {
+          recusas++;
+          continue;
+        }
         if (!xml.includes('<item')) continue;
         fragmentos.push(xml);
         rotulos.push(rotulo);
@@ -513,11 +525,19 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
       fontes.preferencias =
         fragmentos.length > 0
           ? { status: 'ok', fragmentos, rotulos }
-          : {
-              status: 'vazio',
-              fragmentos: [],
-              motivo: 'Nenhuma preferência cadastrada nos três tipos.',
-            };
+          : recusas > 0
+            ? {
+                status: 'falhou',
+                fragmentos: [],
+                motivo:
+                  'O Eproc recusou a chave do autocompletar para os tipos de ' +
+                  'preferência (a chave passou a ser de cada tela).',
+              }
+            : {
+                status: 'vazio',
+                fragmentos: [],
+                motivo: 'Nenhuma preferência cadastrada nos três tipos.',
+              };
     }
   } catch (err) {
     fontes.preferencias = {

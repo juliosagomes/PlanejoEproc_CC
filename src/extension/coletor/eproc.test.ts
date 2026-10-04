@@ -59,8 +59,9 @@ function resposta(html: string): Response {
 const PAGINA_ORGAO = `<html><body><h1>Localizadores do Órgão</h1>${ORGAO}
   <p>7 registros</p></body></html>`;
 const PAGINA_SELECT = `<html><body>${SELECT}</body></html>`;
-// O hash do autocompletar de preferências vem no HTML de qualquer tela de
-// lista do painel — é daqui que o coletor o extrai.
+// O coletor extrai daqui o hash do autocompletar de preferências. No Eproc real
+// ele deixou de valer para outros `nomeAcao` (decisoes.md#D-35); o falso aceita
+// para exercitar o caminho feliz.
 const PAGINA_MODELOS = `<html><body>${MODELOS}<p>4 registros</p>
   <script>var u = "controlador_ajax.php?acao_ajax=preferencia_auto_completar&nomeAcao=minuta_cadastrar&hash=0123456789abcdef0123456789abcdef";</script>
   </body></html>`;
@@ -307,6 +308,87 @@ describe('coletor do Eproc', () => {
     expect(r.resumo.localizadores).toBe(7);
     expect(r.resumo.modelos).toBe(0);
     expect(r.catalogo.fontes.modelos?.status).toBe('semPermissao');
+  });
+});
+
+describe('coletor do Eproc — preferências com a chave recusada (D-35)', () => {
+  /** Igual ao fetch padrão, trocando só a resposta do autocompletar. */
+  function stubAutocompletar(corpo: string): void {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((entrada: string) => {
+        const url = String(entrada);
+        if (url.includes('preferencia_auto_completar')) return Promise.resolve(resposta(corpo));
+        if (url.includes('localizador_orgao_listar')) return Promise.resolve(resposta(PAGINA_ORGAO));
+        if (url.includes('localizador_processos_lista')) return Promise.resolve(resposta(PAGINA_SELECT));
+        if (url.includes('localizador_acao_preferencial_listar')) {
+          return Promise.resolve(resposta(PAGINA_ACOES));
+        }
+        if (url.includes('modelo_padrao_listar')) return Promise.resolve(resposta(PAGINA_MODELOS));
+        if (url.includes('texto_padrao_listar')) return Promise.resolve(resposta(PAGINA_TEXTOS));
+        return Promise.resolve(resposta('<html><body>tela desconhecida</body></html>'));
+      }),
+    );
+  }
+
+  beforeEach(() => {
+    document.body.innerHTML = MENU;
+    instalarIframeFalso();
+    paginasPorTela = { modelo_padrao_listar: [PAGINA_MODELOS], texto_padrao_listar: [PAGINA_TEXTOS] };
+  });
+
+  afterEach(() => {
+    desinstalarIframeFalso();
+  });
+
+  it('página de erro no lugar do XML é falha, não "nenhuma cadastrada"', async () => {
+    stubAutocompletar('<!DOCTYPE html><html><body>Acesso negado</body></html>');
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.preferencias?.status).toBe('falhou');
+    expect(coleta.fontes.preferencias?.motivo).toContain('recusou a chave');
+  });
+
+  it('XML sem itens continua sendo "vazio"', async () => {
+    stubAutocompletar('<?xml version="1.0"?><itens></itens>');
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.preferencias?.status).toBe('vazio');
+  });
+
+  it('na falha, mantém as da última sincronização e soma as das ações preferenciais', async () => {
+    stubAutocompletar('<html>erro</html>');
+    const coleta = await coletarUnidadeNaAba();
+
+    const semAnterior = aplicarColeta(coleta, '2026-10-04T00:00:00.000Z');
+    if (!semAnterior.ok) throw new Error(semAnterior.erro);
+    const dosVinculos = semAnterior.catalogo.preferencias ?? [];
+    expect(dosVinculos.length).toBeGreaterThan(0);
+    expect(dosVinculos.every((p) => p.detalhe === undefined)).toBe(true);
+    expect(semAnterior.catalogo.fontes.preferencias?.status).toBe('falhou');
+    expect(semAnterior.catalogo.fontes.preferencias?.motivo).toContain('ações preferenciais');
+
+    const anterior = {
+      ...semAnterior.catalogo,
+      preferencias: [{ nome: 'Antiga só no catálogo', detalhe: 'Minuta' }],
+    };
+    const comAnterior = aplicarColeta(coleta, '2026-10-04T00:00:00.000Z', anterior);
+    if (!comAnterior.ok) throw new Error(comAnterior.erro);
+    expect(comAnterior.catalogo.preferencias?.[0]).toEqual({
+      nome: 'Antiga só no catálogo',
+      detalhe: 'Minuta',
+    });
+    expect(comAnterior.resumo.preferencias).toBe(dosVinculos.length + 1);
+    expect(comAnterior.catalogo.fontes.preferencias?.motivo).toContain(
+      '1 mantidas da última sincronização',
+    );
+
+    // Catálogo de outra unidade não empresta nada.
+    const deOutra = {
+      ...anterior,
+      unidade: { ...anterior.unidade, chave: 'outro::host::VX' },
+    };
+    const r = aplicarColeta(coleta, '2026-10-04T00:00:00.000Z', deOutra);
+    if (!r.ok) throw new Error(r.erro);
+    expect(r.resumo.preferencias).toBe(dosVinculos.length);
   });
 });
 

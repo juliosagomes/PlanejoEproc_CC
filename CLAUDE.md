@@ -330,6 +330,11 @@ opcionais, como no D-23:
   `CORES_CANVAS` (`FlowCanvas.tsx`).
 - O canvas desenha sempre em Diagrama (`FLOW_MODE_DESENHO`); `Plano.flowMode`
   continua no schema, mas não é lido para desenhar (D-34).
+- O Eproc passou a amarrar o hash do autocompletar ao `nomeAcao` da tela, e a
+  coleta das preferências parou (D-35). Na falha, `aplicarColeta` recebe o
+  catálogo anterior e mantém a lista, somada aos nomes das ações
+  preferenciais. Recusa de hash chega como HTTP 200 com HTML: trate como
+  falha, nunca como lista vazia.
 
 ## Regras de ouro
 

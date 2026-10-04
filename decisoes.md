@@ -1593,6 +1593,46 @@ sistema", é um bloco de tokens a mais e um valor a mais em `Tema`. Para voltar
 com o Orgânico, basta ler `flowMode` de novo em `PjEdge`/`EdgePanel` e
 devolver o alternador ao cabeçalho; o `setFlowMode` da store continua lá.
 
+---
+
+## D-35 · Preferências: falha da coleta não apaga a lista
+
+**Decisão.** Quando a fonte das preferências não vem `ok`, o catálogo grava as
+da última sincronização (mesma unidade) somadas aos nomes que as ações
+preferenciais citam, e o modal diz por quê, em vez de anunciar "nenhuma
+cadastrada".
+
+**Por que.** Em 04/10/2026 o Eproc passou a amarrar o `hash` do autocompletar
+`preferencia_auto_completar` ao `nomeAcao` da tela (levantado no eproc1g, só
+leitura). O coletor lia o hash de Modelos Padrão e o usava com os três tipos
+(`minuta_cadastrar`, `processo_movimento_consultar`, `processo_intimacao_bloco`).
+Os hashes de cinco telas do menu, cruzados com os três tipos, deram HTTP 200
+com página HTML de erro nas quinze combinações. Cada tela do menu traz só o
+autocompletar com o próprio `nomeAcao`, e nenhuma traz o dos três tipos.
+
+Dois defeitos somados escondiam isso:
+
+- **A recusa parecia lista vazia.** O coletor descartava toda resposta sem
+  `<item` e terminava em `vazio`. Agora, se a resposta não é `<itens>` (ou não
+  é HTTP 200), conta como recusa e a fonte vira `falhou` com motivo próprio.
+- **Cada sincronização apagava a anterior.** O catálogo é regravado inteiro, e
+  sem preferências na coleta elas sumiam. `aplicarColeta` recebe agora o
+  catálogo anterior e, só para esta fonte, cobre a falta com ele.
+
+Os nomes vindos das ações preferenciais entram **sem tipo** (`detalhe`), porque
+o vínculo não o traz, e só cobrem as preferências que atuam em algum
+localizador. É uma lista incompleta, mas é melhor do que nenhuma lista.
+
+**O que precisaria mudar para evoluir.** Achar de onde sai um hash válido para
+cada tipo. `processo_movimentar` cita `minuta_cadastrar` e
+`processo_movimento_consultar`, mas o autocompletar desses tipos só aparece em
+telas abertas a partir de um processo (Nova Minuta com `num_processo`,
+Consultar Processo). Isso exigiria escolher um processo da unidade e abrir
+telas dele. A Intimação em bloco só é alcançada submetendo um filtro. Antes de
+codar, levantar se alguma dessas telas é leitura pura. O caminho de
+`atualizar_combo_preferencias` (ajax visto em `processo_movimentar`) recebe
+`id_preferencia_padrao` por POST e pode gravar estado: não usar sem levantar.
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.
