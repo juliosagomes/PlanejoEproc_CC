@@ -532,3 +532,29 @@ describe('ações preferenciais planejadas (D-28)', () => {
     expect(md).toContain('- [ ] Ofício INSS _(Minutar)_');
   });
 });
+
+describe('atalhos (D-30)', () => {
+  it('atalho não vira localizador no checklist, e a aresta usa o nome do alvo', () => {
+    const alvo = noLocalizador('n1', 'Aguardando prazo');
+    const origem = noLocalizador('n2', 'Minutar');
+    const atalho: Localizador = {
+      id: 's1',
+      position: { x: 0, y: 0 },
+      data: { nome: '', ja_criado: false, flags: [], atalhoPara: 'n1' },
+    };
+    const aresta: Edge = {
+      id: 'e1',
+      source: 'n2',
+      target: 's1',
+      data: {
+        kind: 'manual',
+        resumo: '',
+        observacao: '',
+        subitems: [{ id: 'x', categoria: 'Modelo', nome: 'Vista', ja_criado: false }],
+      },
+    };
+    const g = deriveChecklist([alvo, origem, atalho], [aresta]);
+    expect(g.Localizador.map((i) => i.nome)).toEqual(['Aguardando prazo', 'Minutar']);
+    expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Aguardando prazo' });
+  });
+});

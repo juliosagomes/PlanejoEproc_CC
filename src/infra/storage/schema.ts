@@ -250,6 +250,7 @@ const LocalizadorDataSchema = z.object({
   acoesPreferenciais: z
     .array(z.object({ id: z.string(), nome: z.string(), ja_criado: z.boolean() }))
     .optional(),
+  atalhoPara: z.string().optional(),
 });
 
 const LocalizadorSchema = z.object({

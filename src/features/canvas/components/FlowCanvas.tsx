@@ -6,15 +6,16 @@ import {
   MiniMap,
   ReactFlow,
   useReactFlow,
-  type Viewport,
+  useStore,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import type { EdgeKind } from '@/domain';
+import { nomeEfetivo, type EdgeKind } from '@/domain';
 import { NEW_NODE_DATATYPE } from '@/components/Sidebar';
 import { loadCamera, saveCamera } from '@/infra/storage';
 import { cn } from '@/utils/cn';
 import { acharGemeos } from '../gemeos';
+import { useIrParaNo } from '../irParaNo';
 import { useCanvasStore } from '../store';
 import { LocalizadorNode } from './LocalizadorNode';
 import { PjEdge } from './PjEdge';
@@ -70,17 +71,28 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
     return () => window.clearTimeout(t);
   }, [planoId, setViewport, fitView]);
 
-  const salvarCameraRef = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(salvarCameraRef.current), []);
-  const onMoveEnd = (_: unknown, viewport: Viewport) => {
+  // Grava a partir da transformação, e não do `onMoveEnd`: este só dispara em
+  // gesto do usuário, e o "enquadrar" dos controles ficaria sem gravar.
+  // Enquanto a câmera ainda é a do plano anterior (a troca acabou de acontecer
+  // e a restauração não foi aplicada), nada é gravado — senão o plano novo
+  // herdaria a câmera do velho.
+  const transform = useStore((s) => s.transform);
+  const transformNaTroca = useRef<readonly number[] | null>(null);
+  const planoDaTroca = useRef<string | null>(null);
+  if (planoDaTroca.current !== planoId) {
+    planoDaTroca.current = planoId;
+    transformNaTroca.current = transform;
+  }
+  useEffect(() => {
     if (planoId === null) return;
-    const id = planoId;
-    window.clearTimeout(salvarCameraRef.current);
-    salvarCameraRef.current = window.setTimeout(
-      () => saveCamera(id, viewport),
-      ESPERA_SALVAR_CAMERA_MS,
-    );
-  };
+    // Por valor: o ReactFlow recria o array ao iniciar, com os mesmos números.
+    const naTroca = transformNaTroca.current;
+    if (naTroca && naTroca.every((v, i) => v === transform[i])) return;
+    transformNaTroca.current = null;
+    const [x, y, zoom] = transform;
+    const t = window.setTimeout(() => saveCamera(planoId, { x, y, zoom }), ESPERA_SALVAR_CAMERA_MS);
+    return () => window.clearTimeout(t);
+  }, [transform, planoId]);
 
   /**
    * Realce por setor (decisoes.md#D-22): com o filtro ligado, o que não é do
@@ -106,7 +118,12 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
    * outras e recua o resto, pelo mesmo esmaecimento do filtro por setor —
    * enquanto dura o hover, ele manda; ao sair, o filtro volta.
    */
-  const gemeos = useMemo(() => acharGemeos(nodes), [nodes]);
+  // O atalho conta como cópia do alvo (D-30): passar o mouse num acende o outro.
+  const gemeos = useMemo(
+    () => acharGemeos(nodes.map((n) => ({ id: n.id, data: { nome: nomeEfetivo(nodes, n.id) } }))),
+    [nodes],
+  );
+  const irParaNo = useIrParaNo();
   const [hoverId, setHoverId] = useState<string | null>(null);
   const grupoHover = useMemo(() => {
     const chave = hoverId === null ? undefined : gemeos.chaveDe.get(hoverId);
@@ -203,6 +220,10 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         // Selecionar é com o ReactFlow (clique, Ctrl+clique, Shift+arrastar em
         // caixa); a store deriva `selectedId` das marcas que ele escreve. Um
         // `onNodeClick` que selecionasse por conta própria desfaria o Ctrl+clique.
+        onNodeDoubleClick={(_, n) => {
+          const alvo = (n.data as { atalhoPara?: string } | undefined)?.atalhoPara;
+          if (alvo) irParaNo(alvo);
+        }}
         onNodeMouseEnter={(_, n) => setHoverId(n.id)}
         onNodeMouseLeave={() => setHoverId(null)}
         onNodeDragStart={() => setHoverId(null)}
@@ -229,7 +250,6 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         minZoom={0.4}
         maxZoom={1.8}
         defaultViewport={{ x: 0, y: 0, zoom: 1 }}
-        onMoveEnd={onMoveEnd}
       >
         <Background gap={20} size={1} color="var(--grade-ponto)" />
         <Controls showInteractive={false} position="bottom-left" />

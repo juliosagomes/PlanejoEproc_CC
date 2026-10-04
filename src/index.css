@@ -546,6 +546,43 @@ body {
     font-size: 11px;
   }
 
+  /* ---------- Atalho de localizador (D-30) ---------- */
+  .pj-atalho {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    max-width: 230px;
+    padding: 0 13px 0 10px;
+    border-radius: 999px;
+    border: 1.5px dotted var(--destaque);
+    background: var(--destaque-suave);
+    color: oklch(0.42 0.14 265);
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: box-shadow 0.12s ease;
+  }
+  .pj-atalho-nome {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pj-atalho-seta {
+    font-size: 14px;
+  }
+  .pj-atalho.selected {
+    box-shadow: 0 0 0 2px var(--destaque);
+  }
+  .pj-atalho.orfao {
+    border-color: oklch(0.5 0.18 25);
+    background: oklch(0.97 0.03 25);
+    color: oklch(0.5 0.18 25);
+  }
+  .react-flow__node.pj-gemeo .pj-atalho {
+    box-shadow: 0 0 0 3px oklch(0.8 0.12 80 / 0.45);
+    border-color: var(--aviso);
+  }
+
   /* ---------- Barra de ações em lote (seleção múltipla) ---------- */
   .selecao-lote {
     position: absolute;

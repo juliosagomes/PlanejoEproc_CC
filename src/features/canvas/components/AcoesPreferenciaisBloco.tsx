@@ -1,8 +1,10 @@
 import { useId, useMemo, useState } from 'react';
 import {
+  atalhosPara,
   atpsManuaisSaindo,
   canonPreferencia,
   linhasAcoesPreferenciais,
+  nomeEfetivo,
   type LinhaAcaoPreferencial,
 } from '@/domain';
 import { Icon } from '@/components/Icon';
@@ -36,7 +38,12 @@ export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) 
   const doEproc = useAcoesPreferenciaisDoLocalizador(node.data.nome);
   const sugestoes = useSugestoesSubitem('Preferência');
   const planejadas = node.data.acoesPreferenciais;
-  const atps = useMemo(() => atpsManuaisSaindo(node.id, edges), [node.id, edges]);
+  // As transições que saem de um atalho são deste localizador (D-30).
+  const atps = useMemo(
+    () =>
+      [node.id, ...atalhosPara(nodes, node.id)].flatMap((id) => atpsManuaisSaindo(id, edges)),
+    [node.id, nodes, edges],
+  );
   const linhas = useMemo(
     () => linhasAcoesPreferenciais(doEproc, planejadas ?? [], atps),
     [doEproc, planejadas, atps],
@@ -99,7 +106,7 @@ export function AcoesPreferenciaisBloco({ node }: AcoesPreferenciaisBlocoProps) 
               key={chaveLinha(l)}
               linha={l}
               somenteLeitura={somenteLeitura}
-              nomeDestino={(id) => nodes.find((n) => n.id === id)?.data.nome || 'sem nome'}
+              nomeDestino={(id) => nomeEfetivo(nodes, id) || 'sem nome'}
               onMarcar={(id, ja) => updateAcao(node.id, id, { ja_criado: ja })}
               onRemover={(id) => removeAcao(node.id, id)}
               onVerAresta={(id) => setSelectedId(id)}

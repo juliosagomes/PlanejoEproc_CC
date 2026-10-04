@@ -183,6 +183,7 @@ function Editor() {
   const stats: HeaderStats = useMemo(() => {
     let pendentes = 0;
     for (const n of nodes) {
+      if (n.data.atalhoPara !== undefined) continue;
       if (!n.data.ja_criado) pendentes += 1;
       for (const a of n.data.acoesPreferenciais ?? []) if (!a.ja_criado) pendentes += 1;
     }
@@ -190,7 +191,9 @@ function Editor() {
       const subs = e.data?.subitems ?? [];
       for (const s of subs) if (!s.ja_criado) pendentes += 1;
     }
-    return { nodes: nodes.length, edges: edges.length, pendentes };
+    // Atalho não é localizador a mais: conta só o que existe de fato (D-30).
+    const localizadores = nodes.filter((n) => n.data.atalhoPara === undefined).length;
+    return { nodes: localizadores, edges: edges.length, pendentes };
   }, [nodes, edges]);
 
   // Garante que qualquer save pendente seja gravado antes do tab fechar.
@@ -535,9 +538,10 @@ function Editor() {
           />
         )}
 
+        {/* O provider envolve também o painel lateral: o atalho (D-30) leva a
+            câmera até o localizador a partir de um botão do painel. */}
         <ReactFlowProvider>
-          <FlowCanvas planoId={ativoId} />
-        </ReactFlowProvider>
+        <FlowCanvas planoId={ativoId} />
 
         <aside
           className="no-print bg-superficie overflow-hidden flex-shrink-0"
@@ -556,6 +560,7 @@ function Editor() {
           )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}
         </aside>
+        </ReactFlowProvider>
       </div>
 
       <CatalogoOrgaoModal

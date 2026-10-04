@@ -67,6 +67,12 @@ export interface LocalizadorData {
    * migração, como o `sistema` do D-23.
    */
   acoesPreferenciais?: AcaoPreferencialPlanejada[];
+  /**
+   * Presente quando o nó é um **atalho** para outro localizador do plano — o id
+   * do alvo (decisoes.md#D-30). Atalho não tem nome próprio nem entra no
+   * checklist; opcional, sem migração.
+   */
+  atalhoPara?: string;
 }
 
 export interface Localizador {

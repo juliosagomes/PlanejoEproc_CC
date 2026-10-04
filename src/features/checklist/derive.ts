@@ -1,5 +1,7 @@
 import {
   SUBITEM_CATS,
+  ehAtalho,
+  nomeEfetivo,
   ehRecursoRegra,
   regraDoSubitem,
   type AtpRule,
@@ -177,6 +179,8 @@ export function deriveChecklist(
     // nessa lista. Incluí-lo o mostraria como tarefa pendente e ainda puxaria a
     // contagem de progresso para baixo (decisoes.md#D-23).
     if (n.data.sistema) continue;
+    // Atalho representa outro localizador, que já está na lista (D-30).
+    if (ehAtalho(n)) continue;
     groups['Localizador'].push({
       kind: 'node',
       nodeId: n.id,
@@ -190,6 +194,7 @@ export function deriveChecklist(
   // sistema: vincular uma preferência a um padrão do Eproc é configuração que a
   // secretaria faz.
   for (const n of nodes) {
+    if (ehAtalho(n)) continue;
     for (const a of n.data.acoesPreferenciais ?? []) {
       groups['Ação preferencial'].push({
         kind: 'acao',
@@ -206,8 +211,8 @@ export function deriveChecklist(
     const data = e.data;
     if (!data) continue;
     const subs = data.subitems;
-    const src = nomeOuPlaceholder(nodes.find((n) => n.id === e.source)?.data.nome);
-    const tgt = nomeOuPlaceholder(nodes.find((n) => n.id === e.target)?.data.nome);
+    const src = nomeOuPlaceholder(nomeEfetivo(nodes, e.source));
+    const tgt = nomeOuPlaceholder(nomeEfetivo(nodes, e.target));
     const contexto = `${src} → ${tgt}`;
 
     const aImplantar = subs

@@ -12,6 +12,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import {
   SCHEMA_VERSION,
+  alvoReal,
   flagsPadrao,
   type AcaoPreferencialPlanejada,
   type AtpRule,
@@ -121,6 +122,13 @@ interface CanvasActions {
     patch: Partial<Omit<AcaoPreferencialPlanejada, 'id'>>,
   ) => void;
   removeAcaoPreferencial: (nodeId: string, acaoId: string) => void;
+
+  // Atalhos (decisoes.md#D-30)
+  /**
+   * Cria um atalho para o localizador `alvoId`, logo abaixo dele, e o seleciona.
+   * Devolve o id, ou `''` em visualização ou alvo inexistente.
+   */
+  criarAtalho: (alvoId: string) => string;
 
   // Seleção múltipla (Card 7)
   /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
@@ -376,6 +384,29 @@ export const useCanvasStore = create<CanvasStore>()(
         edges: s.edges.filter((e) => e.id !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
       }));
+    },
+
+    criarAtalho: (alvoId) => {
+      if (get().somenteLeitura) return '';
+      const alvo = alvoReal(get().nodes, alvoId);
+      const no = get().nodes.find((n) => n.id === alvo);
+      if (!alvo || !no) return '';
+      const id = uid('n');
+      set((s) => ({
+        nodes: [
+          ...comSelecao(s.nodes, new Set()),
+          {
+            id,
+            type: 'localizador',
+            position: { x: no.position.x + 40, y: no.position.y + 110 },
+            data: { nome: '', ja_criado: false, flags: [], atalhoPara: alvo },
+            selected: true,
+          },
+        ],
+        edges: comSelecao(s.edges, new Set()),
+        selectedId: id,
+      }));
+      return id;
     },
 
     addAcaoPreferencial: (nodeId, nome, ja_criado = false) => {

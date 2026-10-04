@@ -1356,6 +1356,47 @@ gravado, com migração que expanda os existentes.
 
 ---
 
+## D-30 · Atalho de localizador é um nó que aponta para outro, sem nome próprio
+
+**Decisão.** `LocalizadorData.atalhoPara?: string` faz de um nó um **atalho** para
+outro localizador do mesmo plano — o "continua em…" que evita puxar uma seta de
+um canto a outro do quadro. No canvas é uma pílula pontilhada com o nome do alvo;
+clique duplo (ou "Ir para o localizador", no painel) leva a câmera até o alvo e o
+seleciona. Campo opcional, sem bump.
+
+**Sem nome próprio.** O atalho lê o nome do alvo a cada render. Guardar uma cópia
+deixaria dois nomes para o mesmo localizador, e renomear o alvo esqueceria os
+atalhos. Pela mesma razão, o painel do atalho não tem nome, descrição, setores
+nem ações preferenciais — tudo isso é do alvo.
+
+**Transição ligada ao atalho é transição do alvo.** Chegando ou saindo, o
+checklist escreve "Minutar → Aguardando prazo", o painel da aresta mostra o alvo
+nas pontas, e as ATPs "Por Ação Manual" que saem de um atalho aparecem nas ações
+do alvo (D-28). O atalho não entra no checklist nem na contagem de localizadores
+do cabeçalho: não é localizador a mais.
+
+**Um nível só.** Criar atalho de um atalho aponta para o alvo dele
+(`alvoReal`). Ninguém precisa seguir cadeia, e não há ciclo possível.
+
+**Alvo apagado deixa o atalho órfão, em vermelho.** Apagar em cascata levaria
+junto as transições ligadas ao atalho — perda de trabalho calada. Órfão, ele
+avisa e o painel oferece outro alvo.
+
+**Por que não um tipo de nó novo.** Um `type: 'atalho'` na união do `Localizador`
+seria mais limpo no domínio, mas pediria `SCHEMA_VERSION = 5` e migração para um
+ganho que o campo opcional já entrega. O cartão e a pílula são o mesmo tipo do
+ReactFlow; o componente escolhe o desenho pelo campo.
+
+**Junto com o Card 2.** O atalho conta como cópia do alvo: passar o mouse num
+acende o outro, e o selo "×N" do alvo inclui os atalhos.
+
+**O que precisaria mudar para evoluir.** Atalho para localizador de **outro**
+plano é outra coisa — exige identidade estável entre planos e navegação entre
+eles. Se vier, o campo vira `{ planoId?, nodeId }`, e o desenho órfão já cobre o
+caso do plano apagado.
+
+---
+
 ## Como adicionar uma decisão nova
 
 1. Atribuir ID sequencial (`D-N`).

@@ -734,3 +734,25 @@ describe('ações preferenciais planejadas (D-28)', () => {
     expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais).toBeUndefined();
   });
 });
+
+describe('atalhos (D-30)', () => {
+  it('cria ao lado do alvo, selecionado, apontando para o localizador de verdade', () => {
+    const s = useCanvasStore.getState();
+    const a = s.createNode({ x: 100, y: 100 });
+    const s1 = useCanvasStore.getState().criarAtalho(a);
+    const s2 = useCanvasStore.getState().criarAtalho(s1);
+    const nodes = useCanvasStore.getState().nodes;
+    expect(nodes.find((n) => n.id === s1)?.data.atalhoPara).toBe(a);
+    // Atalho de atalho aponta para o alvo, nunca para o atalho.
+    expect(nodes.find((n) => n.id === s2)?.data.atalhoPara).toBe(a);
+    expect(nodes.find((n) => n.id === s1)?.position).toEqual({ x: 140, y: 210 });
+    expect(useCanvasStore.getState().selectedId).toBe(s2);
+  });
+
+  it('em visualização ou com alvo inexistente não cria', () => {
+    expect(useCanvasStore.getState().criarAtalho('nada')).toBe('');
+    const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    useCanvasStore.setState({ somenteLeitura: true });
+    expect(useCanvasStore.getState().criarAtalho(a)).toBe('');
+  });
+});
