@@ -36,6 +36,21 @@ describe('consultas salvas', () => {
     ]);
   });
 
+  it('JSON da lista do componente novo (D-37): `data`, entidades e grupo', () => {
+    const lista = JSON.stringify({
+      draw: 1,
+      recordsTotal: 2,
+      data: [
+        { Descricao: '&#128309; Conclusos', SinPreferenciaIndividual: 'N', DescricaoGrupoFormularioPersonalizacaoGrupo: 'Gabinete', IdFormularioPersonalizacao: '5' },
+        { Descricao: 'Sem grupo', SinPreferenciaIndividual: 'N', DescricaoGrupoFormularioPersonalizacaoGrupo: '', IdFormularioPersonalizacao: '6' },
+      ],
+    });
+    expect(parseConsultasJson(lista, 'areaMinutas')).toEqual([
+      { tela: 'areaMinutas', nome: '🔵 Conclusos', eprocId: '5', individual: false, grupo: 'Gabinete' },
+      { tela: 'areaMinutas', nome: 'Sem grupo', eprocId: '6', individual: false },
+    ]);
+  });
+
   it('JSON inválido ou fora do formato vira lista vazia', () => {
     expect(parseConsultasJson('<html>erro</html>', 'relatorioGeral')).toEqual([]);
     expect(parseConsultasJson('{"geral":{"geral0":"Erro"}}', 'relatorioGeral')).toEqual([]);

@@ -7,8 +7,8 @@ import { normalizarRotulo } from './setores';
  * cada setor.
  *
  * O setor trabalha a partir de **filas de trabalho** — o que ele abre no Eproc
- * para saber o que fazer: uma preferência de consulta ou uma consulta salva numa
- * tela de relatório. O painel planeja essas filas e confere a **cobertura**:
+ * para saber o que fazer: uma consulta salva numa das três telas de relatório
+ * (decisoes.md#D-37). O painel planeja essas filas e confere a **cobertura**:
  * todo localizador do setor está em alguma fila, ou foi deixado de fora com
  * motivo.
  *
@@ -19,25 +19,35 @@ export const PAINEL_VERSION = 1 as const;
 
 export type PainelVersion = typeof PAINEL_VERSION;
 
-/** Onde a fila mora no Eproc. */
-export type OrigemFila = 'preferencia' | TelaConsulta;
-
-export const ORIGENS_FILA: Record<OrigemFila, string> = {
-  preferencia: 'Preferência de consulta',
-  ...TELAS_CONSULTA,
-};
+/** As telas do Eproc onde uma fila mora (decisoes.md#D-37). */
+export type TelaFila = Exclude<TelaConsulta, 'semMovimentacao'>;
 
 /**
- * As origens que a fila nova oferece. "Processos sem Movimentação" saiu a
- * pedido do usuário: não é onde o setor trabalha no Eproc. Continua em
- * `ORIGENS_FILA` para a fila já gravada com ela abrir e mostrar o rótulo.
+ * Origens de antes, que o Eproc não tem como fila: a "preferência de consulta"
+ * era a preferência da Movimentação Processual, que lança evento, e "Processos
+ * sem Movimentação" não é tela de trabalho. Continuam aceitas para a fila
+ * gravada abrir; o painel pede que se escolha a tela certa.
  */
-export const ORIGENS_FILA_NOVA: readonly OrigemFila[] = [
-  'preferencia',
+export type OrigemLegada = 'preferencia' | 'semMovimentacao';
+
+/** Onde a fila mora no Eproc. */
+export type OrigemFila = TelaFila | OrigemLegada;
+
+export const ORIGENS_FILA: Record<OrigemFila, string> = {
+  ...TELAS_CONSULTA,
+  preferencia: 'Preferência de consulta',
+};
+
+/** As origens que a fila nova oferece, na ordem do menu de quem trabalha. */
+export const ORIGENS_FILA_NOVA: readonly TelaFila[] = [
   'relatorioGeral',
   'areaMinutas',
   'processosPorLocalizador',
 ];
+
+export function ehTelaFila(origem: string): origem is TelaFila {
+  return (ORIGENS_FILA_NOVA as readonly string[]).includes(origem);
+}
 
 export interface FilaTrabalho {
   id: string;
@@ -46,8 +56,8 @@ export interface FilaTrabalho {
   origem: OrigemFila;
   setorId: string;
   /**
-   * Grupo de preferências. Só faz sentido em `origem: 'preferencia'`: a consulta
-   * salva de relatório fica guardada na própria tela.
+   * Grupo de preferências. No Eproc toda consulta salva das três telas pode
+   * estar num grupo (decisoes.md#D-37).
    */
   grupoId?: string;
   /**
@@ -61,8 +71,9 @@ export interface FilaTrabalho {
 }
 
 /**
- * Grupo de preferências do Eproc, reduzido ao que o painel planeja: um nome. Só
- * agrupa preferências de **consulta** — minuta e intimação em bloco ficam fora.
+ * Grupo de preferências do Eproc, reduzido ao que o painel planeja: um nome. O
+ * Eproc agrupa preferências de qualquer tipo; o painel usa os grupos para as
+ * filas. Os nomes que a sincronização traz entram como sugestão (D-37).
  */
 export interface GrupoPreferencias {
   id: string;

@@ -1,6 +1,8 @@
 import {
   ORIGENS_FILA,
+  ORIGENS_FILA_NOVA,
   chaveLocalizador,
+  ehTelaFila,
   type DefinicaoFlag,
   type FilaTrabalho,
   type GrupoPreferencias,
@@ -9,6 +11,7 @@ import {
 import { Icon } from '@/components/Icon';
 import { cn } from '@/utils/cn';
 import { usePainelStore } from '../store';
+import { NOVO_GRUPO, SeletorGrupo } from './SeletorGrupo';
 
 interface FilaCardProps {
   fila: FilaTrabalho;
@@ -25,6 +28,7 @@ export function FilaCard({ fila, doSetor, locs, grupos, somenteLeitura, setoresP
   const atualizar = usePainelStore((s) => s.atualizarFila);
   const remover = usePainelStore((s) => s.removerFila);
   const definirGrupo = usePainelStore((s) => s.definirGrupo);
+  const criarGrupo = usePainelStore((s) => s.criarGrupo);
   const incluir = usePainelStore((s) => s.incluirLocalizador);
   const tirar = usePainelStore((s) => s.tirarLocalizador);
 
@@ -67,33 +71,39 @@ export function FilaCard({ fila, doSetor, locs, grupos, somenteLeitura, setoresP
       </div>
 
       <div className="flex flex-wrap items-center gap-1.5 text-[11.5px] text-texto-2">
-        <span
-          className={cn(
-            'px-1.5 py-px rounded border',
-            fila.origem === 'preferencia'
-              ? 'text-ok bg-ok-suave border-ok-borda'
-              : 'bg-superficie-2 border-borda',
-          )}
-        >
-          {ORIGENS_FILA[fila.origem]}
-        </span>
-        {fila.origem === 'preferencia' && (
+        {ehTelaFila(fila.origem) ? (
+          <span className="px-1.5 py-px rounded border bg-superficie-2 border-borda">
+            {ORIGENS_FILA[fila.origem]}
+          </span>
+        ) : (
+          // Origem de antes, que o Eproc não tem como fila (D-37): pede a tela certa.
           <select
-            className="select"
+            className="select text-aviso bg-aviso-suave"
             style={{ width: 'auto', height: 22, padding: '0 6px', fontSize: 11.5 }}
-            aria-label="Grupo de preferências"
+            aria-label="Escolher a tela da fila"
+            title={`"${ORIGENS_FILA[fila.origem]}" não é tela de fila no Eproc. Escolha onde a fila fica.`}
             disabled={somenteLeitura}
-            value={fila.grupoId ?? ''}
-            onChange={(e) => definirGrupo(fila.id, e.target.value || null)}
+            value=""
+            onChange={(e) => ehTelaFila(e.target.value) && atualizar(fila.id, { origem: e.target.value })}
           >
-            <option value="">Sem grupo</option>
-            {grupos.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.nome}
+            <option value="">{ORIGENS_FILA[fila.origem]} — revisar onde fica…</option>
+            {ORIGENS_FILA_NOVA.map((o) => (
+              <option key={o} value={o}>
+                {ORIGENS_FILA[o]}
               </option>
             ))}
           </select>
         )}
+        <SeletorGrupo
+          className="select"
+          style={{ width: 'auto', height: 22, padding: '0 6px', fontSize: 11.5 }}
+          disabled={somenteLeitura}
+          value={fila.grupoId ?? ''}
+          grupos={grupos}
+          onChange={(v) =>
+            definirGrupo(fila.id, (v.startsWith(NOVO_GRUPO) ? criarGrupo(v.slice(NOVO_GRUPO.length)) : v) || null)
+          }
+        />
         {setoresParaMover && !somenteLeitura && (
           <select
             className="select"

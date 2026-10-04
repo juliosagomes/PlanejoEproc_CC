@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import type { DefinicaoFlag, FilaTrabalho, PainelUnidade } from '@/domain';
+import { chaveLocalizador, type DefinicaoFlag, type FilaTrabalho, type PainelUnidade } from '@/domain';
 import { Icon } from '@/components/Icon';
+import { useGruposDoEproc } from '../dados';
 import { usePainelStore } from '../store';
 
 interface GruposPreferenciasProps {
@@ -10,16 +11,19 @@ interface GruposPreferenciasProps {
 }
 
 /**
- * Os grupos de preferências e as filas de cada um. Só filas de preferência de
- * consulta entram em grupo; a consulta salva de relatório fica na própria tela.
+ * Os grupos de preferências e as filas de cada um. No Eproc toda consulta salva
+ * das três telas pode estar num grupo (D-37); os grupos que a sincronização viu
+ * e o painel ainda não tem aparecem para trazer com um clique.
  */
 export function GruposPreferencias({ painel, setores, somenteLeitura }: GruposPreferenciasProps) {
   const criarGrupo = usePainelStore((s) => s.criarGrupo);
   const removerGrupo = usePainelStore((s) => s.removerGrupo);
   const definirGrupo = usePainelStore((s) => s.definirGrupo);
   const [novo, setNovo] = useState('');
+  const conhecidos = new Set(painel.grupos.map((g) => chaveLocalizador(g.nome)));
+  const doEproc = useGruposDoEproc().filter((n) => !conhecidos.has(chaveLocalizador(n)));
 
-  const prefs = painel.filas.filter((f) => f.origem === 'preferencia');
+  const prefs = painel.filas;
   const semGrupo = prefs.filter((f) => !f.grupoId || !painel.grupos.some((g) => g.id === f.grupoId));
   const chip = (f: FilaTrabalho) => {
     const s = setores.find((x) => x.id === f.setorId);
@@ -99,10 +103,26 @@ export function GruposPreferencias({ painel, setores, somenteLeitura }: GruposPr
           ))}
           {semGrupo.length === 0 && (
             <li className="text-[12px] text-texto-3">
-              {prefs.length === 0 ? 'Nenhuma fila de preferência ainda.' : 'Todas as filas de preferência têm grupo.'}
+              {prefs.length === 0 ? 'Nenhuma fila ainda.' : 'Todas as filas têm grupo.'}
             </li>
           )}
         </ul>
+        {!somenteLeitura && doEproc.length > 0 && (
+          <div className="flex flex-wrap items-center gap-1.5 text-[12px] text-texto-2">
+            <span>Do Eproc:</span>
+            {doEproc.map((n) => (
+              <button
+                key={n}
+                type="button"
+                className="btn btn-sm"
+                title="Trazer este grupo do Eproc para o painel"
+                onClick={() => criarGrupo(n)}
+              >
+                <Icon.Plus /> {n}
+              </button>
+            ))}
+          </div>
+        )}
         {!somenteLeitura && (
           <form
             className="flex gap-1.5"

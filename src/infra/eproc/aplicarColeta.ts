@@ -14,7 +14,7 @@ import { parseAcaoPreferencial } from './parseAcaoPreferencial';
 import { parseModeloPadrao, parseTextoPadrao } from './parseListasSimples';
 import { parseLocalizadorOrgao } from './parseLocalizadorOrgao';
 import { montarConsultasSalvas } from './parseConsultasSalvas';
-import { montarPreferencias, parsePreferenciasXml } from './parsePreferencias';
+import { montarPreferencias, parsePreferencias } from './parsePreferencias';
 import { parseSelectLocalizadores } from './parseSelectLocalizadores';
 import type { ColetaUnidade, FonteBruta } from './tipos';
 
@@ -173,7 +173,7 @@ export function aplicarColeta(
 
 /**
  * Preferências têm caminho próprio porque o **tipo** de cada fragmento não está
- * dentro do XML — vem em `rotulos`, paralelo a `fragmentos`. Sem esse
+ * na resposta — vem em `rotulos`, paralelo a `fragmentos`. Sem esse
  * pareamento, as 150 preferências viriam sem distinguir Minuta de Intimação.
  *
  * Quando a fonte não vem `ok`, o catálogo não perde a lista: ficam as da última
@@ -202,8 +202,8 @@ function aplicarPreferencias(
   }
 
   try {
-    const porTipo = bruta.fragmentos.map((xml, i) =>
-      parsePreferenciasXml(xml, bruta.rotulos?.[i] ?? 'Preferência'),
+    const porTipo = bruta.fragmentos.map((frag, i) =>
+      parsePreferencias(frag, bruta.rotulos?.[i] ?? 'Preferência'),
     );
     const itens = montarPreferencias(porTipo);
     fontes.preferencias = resultadoDeFonte(bruta, itens.length);

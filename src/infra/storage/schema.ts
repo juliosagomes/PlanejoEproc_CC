@@ -652,6 +652,7 @@ const ItemCatalogoUnidadeSchema = z.object({
   nome: z.string(),
   orgao: z.string().optional(),
   detalhe: z.string().optional(),
+  grupo: z.string().optional(),
 }) satisfies z.ZodType<ItemCatalogoUnidade>;
 
 const AcaoPreferencialUnidadeSchema = z.object({
@@ -664,6 +665,7 @@ const ConsultaSalvaUnidadeSchema = z.object({
   nome: z.string(),
   eprocId: z.string().optional(),
   individual: z.boolean().optional(),
+  grupo: z.string().optional(),
 }) satisfies z.ZodType<ConsultaSalvaUnidade>;
 
 const FonteResultadoSchema = z.object({

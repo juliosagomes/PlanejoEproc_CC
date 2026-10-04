@@ -45,7 +45,12 @@ interface PainelActions {
   tirarLocalizador: (filaId: string, nome: string) => void;
   deixarDeFora: (nome: string, motivo: string) => void;
   desfazerFora: (nome: string) => void;
-  criarGrupo: (nome: string) => void;
+  /**
+   * Devolve o id do grupo com esse nome, criando-o se preciso — os nomes que
+   * vêm do Eproc não podem duplicar o grupo que o usuário já criou à mão.
+   * `''` para nome vazio ou sessão de visualização.
+   */
+  criarGrupo: (nome: string) => string;
   removerGrupo: (id: string) => void;
 }
 
@@ -72,14 +77,13 @@ export const usePainelStore = create<PainelStore>((set, get) => {
     criarFila: (dados) => {
       const nome = dados.nome.trim();
       if (!nome) return;
-      // Grupo só existe para preferência; a consulta de relatório fica na tela.
       const { grupoId, ...resto } = dados;
       const fila: FilaTrabalho = {
         ...resto,
         nome,
         id: uid('fila'),
         localizadores: [],
-        ...(dados.origem === 'preferencia' && grupoId ? { grupoId } : {}),
+        ...(grupoId ? { grupoId } : {}),
       };
       mudar((p) => ({ ...p, filas: [...p.filas, fila] }));
     },
@@ -119,8 +123,12 @@ export const usePainelStore = create<PainelStore>((set, get) => {
 
     criarGrupo: (nome) => {
       const n = nome.trim();
-      if (!n) return;
-      mudar((p) => ({ ...p, grupos: [...p.grupos, { id: uid('grupo'), nome: n }] }));
+      if (!n || useCanvasStore.getState().somenteLeitura) return '';
+      const existente = get().painel.grupos.find((g) => mesmo(n)(g.nome));
+      if (existente) return existente.id;
+      const id = uid('grupo');
+      mudar((p) => ({ ...p, grupos: [...p.grupos, { id, nome: n }] }));
+      return id;
     },
 
     removerGrupo: (id) =>

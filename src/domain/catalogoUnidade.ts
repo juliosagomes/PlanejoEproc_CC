@@ -60,18 +60,15 @@ export interface LocalizadorUnidade {
 
 /** Item simples de catálogo — preferências, modelos, textos padrão. */
 export interface ItemCatalogoUnidade {
-  /**
-   * Código do Eproc. Ausente nas **preferências**: a tela que as lista
-   * (`consultar_formulario_personalizacao_grupo`) mostra só o nome, sem link
-   * que carregue o `num_id_form_personalizacao`. Para sugerir nomes no editor
-   * isso basta; para qualquer integração mais funda, não.
-   */
+  /** Código do Eproc. Nas preferências, o `IdFormularioPersonalizacao` (D-37). */
   eprocId?: string;
   nome: string;
   /** Sigla do órgão dono, para separar o que é da unidade do que é herdado. */
   orgao?: string;
-  /** Tipo de documento (modelos) ou sigla auto-texto (textos padrão). */
+  /** Tipo de documento (modelos), sigla auto-texto (textos padrão) ou tipo da preferência. */
   detalhe?: string;
+  /** Grupo de preferências no Eproc. Só nas preferências, e só quando há (D-37). */
+  grupo?: string;
 }
 
 /**
@@ -116,6 +113,8 @@ export interface ConsultaSalvaUnidade {
   eprocId?: string;
   /** Relatório Geral distingue a consulta individual da compartilhada. */
   individual?: boolean;
+  /** Grupo de preferências no Eproc, quando a consulta está em um (D-37). */
+  grupo?: string;
 }
 
 export type FonteStatus = 'ok' | 'vazio' | 'semPermissao' | 'falhou';

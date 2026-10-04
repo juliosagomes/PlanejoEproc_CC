@@ -178,12 +178,16 @@ existem em nenhum outro arquivo do projeto:
 - **Consulta salva** — filtro com nome salvo numa tela de relatório do Eproc (que
   o Eproc chama de preferência da tela). Coletada só pelo nome (decisoes.md#D-32).
 - **Fila de trabalho** — o que um setor abre no Eproc para saber o que fazer: uma
-  preferência de consulta ou uma consulta salva de relatório, com os
-  localizadores que ela olha. Mora no **painel da unidade**, que confere a
+  consulta salva numa de três telas (Relatório Geral, Área de Trabalho de
+  Minutas, Lista de Processos por Localizador), com os localizadores que ela
+  olha (decisoes.md#D-37). Mora no **painel da unidade**, que confere a
   **cobertura** (todo localizador do setor numa fila, ou fora de propósito com
   motivo). Não chamar de "consulta": é o termo do usuário (decisoes.md#D-33).
-- **Grupo de preferências** — agrupa só filas de **preferência de consulta**;
-  minuta e intimação em bloco não entram (decisoes.md#D-33).
+- **Grupo de preferências** — o agrupamento que o Eproc faz das preferências,
+  de qualquer tipo. No painel, qualquer fila pode estar num; os nomes do Eproc
+  chegam pela sincronização como sugestão (decisoes.md#D-37).
+- **Tipos de preferência** — Minuta, Movimentação e **Intimação**. A tela do
+  Eproc diz "Intimação Eletrônica em Bloco"; o tipo é Intimação.
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -333,8 +337,10 @@ opcionais, como no D-23:
 - O Eproc passou a amarrar o hash do autocompletar ao `nomeAcao` da tela, e a
   coleta das preferências parou (D-35). Na falha, `aplicarColeta` recebe o
   catálogo anterior e mantém a lista, somada aos nomes das ações
-  preferenciais. Recusa de hash chega como HTTP 200 com HTML: trate como
-  falha, nunca como lista vazia.
+  preferenciais. O D-37 achou o caminho que não amarra o hash: a lista da
+  janela de preferências do Relatório Geral (`data_table_listar_v2`), que traz
+  o grupo. Não volte ao autocompletar para as preferências. Recusa de hash
+  chega como HTTP 200 com HTML: trate como falha, nunca como lista vazia.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.

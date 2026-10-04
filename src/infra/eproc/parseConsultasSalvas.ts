@@ -1,10 +1,12 @@
 import { TELAS_CONSULTA, type ConsultaSalvaUnidade, type TelaConsulta } from '@/domain';
-import { parsePreferenciasXml } from './parsePreferencias';
+import { linhasDaLista, parsePreferenciasXml, textoDaLista } from './parsePreferencias';
 
 /**
  * Parser das consultas salvas nas telas de relatório (decisoes.md#D-32).
  *
- * Dois formatos, porque o Eproc tem duas gerações de componente:
+ * O caminho atual é a lista do componente novo (`data_table_listar_v2`,
+ * decisoes.md#D-37): JSON `{ data: [...] }` para as quatro telas, com o grupo.
+ * Os dois formatos de antes ficam como reserva do coletor:
  *
  *  - **Lista de Processos por Localizador, Área de Minutas, Sem Movimentação**:
  *    o mesmo autocompletar das preferências (`preferencia_auto_completar`), com
@@ -20,36 +22,20 @@ export function ehTelaConsulta(rotulo: string | undefined): rotulo is TelaConsul
   return !!rotulo && rotulo in TELAS_CONSULTA;
 }
 
-interface ItemRelatorioGeral {
-  Descricao?: unknown;
-  IdFormularioPersonalizacao?: unknown;
-  SinPreferenciaIndividual?: unknown;
-}
-
-function texto(v: unknown): string {
-  return typeof v === 'string' ? v.replace(/\s+/g, ' ').trim() : '';
-}
-
 export function parseConsultasJson(json: string, tela: TelaConsulta): ConsultaSalvaUnidade[] {
-  let dados: unknown;
-  try {
-    dados = JSON.parse(json);
-  } catch {
-    return [];
-  }
-  if (!Array.isArray(dados)) return [];
   const saida: ConsultaSalvaUnidade[] = [];
-  for (const bruto of dados as ItemRelatorioGeral[]) {
-    if (typeof bruto !== 'object' || bruto === null) continue;
-    const nome = texto(bruto.Descricao);
+  for (const linha of linhasDaLista(json)) {
+    const nome = textoDaLista(linha.Descricao);
     if (!nome) continue;
-    const id = texto(bruto.IdFormularioPersonalizacao);
-    const sin = texto(bruto.SinPreferenciaIndividual).toUpperCase();
+    const id = textoDaLista(linha.IdFormularioPersonalizacao);
+    const sin = textoDaLista(linha.SinPreferenciaIndividual).toUpperCase();
+    const grupo = textoDaLista(linha.DescricaoGrupoFormularioPersonalizacaoGrupo);
     saida.push({
       tela,
       nome,
       ...(id ? { eprocId: id } : {}),
       ...(sin === 'S' || sin === 'N' ? { individual: sin === 'S' } : {}),
+      ...(grupo ? { grupo } : {}),
     });
   }
   return saida;

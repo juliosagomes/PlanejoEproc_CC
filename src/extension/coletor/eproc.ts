@@ -28,14 +28,14 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
   const TIMEOUT_FRAME_MS = 30000;
 
   /**
-   * Uma requisição por tipo de preferência. O tipo não vem dentro do XML — só
+   * Uma requisição por tipo de preferência. O tipo não vem na resposta — só
    * existe na pergunta —, então viaja em `rotulos`, paralelo aos fragmentos.
    * Os rótulos são os do glossário (`PREF_TIPOS` do domínio).
    */
   const TIPOS_PREFERENCIA: ReadonlyArray<readonly [string, string]> = [
     ['minuta_cadastrar', 'Minuta'],
     ['processo_movimento_consultar', 'Movimentação'],
-    ['processo_intimacao_bloco', 'Intimação'],
+    ['processo_intimacao_bloco', 'Intimação'], // a tela diz "em bloco"; o tipo é Intimação
   ];
 
   const host = location.host;
@@ -467,58 +467,100 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
     };
   }
 
-  /* --- fonte 6: preferências, pelo autocomplete --------------------------- */
+  /* --- lista de preferências da unidade (decisoes.md#D-37) -------------- */
+
+  // O componente novo de preferências, o da janela "Listar preferências" do
+  // Relatório Geral, lista **qualquer** tipo com a mesma chave: o tipo vai no
+  // `acao_request` do POST, não no `hash`. Por isso ele substitui o
+  // autocompletar, cuja chave passou a ser de cada tela (D-35). Só lê: a mesma
+  // janela tem editar, desativar e salvar, e nenhum deles é chamado aqui.
+  //
+  // Sem `columns[i][data]` o Eproc devolve só a descrição e o id; o grupo e as
+  // marcas vêm porque são pedidos pelo nome.
+  const COLUNAS_PREFERENCIA = [
+    'Descricao',
+    'SinValorPadrao',
+    'SinPainelInicial',
+    'SinPreferenciaIndividual',
+    'DescricaoGrupoFormularioPersonalizacaoGrupo',
+    'IdFormularioPersonalizacao',
+  ];
+  /** A URL vem dentro de HTML ou de JSON, escapada de um dos dois jeitos. */
+  const desescapar = (bruto: string): string =>
+    bruto.replace(/\\\//g, '/').replace(/\\u0026/g, '&').replace(/&amp;/g, '&');
+
+  let listarPreferencias: ((acaoRequest: string) => Promise<string | null>) | null = null;
+  let motivoLista = 'O Relatório Geral não está no menu deste perfil.';
+  try {
+    const linkRg = acharLink(docMenu, (a) =>
+      /[?&]acao=relatorio_geral_listar(&|$|")/.test(a.getAttribute('href') ?? ''),
+    );
+    if (linkRg) {
+      motivoLista = 'Não achei a lista de preferências no Relatório Geral.';
+      await dormir(PAUSA_MS);
+      const tela = parseDoc(await lerHtml(await fetch(linkRg.href, { credentials: 'same-origin' })));
+      const urlModal = tela.getElementById('selPreferencia-list')?.getAttribute('data-url');
+      if (urlModal) {
+        await dormir(PAUSA_MS);
+        const modal = await lerHtml(
+          await fetch(new URL(desescapar(urlModal), base).href, { credentials: 'same-origin' }),
+        );
+        const bruto = modal.match(/controlador_ajax\.php\?acao_ajax=data_table_listar_v2[^"'\s<>]*/)?.[0];
+        if (bruto) {
+          const urlLista = new URL(desescapar(bruto), base).href;
+          listarPreferencias = async (acaoRequest) => {
+            const corpo = new URLSearchParams({
+              draw: '1',
+              start: '0',
+              length: '1000',
+              acao_request: acaoRequest,
+            });
+            COLUNAS_PREFERENCIA.forEach((c, i) => {
+              corpo.append(`columns[${i}][data]`, c);
+              corpo.append(`columns[${i}][name]`, '');
+            });
+            await dormir(PAUSA_MS);
+            const res = await fetch(urlLista, {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest',
+              },
+              body: corpo.toString(),
+            });
+            if (!res.ok) return null;
+            // Recusa chega como HTTP 200 com HTML, como no autocompletar (D-35).
+            const json = await lerHtml(res);
+            return json.trimStart().startsWith('{') && json.includes('"data"') ? json : null;
+          };
+        }
+      }
+    }
+  } catch (err) {
+    motivoLista = err instanceof Error ? err.message : String(err);
+  }
+
+  /** Lista com ao menos uma linha. `"data":[]` é vazio de verdade. */
+  const temLinhas = (json: string) => /"data"\s*:\s*\[\s*\{/.test(json);
+
+  /* --- fonte 6: preferências ---------------------------------------------- */
 
   try {
-    // O `hash` do autocomplete não se inventa: é lido do HTML de uma tela que o
-    // carregue. Até out/2026 qualquer tela de lista servia; desde 04/10/2026 o
-    // Eproc amarra o hash ao `nomeAcao` da tela, e nenhuma tela do menu traz o
-    // dos três tipos (decisoes.md#D-35). O caminho continua aqui para o caso de
-    // a chave voltar a valer, mas a recusa agora vira `falhou`, não `vazio` —
-    // e `aplicarColeta` cobre a falta com o que já se sabia.
-    const linkTela = acharLink(docMenu, (a) =>
-      /[?&]acao=(modelo_padrao_listar|minuta_area_trabalho)(&|$|")/.test(
-        a.getAttribute('href') ?? '',
-      ),
-    );
-    const htmlTela = linkTela
-      ? await lerHtml(await fetch(linkTela.href, { credentials: 'same-origin' }))
-      : '';
-    const hash = htmlTela.match(
-      /acao_ajax=preferencia_auto_completar[^"'<>]*?hash=([a-f0-9]{32})/i,
-    )?.[1];
-
-    if (!hash) {
-      fontes.preferencias = {
-        status: 'semPermissao',
-        fragmentos: [],
-        motivo:
-          'Não achei a chave do autocompletar de preferências nas telas deste perfil.',
-      };
+    if (!listarPreferencias) {
+      fontes.preferencias = { status: 'semPermissao', fragmentos: [], motivo: motivoLista };
     } else {
       const fragmentos: string[] = [];
       const rotulos: string[] = [];
-      // Hash recusado não dá erro HTTP: o Eproc responde 200 com uma página
-      // HTML. Só `<itens>` sem `<item>` é lista vazia de verdade.
       let recusas = 0;
-      for (const [nomeAcao, rotulo] of TIPOS_PREFERENCIA) {
-        await dormir(PAUSA_MS);
-        const res = await fetch(
-          `${base}controlador_ajax.php?acao_ajax=preferencia_auto_completar` +
-            `&nomeAcao=${nomeAcao}&hash=${hash}`,
-          { credentials: 'same-origin', headers: { 'X-Requested-With': 'XMLHttpRequest' } },
-        );
-        if (!res.ok) {
+      for (const [acaoRequest, rotulo] of TIPOS_PREFERENCIA) {
+        const json = await listarPreferencias(acaoRequest);
+        if (json === null) {
           recusas++;
           continue;
         }
-        const xml = await lerHtml(res);
-        if (!xml.includes('<itens')) {
-          recusas++;
-          continue;
-        }
-        if (!xml.includes('<item')) continue;
-        fragmentos.push(xml);
+        if (!temLinhas(json)) continue;
+        fragmentos.push(json);
         rotulos.push(rotulo);
       }
 
@@ -529,9 +571,7 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
             ? {
                 status: 'falhou',
                 fragmentos: [],
-                motivo:
-                  'O Eproc recusou a chave do autocompletar para os tipos de ' +
-                  'preferência (a chave passou a ser de cada tela).',
+                motivo: 'O Eproc recusou a lista de preferências do Relatório Geral.',
               }
             : {
                 status: 'vazio',
@@ -550,9 +590,8 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
   /* --- fonte 7: consultas salvas nas telas de relatório (D-32) ------------ */
 
   try {
-    // Telas cujo componente de preferência é o mesmo autocompletar das
-    // preferências, com `nomeAcao` igual à ação da tela. O rótulo é a chave de
-    // `TELAS_CONSULTA` do domínio.
+    // O rótulo é a chave de `TELAS_CONSULTA` do domínio. Na reserva, as telas
+    // cujo componente é o autocompletar, com `nomeAcao` igual à ação da tela.
     const TELAS_AUTOCOMPLETAR: ReadonlyArray<readonly [string, string]> = [
       ['localizador_processos_lista', 'processosPorLocalizador'],
       ['minuta_area_trabalho', 'areaMinutas'],
@@ -562,7 +601,28 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
     const rotulos: string[] = [];
     let algumaTela = false;
 
-    for (const [acao, tela] of TELAS_AUTOCOMPLETAR) {
+    // Caminho principal (D-37): a lista do componente novo responde pelas
+    // quatro telas, e traz o grupo de cada consulta. O `acao_request` é a ação
+    // de listagem de cada tela.
+    const TELAS_LISTA: ReadonlyArray<readonly [string, string]> = [
+      ['relatorio_geral_listar', 'relatorioGeral'],
+      ['localizador_processos_lista', 'processosPorLocalizador'],
+      ['minuta_area_trabalho', 'areaMinutas'],
+      ['relatorio_sem_movimentacao_listar', 'semMovimentacao'],
+    ];
+    if (listarPreferencias) {
+      algumaTela = true;
+      for (const [acaoRequest, tela] of TELAS_LISTA) {
+        const json = await listarPreferencias(acaoRequest);
+        if (json === null || !temLinhas(json)) continue;
+        fragmentos.push(json);
+        rotulos.push(tela);
+      }
+    }
+    // Reserva: o caminho de antes, tela a tela, sem grupo.
+    const reserva = fragmentos.length === 0;
+
+    for (const [acao, tela] of reserva ? TELAS_AUTOCOMPLETAR : []) {
       const link = acharLink(docMenu, (a) =>
         new RegExp(`[?&]acao=${acao}(&|$|")`).test(a.getAttribute('href') ?? ''),
       );
@@ -596,7 +656,7 @@ export async function coletarUnidadeNaAba(): Promise<ColetaUnidade> {
     const linkRg = acharLink(docMenu, (a) =>
       /[?&]acao=relatorio_geral_listar(&|$|")/.test(a.getAttribute('href') ?? ''),
     );
-    if (linkRg) {
+    if (reserva && linkRg) {
       algumaTela = true;
       await dormir(PAUSA_MS);
       const html = await lerHtml(await fetch(linkRg.href, { credentials: 'same-origin' }));

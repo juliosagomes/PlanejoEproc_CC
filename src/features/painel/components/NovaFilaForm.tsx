@@ -1,9 +1,16 @@
 import { useState } from 'react';
-import { ORIGENS_FILA, ORIGENS_FILA_NOVA, type GrupoPreferencias, type OrigemFila } from '@/domain';
+import {
+  ORIGENS_FILA,
+  ORIGENS_FILA_NOVA,
+  chaveLocalizador,
+  type GrupoPreferencias,
+  type TelaFila,
+} from '@/domain';
 import { Icon } from '@/components/Icon';
 import { SugestoesInput } from '@/components/SugestoesInput';
 import { useSugestoesFila } from '../dados';
 import { usePainelStore } from '../store';
+import { NOVO_GRUPO, SeletorGrupo } from './SeletorGrupo';
 
 interface NovaFilaFormProps {
   setorId: string;
@@ -12,10 +19,11 @@ interface NovaFilaFormProps {
 
 export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
   const criarFila = usePainelStore((s) => s.criarFila);
+  const criarGrupo = usePainelStore((s) => s.criarGrupo);
   const [aberto, setAberto] = useState(false);
   const [nome, setNome] = useState('');
-  const [origem, setOrigem] = useState<OrigemFila>('preferencia');
-  const [grupoId, setGrupoId] = useState('');
+  const [origem, setOrigem] = useState<TelaFila>('relatorioGeral');
+  const [grupo, setGrupo] = useState('');
   const sugestoes = useSugestoesFila();
 
   if (!aberto) {
@@ -29,6 +37,7 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
   const fechar = () => {
     setAberto(false);
     setNome('');
+    setGrupo('');
   };
 
   return (
@@ -37,6 +46,8 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
       onSubmit={(e) => {
         e.preventDefault();
         if (!nome.trim()) return;
+        // Grupo vindo do Eproc só vira grupo do painel quando a fila é criada.
+        const grupoId = grupo.startsWith(NOVO_GRUPO) ? criarGrupo(grupo.slice(NOVO_GRUPO.length)) : grupo;
         const alvo = nome.trim().toLocaleLowerCase('pt-BR');
         const doEproc = sugestoes.some(
           (s) => s.origem === origem && s.valor.toLocaleLowerCase('pt-BR') === alvo,
@@ -60,7 +71,12 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
           value={nome}
           onValueChange={setNome}
           sugestoes={sugestoes}
-          onEscolher={(s) => setOrigem(s.origem)}
+          onEscolher={(s) => {
+            setOrigem(s.origem);
+            if (!s.grupo) return;
+            const doPainel = grupos.find((g) => chaveLocalizador(g.nome) === chaveLocalizador(s.grupo ?? ''));
+            setGrupo(doPainel ? doPainel.id : NOVO_GRUPO + s.grupo);
+          }}
           placeholder={
             sugestoes.length > 0
               ? 'Digite ou escolha uma consulta da unidade'
@@ -75,7 +91,7 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
           <select
             className="select"
             value={origem}
-            onChange={(e) => setOrigem(e.target.value as OrigemFila)}
+            onChange={(e) => setOrigem(e.target.value as TelaFila)}
           >
             {ORIGENS_FILA_NOVA.map((o) => (
               <option key={o} value={o}>
@@ -84,19 +100,10 @@ export function NovaFilaForm({ setorId, grupos }: NovaFilaFormProps) {
             ))}
           </select>
         </label>
-        {origem === 'preferencia' && (
-          <label className="flex flex-col gap-1 text-[11.5px] text-texto-2 flex-1 min-w-[160px]">
-            Grupo de preferências
-            <select className="select" value={grupoId} onChange={(e) => setGrupoId(e.target.value)}>
-              <option value="">Sem grupo</option>
-              {grupos.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.nome}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
+        <label className="flex flex-col gap-1 text-[11.5px] text-texto-2 flex-1 min-w-[160px]">
+          Grupo de preferências
+          <SeletorGrupo value={grupo} grupos={grupos} onChange={setGrupo} />
+        </label>
       </div>
       <div className="flex gap-2">
         <button type="submit" className="btn btn-sm btn-accent" disabled={!nome.trim()}>

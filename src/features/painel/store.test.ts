@@ -15,18 +15,25 @@ beforeEach(() => {
 
 describe('store do painel', () => {
   it('grava a cada mudança', () => {
-    acoes().criarFila({ nome: ' TRIAGEM ', origem: 'preferencia', setorId: 's1', ja_criado: false });
+    acoes().criarFila({ nome: ' TRIAGEM ', origem: 'relatorioGeral', setorId: 's1', ja_criado: false });
     expect(painel().filas[0]?.nome).toBe('TRIAGEM');
     expect(loadPainel()).toEqual(painel());
   });
 
-  it('consulta de relatório não leva grupo', () => {
-    acoes().criarFila({ nome: 'X', origem: 'relatorioGeral', setorId: 's1', grupoId: 'g1', ja_criado: false });
-    expect(painel().filas[0]).not.toHaveProperty('grupoId');
+  it('fila de qualquer das três telas leva grupo (D-37)', () => {
+    acoes().criarFila({ nome: 'X', origem: 'areaMinutas', setorId: 's1', grupoId: 'g1', ja_criado: false });
+    expect(painel().filas[0]?.grupoId).toBe('g1');
+  });
+
+  it('criar grupo com nome que já existe devolve o mesmo grupo', () => {
+    const a = acoes().criarGrupo('Preferências de Secretaria');
+    const b = acoes().criarGrupo('  preferencias de secretaria ');
+    expect(b).toBe(a);
+    expect(painel().grupos).toHaveLength(1);
   });
 
   it('não repete o localizador na fila, nem por diferença de maiúsculas', () => {
-    acoes().criarFila({ nome: 'X', origem: 'preferencia', setorId: 's1', ja_criado: false });
+    acoes().criarFila({ nome: 'X', origem: 'relatorioGeral', setorId: 's1', ja_criado: false });
     const id = painel().filas[0]!.id;
     acoes().incluirLocalizador(id, 'Cumprir despacho');
     acoes().incluirLocalizador(id, 'cumprir DESPACHO');
@@ -38,7 +45,7 @@ describe('store do painel', () => {
   it('apagar o grupo solta as filas dele', () => {
     acoes().criarGrupo('Filas da Secretaria');
     const g = painel().grupos[0]!.id;
-    acoes().criarFila({ nome: 'X', origem: 'preferencia', setorId: 's1', grupoId: g, ja_criado: false });
+    acoes().criarFila({ nome: 'X', origem: 'relatorioGeral', setorId: 's1', grupoId: g, ja_criado: false });
     acoes().removerGrupo(g);
     expect(painel().grupos).toEqual([]);
     expect(painel().filas[0]).not.toHaveProperty('grupoId');

@@ -1649,6 +1649,9 @@ Os nomes vindos das ações preferenciais entram **sem tipo** (`detalhe`), porqu
 o vínculo não o traz, e só cobrem as preferências que atuam em algum
 localizador. É uma lista incompleta, mas é melhor do que nenhuma lista.
 
+**Resolvido no D-37:** a lista da janela de preferências do Relatório Geral
+não amarra o hash ao tipo. O texto abaixo fica como registro.
+
 **O que precisaria mudar para evoluir.** Achar de onde sai um hash válido para
 cada tipo. `processo_movimentar` cita `minuta_cadastrar` e
 `processo_movimento_consultar`, mas o autocompletar desses tipos só aparece em
@@ -1687,6 +1690,62 @@ botão, passou para o rótulo do menu ("Baixando…").
 da última sincronização; isso pede um carimbo no catálogo da unidade, num
 campo opcional, sem bump de schema. Um atalho de teclado para os menus
 entra junto com a busca por comandos, se ela vier.
+
+---
+
+## D-37 · Preferências pela lista do componente novo; filas só nas três telas
+
+**Decisão.** A sincronização lê as preferências e as consultas salvas pela
+lista da janela "Listar preferências" do Relatório Geral, que traz o **grupo**
+de cada uma. O painel passa a ter filas só em três telas (Relatório Geral, Área
+de Trabalho de Minutas, Lista de Processos por Localizador), e qualquer fila
+pode estar num grupo de preferências. Campos novos opcionais (`grupo` no item do
+catálogo e na consulta salva): sem bump.
+
+**Como a lista é lida** (levantado no eproc1g/TJMG em 04/10/2026, somente
+leitura). A tela do Relatório Geral tem o botão `#selPreferencia-list`, cujo
+`data-url` abre `ui_preferencias/modal_lista_preferencias`. O HTML dessa janela
+traz a URL de `controlador_ajax.php?acao_ajax=data_table_listar_v2` com `hash`.
+Um POST de listagem com `acao_request=<tipo>` devolve `{ data: [...] }` com
+`Descricao`, `SinValorPadrao`, `SinPainelInicial`, `SinPreferenciaIndividual`,
+`DescricaoGrupoFormularioPersonalizacaoGrupo` e `IdFormularioPersonalizacao`.
+
+- **A chave não depende do tipo.** É isso que o autocompletar perdeu (D-35). Uma
+  chave lista minuta (`minuta_cadastrar`), movimentação
+  (`processo_movimento_consultar`), intimação (`processo_intimacao_bloco` — a
+  tela diz "em bloco", o tipo é **Intimação**) e as consultas das telas de
+  relatório (`relatorio_geral_listar`, `localizador_processos_lista`,
+  `minuta_area_trabalho`).
+- **As colunas vêm porque são pedidas.** Sem `columns[i][data]` no POST, o Eproc
+  devolve só descrição e id. `length=1000` traz tudo numa página.
+- **A preferência individual fica fora do catálogo**: é do servidor que
+  sincroniza, não da unidade.
+- **Só leitura.** A mesma janela tem editar, desativar e salvar; o coletor não
+  os chama. O autocompletar por tela continua como reserva das consultas salvas,
+  se a janela sumir do Relatório Geral.
+
+Existe um segundo caminho, em HTML: `minuta_area_trabalho` traz um link para
+`formulario_personalizacao_listar`, e trocar o `nome_acao` lista qualquer tipo
+antigo. Não foi usado: o JSON cobre também o Relatório Geral.
+
+**Por que filas só em três telas.** A "preferência de consulta" do D-33 era a
+preferência da Movimentação Processual, que lança evento, e não uma fila; e
+"Processos sem Movimentação" não é tela de trabalho. As duas telas mostram a
+coluna **Grupo** nas próprias preferências, por isso o grupo deixou de ser só
+da preferência de consulta. As filas gravadas com uma origem de antes continuam
+abrindo e pedem, no cartão, a tela certa.
+
+**Grupos do Eproc entram como sugestão, não como importação.** O seletor de
+grupo oferece, abaixo dos grupos do painel, os nomes que a sincronização viu, e
+a aba de grupos tem um botão para trazer cada um. Escolher uma consulta salva
+ao criar a fila já sugere o grupo dela. A unidade continua dizendo o que é de
+quem, como no D-33.
+
+**O que precisaria mudar para evoluir.** As marcas Padrão e Painel Inicial já
+chegam na lista e não são guardadas; dariam um selo na fila. A janela também
+leva a `buscar_request_por_id` (D-32), o caminho para os filtros. Se o Eproc
+mudar a janela, o coletor cai no autocompletar para as consultas, mas as
+preferências ficam com a reserva do D-35.
 
 
 1. Atribuir ID sequencial (`D-N`).
