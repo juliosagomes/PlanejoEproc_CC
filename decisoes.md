@@ -1261,7 +1261,492 @@ já adicionados.
 
 ---
 
-## Como adicionar uma decisão nova
+## D-28 · Ações preferenciais planejadas moram no nó, ao lado das do Eproc
+
+> **Emenda ao [D-16](#d-16--catálogo-lido-direto-da-unidade-no-eproc)**: o bloco
+> "Ações Preferenciais Vinculadas" deixa de ser só informação.
+
+**Decisão.** O localizador ganha `acoesPreferenciais?: AcaoPreferencialPlanejada[]`
+— preferências que o usuário quer que atuem ali, cada uma com ✓ de "já vinculada
+no Eproc". O bloco do painel junta três origens numa lista só, cada linha com
+selo próprio: **Eproc** (o que a sincronização trouxe, só leitura), **Planejada**
+(editável) e **ATP manual** (regras de ATP com tipo de controle "Por Ação Manual"
+nas arestas que **saem** do localizador, derivadas e nunca gravadas). Cada
+planejada vira tarefa numa seção nova do checklist, "Ação preferencial", com o
+localizador como contexto. Sem bump: o campo é opcional, como o `sistema` do
+D-23.
+
+**Por que no nó, e não na aresta.** O vínculo do Eproc é entre uma preferência e
+o localizador onde ela aparece para quem trabalha a fila. Até aqui a única forma
+de planejá-lo era desenhar uma aresta verde, que diz outra coisa — "esta
+preferência leva o processo de A para B". As duas continuam existindo e não se
+substituem: a preferência que *move* é recurso da aresta (D-24); a que está
+*disponível* no localizador é ação preferencial do nó.
+
+**Por que a ATP manual entra na mesma lista.** No Eproc, a regra "Por Ação
+Manual" só roda quando um servidor a aciona estando no localizador de origem — o
+próprio cadastro tem a opção "ação preferencial na capa". Para quem trabalha a
+fila ela é indistinguível de uma ação preferencial. Derivada, e não copiada, para
+que a regra tenha um lugar só: a aresta. Clicar na linha abre a transição.
+
+**Planejada e Eproc com o mesmo nome aparecem uma vez.** A régua é a da anotação
+de preferência (caixa e espaço, D-25). A linha fica como planejada, com selo
+"Planejada · Eproc", e vincular uma preferência que a sincronização já mostra
+nasce marcada — liga, nunca desliga, a mesma regra do `SubitemNomeInput`.
+
+**No checklist, mesmo localizador de sistema.** O nó de sistema fica fora do
+checklist (D-23), mas vincular uma preferência a ele é configuração que a
+secretaria faz. A ação entra.
+
+**O que precisaria mudar para evoluir.** Se a ação planejada precisar de mais do
+que nome — tipo, modelo usado —, o caminho é reaproveitar o `PrefRule` como
+detalhamento, como o recurso da aresta faz. E a mesma lista é o ponto de partida
+natural de um "rascunho como está" a partir da sincronização: as ações do Eproc
+já chegam no formato que um nó novo receberia.
+
+---
+
+## D-29 · Conjuntos de eventos: atalho de seleção e de leitura, não dado do plano
+
+**Decisão.** Onde a regra de ATP escolhe eventos — o gatilho "Por Evento" e os
+filtros de evento —, o seletor ganha **conjuntos**: 43 padrão, deduzidos da
+própria lista do Eproc e organizados em oito categorias, mais os que a unidade
+criar. O plano continua gravando a lista explícita de ids; o conjunto só ajuda a
+montá-la ("Selecionar todos", depois "Tirar" em Mera ciência) e a lê-la ("Todos
+os eventos, exceto Mera ciência — 1.013 de 1.077") no modal e no checklist.
+
+**Por que não gravar o conjunto no plano.** O que a secretaria marca no Eproc é
+evento por evento; o Eproc não tem "conjunto" no gatilho. Guardar "exceto Mera
+ciência" em vez dos ids faria o plano mudar de significado quando a definição do
+conjunto mudasse — a regra planejada hoje passaria a dizer outra coisa amanhã,
+sem ninguém editá-la. Com ids explícitos, o resumo é só uma leitura do que está
+gravado, e pode melhorar à vontade. Sem bump, sem migração.
+
+**Os padrão são regras sobre o rótulo, e não listas de ids.** A redação do
+catálogo é muito regular ("Audiência de X designada", "Juntada de Mandado -
+Cumprido Negativo", "Expedida/certificada a intimação eletrônica - …"), e regra
+continua valendo para o evento novo que siga a mesma forma. A comparação é sem
+acento porque a lista mistura "Decisao" com "Decisão". Medido contra o catálogo
+embutido (1.077 eventos), só três ficam fora de todo conjunto. O teste prende
+cada regra a exemplos reais que precisam — e não podem — estar dentro, incluindo
+as armadilhas encontradas ("Audiência pre*liminar*" não é liminar; "alvará de
+soltura" é prisão, não valores).
+
+**"Mera ciência" é a definição mais discutível, e está escrita.** Entram as
+intimações, citações e comunicações expedidas ou confirmadas e as publicações
+no Diário — o que a própria secretaria gera e que não pede providência. **Não**
+entra "Decorrido prazo": é exatamente o evento que dispara providência. Quem
+discordar cria o seu conjunto a partir da seleção.
+
+**Conjuntos da unidade, numa chave por silo.** Como os setores (D-26), e pelo
+mesmo motivo: é conhecimento de como aquela vara trabalha, não de um plano. Não
+viajam no export nem na sincronização — não precisam, porque o plano já leva os
+ids. Apagar um conjunto não muda regra nenhuma.
+
+**O checklist diz o que marcar.** A primeira linha é o resumo; a segunda é a
+lista que se confere no Eproc — os marcados, ou, quando é "todos menos alguns",
+os que ficam de fora ("Marcar todos e desmarcar: …"). Seleção pequena e sem
+conjunto sai em uma linha, como antes.
+
+**O que precisaria mudar para evoluir.** Se a unidade quiser compartilhar
+conjuntos entre colegas, eles entram na sincronização por lotação como os
+setores — a chave já é do silo. Se o Eproc passar a oferecer grupos de evento no
+gatilho (hoje só há quatro, e só nos filtros), o conjunto pode virar valor
+gravado, com migração que expanda os existentes.
+
+---
+
+## D-30 · Atalho de localizador é um nó que aponta para outro, sem nome próprio
+
+**Decisão.** `LocalizadorData.atalhoPara?: string` faz de um nó um **atalho** para
+outro localizador do mesmo plano — o "continua em…" que evita puxar uma seta de
+um canto a outro do quadro. No canvas é uma pílula pontilhada com o nome do alvo;
+clique duplo (ou "Ir para o localizador", no painel) leva a câmera até o alvo e o
+seleciona. Campo opcional, sem bump.
+
+**Sem nome próprio.** O atalho lê o nome do alvo a cada render. Guardar uma cópia
+deixaria dois nomes para o mesmo localizador, e renomear o alvo esqueceria os
+atalhos. Pela mesma razão, o painel do atalho não tem nome, descrição, setores
+nem ações preferenciais — tudo isso é do alvo.
+
+**Transição ligada ao atalho é transição do alvo.** Chegando ou saindo, o
+checklist escreve "Minutar → Aguardando prazo", o painel da aresta mostra o alvo
+nas pontas, e as ATPs "Por Ação Manual" que saem de um atalho aparecem nas ações
+do alvo (D-28). O atalho não entra no checklist nem na contagem de localizadores
+do cabeçalho: não é localizador a mais.
+
+**Um nível só.** Criar atalho de um atalho aponta para o alvo dele
+(`alvoReal`). Ninguém precisa seguir cadeia, e não há ciclo possível.
+
+**Alvo apagado deixa o atalho órfão, em vermelho.** Apagar em cascata levaria
+junto as transições ligadas ao atalho — perda de trabalho calada. Órfão, ele
+avisa e o painel oferece outro alvo.
+
+**Por que não um tipo de nó novo.** Um `type: 'atalho'` na união do `Localizador`
+seria mais limpo no domínio, mas pediria `SCHEMA_VERSION = 5` e migração para um
+ganho que o campo opcional já entrega. O cartão e a pílula são o mesmo tipo do
+ReactFlow; o componente escolhe o desenho pelo campo.
+
+**Junto com o Card 2.** O atalho conta como cópia do alvo: passar o mouse num
+acende o outro, e o selo "×N" do alvo inclui os atalhos.
+
+**O que precisaria mudar para evoluir.** Atalho para localizador de **outro**
+plano é outra coisa — exige identidade estável entre planos e navegação entre
+eles. Se vier, o campo vira `{ planoId?, nodeId }`, e o desenho órfão já cobre o
+caso do plano apagado.
+
+---
+
+## D-31 · Grupos organizam o desenho, com membros explícitos e posição absoluta
+
+**Decisão.** `Plano.grupos?: GrupoLocalizadores[]` — molduras nomeadas e
+coloridas. Selecionar localizadores e "Agrupar" cria a moldura em volta deles;
+arrastar a moldura leva os membros; soltar um localizador dentro dela o torna
+membro, e fora, o tira; recolher troca os membros por um bloco "N localizadores",
+e as setas deles passam a chegar na moldura. Desfazer o grupo mantém os
+localizadores. Campo opcional, ausente quando não há grupo: sem bump.
+
+**Para organizar o desenho, não para dizer quem trabalha.** Isso é dos setores
+(D-22/D-26), que filtram em vez de agrupar. Por isso o grupo não aparece no
+checklist nem tem efeito no Eproc, que não conhece agrupamento de localizadores.
+
+**Sem `parentNode` do ReactFlow.** O ReactFlow agrupa com posição *relativa* ao
+pai, e isso faria o mesmo campo `position` mudar de significado conforme o nó
+está ou não num grupo — no domínio, no export e em todo cálculo de geometria
+(dobra da seta, atalho, alinhamento). As posições continuam absolutas, e a store
+aplica o deslocamento da moldura aos membros. O custo é tratar à mão as mudanças
+que o ReactFlow manda para o nó da moldura (`grupoMudancas.ts`): arrastar move
+os membros, redimensionar pelo canto não.
+
+**Membros explícitos, não geometria.** Grupo recolhido não tem onde "conter"
+ninguém, e o membro precisa continuar membro. A geometria só decide no momento
+em que um localizador é solto (o centro, e a menor moldura quando há uma dentro
+da outra). Um localizador é membro de um grupo só.
+
+**Fora de `nodes`.** A store guarda as molduras em `grupos`, não misturadas aos
+localizadores: todo o app lê `nodes` como "os localizadores", e cada filtro
+precisaria lembrar de pular molduras. O `FlowCanvas` junta as duas listas só na
+hora de desenhar, com as molduras atrás (zIndex negativo — o ReactFlow ergue o
+selecionado em 1000, e uma moldura erguida cobriria os membros).
+
+**A moldura leva `width`/`height` no próprio nó** (correção de outubro/2026,
+em `moldurasParaFlow`). No ReactFlow 11 esses campos são a medida que a lib
+escreve, e só sobrevivem se a store guardar a mudança `dimensions` — o que ela
+faz para os localizadores, mas não para as molduras, cujo tamanho é nosso. O
+`FlowCanvas` passa um array novo de nós a cada render, e sem a medida no nó
+ela se apagava: a moldura piscava com `visibility: hidden`, as setas do grupo
+recolhido sumiam no primeiro hover e o redimensionar começava do zero. Todo
+nó que o app desenhar sem guardar a medição pela store precisa trazer a
+medida junto. Na mesma correção: recolher desmarca o que some (membros e
+setas internas), e a seta presa à moldura não oferece a alça de dobra.
+
+**O que precisaria mudar para evoluir.** Grupo dentro de grupo (hoje a moldura
+menor ganha, mas não há hierarquia) pediria `grupoPai` e propagar o arrasto.
+Setas que chegam na moldura recolhida são só desenho; se um dia for útil
+"conectar ao grupo", é aí que um destino-grupo entraria no domínio da aresta.
+
+**Aresta no grupo (outubro/2026, a pedido do usuário).** A moldura ganhou alças
+de verdade, aberta ou recolhida: `source`/`target` da aresta podem ser o id de
+um grupo. Sem bump — o schema nunca conferiu que a ponta é nó. O nome da ponta
+vem de `nomeDaPonta` (`Grupo "rótulo"`), no painel da aresta, no checklist e na
+ATP manual. Desfazer o grupo, ou apagá-lo na seleção, leva junto as setas
+presas a ele; os localizadores ficam. Seta entre um membro e o próprio grupo
+some quando ele recolhe, como as internas.
+
+---
+
+## D-32 · Consultas salvas entram no catálogo só pelo nome
+
+**Decisão.** A sincronização com a unidade ganha uma sétima fonte: as **consultas
+salvas** (o que o Eproc chama de preferência da tela) de quatro telas de
+relatório — Relatório Geral, Lista de Processos por Localizador, Área de
+Trabalho de Minutas e Processos sem Movimentação nos Últimos N Dias. Elas
+aparecem numa aba nova do catálogo ("Consultas salvas"), com a tela de origem, e
+aceitam a anotação do D-25. Só o **nome** é coletado; os filtros, não.
+`CatalogoUnidade.consultasSalvas` é opcional, sem versão nova.
+
+**Como cada tela entrega a lista** (levantado no eproc1g/TJMG em 03/10/2026,
+somente leitura):
+
+- As três primeiras usam o mesmo autocompletar das preferências
+  (`preferencia_auto_completar`), com `nomeAcao` igual à ação da tela. O `hash`
+  é **da tela**: o de uma devolve página de erro na outra, então o coletor abre
+  cada tela antes de perguntar.
+- O Relatório Geral usa um componente mais novo (`ui_preferencias`). A lista é um
+  POST de busca com termo vazio em `ui_preferencias/listar`, cuja URL não está
+  num link: vem no HTML dentro de um JSON, com a barra escapada. Resposta em JSON
+  (`Descricao`, `IdFormularioPersonalizacao`, `SinPreferenciaIndividual`).
+
+**Por que sem os filtros.** O card pedia, no fundo, saber que consulta olha para
+qual localizador ("contém localizador X", "sem movimentação há N dias"). Nenhuma
+das quatro telas entrega isso sem uma de duas coisas que a coleta não faz:
+
+- **Aplicar a consulta.** Nas telas antigas, escolher a preferência submete o
+  formulário de pesquisa: o servidor devolve a tela já filtrada — com a lista de
+  processos junto — e pode registrar a escolha como a última usada. Isso é
+  executar pesquisa e, possivelmente, escrever estado no Eproc.
+- **Avaliar código da página.** O conteúdo das preferências antigas está em
+  `arrCamposPersonalizados`, que só sai com `eval` — o mesmo bloqueio do item do
+  roadmap sobre o detalhe interno da preferência.
+
+O componente novo tem `ui_preferencias/buscar_request_por_id`, que devolve a
+pesquisa salva em JSON sem executá-la. Testado com as consultas desta unidade,
+devolveu lista vazia em todas as variações — o formulário traz um
+`conf_migracao`, e a leitura mais provável é que as consultas antigas não estão
+no formato novo. Fica registrado como o caminho a reexaminar.
+
+**O que se ganha mesmo assim.** O catálogo passa a responder "que relatórios a
+unidade usa?", e a anotação guarda o que cada um filtra — conhecimento que a
+secretaria tem e o Eproc não deixa ler. Os nomes podem conter nome de servidor;
+por isso as fixtures dos testes são sintéticas.
+
+**O que precisaria mudar para evoluir.** Se `buscar_request_por_id` passar a
+responder para as consultas da unidade (depois de migradas no Eproc), um parser
+do JSON em `infra/eproc/` daria os filtros, e daí o painel do localizador poderia
+listar "consultas que olham para este localizador". O coletor já abre as telas
+certas; seria mais uma requisição por consulta, com pausa.
+
+---
+
+## D-33 · Painel da unidade: filas de trabalho por setor, e a cobertura dos localizadores
+
+**Decisão.** Uma segunda tela, alternada com o canvas no cabeçalho ("Fluxo |
+Painel da unidade"), planeja **como o trabalho chega a cada setor**. Cada setor
+tem **filas de trabalho** — o que ele abre no Eproc para saber o que fazer: uma
+preferência de consulta ou uma consulta salva numa das quatro telas de relatório
+(D-32). Cada fila diz quais localizadores olha, e a tela confere a
+**cobertura**: todo localizador do setor está em alguma fila ou foi deixado
+**fora de propósito**, com motivo. Uma segunda aba agrupa as filas de
+preferência em **grupos de preferências**. Tudo mora na **unidade**: chave
+`painel` por silo, como os setores (D-26). Sem bump de `SCHEMA_VERSION`, porque
+o plano não muda.
+
+**Por que.**
+
+- **O desenho do fluxo não respondia "quem vê o quê".** O canvas diz por onde o
+  processo passa; não diz se alguém o encontra quando ele para num localizador.
+  Localizador que nenhuma fila olha é processo esquecido, e é isso que a
+  cobertura acusa. A decisão de deixar um localizador de fora (arquivo, passagem
+  automática) é legítima, e por isso exige motivo em vez de sumir da conta.
+- **"Fila de trabalho", não "consulta".** O nome foi escolha do usuário, depois
+  de ver a demo. "Consulta salva" (D-32) continua sendo o termo do catálogo, e
+  "preferência de consulta" o tipo do Eproc; a fila é o papel que qualquer um
+  dos dois cumpre para o setor.
+- **Na unidade, não no plano.** Também escolha do usuário. As filas e os grupos
+  descrevem a vara, não um desenho; um plano novo ("como deveria ser") não
+  recomeça o painel do zero. Consequência: a fila guarda localizadores **por
+  nome**, não por id de nó — o mesmo localizador existe em vários planos com ids
+  diferentes. A comparação ignora maiúsculas, acentos e espaços (a mesma
+  normalização dos rótulos de setor).
+- **A cobertura olha todos os planos do silo**, com o ativo vivo, como o
+  inventário do `SetoresModal`. Os setores de um localizador são a união das
+  marcações dele em todos os planos. Atalhos (D-30) e nós sem nome não contam.
+- **Grupo só para preferência de consulta.** Preferências de minuta e de
+  intimação em bloco não entram: o grupo serve para organizar o que o servidor
+  abre para trabalhar. Consulta salva de relatório também não: ela fica na
+  própria tela do Eproc. Não há um grupo por setor obrigatório.
+- **O vínculo atual do Eproc não é importado.** A sincronização (D-16/D-32)
+  entra só como **sugestão de nome** ao criar a fila (preferências do tipo
+  `processo_movimento_consultar` e as consultas salvas da tela escolhida). Que
+  fila é de qual setor e de qual grupo é a unidade quem diz — o mesmo motivo do
+  D-16 para não gerar arestas.
+- **Nada vai ao checklist.** O selo "Planejada ↔ Já existe no Eproc" basta; o
+  usuário não quis as filas como tarefa.
+- **Tela enxuta, por pedido.** A demo tinha resumo em cartões, prévia do seletor
+  do Eproc, frases de explicação e uma matriz localizador × fila. Saiu tudo.
+
+**Custos assumidos.**
+
+- **Renomear um localizador no canvas desliga a fila dele.** O nome antigo
+  aparece riscado na fila ("Não está em nenhum plano"), e o localizador renomeado
+  aparece descoberto. É o preço de a fila não depender de um plano.
+- **O painel não viaja entre colegas.** Os setores se propagam pelo retrato
+  `Plano.flags` (D-26); o painel não tem retrato. Numa lotação, cada navegador
+  tem o seu.
+- **Setor apagado não apaga filas.** Elas aparecem em "Sem setor", com um
+  seletor para mover para outro setor — perder fila planejada por um clique em
+  outra tela seria pior que o resíduo.
+
+**O que precisaria mudar para evoluir.** Para o painel valer entre colegas da
+lotação, o caminho barato é o do D-26: um retrato do painel dentro do plano,
+absorvido por uma consolidação na entrada — com o problema de que filas não têm
+rótulo único como setores, e a fusão precisaria de regra própria. O caminho
+limpo é um campo no payload da sincronização, com o Apps Script mudando junto.
+Se os filtros das consultas salvas um dia forem legíveis (D-32), a lista de
+localizadores de cada fila deixa de ser declarada e passa a ser lida.
+
+**"Processos sem Movimentação" saiu das origens da fila (outubro/2026).** O
+usuário apontou que não é tela onde o setor trabalha. A fila nova oferece
+`ORIGENS_FILA_NOVA` (preferência de consulta, Relatório Geral, Área de Trabalho
+de Minutas, Lista de Processos por Localizador), e as consultas salvas dessa tela
+não viram sugestão de fila. A origem continua em `ORIGENS_FILA` e no schema, para
+fila já gravada com ela abrir; a coleta do D-32 não mudou.
+
+
+---
+
+## D-34 · Tema escuro por padrão, e o canvas só em Diagrama
+
+**Decisão.** O app ganha tema escuro, que é o **padrão**; o claro continua a um
+clique (sol/lua no cabeçalho). E o alternador Orgânico/Diagrama sai do
+cabeçalho: o canvas desenha sempre em Diagrama.
+
+**Por que.**
+
+- **Tema por atributo, não por media query.** `data-tema` no `<html>` escolhe
+  um de dois blocos de tokens em `index.css`. Seguir o sistema operacional
+  (`prefers-color-scheme`) não daria ao usuário o padrão que ele pediu.
+- **Toda cor de componente virou token.** Havia cerca de 40 cores escritas
+  direto nas regras (chips de setor, selos, molduras de grupo, perigo), e cada
+  uma valia para um tema só. As molduras de grupo tiram a luminosidade de
+  tokens (`--g-l-*`), porque matiz e croma continuam vindo da cor do grupo.
+- **O ReactFlow recebe algumas cores como texto** (ponta da seta, minimapa) e
+  monta id de marcador com elas, então `var(--…)` não serve ali.
+  `CORES_CANVAS`, em `FlowCanvas.tsx`, repete os valores dos tokens por tema.
+- **Chave global ao navegador** (`planejoeproc:tema`), como o "já vi o
+  tutorial": é preferência da pessoa, e a tela de entrada, antes de haver
+  sessão, também é pintada por ela. Só o claro precisa ser gravado. O HTML já
+  nasce com `data-tema="escuro"`, para a tela não piscar clara enquanto o
+  `chrome.storage` carrega. O popup, que não hidrata o espelho, lê a chave
+  direto.
+- **Orgânico fora da tela, não do schema.** `Plano.flowMode` continua gravado
+  e validando; o desenho lê `FLOW_MODE_DESENHO` e ignora o campo. Forçar o
+  campo para `sharp` ao abrir regravaria todo plano aberto e faria a próxima
+  publicação anunciar mudança em tudo. Plano novo já nasce `sharp`.
+
+**O que precisaria mudar para evoluir.** Um terceiro tema, ou "seguir o
+sistema", é um bloco de tokens a mais e um valor a mais em `Tema`. Para voltar
+com o Orgânico, basta ler `flowMode` de novo em `PjEdge`/`EdgePanel` e
+devolver o alternador ao cabeçalho; o `setFlowMode` da store continua lá.
+
+---
+
+## D-35 · Preferências: falha da coleta não apaga a lista
+
+**Decisão.** Quando a fonte das preferências não vem `ok`, o catálogo grava as
+da última sincronização (mesma unidade) somadas aos nomes que as ações
+preferenciais citam, e o modal diz por quê, em vez de anunciar "nenhuma
+cadastrada".
+
+**Por que.** Em 04/10/2026 o Eproc passou a amarrar o `hash` do autocompletar
+`preferencia_auto_completar` ao `nomeAcao` da tela (levantado no eproc1g, só
+leitura). O coletor lia o hash de Modelos Padrão e o usava com os três tipos
+(`minuta_cadastrar`, `processo_movimento_consultar`, `processo_intimacao_bloco`).
+Os hashes de cinco telas do menu, cruzados com os três tipos, deram HTTP 200
+com página HTML de erro nas quinze combinações. Cada tela do menu traz só o
+autocompletar com o próprio `nomeAcao`, e nenhuma traz o dos três tipos.
+
+Dois defeitos somados escondiam isso:
+
+- **A recusa parecia lista vazia.** O coletor descartava toda resposta sem
+  `<item` e terminava em `vazio`. Agora, se a resposta não é `<itens>` (ou não
+  é HTTP 200), conta como recusa e a fonte vira `falhou` com motivo próprio.
+- **Cada sincronização apagava a anterior.** O catálogo é regravado inteiro, e
+  sem preferências na coleta elas sumiam. `aplicarColeta` recebe agora o
+  catálogo anterior e, só para esta fonte, cobre a falta com ele.
+
+Os nomes vindos das ações preferenciais entram **sem tipo** (`detalhe`), porque
+o vínculo não o traz, e só cobrem as preferências que atuam em algum
+localizador. É uma lista incompleta, mas é melhor do que nenhuma lista.
+
+**Resolvido no D-37:** a lista da janela de preferências do Relatório Geral
+não amarra o hash ao tipo. O texto abaixo fica como registro.
+
+**O que precisaria mudar para evoluir.** Achar de onde sai um hash válido para
+cada tipo. `processo_movimentar` cita `minuta_cadastrar` e
+`processo_movimento_consultar`, mas o autocompletar desses tipos só aparece em
+telas abertas a partir de um processo (Nova Minuta com `num_processo`,
+Consultar Processo). Isso exigiria escolher um processo da unidade e abrir
+telas dele. A Intimação em bloco só é alcançada submetendo um filtro. Antes de
+codar, levantar se alguma dessas telas é leitura pura. O caminho de
+`atualizar_combo_preferencias` (ajax visto em `processo_movimentar`) recebe
+`id_preferencia_padrao` por POST e pode gravar estado: não usar sem levantar.
+
+---
+
+## D-36 · Cabeçalho enxuto: ações em dois menus, o nome do plano é o seletor
+
+**Decisão.** O cabeçalho passa de treze controles a nove: o nome do plano
+ativo vira o próprio seletor (duplo clique ou F2 renomeia), as ações de
+arquivo e de servidor entram no menu **Plano**, as da unidade (sincronizar,
+catálogo, setores) no menu **Unidade**, e tema e tutorial no menu ⋯. O
+progresso de implantação ("8 de 27 criados") fica sempre visível e abre o
+checklist.
+
+**Por que.** Em tela de notebook (1366 px) os botões da direita, entre eles o
+"Gerar Checklist", saíam da barra. O nome do plano aparecia duas vezes, no
+seletor e no campo ao lado. Três botões usavam a mesma nuvem para coisas
+diferentes (baixar e enviar ao servidor, ler do Eproc); a leitura do Eproc
+ganhou ícone próprio. O progresso só aparecia a partir de 2000 px, e contava
+de um jeito diferente do checklist; agora usa `contarChecklist`, para os dois
+números nunca discordarem. No painel da unidade somem o seletor, o progresso
+e o checklist, que são do plano ativo.
+
+O custo é um clique a mais para ações raras (abrir arquivo, salvar cópia,
+catálogo). O trabalho em curso com o servidor, que antes aparecia no próprio
+botão, passou para o rótulo do menu ("Baixando…").
+
+**O que precisaria mudar para evoluir.** O menu Unidade pode mostrar a hora
+da última sincronização; isso pede um carimbo no catálogo da unidade, num
+campo opcional, sem bump de schema. Um atalho de teclado para os menus
+entra junto com a busca por comandos, se ela vier.
+
+---
+
+## D-37 · Preferências pela lista do componente novo; filas só nas três telas
+
+**Decisão.** A sincronização lê as preferências e as consultas salvas pela
+lista da janela "Listar preferências" do Relatório Geral, que traz o **grupo**
+de cada uma. O painel passa a ter filas só em três telas (Relatório Geral, Área
+de Trabalho de Minutas, Lista de Processos por Localizador), e qualquer fila
+pode estar num grupo de preferências. Campos novos opcionais (`grupo` no item do
+catálogo e na consulta salva): sem bump.
+
+**Como a lista é lida** (levantado no eproc1g/TJMG em 04/10/2026, somente
+leitura). A tela do Relatório Geral tem o botão `#selPreferencia-list`, cujo
+`data-url` abre `ui_preferencias/modal_lista_preferencias`. O HTML dessa janela
+traz a URL de `controlador_ajax.php?acao_ajax=data_table_listar_v2` com `hash`.
+Um POST de listagem com `acao_request=<tipo>` devolve `{ data: [...] }` com
+`Descricao`, `SinValorPadrao`, `SinPainelInicial`, `SinPreferenciaIndividual`,
+`DescricaoGrupoFormularioPersonalizacaoGrupo` e `IdFormularioPersonalizacao`.
+
+- **A chave não depende do tipo.** É isso que o autocompletar perdeu (D-35). Uma
+  chave lista minuta (`minuta_cadastrar`), movimentação
+  (`processo_movimento_consultar`), intimação (`processo_intimacao_bloco` — a
+  tela diz "em bloco", o tipo é **Intimação**) e as consultas das telas de
+  relatório (`relatorio_geral_listar`, `localizador_processos_lista`,
+  `minuta_area_trabalho`).
+- **As colunas vêm porque são pedidas.** Sem `columns[i][data]` no POST, o Eproc
+  devolve só descrição e id. `length=1000` traz tudo numa página.
+- **A preferência individual fica fora do catálogo**: é do servidor que
+  sincroniza, não da unidade.
+- **Só leitura.** A mesma janela tem editar, desativar e salvar; o coletor não
+  os chama. O autocompletar por tela continua como reserva das consultas salvas,
+  se a janela sumir do Relatório Geral.
+
+Existe um segundo caminho, em HTML: `minuta_area_trabalho` traz um link para
+`formulario_personalizacao_listar`, e trocar o `nome_acao` lista qualquer tipo
+antigo. Não foi usado: o JSON cobre também o Relatório Geral.
+
+**Por que filas só em três telas.** A "preferência de consulta" do D-33 era a
+preferência da Movimentação Processual, que lança evento, e não uma fila; e
+"Processos sem Movimentação" não é tela de trabalho. As duas telas mostram a
+coluna **Grupo** nas próprias preferências, por isso o grupo deixou de ser só
+da preferência de consulta. As filas gravadas com uma origem de antes continuam
+abrindo e pedem, no cartão, a tela certa.
+
+**Grupos do Eproc entram como sugestão, não como importação.** O seletor de
+grupo oferece, abaixo dos grupos do painel, os nomes que a sincronização viu, e
+a aba de grupos tem um botão para trazer cada um. Escolher uma consulta salva
+ao criar a fila já sugere o grupo dela. A unidade continua dizendo o que é de
+quem, como no D-33.
+
+**O que precisaria mudar para evoluir.** As marcas Padrão e Painel Inicial já
+chegam na lista e não são guardadas; dariam um selo na fila. A janela também
+leva a `buscar_request_por_id` (D-32), o caminho para os filtros. Se o Eproc
+mudar a janela, o coletor cai no autocompletar para as consultas, mas as
+preferências ficam com a reserva do D-35.
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

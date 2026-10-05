@@ -60,18 +60,15 @@ export interface LocalizadorUnidade {
 
 /** Item simples de catálogo — preferências, modelos, textos padrão. */
 export interface ItemCatalogoUnidade {
-  /**
-   * Código do Eproc. Ausente nas **preferências**: a tela que as lista
-   * (`consultar_formulario_personalizacao_grupo`) mostra só o nome, sem link
-   * que carregue o `num_id_form_personalizacao`. Para sugerir nomes no editor
-   * isso basta; para qualquer integração mais funda, não.
-   */
+  /** Código do Eproc. Nas preferências, o `IdFormularioPersonalizacao` (D-37). */
   eprocId?: string;
   nome: string;
   /** Sigla do órgão dono, para separar o que é da unidade do que é herdado. */
   orgao?: string;
-  /** Tipo de documento (modelos) ou sigla auto-texto (textos padrão). */
+  /** Tipo de documento (modelos), sigla auto-texto (textos padrão) ou tipo da preferência. */
   detalhe?: string;
+  /** Grupo de preferências no Eproc. Só nas preferências, e só quando há (D-37). */
+  grupo?: string;
 }
 
 /**
@@ -91,6 +88,35 @@ export interface AcaoPreferencialUnidade {
   preferencias: string[];
 }
 
+/**
+ * Telas do Eproc em que o usuário salva uma **consulta** — um conjunto de filtros
+ * com nome, que o Eproc chama de preferência da tela (decisoes.md#D-32). Os
+ * rótulos são os do menu.
+ */
+export const TELAS_CONSULTA = {
+  relatorioGeral: 'Relatório Geral',
+  processosPorLocalizador: 'Lista de Processos por Localizador',
+  areaMinutas: 'Área de Trabalho de Minutas',
+  semMovimentacao: 'Processos sem Movimentação nos Últimos N Dias',
+} as const;
+
+export type TelaConsulta = keyof typeof TELAS_CONSULTA;
+
+/**
+ * Uma consulta salva da unidade. Só o **nome**: os filtros dela não saem do
+ * Eproc sem aplicar a consulta (executar a pesquisa) ou avaliar código da
+ * página — as duas coisas a coleta não faz (D-32).
+ */
+export interface ConsultaSalvaUnidade {
+  tela: TelaConsulta;
+  nome: string;
+  eprocId?: string;
+  /** Relatório Geral distingue a consulta individual da compartilhada. */
+  individual?: boolean;
+  /** Grupo de preferências no Eproc, quando a consulta está em um (D-37). */
+  grupo?: string;
+}
+
 export type FonteStatus = 'ok' | 'vazio' | 'semPermissao' | 'falhou';
 
 export const FONTES = [
@@ -100,6 +126,7 @@ export const FONTES = [
   'modelos',
   'textosPadrao',
   'acoesPreferenciais',
+  'consultasSalvas',
 ] as const;
 
 export type FonteId = (typeof FONTES)[number];
@@ -131,5 +158,7 @@ export interface CatalogoUnidade {
   modelos?: ItemCatalogoUnidade[];
   textosPadrao?: ItemCatalogoUnidade[];
   acoesPreferenciais?: AcaoPreferencialUnidade[];
+  /** Opcional pelo mesmo motivo dos outros: catálogo gravado antes segue validando. */
+  consultasSalvas?: ConsultaSalvaUnidade[];
   fontes: Partial<Record<FonteId, FonteResultado>>;
 }

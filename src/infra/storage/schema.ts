@@ -3,7 +3,10 @@ import {
   ANOTACOES_CATALOGO_VERSION,
   CATALOGO_ORGAO_VERSION,
   CATALOGO_UNIDADE_VERSION,
+  CONJUNTOS_EVENTO_VERSION,
   CORES_FLAG,
+  ORIGENS_FILA,
+  PAINEL_VERSION,
   PREF_TIPOS,
   SCHEMA_VERSION,
   SETORES_VERSION,
@@ -15,6 +18,8 @@ import {
   type AnotacoesCatalogo,
   type CatalogoOrgao,
   type CatalogoUnidade,
+  type ConjuntosEventoUnidade,
+  type ConsultaSalvaUnidade,
   type DefinicaoFlag,
   type DobraAresta,
   type AtpRule,
@@ -25,6 +30,8 @@ import {
   type Localizador,
   type LocalizadorOrgao,
   type LocalizadorUnidade,
+  type OrigemFila,
+  type PainelUnidade,
   type Plano,
   type PrefRule,
   type SetoresUnidade,
@@ -83,6 +90,36 @@ export const SetoresUnidadeSchema = z.object({
   version: z.literal(SETORES_VERSION),
   itens: z.array(DefinicaoFlagSchema),
 }) satisfies z.ZodType<SetoresUnidade>;
+
+/**
+ * Painel da unidade (decisoes.md#D-33). Chave por escopo, como os setores. A
+ * origem é validada contra a lista do domínio: uma origem desconhecida não teria
+ * rótulo para mostrar.
+ */
+const ORIGENS = Object.keys(ORIGENS_FILA) as [OrigemFila, ...OrigemFila[]];
+
+export const PainelUnidadeSchema = z.object({
+  version: z.literal(PAINEL_VERSION),
+  filas: z.array(
+    z.object({
+      id: z.string(),
+      nome: z.string(),
+      origem: z.enum(ORIGENS),
+      setorId: z.string(),
+      grupoId: z.string().optional(),
+      localizadores: z.array(z.string()),
+      ja_criado: z.boolean(),
+    }),
+  ),
+  grupos: z.array(z.object({ id: z.string(), nome: z.string() })),
+  foraDasFilas: z.array(z.object({ nome: z.string(), motivo: z.string() })),
+}) satisfies z.ZodType<PainelUnidade>;
+
+/** Conjuntos de eventos criados pelo usuário (decisoes.md#D-29). Chave por escopo, como os setores. */
+export const ConjuntosEventoUnidadeSchema = z.object({
+  version: z.literal(CONJUNTOS_EVENTO_VERSION),
+  itens: z.array(z.object({ id: z.string(), rotulo: z.string(), ids: z.array(z.string()) })),
+}) satisfies z.ZodType<ConjuntosEventoUnidade>;
 
 /* ---------------------------------------------------------------------------
  * Regra de ATP — espelho da tela de cadastro do Eproc (decisoes.md#D-27).
@@ -239,6 +276,10 @@ const LocalizadorDataSchema = z.object({
   ja_criado: z.boolean(),
   sistema: z.boolean().optional(),
   flags: z.array(z.string()),
+  acoesPreferenciais: z
+    .array(z.object({ id: z.string(), nome: z.string(), ja_criado: z.boolean() }))
+    .optional(),
+  atalhoPara: z.string().optional(),
 });
 
 const LocalizadorSchema = z.object({
@@ -258,6 +299,18 @@ const EdgeSchema = z.object({
 
 const FlowModeSchema = z.enum(['organic', 'sharp']);
 
+/** Moldura de grupo (decisoes.md#D-31). Medidas finitas: viram atributos de SVG/CSS. */
+const GrupoSchema = z.object({
+  id: z.string(),
+  rotulo: z.string(),
+  cor: CorFlagSchema,
+  position: z.object({ x: z.number().finite(), y: z.number().finite() }),
+  largura: z.number().positive().finite(),
+  altura: z.number().positive().finite(),
+  recolhido: z.boolean().optional(),
+  membros: z.array(z.string()),
+});
+
 const PlanoV4Schema = z.object({
   version: z.literal(SCHEMA_VERSION),
   planoNome: z.string(),
@@ -265,6 +318,7 @@ const PlanoV4Schema = z.object({
   flags: z.array(DefinicaoFlagSchema),
   nodes: z.array(LocalizadorSchema),
   edges: z.array(EdgeSchema),
+  grupos: z.array(GrupoSchema).optional(),
   exportedAt: z.string().optional(),
 }) satisfies z.ZodType<Plano>;
 
@@ -598,12 +652,21 @@ const ItemCatalogoUnidadeSchema = z.object({
   nome: z.string(),
   orgao: z.string().optional(),
   detalhe: z.string().optional(),
+  grupo: z.string().optional(),
 }) satisfies z.ZodType<ItemCatalogoUnidade>;
 
 const AcaoPreferencialUnidadeSchema = z.object({
   localizador: z.string(),
   preferencias: z.array(z.string()),
 }) satisfies z.ZodType<AcaoPreferencialUnidade>;
+
+const ConsultaSalvaUnidadeSchema = z.object({
+  tela: z.enum(['relatorioGeral', 'processosPorLocalizador', 'areaMinutas', 'semMovimentacao']),
+  nome: z.string(),
+  eprocId: z.string().optional(),
+  individual: z.boolean().optional(),
+  grupo: z.string().optional(),
+}) satisfies z.ZodType<ConsultaSalvaUnidade>;
 
 const FonteResultadoSchema = z.object({
   status: z.enum(['ok', 'vazio', 'semPermissao', 'falhou']),
@@ -620,5 +683,6 @@ export const CatalogoUnidadeSchema = z.object({
   modelos: z.array(ItemCatalogoUnidadeSchema).optional(),
   textosPadrao: z.array(ItemCatalogoUnidadeSchema).optional(),
   acoesPreferenciais: z.array(AcaoPreferencialUnidadeSchema).optional(),
+  consultasSalvas: z.array(ConsultaSalvaUnidadeSchema).optional(),
   fontes: z.record(z.string(), FonteResultadoSchema),
 }) satisfies z.ZodType<CatalogoUnidade>;

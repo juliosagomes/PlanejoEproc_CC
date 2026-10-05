@@ -37,7 +37,7 @@ interface UnidadeActions {
 
 export type UnidadeStore = UnidadeState & UnidadeActions;
 
-export const useUnidadeStore = create<UnidadeStore>((set) => ({
+export const useUnidadeStore = create<UnidadeStore>((set, get) => ({
   catalogo: null,
   sincronizando: false,
   erro: null,
@@ -55,7 +55,7 @@ export const useUnidadeStore = create<UnidadeStore>((set) => ({
       // topo faria o `npm run dev` (e os testes) puxarem a ponte sem necessidade.
       const { coletarDaUnidade } = await import('@/extension/unidade');
       const coleta = await coletarDaUnidade();
-      const resultado = aplicarColeta(coleta);
+      const resultado = aplicarColeta(coleta, undefined, get().catalogo);
       if (!resultado.ok) {
         set({ sincronizando: false, erro: resultado.erro });
         return;

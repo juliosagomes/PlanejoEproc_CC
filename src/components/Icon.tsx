@@ -19,6 +19,27 @@ const baseProps = {
 } as const;
 
 export const Icon = {
+  Sol: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="7" cy="7" r="2.6" stroke="currentColor" strokeWidth="1.4" />
+      <path
+        d="M7 1.2v1.4M7 11.4v1.4M1.2 7h1.4M11.4 7h1.4M2.9 2.9l1 1M10.1 10.1l1 1M2.9 11.1l1-1M10.1 3.9l1-1"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  Lua: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M11.8 8.6A5 5 0 0 1 5.4 2.2a5 5 0 1 0 6.4 6.4Z"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   Plus: (p: IconProps) => (
     <svg {...baseProps} {...p}>
       <path
@@ -344,6 +365,36 @@ export const Icon = {
         strokeLinejoin="round"
       />
       <circle cx="7" cy="10.2" r="0.75" fill="currentColor" />
+    </svg>
+  ),
+  /**
+   * Duas setas em círculo — "Sincronizar com a unidade" (leitura do Eproc).
+   * A nuvem fica reservada ao servidor da lotação, para os dois não se
+   * confundirem no mesmo cabeçalho.
+   */
+  Sincronizar: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M11.6 6.2A4.7 4.7 0 0 0 3.3 4M2.4 7.8A4.7 4.7 0 0 0 10.7 10"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <path
+        d="M3.3 1.6V4h2.4M10.7 12.4V10H8.3"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  /** Três pontos — menu de opções gerais. */
+  Reticencias: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="3" cy="7" r="1.1" fill="currentColor" />
+      <circle cx="7" cy="7" r="1.1" fill="currentColor" />
+      <circle cx="11" cy="7" r="1.1" fill="currentColor" />
     </svg>
   ),
   /** Check do canto direito superior do nó "já criado". 10×10. */

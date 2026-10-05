@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import ACOES from '@/infra/eproc/__fixtures__/localizadorAcaoPreferencialListar.html?raw';
 import ORGAO from '@/infra/eproc/__fixtures__/localizadorOrgaoListar.html?raw';
 import MODELOS from '@/infra/eproc/__fixtures__/modeloPadraoListar.html?raw';
-import PREF_XML from '@/infra/eproc/__fixtures__/preferenciaAutoCompletar.xml?raw';
 import SELECT from '@/infra/eproc/__fixtures__/selLocalizador.html?raw';
 import TEXTOS from '@/infra/eproc/__fixtures__/textoPadraoListar.html?raw';
 import { aplicarColeta } from '@/infra/eproc/aplicarColeta';
@@ -59,12 +58,72 @@ function resposta(html: string): Response {
 const PAGINA_ORGAO = `<html><body><h1>Localizadores do Órgão</h1>${ORGAO}
   <p>7 registros</p></body></html>`;
 const PAGINA_SELECT = `<html><body>${SELECT}</body></html>`;
-// O hash do autocompletar de preferências vem no HTML de qualquer tela de
-// lista do painel — é daqui que o coletor o extrai.
+// O hash do autocompletar aqui não é mais lido: as preferências vêm da lista do
+// Relatório Geral (decisoes.md#D-37).
 const PAGINA_MODELOS = `<html><body>${MODELOS}<p>4 registros</p>
   <script>var u = "controlador_ajax.php?acao_ajax=preferencia_auto_completar&nomeAcao=minuta_cadastrar&hash=0123456789abcdef0123456789abcdef";</script>
   </body></html>`;
 const PAGINA_TEXTOS = `<html><body>${TEXTOS}<p>3 registros</p></body></html>`;
+
+/* --- Lista de preferências do componente novo (decisoes.md#D-37) ----------
+ * Sintética, no formato levantado no eproc1g em 04/10/2026: a tela do Relatório
+ * Geral tem o botão com a URL da janela; a janela traz a URL da lista; a lista
+ * é um POST com o tipo em `acao_request`. As descrições trazem entidades HTML e
+ * o JSON é ASCII, com `\u00..` nos acentos, como no Eproc. */
+const TELA_RG_LISTA = `<html><body>
+  <button type="button" id="selPreferencia-list" data-url="controlador.php?acao=ui_preferencias/modal_lista_preferencias&amp;acao_request=relatorio_geral_listar&amp;hash=111"></button>
+  </body></html>`;
+const MODAL_LISTA = `<html><body><form id="frm_preferencias"></form><script>
+  DataTableHelper.build({ "ajax": "controlador_ajax.php?acao_ajax=data_table_listar_v2&contexto_datatable[0]=UiPreferenciasRN&acao_origem=ui_preferencias/modal_lista_preferencias&hash=222" });
+  </script></body></html>`;
+let proximoId = 1000;
+const linha = (Descricao: string, grupo = '', SinPreferenciaIndividual = 'N') => ({
+  Descricao,
+  SinValorPadrao: '',
+  SinPainelInicial: '',
+  SinPreferenciaIndividual,
+  DescricaoGrupoFormularioPersonalizacaoGrupo: grupo,
+  IdFormularioPersonalizacao: String((proximoId += 1)),
+});
+/** Como o Eproc: JSON só com ASCII, acentos em `\u00..`. */
+const lista = (...linhas: ReturnType<typeof linha>[]) =>
+  JSON.stringify({ draw: 1, recordsTotal: linhas.length, recordsFiltered: linhas.length, data: linhas }).replace(
+    /[\u0080-￿]/g,
+    (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, '0')}`,
+  );
+const LISTAS: Record<string, string> = {
+  minuta_cadastrar: lista(
+    linha('&#128309; GAB - Despachar', 'Preferências de Gabinete'),
+    linha('Juntar AR'),
+    linha('Expedir Ofício'),
+  ),
+  processo_movimento_consultar: lista(linha('Dar Andamento', 'Secretaria'), linha('Arquivar')),
+  // A repetida não duplica; a individual é do servidor, não da unidade.
+  processo_intimacao_bloco: lista(linha('Juntar AR'), linha('Minha pessoal', '', 'S'), linha('Intimar Exequente')),
+  relatorio_geral_listar: lista(linha('Conclusos há 30 dias', 'Gerenciamento')),
+  localizador_processos_lista: lista(linha('Expedição', 'Secretaria')),
+  minuta_area_trabalho: lista(),
+  relatorio_sem_movimentacao_listar: lista(),
+};
+
+/**
+ * As rotas do caminho novo das preferências. `null` quando a URL não é dele,
+ * para o fetch falso seguir para as outras telas. A janela vem antes do
+ * Relatório Geral: a URL dela também cita `relatorio_geral_listar`.
+ */
+function rotaLista(
+  url: string,
+  init?: RequestInit,
+  listas: Record<string, string> = LISTAS,
+): Promise<Response> | null {
+  if (url.includes('data_table_listar_v2')) {
+    const tipo = new URLSearchParams(String(init?.body ?? '')).get('acao_request') ?? '';
+    return Promise.resolve(resposta(listas[tipo] ?? '<html>erro</html>'));
+  }
+  if (url.includes('modal_lista_preferencias')) return Promise.resolve(resposta(MODAL_LISTA));
+  if (url.includes('relatorio_geral_listar')) return Promise.resolve(resposta(TELA_RG_LISTA));
+  return null;
+}
 
 /** Menu do Painel do Diretor de Secretaria, reduzido aos dois links usados. */
 /* ---------------------------------------------------------------------------
@@ -167,6 +226,7 @@ const MENU = `
   <a href="controlador.php?acao=modelo_padrao_listar&hash=ghi">Modelos Padrão</a>
   <a href="controlador.php?acao=texto_padrao_listar&hash=jkl">Textos Padrão</a>
   <a href="controlador.php?acao=localizador_acao_preferencial_listar&hash=mno">Ações Preferenciais</a>
+  <a href="controlador.php?acao=relatorio_geral_listar&hash=pqr">Relatório Geral</a>
 `;
 
 /**
@@ -198,11 +258,12 @@ describe('coletor do Eproc', () => {
     };
     vi.stubGlobal(
       'fetch',
-      vi.fn((entrada: string) => {
+      vi.fn((entrada: string, init?: RequestInit) => {
         const url = String(entrada);
+        const daLista = rotaLista(url, init);
+        if (daLista) return daLista;
         if (url.includes('localizador_orgao_listar')) return Promise.resolve(resposta(PAGINA_ORGAO));
         if (url.includes('localizador_processos_lista')) return Promise.resolve(resposta(PAGINA_SELECT));
-        if (url.includes('preferencia_auto_completar')) return Promise.resolve(resposta(PREF_XML));
         if (url.includes('localizador_acao_preferencial_listar')) {
           return Promise.resolve(resposta(PAGINA_ACOES));
         }
@@ -266,9 +327,21 @@ describe('coletor do Eproc', () => {
     expect(r.resumo.textosPadrao).toBe(3);
     // 4 modelos por página × 2 páginas: prova que o laço do iframe avançou.
     expect(r.resumo.modelos).toBe(8);
-    // 3 tipos de preferência, 5 itens úteis cada, deduplicados por nome.
-    expect(r.resumo.preferencias).toBe(5);
-    expect(r.catalogo.preferencias?.[0]?.detalhe).toBe('Minuta');
+    // 3 + 2 + 3 linhas, menos a repetida e a individual.
+    expect(r.resumo.preferencias).toBe(6);
+    expect(r.catalogo.preferencias?.[0]).toMatchObject({
+      nome: '🔵 GAB - Despachar',
+      detalhe: 'Minuta',
+      grupo: 'Preferências de Gabinete',
+    });
+    expect(r.catalogo.preferencias?.find((p) => p.nome === 'Dar Andamento')?.detalhe).toBe('Movimentação');
+    expect(r.catalogo.preferencias?.find((p) => p.nome === 'Intimar Exequente')?.detalhe).toBe('Intimação');
+    expect(r.catalogo.preferencias?.some((p) => p.nome === 'Minha pessoal')).toBe(false);
+    // As consultas saem da mesma lista, com a tela e o grupo.
+    expect(r.catalogo.consultasSalvas).toEqual([
+      expect.objectContaining({ tela: 'relatorioGeral', nome: 'Conclusos há 30 dias', grupo: 'Gerenciamento' }),
+      expect.objectContaining({ tela: 'processosPorLocalizador', nome: 'Expedição', grupo: 'Secretaria' }),
+    ]);
     // 3 linhas na fixture, uma sem vínculo nenhum.
     expect(r.resumo.acoesPreferenciais).toBe(2);
     expect(r.catalogo.acoesPreferenciais?.[0]?.preferencias).toHaveLength(4);
@@ -307,5 +380,160 @@ describe('coletor do Eproc', () => {
     expect(r.resumo.localizadores).toBe(7);
     expect(r.resumo.modelos).toBe(0);
     expect(r.catalogo.fontes.modelos?.status).toBe('semPermissao');
+  });
+});
+
+describe('coletor do Eproc — lista de preferências recusada (D-35/D-37)', () => {
+  /** Igual ao fetch padrão, com a mesma resposta da lista para todo tipo. */
+  function stubLista(corpo: string): void {
+    const todas = Object.fromEntries(Object.keys(LISTAS).map((k) => [k, corpo]));
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((entrada: string, init?: RequestInit) => {
+        const url = String(entrada);
+        const daLista = rotaLista(url, init, todas);
+        if (daLista) return daLista;
+        if (url.includes('localizador_orgao_listar')) return Promise.resolve(resposta(PAGINA_ORGAO));
+        if (url.includes('localizador_processos_lista')) return Promise.resolve(resposta(PAGINA_SELECT));
+        if (url.includes('localizador_acao_preferencial_listar')) {
+          return Promise.resolve(resposta(PAGINA_ACOES));
+        }
+        if (url.includes('modelo_padrao_listar')) return Promise.resolve(resposta(PAGINA_MODELOS));
+        if (url.includes('texto_padrao_listar')) return Promise.resolve(resposta(PAGINA_TEXTOS));
+        return Promise.resolve(resposta('<html><body>tela desconhecida</body></html>'));
+      }),
+    );
+  }
+
+  beforeEach(() => {
+    document.body.innerHTML = MENU;
+    instalarIframeFalso();
+    paginasPorTela = { modelo_padrao_listar: [PAGINA_MODELOS], texto_padrao_listar: [PAGINA_TEXTOS] };
+  });
+
+  afterEach(() => {
+    desinstalarIframeFalso();
+  });
+
+  it('página de erro no lugar do JSON é falha, não "nenhuma cadastrada"', async () => {
+    stubLista('<!DOCTYPE html><html><body>Acesso negado</body></html>');
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.preferencias?.status).toBe('falhou');
+    expect(coleta.fontes.preferencias?.motivo).toContain('recusou a lista');
+  });
+
+  it('lista sem linhas continua sendo "vazio"', async () => {
+    stubLista(lista());
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.preferencias?.status).toBe('vazio');
+  });
+
+  it('na falha, mantém as da última sincronização e soma as das ações preferenciais', async () => {
+    stubLista('<html>erro</html>');
+    const coleta = await coletarUnidadeNaAba();
+
+    const semAnterior = aplicarColeta(coleta, '2026-10-04T00:00:00.000Z');
+    if (!semAnterior.ok) throw new Error(semAnterior.erro);
+    const dosVinculos = semAnterior.catalogo.preferencias ?? [];
+    expect(dosVinculos.length).toBeGreaterThan(0);
+    expect(dosVinculos.every((p) => p.detalhe === undefined)).toBe(true);
+    expect(semAnterior.catalogo.fontes.preferencias?.status).toBe('falhou');
+    expect(semAnterior.catalogo.fontes.preferencias?.motivo).toContain('ações preferenciais');
+
+    const anterior = {
+      ...semAnterior.catalogo,
+      preferencias: [{ nome: 'Antiga só no catálogo', detalhe: 'Minuta' }],
+    };
+    const comAnterior = aplicarColeta(coleta, '2026-10-04T00:00:00.000Z', anterior);
+    if (!comAnterior.ok) throw new Error(comAnterior.erro);
+    expect(comAnterior.catalogo.preferencias?.[0]).toEqual({
+      nome: 'Antiga só no catálogo',
+      detalhe: 'Minuta',
+    });
+    expect(comAnterior.resumo.preferencias).toBe(dosVinculos.length + 1);
+    expect(comAnterior.catalogo.fontes.preferencias?.motivo).toContain(
+      '1 mantidas da última sincronização',
+    );
+
+    // Catálogo de outra unidade não empresta nada.
+    const deOutra = {
+      ...anterior,
+      unidade: { ...anterior.unidade, chave: 'outro::host::VX' },
+    };
+    const r = aplicarColeta(coleta, '2026-10-04T00:00:00.000Z', deOutra);
+    if (!r.ok) throw new Error(r.erro);
+    expect(r.resumo.preferencias).toBe(dosVinculos.length);
+  });
+});
+
+describe('coletor do Eproc — consultas salvas (D-32)', () => {
+  const MENU_RELATORIOS = `
+    <div id="nav-profile"><span>FULANO DE TAL (x0000000)</span></div>
+    <select id="selInfraUnidades"><option selected title="Vara X - VX/GERENTE">VX/GERENTE</option></select>
+    <a href="controlador.php?acao=localizador_orgao_listar&hash=abc">Localizadores do Órgão</a>
+    <a aria-label="Lista de Processos por Localizador" href="controlador.php?acao=localizador_processos_lista&hash=def">Lista</a>
+    <a href="controlador.php?acao=minuta_area_trabalho&hash=ghi">Área de Trabalho</a>
+    <a href="controlador.php?acao=relatorio_geral_listar&hash=jkl">Relatório Geral</a>
+  `;
+  const HASH_LISTA = 'a'.repeat(32);
+  const HASH_MINUTAS = 'b'.repeat(32);
+  const tela = (hash: string) =>
+    `<html><body><script>var u = "controlador_ajax.php?acao_ajax=preferencia_auto_completar&hash=${hash}";</script></body></html>`;
+  const xml = (nome: string) => `<itens><item id="1|x" descricao="${nome}" complemento="N"/></itens>`;
+  // A URL do Relatório Geral vem escapada dentro de um JSON, como no Eproc.
+  const TELA_RG = `<html><body><script>UI.init({"url":"controlador.php?acao=ui_preferencias\/listar&acao_request=relatorio_geral_listar&hash=zzz"});</script></body></html>`;
+
+  // Sem o botão da lista no Relatório Geral, o coletor cai no caminho de antes.
+  it('na reserva, coleta as quatro telas com a tela de cada fragmento no rótulo', async () => {
+    document.body.innerHTML = MENU_RELATORIOS;
+    const chamadas: { url: string; metodo: string }[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((entrada: string, init?: RequestInit) => {
+        const url = String(entrada);
+        chamadas.push({ url, metodo: init?.method ?? 'GET' });
+        if (url.includes('acao_ajax=preferencia_auto_completar')) {
+          if (url.includes(`nomeAcao=localizador_processos_lista&hash=${HASH_LISTA}`)) {
+            return Promise.resolve(resposta(xml('Conclusos')));
+          }
+          if (url.includes(`nomeAcao=minuta_area_trabalho&hash=${HASH_MINUTAS}`)) {
+            return Promise.resolve(resposta(xml('Minutas urgentes')));
+          }
+          return Promise.resolve(resposta('<html>erro</html>'));
+        }
+        if (url.includes('ui_preferencias/listar')) {
+          return Promise.resolve(resposta(JSON.stringify([{ Descricao: 'Geral 1', IdFormularioPersonalizacao: '7', SinPreferenciaIndividual: 'N' }])));
+        }
+        if (url.includes('localizador_orgao_listar')) return Promise.resolve(resposta(PAGINA_ORGAO));
+        if (url.includes('localizador_processos_lista')) return Promise.resolve(resposta(tela(HASH_LISTA)));
+        if (url.includes('minuta_area_trabalho')) return Promise.resolve(resposta(tela(HASH_MINUTAS)));
+        if (url.includes('relatorio_geral_listar')) return Promise.resolve(resposta(TELA_RG));
+        return Promise.resolve(resposta('<html><body>tela desconhecida</body></html>'));
+      }),
+    );
+
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.consultasSalvas).toMatchObject({
+      status: 'ok',
+      rotulos: ['processosPorLocalizador', 'areaMinutas', 'relatorioGeral'],
+    });
+    // A lista do Relatório Geral é um POST de busca vazia, com a barra desescapada.
+    expect(chamadas.find((c) => c.url.includes('ui_preferencias/listar'))?.metodo).toBe('POST');
+
+    const r = aplicarColeta(coleta, '2026-10-03T00:00:00.000Z');
+    if (!r.ok) throw new Error(r.erro);
+    expect(r.ok && r.catalogo.consultasSalvas?.map((c) => `${c.tela}:${c.nome}`)).toEqual([
+      'processosPorLocalizador:Conclusos',
+      'areaMinutas:Minutas urgentes',
+      'relatorioGeral:Geral 1',
+    ]);
+    expect(r.ok && r.resumo.consultasSalvas).toBe(3);
+  });
+
+  it('sem nenhuma das telas no menu, a fonte é "sem permissão"', async () => {
+    document.body.innerHTML = MENU_RELATORIOS.replace(/<a href="controlador\.php\?acao=(minuta_area_trabalho|relatorio_geral_listar)[^<]*<\/a>/g, '').replace(/<a aria-label[^<]*<\/a>/, '');
+    vi.stubGlobal('fetch', vi.fn(() => Promise.resolve(resposta('<html><body></body></html>'))));
+    const coleta = await coletarUnidadeNaAba();
+    expect(coleta.fontes.consultasSalvas?.status).toBe('semPermissao');
   });
 });

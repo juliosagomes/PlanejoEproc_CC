@@ -1,12 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactFlowProvider } from 'reactflow';
 
 import { somenteVisualizacao } from '@/domain';
-import { Header, type HeaderStats } from '@/components/Header';
+import { Header, type HeaderStats, type TelaEditor } from '@/components/Header';
 import { Sidebar } from '@/components/Sidebar';
 import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
+import { confirmarApagarSelecao } from '@/features/canvas/selecao';
+import { GrupoPanel } from '@/features/canvas/components/GrupoPanel';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
@@ -15,6 +17,8 @@ import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
+import { contarChecklist, deriveChecklist } from '@/features/checklist/derive';
+import { PainelUnidade } from '@/features/painel/components/PainelUnidade';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { SetoresModal } from '@/features/setores/components/SetoresModal';
 import { useSetoresStore } from '@/features/setores/store';
@@ -78,7 +82,6 @@ function Editor() {
   const resetMensagensSync = useSyncStore((s) => s.resetMensagens);
 
   const planoNome = useCanvasStore((s) => s.planoNome);
-  const flowMode = useCanvasStore((s) => s.flowMode);
   const selectedId = useCanvasStore((s) => s.selectedId);
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
@@ -86,7 +89,6 @@ function Editor() {
   const filtroFlags = useCanvasStore((s) => s.filtroFlags);
 
   const setPlanoNome = useCanvasStore((s) => s.setPlanoNome);
-  const setFlowMode = useCanvasStore((s) => s.setFlowMode);
   const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
   const loadPlanoAcao = useCanvasStore((s) => s.loadPlano);
   const createNode = useCanvasStore((s) => s.createNode);
@@ -97,6 +99,12 @@ function Editor() {
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
+  // Canvas do plano ou painel da unidade (decisoes.md#D-33). O ref serve ao
+  // atalho Delete, registrado uma vez só: com o painel na frente, a seleção do
+  // canvas continua existindo e não pode ser apagada às cegas.
+  const [tela, setTela] = useState<TelaEditor>('fluxo');
+  const telaRef = useRef(tela);
+  telaRef.current = tela;
 
   /* ==========================================================================
    * Tutorial (decisoes.md#D-20)
@@ -171,6 +179,11 @@ function Editor() {
     () => (selectedId ? nodes.find((n) => n.id === selectedId) ?? null : null),
     [selectedId, nodes],
   );
+  const grupos = useCanvasStore((s) => s.grupos);
+  const selectedGrupo = useMemo(
+    () => (selectedId ? grupos.find((g) => g.id === selectedId) ?? null : null),
+    [selectedId, grupos],
+  );
   const selectedEdge = useMemo(
     () =>
       !selectedNode && selectedId
@@ -179,14 +192,11 @@ function Editor() {
     [selectedId, edges, selectedNode],
   );
 
+  // A mesma conta do checklist: o número do cabeçalho e o do modal não podem
+  // discordar, e o checklist é quem sabe o que conta como item.
   const stats: HeaderStats = useMemo(() => {
-    let pendentes = 0;
-    for (const n of nodes) if (!n.data.ja_criado) pendentes += 1;
-    for (const e of edges) {
-      const subs = e.data?.subitems ?? [];
-      for (const s of subs) if (!s.ja_criado) pendentes += 1;
-    }
-    return { nodes: nodes.length, edges: edges.length, pendentes };
+    const { total, done } = contarChecklist(deriveChecklist(nodes, edges));
+    return { total, criados: done };
   }, [nodes, edges]);
 
   // Garante que qualquer save pendente seja gravado antes do tab fechar.
@@ -202,16 +212,26 @@ function Editor() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== 'Delete') return;
+      if (telaRef.current !== 'fluxo') return;
       if (useCanvasStore.getState().somenteLeitura) return;
       const t = e.target as HTMLElement | null;
       if (!t) return;
       const tag = t.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA' || t.isContentEditable) return;
       const store = useCanvasStore.getState();
+      const nos = store.nodes.filter((n) => n.selected).length;
+      const arestas = store.edges.filter((edge) => edge.selected).length;
+      const molduras = store.grupos.filter((g) => g.selected).length;
+      if (nos + arestas + molduras > 1) {
+        e.preventDefault();
+        if (confirmarApagarSelecao(nos, arestas)) store.deleteSelecao();
+        return;
+      }
       const id = store.selectedId;
       if (!id) return;
       e.preventDefault();
-      if (store.nodes.some((n) => n.id === id)) store.deleteNode(id);
+      if (store.grupos.some((g) => g.id === id)) store.removerGrupo(id);
+      else if (store.nodes.some((n) => n.id === id)) store.deleteNode(id);
       else if (store.edges.some((edge) => edge.id === id)) store.deleteEdge(id);
     };
     window.addEventListener('keydown', handler);
@@ -239,6 +259,14 @@ function Editor() {
     flushPersist();
     setAtivo(id);
     loadPlanoAcao(loadPlano(id));
+    refreshPlanos();
+  };
+
+  // Renomear o ativo no próprio cabeçalho: um nome inteiro de uma vez, não
+  // tecla a tecla — por isso grava e atualiza o índice na hora.
+  const onRenomearAtivo = (nome: string) => {
+    setPlanoNome(nome);
+    flushPersist();
     refreshPlanos();
   };
 
@@ -468,7 +496,7 @@ function Editor() {
     });
   };
 
-  const painelAberto = !!(selectedNode || selectedEdge);
+  const painelAberto = !!(selectedNode || selectedEdge || selectedGrupo);
 
   // `Editor` só é montado com sessão ativa (ver `App`), mas o seletor devolve
   // o tipo anulável — este guarda mantém o Header com prop não-anulável.
@@ -478,7 +506,7 @@ function Editor() {
     <div className="flex flex-col h-screen">
       <Header
         planoNome={planoNome}
-        onPlanoNomeChange={setPlanoNome}
+        onPlanoNomeChange={onRenomearAtivo}
         sidebarVisivel={sidebarVisivel}
         onAlternarSidebar={() => setSidebarVisivel((v) => !v)}
         sessao={sessao}
@@ -506,13 +534,16 @@ function Editor() {
         onSincronizarUnidade={() => void sincronizarUnidade()}
         sincronizandoUnidade={sincronizandoUnidade}
         onChecklist={() => setShowChecklist(true)}
-        flowMode={flowMode}
-        onFlowModeChange={setFlowMode}
+        onVerTutorial={() => setTutorialManual(true)}
         stats={stats}
+        tela={tela}
+        onTelaChange={setTela}
       />
 
       <div className="flex flex-1 min-h-0">
-        {sidebarVisivel && (
+        {tela === 'painel' && <PainelUnidade />}
+
+        {tela === 'fluxo' && sidebarVisivel && (
           <Sidebar
             onCreateNode={criarNoCentro}
             somenteLeitura={somenteLeitura}
@@ -524,9 +555,11 @@ function Editor() {
           />
         )}
 
+        {/* O provider envolve também o painel lateral: o atalho (D-30) leva a
+            câmera até o localizador a partir de um botão do painel. */}
+        {tela === 'fluxo' && (
         <ReactFlowProvider>
-          <FlowCanvas />
-        </ReactFlowProvider>
+        <FlowCanvas planoId={ativoId} />
 
         <aside
           className="no-print bg-superficie overflow-hidden flex-shrink-0"
@@ -544,7 +577,10 @@ function Editor() {
             />
           )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}
+          {selectedGrupo && <GrupoPanel key={selectedGrupo.id} grupo={selectedGrupo} />}
         </aside>
+        </ReactFlowProvider>
+        )}
       </div>
 
       <CatalogoOrgaoModal

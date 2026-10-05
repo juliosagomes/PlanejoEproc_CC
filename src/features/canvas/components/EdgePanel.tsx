@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import {
+  FLOW_MODE_DESENHO,
   KIND_CATEGORIA,
   KIND_LABELS,
   SUBITEM_CATS,
   ehRecursoRegra,
   hasDetalheSubitem,
+  nomeDaPonta,
   type EdgeData,
   type EdgeKind,
   type Subitem,
@@ -33,15 +35,14 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   const updateEdge = useCanvasStore((s) => s.updateEdge);
   const deleteEdge = useCanvasStore((s) => s.deleteEdge);
   const setDobra = useCanvasStore((s) => s.setDobra);
-  const flowMode = useCanvasStore((s) => s.flowMode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   // As pontas da aresta são a origem e o destino da regra de ATP: o modal de
   // detalhamento as mostra em vez de pedi-las de novo.
   const origem = useCanvasStore(
-    (s) => s.nodes.find((n) => n.id === edge.source)?.data.nome ?? '',
+    (s) => nomeDaPonta(s.nodes, s.grupos, edge.source),
   );
   const destino = useCanvasStore(
-    (s) => s.nodes.find((n) => n.id === edge.target)?.data.nome ?? '',
+    (s) => nomeDaPonta(s.nodes, s.grupos, edge.target),
   );
 
   const data: EdgeData = edge.data ?? defaultEdgeData();
@@ -263,9 +264,9 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                           })
                         }
                       />
-                      <input
-                        className="input text-texto-2"
-                        style={{ height: 22, padding: '2px 6px', fontSize: 11 }}
+                      <textarea
+                        className="input subitem-desc text-texto-2"
+                        rows={1}
                         placeholder="descrição (opcional)"
                         value={s.descricao ?? ''}
                         onChange={(e) => updateSub(i, { descricao: e.target.value })}
@@ -309,7 +310,7 @@ export function EdgePanel({ edge }: EdgePanelProps) {
           {/* Só aparece quando há o que restaurar. O gesto de reset é o duplo
               clique na alça; este botão é a descoberta dele — sem ele, quem
               arrastou a dobra por engano não tem como saber que dá para voltar. */}
-          {flowMode === 'sharp' && temDobraManual(data.dobra) && (
+          {FLOW_MODE_DESENHO === 'sharp' && temDobraManual(data.dobra) && (
             <button
               type="button"
               className="btn btn-sm w-full justify-center"

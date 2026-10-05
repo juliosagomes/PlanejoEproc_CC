@@ -10,10 +10,15 @@ import {
 } from 'reactflow';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { shallow } from 'zustand/shallow';
 import {
+  CORES_FLAG,
   SCHEMA_VERSION,
+  alvoReal,
   flagsPadrao,
+  molduraEnvolvendo,
+  reagruparSoltos,
+  type GrupoLocalizadores,
+  type AcaoPreferencialPlanejada,
   type AtpRule,
   type DefinicaoFlag,
   type DobraAresta,
@@ -27,12 +32,24 @@ import {
 import { flushPlataforma } from '@/infra/plataforma';
 import { criarSavePlanoDebounced, planoVazio } from '@/infra/storage';
 import { uid } from '@/utils/uid';
+import {
+  aplicarMudancasGrupos,
+  reagruparAposArrasto,
+  retanguloDoNo,
+  type GrupoFlow,
+} from './grupoMudancas';
 
 /* ============================================================================
  * STORE DO CANVAS
  *
  * Holds the ReactFlow `Node`/`Edge` shapes (ReactFlow precisa deles assim) e
- * mantém também `selectedId`, `planoNome`, `flowMode`. Conversão para o tipo
+ * mantém também `selectedId`, `planoNome`, `flowMode`.
+ *
+ * Seleção: a verdade é o campo `selected` de cada nó e aresta, que o próprio
+ * ReactFlow escreve (clique, Ctrl+clique, Shift+arrastar em caixa).
+ * `selectedId` é derivado — o item quando há **exatamente um** selecionado, que
+ * é quando faz sentido abrir o painel de detalhes; com dois ou mais ele é
+ * `null` e o canvas mostra a barra de ações em lote. Conversão para o tipo
  * `Plano` (domain) acontece em `getPlano()` / `loadPlano(plano)`.
  *
  * Persistência: uma única assinatura observa o slice persistível
@@ -81,6 +98,13 @@ interface CanvasState {
    * escopo de armazenamento.
    */
   somenteLeitura: boolean;
+  /**
+   * Molduras de grupo (decisoes.md#D-31). Fora de `nodes` de propósito: o resto
+   * do app lê `nodes` como "os localizadores", e misturar molduras ali faria
+   * cada filtro precisar lembrar de pulá-las. O `FlowCanvas` junta as duas
+   * listas na hora de desenhar.
+   */
+  grupos: GrupoFlow[];
 }
 
 interface CanvasActions {
@@ -105,6 +129,41 @@ interface CanvasActions {
   setDobra: (id: string, dobra?: DobraAresta) => void;
   deleteNode: (id: string) => void;
   deleteEdge: (id: string) => void;
+
+  // Ações preferenciais planejadas (decisoes.md#D-28)
+  /** Vincula uma preferência ao localizador. Devolve o id, ou `''` em visualização. */
+  addAcaoPreferencial: (nodeId: string, nome: string, ja_criado?: boolean) => string;
+  updateAcaoPreferencial: (
+    nodeId: string,
+    acaoId: string,
+    patch: Partial<Omit<AcaoPreferencialPlanejada, 'id'>>,
+  ) => void;
+  removeAcaoPreferencial: (nodeId: string, acaoId: string) => void;
+
+  // Atalhos (decisoes.md#D-30)
+  /**
+   * Cria um atalho para o localizador `alvoId`, logo abaixo dele, e o seleciona.
+   * Devolve o id, ou `''` em visualização ou alvo inexistente.
+   */
+  criarAtalho: (alvoId: string) => string;
+
+  // Grupos (decisoes.md#D-31)
+  /** Cria uma moldura em volta dos nós e a seleciona. Devolve o id, ou `''`. */
+  criarGrupo: (nodeIds: string[]) => string;
+  atualizarGrupo: (
+    id: string,
+    patch: Partial<Pick<GrupoLocalizadores, 'rotulo' | 'cor' | 'recolhido'>>,
+  ) => void;
+  /** Desfaz a moldura; os localizadores ficam onde estão. */
+  removerGrupo: (id: string) => void;
+
+  // Seleção múltipla (Card 7)
+  /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
+  deleteSelecao: () => void;
+  /** Reposiciona vários nós de uma vez (alinhar). Ids ausentes são ignorados. */
+  moverNos: (posicoes: Record<string, Position>) => void;
+  /** Liga ou desliga um setor em vários nós de uma vez. */
+  marcarFlagEmLote: (nodeIds: string[], flagId: string, ligar: boolean) => void;
 
   // Setores (decisoes.md#D-22, D-26)
   /** Atualiza o espelho. Chamada pela store de setores, dona da lista. */
@@ -165,6 +224,7 @@ function planoParaFlow(plano: Plano): {
   edges: FlowEdge[];
   planoNome: string;
   flowMode: FlowMode;
+  grupos: GrupoFlow[];
 } {
   return {
     nodes: plano.nodes.map((n) => ({
@@ -184,6 +244,7 @@ function planoParaFlow(plano: Plano): {
     })),
     planoNome: plano.planoNome,
     flowMode: plano.flowMode,
+    grupos: plano.grupos ?? [],
   };
 }
 
@@ -206,6 +267,10 @@ function flowParaPlano(state: CanvasState): Plano {
       targetHandle: e.targetHandle ?? null,
       data: e.data ?? defaultEdgeData(),
     })),
+    // Ausente, e não `[]`, quando não há grupo: plano sem moldura não muda de forma.
+    ...(state.grupos.length > 0
+      ? { grupos: state.grupos.map(({ selected: _s, ...g }) => g) }
+      : {}),
   };
 }
 
@@ -222,6 +287,33 @@ function flowParaPlano(state: CanvasState): Plano {
 
 const inicial = planoParaFlow(planoVazio());
 
+/** Marca como selecionados exatamente os itens de `ids`, preservando identidade dos que não mudam. */
+function comSelecao<T extends { id: string; selected?: boolean }>(
+  itens: T[],
+  ids: ReadonlySet<string>,
+): T[] {
+  return itens.map((i) => (!!i.selected === ids.has(i.id) ? i : { ...i, selected: ids.has(i.id) }));
+}
+
+/** Tira os ids de todo grupo, preservando a identidade dos grupos que não mudam. */
+function semMembros(grupos: GrupoFlow[], ids: ReadonlySet<string>): GrupoFlow[] {
+  return grupos.map((g) =>
+    g.membros.some((m) => ids.has(m)) ? { ...g, membros: g.membros.filter((m) => !ids.has(m)) } : g,
+  );
+}
+
+function unicoSelecionado(
+  nodes: FlowNode[],
+  edges: FlowEdge[],
+  grupos: GrupoFlow[] = [],
+): string | null {
+  const ns = nodes.filter((n) => n.selected);
+  const es = edges.filter((e) => e.selected);
+  const gs = grupos.filter((g) => g.selected);
+  if (ns.length + es.length + gs.length !== 1) return null;
+  return ns[0]?.id ?? es[0]?.id ?? gs[0]?.id ?? null;
+}
+
 export const useCanvasStore = create<CanvasStore>()(
   subscribeWithSelector((set, get) => ({
     nodes: inicial.nodes,
@@ -232,6 +324,7 @@ export const useCanvasStore = create<CanvasStore>()(
     flags: flagsPadrao(),
     filtroFlags: [],
     somenteLeitura: false,
+    grupos: [],
 
     // Em visualização, filtramos em vez de ignorar: `dimensions` e `select` são
     // o ReactFlow medindo e destacando o que já está na tela, e barrá-las
@@ -241,7 +334,21 @@ export const useCanvasStore = create<CanvasStore>()(
         ? changes.filter((c) => c.type === 'dimensions' || c.type === 'select')
         : changes;
       if (efetivas.length === 0) return;
-      set((s) => ({ nodes: applyNodeChanges(efetivas, s.nodes) as FlowNode[] }));
+      set((s) => {
+        // As molduras chegam no mesmo fluxo que os localizadores; cada uma vai
+        // para o seu lado.
+        const idsGrupo = new Set(s.grupos.map((g) => g.id));
+        const deGrupo = efetivas.filter((c) => 'id' in c && idsGrupo.has(c.id));
+        const deNo = efetivas.filter((c) => !('id' in c && idsGrupo.has(c.id)));
+        let nodes = deNo.length > 0 ? (applyNodeChanges(deNo, s.nodes) as FlowNode[]) : s.nodes;
+        let grupos = s.grupos;
+        if (deGrupo.length > 0) ({ grupos, nodes } = aplicarMudancasGrupos(grupos, nodes, deGrupo));
+        grupos = reagruparAposArrasto(grupos, nodes, deNo);
+        if (!efetivas.some((c) => c.type === 'select' || c.type === 'remove')) {
+          return { nodes, grupos };
+        }
+        return { nodes, grupos, selectedId: unicoSelecionado(nodes, s.edges, grupos) };
+      });
     },
 
     onEdgesChange: (changes) => {
@@ -249,7 +356,11 @@ export const useCanvasStore = create<CanvasStore>()(
         ? changes.filter((c) => c.type === 'select')
         : changes;
       if (efetivas.length === 0) return;
-      set((s) => ({ edges: applyEdgeChanges(efetivas, s.edges) as FlowEdge[] }));
+      set((s) => {
+        const edges = applyEdgeChanges(efetivas, s.edges) as FlowEdge[];
+        if (!efetivas.some((c) => c.type === 'select')) return { edges };
+        return { edges, selectedId: unicoSelecionado(s.nodes, edges, s.grupos) };
+      });
     },
 
     onConnect: (connection) => {
@@ -270,13 +381,25 @@ export const useCanvasStore = create<CanvasStore>()(
     createNode: (position) => {
       if (get().somenteLeitura) return '';
       const id = uid('n');
-      set((s) => ({
-        nodes: [
-          ...s.nodes,
-          { id, type: 'localizador', position, data: defaultLocalizadorData() },
-        ],
-        selectedId: id,
-      }));
+      set((s) => {
+        const novo: FlowNode = {
+          id,
+          type: 'localizador',
+          position,
+          data: defaultLocalizadorData(),
+          selected: true,
+        };
+        return {
+          nodes: [...comSelecao(s.nodes, new Set()), novo],
+          edges: comSelecao(s.edges, new Set()),
+          // Nó criado dentro de uma moldura já nasce membro dela.
+          grupos: comSelecao(
+            reagruparSoltos(s.grupos, [retanguloDoNo(novo)]) as GrupoFlow[],
+            new Set(),
+          ),
+          selectedId: id,
+        };
+      });
       return id;
     },
 
@@ -315,7 +438,12 @@ export const useCanvasStore = create<CanvasStore>()(
 
     deleteNode: (id) => {
       if (get().somenteLeitura) return;
+      if (get().grupos.some((g) => g.id === id)) {
+        get().removerGrupo(id);
+        return;
+      }
       set((s) => ({
+        grupos: semMembros(s.grupos, new Set([id])),
         nodes: s.nodes.filter((n) => n.id !== id),
         edges: s.edges.filter((e) => e.source !== id && e.target !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
@@ -327,6 +455,180 @@ export const useCanvasStore = create<CanvasStore>()(
       set((s) => ({
         edges: s.edges.filter((e) => e.id !== id),
         selectedId: s.selectedId === id ? null : s.selectedId,
+      }));
+    },
+
+    criarAtalho: (alvoId) => {
+      if (get().somenteLeitura) return '';
+      const alvo = alvoReal(get().nodes, alvoId);
+      const no = get().nodes.find((n) => n.id === alvo);
+      if (!alvo || !no) return '';
+      const id = uid('n');
+      set((s) => ({
+        nodes: [
+          ...comSelecao(s.nodes, new Set()),
+          {
+            id,
+            type: 'localizador',
+            position: { x: no.position.x + 40, y: no.position.y + 110 },
+            data: { nome: '', ja_criado: false, flags: [], atalhoPara: alvo },
+            selected: true,
+          },
+        ],
+        edges: comSelecao(s.edges, new Set()),
+        selectedId: id,
+      }));
+      return id;
+    },
+
+    addAcaoPreferencial: (nodeId, nome, ja_criado = false) => {
+      if (get().somenteLeitura) return '';
+      const id = uid('ap');
+      set((s) => ({
+        nodes: s.nodes.map((n) =>
+          n.id === nodeId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  acoesPreferenciais: [...(n.data.acoesPreferenciais ?? []), { id, nome, ja_criado }],
+                },
+              }
+            : n,
+        ),
+      }));
+      return id;
+    },
+
+    updateAcaoPreferencial: (nodeId, acaoId, patch) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) =>
+          n.id === nodeId
+            ? {
+                ...n,
+                data: {
+                  ...n.data,
+                  acoesPreferenciais: (n.data.acoesPreferenciais ?? []).map((a) =>
+                    a.id === acaoId ? { ...a, ...patch } : a,
+                  ),
+                },
+              }
+            : n,
+        ),
+      }));
+    },
+
+    // A lista vazia some do nó em vez de ficar `[]`: o campo é opcional, e um
+    // plano que nunca planejou ação nenhuma não deveria mudar de forma por ter
+    // tido uma e apagado.
+    removeAcaoPreferencial: (nodeId, acaoId) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          if (n.id !== nodeId) return n;
+          const resto = (n.data.acoesPreferenciais ?? []).filter((a) => a.id !== acaoId);
+          const { acoesPreferenciais: _antigas, ...data } = n.data;
+          return { ...n, data: resto.length > 0 ? { ...data, acoesPreferenciais: resto } : data };
+        }),
+      }));
+    },
+
+    criarGrupo: (nodeIds) => {
+      if (get().somenteLeitura) return '';
+      const alvo = new Set(nodeIds);
+      const membros = get().nodes.filter((n) => alvo.has(n.id));
+      const moldura = molduraEnvolvendo(membros.map(retanguloDoNo));
+      if (!moldura) return '';
+      const id = uid('g');
+      const cor = CORES_FLAG[get().grupos.length % CORES_FLAG.length] ?? CORES_FLAG[0];
+      const grupo: GrupoFlow = {
+        id,
+        rotulo: 'Novo grupo',
+        cor,
+        position: { x: moldura.x, y: moldura.y },
+        largura: moldura.largura,
+        altura: moldura.altura,
+        membros: membros.map((n) => n.id),
+        selected: true,
+      };
+      set((s) => ({
+        // Um localizador é membro de um grupo só: entrar neste o tira dos outros.
+        grupos: [...comSelecao(semMembros(s.grupos, alvo), new Set()), grupo],
+        nodes: comSelecao(s.nodes, new Set()),
+        edges: comSelecao(s.edges, new Set()),
+        selectedId: id,
+      }));
+      return id;
+    },
+
+    atualizarGrupo: (id, patch) => {
+      if (get().somenteLeitura) return;
+      set((s) => {
+        const grupos = s.grupos.map((g) => (g.id === id ? { ...g, ...patch } : g));
+        const alvo = grupos.find((g) => g.id === id);
+        if (!patch.recolhido || !alvo) return { grupos };
+        // Recolher esconde os membros e as setas entre eles. Seleção que fica
+        // escondida é armadilha: o Delete e a barra de lote agiriam sobre o que
+        // não está na tela.
+        // A seta entre um membro e o próprio grupo também some: as duas pontas
+        // viram a mesma moldura.
+        const membros = new Set([...alvo.membros, alvo.id]);
+        const desmarcar = <T extends { id: string; selected?: boolean }>(
+          itens: T[],
+          some: (i: T) => boolean,
+        ): T[] => itens.map((i) => (i.selected && some(i) ? { ...i, selected: false } : i));
+        const nodes = desmarcar(s.nodes, (n) => membros.has(n.id));
+        const edges = desmarcar(s.edges, (e) => membros.has(e.source) && membros.has(e.target));
+        return { grupos, nodes, edges, selectedId: unicoSelecionado(nodes, edges, grupos) };
+      });
+    },
+
+    removerGrupo: (id) => {
+      if (get().somenteLeitura) return;
+      // Os localizadores ficam; as setas presas à moldura saem com ela.
+      set((s) => ({
+        grupos: s.grupos.filter((g) => g.id !== id),
+        edges: s.edges.filter((e) => e.source !== id && e.target !== id),
+        selectedId: s.selectedId === id ? null : s.selectedId,
+      }));
+    },
+
+    deleteSelecao: () => {
+      if (get().somenteLeitura) return;
+      set((s) => {
+        const nos = new Set(s.nodes.filter((n) => n.selected).map((n) => n.id));
+        const pontas = new Set([...nos, ...s.grupos.filter((g) => g.selected).map((g) => g.id)]);
+        return {
+          grupos: semMembros(s.grupos.filter((g) => !g.selected), nos),
+          nodes: s.nodes.filter((n) => !nos.has(n.id)),
+          edges: s.edges.filter((e) => !e.selected && !pontas.has(e.source) && !pontas.has(e.target)),
+          selectedId: null,
+        };
+      });
+    },
+
+    moverNos: (posicoes) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          const p = posicoes[n.id];
+          return p ? { ...n, position: { x: p.x, y: p.y } } : n;
+        }),
+      }));
+    },
+
+    marcarFlagEmLote: (nodeIds, flagId, ligar) => {
+      if (get().somenteLeitura) return;
+      const alvo = new Set(nodeIds);
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          if (!alvo.has(n.id) || n.data.flags.includes(flagId) === ligar) return n;
+          const flags = ligar
+            ? [...n.data.flags, flagId]
+            : n.data.flags.filter((x) => x !== flagId);
+          return { ...n, data: { ...n.data, flags } };
+        }),
       }));
     },
 
@@ -375,7 +677,18 @@ export const useCanvasStore = create<CanvasStore>()(
     // `flowMode`, e não é persistido.
     setFiltroFlags: (ids) => set({ filtroFlags: ids }),
 
-    setSelectedId: (id) => set({ selectedId: id }),
+    // Também acerta as marcas do ReactFlow: quem seleciona por fora do canvas
+    // (checklist, criação de nó) não pode deixar a seleção anterior acesa.
+    setSelectedId: (id) =>
+      set((s) => {
+        const ids = new Set(id === null ? [] : [id]);
+        return {
+          selectedId: id,
+          nodes: comSelecao(s.nodes, ids),
+          edges: comSelecao(s.edges, ids),
+          grupos: comSelecao(s.grupos, ids),
+        };
+      }),
 
     setPlanoNome: (nome) => {
       if (get().somenteLeitura) return;
@@ -426,6 +739,7 @@ export const useCanvasStore = create<CanvasStore>()(
         edges: flow.edges,
         planoNome: flow.planoNome,
         flowMode: flow.flowMode,
+        grupos: flow.grupos,
         filtroFlags: [],
         selectedId: null,
       });
@@ -439,15 +753,43 @@ export const useCanvasStore = create<CanvasStore>()(
  * Persistência reativa.
  *
  * A assinatura observa apenas o slice persistível; mudanças de seleção não
- * disparam gravação. `shallow` compara o array elemento-a-elemento, então
- * trocar `nodes` ou `edges` por novas referências (o que toda mutação faz)
- * é detectado.
+ * disparam gravação. A comparação desce um nível em `nodes` e `edges` e ignora
+ * os campos de tela que o ReactFlow escreve (`CAMPOS_DE_TELA`): a seleção mora
+ * nos próprios nós (Card 7), e sem isso todo clique regravaria o plano.
  * ========================================================================== */
 
 const debouncedSave = criarSavePlanoDebounced();
 
+/**
+ * Campos que o ReactFlow escreve nos nós e arestas e que **não** vão para o
+ * `Plano` (`flowParaPlano` os descarta). Mudança só neles — selecionar, medir —
+ * não é motivo para gravar.
+ */
+const CAMPOS_DE_TELA = new Set(['selected', 'dragging', 'width', 'height', 'positionAbsolute']);
+
+function mesmoItemPersistido(a: object, b: object): boolean {
+  if (a === b) return true;
+  const ra = a as Record<string, unknown>;
+  const rb = b as Record<string, unknown>;
+  const chaves = new Set([...Object.keys(ra), ...Object.keys(rb)]);
+  for (const k of chaves) {
+    if (CAMPOS_DE_TELA.has(k)) continue;
+    if (!Object.is(ra[k], rb[k])) return false;
+  }
+  return true;
+}
+
+function mesmaListaPersistida(a: readonly object[], b: readonly object[]): boolean {
+  if (a === b) return true;
+  if (a.length !== b.length) return false;
+  return a.every((item, i) => {
+    const outro = b[i];
+    return outro !== undefined && mesmoItemPersistido(item, outro);
+  });
+}
+
 useCanvasStore.subscribe(
-  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags] as const,
+  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags, s.grupos] as const,
   () => {
     // Em visualização, o que sobra de mutação são as medições do ReactFlow e o
     // modo de desenho — nada que valha gravar, e gravar carimbaria
@@ -456,7 +798,15 @@ useCanvasStore.subscribe(
     if (estado.somenteLeitura) return;
     debouncedSave(estado.getPlano());
   },
-  { equalityFn: shallow },
+  {
+    equalityFn: (a, b) =>
+      mesmaListaPersistida(a[0], b[0]) &&
+      mesmaListaPersistida(a[1], b[1]) &&
+      a[2] === b[2] &&
+      a[3] === b[3] &&
+      a[4] === b[4] &&
+      mesmaListaPersistida(a[5], b[5]),
+  },
 );
 
 /**

@@ -1,5 +1,6 @@
 import type { DefinicaoFlag } from './flags';
 import type { EdgeData } from './edges';
+import type { GrupoLocalizadores } from './grupos';
 
 /**
  * Versão do schema do plano. Toda persistência (localStorage, JSON exportado)
@@ -20,6 +21,24 @@ export type SchemaVersion = typeof SCHEMA_VERSION;
 export interface Position {
   x: number;
   y: number;
+}
+
+/**
+ * Uma **ação preferencial planejada**: o usuário diz que a preferência `nome`
+ * deve atuar neste localizador. É plano, não fato — o fato é o que a
+ * sincronização traz da unidade (`AcaoPreferencialUnidade`), e o painel mostra
+ * os dois lado a lado (decisoes.md#D-28).
+ *
+ * Mora no **nó**, e não na aresta, porque o vínculo do Eproc é entre a
+ * preferência e o localizador onde ela aparece. A preferência que *move* o
+ * processo para outro localizador continua sendo recurso da aresta (D-24).
+ */
+export interface AcaoPreferencialPlanejada {
+  id: string;
+  /** Nome da preferência, como no Eproc. */
+  nome: string;
+  /** Marcado quando o vínculo já foi feito no Eproc. */
+  ja_criado: boolean;
 }
 
 export interface LocalizadorData {
@@ -43,6 +62,18 @@ export interface LocalizadorData {
    * apagado a definição entre um render e outro.
    */
   flags: string[];
+  /**
+   * Ações preferenciais planejadas para este localizador (decisoes.md#D-28).
+   * Opcional, e por isso aditivo — planos sem o campo seguem validando, sem
+   * migração, como o `sistema` do D-23.
+   */
+  acoesPreferenciais?: AcaoPreferencialPlanejada[];
+  /**
+   * Presente quando o nó é um **atalho** para outro localizador do plano — o id
+   * do alvo (decisoes.md#D-30). Atalho não tem nome próprio nem entra no
+   * checklist; opcional, sem migração.
+   */
+  atalhoPara?: string;
 }
 
 export interface Localizador {
@@ -70,6 +101,15 @@ export interface Edge {
 export type FlowMode = 'organic' | 'sharp';
 
 /**
+ * Como o canvas desenha as setas, para todo plano. O modo orgânico saiu da tela
+ * por simplicidade visual (out/2026); o `flowMode` gravado em cada plano
+ * continua existindo e validando, só não é mais lido para desenhar nem pode ser
+ * trocado. Voltar com a escolha é ler o campo de novo e devolver o alternador ao
+ * cabeçalho.
+ */
+export const FLOW_MODE_DESENHO: FlowMode = 'sharp';
+
+/**
  * Plano completo — unidade de persistência. É o que vai pro localStorage e
  * pro JSON exportado.
  *
@@ -88,5 +128,10 @@ export interface Plano {
   flags: DefinicaoFlag[];
   nodes: Localizador[];
   edges: Edge[];
+  /**
+   * Molduras que organizam o desenho (decisoes.md#D-31). Opcional e ausente
+   * quando não há nenhuma, para que plano sem grupo não mude de forma.
+   */
+  grupos?: GrupoLocalizadores[];
   exportedAt?: string;
 }

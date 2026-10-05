@@ -2,7 +2,14 @@ import type { ItemCatalogoUnidade } from '@/domain';
 import { decodeHtmlEntities } from '@/utils/decodeHtmlEntities';
 
 /**
- * Parser das preferências, vindas do autocompletar `preferencia_auto_completar`.
+ * Parser das preferências. Dois formatos:
+ *
+ *  - **JSON da lista do componente novo** (`data_table_listar_v2`, decisoes.md#D-37),
+ *    o caminho atual: traz id, grupo e as marcas, e não depende do hash da tela.
+ *  - **XML do autocompletar** `preferencia_auto_completar`, o caminho de antes,
+ *    que o D-35 viu parar. O parser fica para catálogo e teste antigos.
+ *
+ * O que segue descreve o XML.
  *
  * **Por que não pela tela de listagem.** Não existe tela que liste preferências
  * avulsas — varri todas as ações do menu e só há variantes `_grupo`, que listam
@@ -56,6 +63,64 @@ export function parsePreferenciasXml(xml: string, tipo: string): ItemCatalogoUni
     });
   }
   return itens;
+}
+
+interface LinhaListaPreferencias {
+  Descricao?: unknown;
+  SinPreferenciaIndividual?: unknown;
+  DescricaoGrupoFormularioPersonalizacaoGrupo?: unknown;
+  IdFormularioPersonalizacao?: unknown;
+}
+
+/** Linhas do JSON da lista (`{ data: [...] }`); `[]` para qualquer outra coisa. */
+export function linhasDaLista(json: string): LinhaListaPreferencias[] {
+  let dados: unknown;
+  try {
+    dados = JSON.parse(json);
+  } catch {
+    return [];
+  }
+  const linhas = Array.isArray(dados)
+    ? dados
+    : typeof dados === 'object' && dados !== null && Array.isArray((dados as { data?: unknown }).data)
+      ? (dados as { data: unknown[] }).data
+      : [];
+  return linhas.filter((l): l is LinhaListaPreferencias => typeof l === 'object' && l !== null);
+}
+
+/** Campo de texto da lista: as descrições trazem entidades HTML (`&#128309;`). */
+export function textoDaLista(v: unknown): string {
+  return typeof v === 'string' ? limpar(v) : typeof v === 'number' ? String(v) : '';
+}
+
+/**
+ * Preferências da lista do componente novo. A preferência **individual** (a do
+ * próprio servidor que sincroniza) fica de fora: o catálogo é da unidade.
+ */
+export function parsePreferenciasJson(json: string, tipo: string): ItemCatalogoUnidade[] {
+  const itens: ItemCatalogoUnidade[] = [];
+  for (const linha of linhasDaLista(json)) {
+    if (textoDaLista(linha.SinPreferenciaIndividual).toUpperCase() === 'S') continue;
+    const nome = textoDaLista(linha.Descricao);
+    if (!nome) continue;
+    const eprocId = textoDaLista(linha.IdFormularioPersonalizacao);
+    const grupo = textoDaLista(linha.DescricaoGrupoFormularioPersonalizacaoGrupo);
+    itens.push({
+      nome,
+      detalhe: tipo,
+      ...(eprocId ? { eprocId } : {}),
+      ...(grupo ? { grupo } : {}),
+    });
+  }
+  return itens;
+}
+
+/** JSON ou XML, pelo primeiro caractere. */
+export function parsePreferencias(fragmento: string, tipo: string): ItemCatalogoUnidade[] {
+  const inicio = fragmento.trimStart()[0];
+  return inicio === '{' || inicio === '['
+    ? parsePreferenciasJson(fragmento, tipo)
+    : parsePreferenciasXml(fragmento, tipo);
 }
 
 /**

@@ -26,8 +26,10 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const planoNome = useCanvasStore((s) => s.planoNome);
   const nodes = useCanvasStore((s) => s.nodes);
   const edges = useCanvasStore((s) => s.edges);
+  const grupos = useCanvasStore((s) => s.grupos);
   const toggleNodeCreated = useCanvasStore((s) => s.toggleNodeCreated);
   const toggleSubitemCreated = useCanvasStore((s) => s.toggleSubitemCreated);
+  const updateAcaoPreferencial = useCanvasStore((s) => s.updateAcaoPreferencial);
   // O checklist é útil como leitura numa sessão de visualização; só as marcações
   // de "já criado" ficam travadas — elas são edição do plano.
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
@@ -35,7 +37,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const [copiado, setCopiado] = useState(false);
 
   // `deriveChecklist` aceita o shape estrutural — passamos `nodes/edges` direto.
-  const groups = useMemo(() => deriveChecklist(nodes, edges), [nodes, edges]);
+  const groups = useMemo(() => deriveChecklist(nodes, edges, grupos), [nodes, edges, grupos]);
   const { total, done } = contarChecklist(groups);
 
   if (!open) return null;
@@ -157,6 +159,8 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                       // Regra e recurso comum são ambos subitens da aresta
                       // desde o D-24, então um toggle só dá conta dos dois.
                       if (it.kind === 'node') toggleNodeCreated(it.nodeId);
+                      else if (it.kind === 'acao')
+                        updateAcaoPreferencial(it.nodeId, it.acaoId, { ja_criado: !it.ja_criado });
                       else toggleSubitemCreated(it.edgeId, it.index);
                     };
                     return (
@@ -210,7 +214,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                             </div>
                             {(it.descricao || (it.kind !== 'node' && it.contexto)) && (
                               <div
-                                className="text-texto-3 mt-0.5"
+                                className="text-texto-3 mt-0.5 whitespace-pre-line"
                                 style={{ fontSize: 11.5, lineHeight: 1.4 }}
                               >
                                 {it.kind !== 'node' && it.contexto && (
@@ -324,7 +328,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                                   </div>
                                   {ch.descricao && (
                                     <div
-                                      className="text-texto-3 mt-px"
+                                      className="text-texto-3 mt-px whitespace-pre-line"
                                       style={{ fontSize: 11, lineHeight: 1.4 }}
                                     >
                                       {ch.descricao}

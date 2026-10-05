@@ -1,11 +1,13 @@
 import type { LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
-import { AcoesPreferenciaisNoEproc } from '@/features/catalogo/components/AcoesPreferenciaisNoEproc';
 import { LocalizadorNomeInput } from '@/features/catalogo/components/LocalizadorNomeInput';
 import { useSugestoesLocalizador } from '@/features/catalogo/sugestoes';
 import { cn } from '@/utils/cn';
 import { useCanvasStore, type FlowNode } from '../store';
+import { AcoesPreferenciaisBloco } from './AcoesPreferenciaisBloco';
+import { AtalhoPanel } from './AtalhoPanel';
+import { AtalhosDoLocalizador } from './AtalhosDoLocalizador';
 
 interface NodePanelProps {
   node: FlowNode;
@@ -14,6 +16,11 @@ interface NodePanelProps {
 }
 
 export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
+  if (node.data.atalhoPara !== undefined) return <AtalhoPanel node={node} />;
+  return <LocalizadorPanel node={node} onGerenciarSetores={onGerenciarSetores} />;
+}
+
+function LocalizadorPanel({ node, onGerenciarSetores }: NodePanelProps) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
@@ -81,7 +88,7 @@ export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
           )}
         </div>
 
-        <AcoesPreferenciaisNoEproc nome={data.nome} />
+        <AcoesPreferenciaisBloco node={node} />
 
         <div>
           <label className="label">Descrição</label>
@@ -155,7 +162,11 @@ export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
                       className={`flag-chip flag-cor-${f.cor}`}
                       style={
                         ativa
-                          ? { background: 'rgba(255,255,255,.18)', color: '#fff' }
+                          ? // Herda a cor do botão primário, que se inverte com o tema.
+                            {
+                              background: 'color-mix(in srgb, currentColor 18%, transparent)',
+                              color: 'inherit',
+                            }
                           : undefined
                       }
                     >
@@ -168,6 +179,8 @@ export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
             </div>
           )}
         </div>
+
+        <AtalhosDoLocalizador node={node} />
 
         <div>
           <label className="label">Observação</label>

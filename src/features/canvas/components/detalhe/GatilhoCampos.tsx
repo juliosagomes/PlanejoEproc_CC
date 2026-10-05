@@ -5,8 +5,9 @@ import {
   type TipoControle,
   type TipoDataControle,
 } from '@/domain';
-import { EVENTOS, POLOS_PETICAO, STATUS_PROCESSO, TIPOS_PETICAO } from '@/data';
+import { POLOS_PETICAO, STATUS_PROCESSO, TIPOS_PETICAO } from '@/data';
 import { CatalogMulti } from '@/components/CatalogMulti';
+import { EventosMulti } from '@/features/eventos/components/EventosMulti';
 import { Field } from './pecas';
 
 /* ============================================================================
@@ -174,11 +175,9 @@ export function GatilhoCampos({ trigger, setTrigger }: GatilhoCamposProps) {
         <>
           {(t.tipo === 'A' || t.tipo === 'E') && (
             <Field label="Evento">
-              <CatalogMulti
+              <EventosMulti
                 values={t.eventoIds ?? []}
-                options={EVENTOS}
                 onChange={(ids) => setTrigger({ ...t, eventoIds: ids })}
-                placeholder="Buscar evento…"
                 ariaLabel="Eventos do gatilho"
               />
             </Field>

@@ -18,6 +18,7 @@ const ESTADO_INICIAL = {
   flags: [],
   filtroFlags: [],
   somenteLeitura: false,
+  grupos: [],
 };
 
 beforeEach(() => {
@@ -615,5 +616,267 @@ describe('somenteLeitura', () => {
 
     flushPersist();
     expect(getActivePlanKey()).toBeNull();
+  });
+});
+
+describe('seleção múltipla (Card 7)', () => {
+  const montar = () => {
+    const s = useCanvasStore.getState();
+    const a = s.createNode({ x: 0, y: 0 });
+    const b = s.createNode({ x: 100, y: 50 });
+    const c = s.createNode({ x: 300, y: 80 });
+    s.onConnect({ source: a, target: b, sourceHandle: null, targetHandle: null });
+    s.onConnect({ source: b, target: c, sourceHandle: null, targetHandle: null });
+    return { a, b, c };
+  };
+  const selecionar = (ids: string[]) =>
+    useCanvasStore.getState().onNodesChange(
+      useCanvasStore.getState().nodes.map((n) => ({
+        type: 'select' as const,
+        id: n.id,
+        selected: ids.includes(n.id),
+      })),
+    );
+
+  it('selectedId só existe com exatamente um item selecionado', () => {
+    const { a, b } = montar();
+    selecionar([a]);
+    expect(useCanvasStore.getState().selectedId).toBe(a);
+    selecionar([a, b]);
+    expect(useCanvasStore.getState().selectedId).toBeNull();
+    selecionar([b]);
+    expect(useCanvasStore.getState().selectedId).toBe(b);
+  });
+
+  it('criar um nó deixa só ele selecionado', () => {
+    const { a, b } = montar();
+    selecionar([a, b]);
+    const novo = useCanvasStore.getState().createNode({ x: 9, y: 9 });
+    const sel = useCanvasStore.getState().nodes.filter((n) => n.selected).map((n) => n.id);
+    expect(sel).toEqual([novo]);
+  });
+
+  it('setSelectedId acerta as marcas do ReactFlow', () => {
+    const { a, b, c } = montar();
+    selecionar([a, b]);
+    useCanvasStore.getState().setSelectedId(c);
+    const sel = useCanvasStore.getState().nodes.filter((n) => n.selected).map((n) => n.id);
+    expect(sel).toEqual([c]);
+  });
+
+  it('deleteSelecao leva os nós e as arestas que tocam neles', () => {
+    const { a, b, c } = montar();
+    selecionar([a, b]);
+    useCanvasStore.getState().deleteSelecao();
+    const s = useCanvasStore.getState();
+    expect(s.nodes.map((n) => n.id)).toEqual([c]);
+    expect(s.edges).toHaveLength(0);
+    expect(s.selectedId).toBeNull();
+  });
+
+  it('moverNos reposiciona só quem foi pedido', () => {
+    const { a, b, c } = montar();
+    useCanvasStore.getState().moverNos({ [a]: { x: 0, y: 500 }, [b]: { x: 100, y: 500 } });
+    const pos = Object.fromEntries(useCanvasStore.getState().nodes.map((n) => [n.id, n.position]));
+    expect(pos[a]).toEqual({ x: 0, y: 500 });
+    expect(pos[b]).toEqual({ x: 100, y: 500 });
+    expect(pos[c]).toEqual({ x: 300, y: 80 });
+  });
+
+  it('marcarFlagEmLote liga e desliga sem duplicar', () => {
+    const { a, b } = montar();
+    const s = useCanvasStore.getState();
+    s.toggleFlagNoNo(a, 'f1');
+    s.marcarFlagEmLote([a, b], 'f1', true);
+    const flags = () => useCanvasStore.getState().nodes.map((n) => n.data.flags);
+    expect(flags()[0]).toEqual(['f1']);
+    expect(flags()[1]).toEqual(['f1']);
+    useCanvasStore.getState().marcarFlagEmLote([a, b], 'f1', false);
+    expect(flags()[0]).toEqual([]);
+    expect(flags()[1]).toEqual([]);
+  });
+
+  it('em visualização, nada disso altera o plano', () => {
+    const { a, b } = montar();
+    useCanvasStore.setState({ somenteLeitura: true });
+    selecionar([a, b]);
+    useCanvasStore.getState().deleteSelecao();
+    useCanvasStore.getState().moverNos({ [a]: { x: 9, y: 9 } });
+    expect(useCanvasStore.getState().nodes).toHaveLength(3);
+    expect(useCanvasStore.getState().nodes[0]?.position).toEqual({ x: 0, y: 0 });
+  });
+
+  it('a marca de seleção não vai para o plano', () => {
+    const { a } = montar();
+    selecionar([a]);
+    const plano = useCanvasStore.getState().getPlano();
+    expect(JSON.stringify(plano)).not.toContain('selected');
+  });
+});
+
+describe('ações preferenciais planejadas (D-28)', () => {
+  it('adiciona, marca e remove; a lista vazia some do nó', () => {
+    const s = useCanvasStore.getState();
+    const n = s.createNode({ x: 0, y: 0 });
+    const a = s.addAcaoPreferencial(n, 'Despacho — cite-se');
+    expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais).toEqual([
+      { id: a, nome: 'Despacho — cite-se', ja_criado: false },
+    ]);
+    useCanvasStore.getState().updateAcaoPreferencial(n, a, { ja_criado: true });
+    expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais?.[0]?.ja_criado).toBe(true);
+    useCanvasStore.getState().removeAcaoPreferencial(n, a);
+    expect('acoesPreferenciais' in (useCanvasStore.getState().nodes[0]?.data ?? {})).toBe(false);
+  });
+
+  it('em visualização não altera nada', () => {
+    const n = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    useCanvasStore.setState({ somenteLeitura: true });
+    expect(useCanvasStore.getState().addAcaoPreferencial(n, 'x')).toBe('');
+    expect(useCanvasStore.getState().nodes[0]?.data.acoesPreferenciais).toBeUndefined();
+  });
+});
+
+describe('atalhos (D-30)', () => {
+  it('cria ao lado do alvo, selecionado, apontando para o localizador de verdade', () => {
+    const s = useCanvasStore.getState();
+    const a = s.createNode({ x: 100, y: 100 });
+    const s1 = useCanvasStore.getState().criarAtalho(a);
+    const s2 = useCanvasStore.getState().criarAtalho(s1);
+    const nodes = useCanvasStore.getState().nodes;
+    expect(nodes.find((n) => n.id === s1)?.data.atalhoPara).toBe(a);
+    // Atalho de atalho aponta para o alvo, nunca para o atalho.
+    expect(nodes.find((n) => n.id === s2)?.data.atalhoPara).toBe(a);
+    expect(nodes.find((n) => n.id === s1)?.position).toEqual({ x: 140, y: 210 });
+    expect(useCanvasStore.getState().selectedId).toBe(s2);
+  });
+
+  it('em visualização ou com alvo inexistente não cria', () => {
+    expect(useCanvasStore.getState().criarAtalho('nada')).toBe('');
+    const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    useCanvasStore.setState({ somenteLeitura: true });
+    expect(useCanvasStore.getState().criarAtalho(a)).toBe('');
+  });
+});
+
+describe('grupos (D-31)', () => {
+  const montar = () => {
+    const s = useCanvasStore.getState();
+    const a = s.createNode({ x: 100, y: 100 });
+    const b = s.createNode({ x: 400, y: 100 });
+    const c = s.createNode({ x: 900, y: 600 });
+    const g = useCanvasStore.getState().criarGrupo([a, b]);
+    return { a, b, c, g };
+  };
+  const grupo = (id: string) => useCanvasStore.getState().grupos.find((x) => x.id === id)!;
+  const pos = (id: string) => useCanvasStore.getState().nodes.find((n) => n.id === id)!.position;
+
+  it('cria a moldura em volta dos nós, selecionada, com os dois como membros', () => {
+    const { a, b, g } = montar();
+    expect(grupo(g)).toMatchObject({ membros: [a, b], position: { x: 80, y: 60 }, selected: true });
+    expect(useCanvasStore.getState().selectedId).toBe(g);
+  });
+
+  it('arrastar a moldura leva os membros; redimensionar pelo canto não', () => {
+    const { a, b, c, g } = montar();
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: g, position: { x: 130, y: 90 }, dragging: true },
+    ]);
+    expect(pos(a)).toEqual({ x: 150, y: 130 });
+    expect(pos(b)).toEqual({ x: 450, y: 130 });
+    expect(pos(c)).toEqual({ x: 900, y: 600 });
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: g, position: { x: 100, y: 50 } },
+      { type: 'dimensions', id: g, dimensions: { width: 700, height: 400 }, resizing: true },
+    ]);
+    expect(pos(a)).toEqual({ x: 150, y: 130 });
+    expect(grupo(g)).toMatchObject({ position: { x: 100, y: 50 }, largura: 700, altura: 400 });
+  });
+
+  it('soltar um nó dentro da moldura o torna membro; fora, o tira', () => {
+    const { a, c, g } = montar();
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: c, position: { x: 200, y: 120 }, dragging: true },
+      { type: 'position', id: c, dragging: false },
+    ]);
+    expect(grupo(g).membros).toContain(c);
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: a, position: { x: 3000, y: 3000 }, dragging: true },
+      { type: 'position', id: a, dragging: false },
+    ]);
+    expect(grupo(g).membros).not.toContain(a);
+  });
+
+  it('apagar localizador o tira do grupo; desfazer o grupo mantém os localizadores', () => {
+    const { a, b, g } = montar();
+    useCanvasStore.getState().deleteNode(a);
+    expect(grupo(g).membros).toEqual([b]);
+    useCanvasStore.getState().removerGrupo(g);
+    expect(useCanvasStore.getState().grupos).toEqual([]);
+    expect(useCanvasStore.getState().nodes.map((n) => n.id)).toContain(b);
+  });
+
+  it('a aresta liga direto à moldura, e sai junto quando o grupo é desfeito', () => {
+    const { a, c, g } = montar();
+    const s = useCanvasStore.getState();
+    s.onConnect({ source: c, target: g, sourceHandle: null, targetHandle: null });
+    s.onConnect({ source: g, target: c, sourceHandle: null, targetHandle: null });
+    s.onConnect({ source: a, target: c, sourceHandle: null, targetHandle: null });
+    expect(useCanvasStore.getState().edges).toHaveLength(3);
+    useCanvasStore.getState().removerGrupo(g);
+    const restantes = useCanvasStore.getState().edges;
+    expect(restantes.map((e) => [e.source, e.target])).toEqual([[a, c]]);
+  });
+
+  it('o plano leva os grupos sem a marca de seleção, e omite a chave quando não há grupo', () => {
+    expect('grupos' in useCanvasStore.getState().getPlano()).toBe(false);
+    const { g } = montar();
+    const plano = useCanvasStore.getState().getPlano();
+    expect(plano.grupos?.[0]?.id).toBe(g);
+    expect(JSON.stringify(plano.grupos)).not.toContain('selected');
+  });
+
+  it('um localizador é membro de um grupo só', () => {
+    const { a, g } = montar();
+    const g2 = useCanvasStore.getState().criarGrupo([a]);
+    expect(grupo(g).membros).not.toContain(a);
+    expect(grupo(g2).membros).toEqual([a]);
+  });
+
+  it('recolher desmarca os membros e as setas entre eles, que somem da tela', () => {
+    const { a, b, c, g } = montar();
+    const st = useCanvasStore.getState();
+    st.onConnect({ source: a, target: b, sourceHandle: null, targetHandle: null });
+    st.onConnect({ source: b, target: c, sourceHandle: null, targetHandle: null });
+    const [interna, saida] = useCanvasStore.getState().edges.map((e) => e.id);
+    useCanvasStore.setState((s) => ({
+      grupos: s.grupos.map((x) => ({ ...x, selected: false })),
+      nodes: s.nodes.map((n) => ({ ...n, selected: n.id === a })),
+      edges: s.edges.map((e) => ({ ...e, selected: true })),
+    }));
+    useCanvasStore.getState().atualizarGrupo(g, { recolhido: true });
+    const depois = useCanvasStore.getState();
+    expect(depois.nodes.find((n) => n.id === a)!.selected).toBe(false);
+    expect(depois.edges.find((e) => e.id === interna)!.selected).toBe(false);
+    // A seta que sai do grupo continua na tela, presa à moldura: segue marcada.
+    expect(depois.edges.find((e) => e.id === saida)!.selected).toBe(true);
+    expect(depois.selectedId).toBe(saida);
+  });
+
+  it('expandir não mexe na seleção', () => {
+    const { a, g } = montar();
+    useCanvasStore.getState().atualizarGrupo(g, { recolhido: true });
+    useCanvasStore.setState((s) => ({ nodes: s.nodes.map((n) => ({ ...n, selected: n.id === a })) }));
+    useCanvasStore.getState().atualizarGrupo(g, { recolhido: false });
+    expect(useCanvasStore.getState().nodes.find((n) => n.id === a)!.selected).toBe(true);
+  });
+
+  it('em visualização: seleciona, mas não arrasta nem cria', () => {
+    const { a, g } = montar();
+    useCanvasStore.setState({ somenteLeitura: true });
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: g, position: { x: 999, y: 999 }, dragging: true },
+    ]);
+    expect(pos(a)).toEqual({ x: 100, y: 100 });
+    expect(useCanvasStore.getState().criarGrupo([a])).toBe('');
   });
 });

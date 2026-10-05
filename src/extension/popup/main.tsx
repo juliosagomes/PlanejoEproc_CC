@@ -6,6 +6,7 @@ import '@fontsource/inter/latin-500.css';
 import '@fontsource/inter/latin-600.css';
 
 import '@/index.css';
+import { TEMA_KEY } from '@/infra/storage/tema';
 import { Popup } from './Popup';
 
 /**
@@ -13,6 +14,15 @@ import { Popup } from './Popup';
  * service worker por mensagem (ver `Popup.tsx`). Ler o storage aqui também
  * criaria uma segunda resposta possível para "qual é a lotação corrente".
  */
+// Sem espelho, o tema vem direto do chrome.storage. Até responder, vale o
+// escuro com que o popup.html nasce.
+chrome.storage.local
+  .get(TEMA_KEY)
+  .then((r) => {
+    if (r[TEMA_KEY] === 'claro') document.documentElement.dataset.tema = 'claro';
+  })
+  .catch(() => {});
+
 const root = document.getElementById('root');
 if (!root) throw new Error('#root não encontrado em popup.html');
 

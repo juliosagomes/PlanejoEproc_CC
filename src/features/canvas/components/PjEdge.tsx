@@ -1,7 +1,7 @@
 import { useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { getBezierPath, getSmoothStepPath, useReactFlow, type EdgeProps } from 'reactflow';
-import type { DobraAresta, EdgeData, EdgeKind } from '@/domain';
+import { FLOW_MODE_DESENHO, type DobraAresta, type EdgeData, type EdgeKind } from '@/domain';
 import { cn } from '@/utils/cn';
 import { useCanvasStore } from '../store';
 import {
@@ -70,6 +70,8 @@ interface Arrasto {
 
 export function PjEdge({
   id,
+  source,
+  target,
   sourceX,
   sourceY,
   targetX,
@@ -90,12 +92,14 @@ export function PjEdge({
   const [hovered, setHovered] = useState(false);
   const { flowToScreenPosition, getZoom } = useReactFlow();
 
-  // Lido da store, e não mais de `document.body.dataset.flowMode`: a alça
-  // precisa aparecer e sumir no instante em que o modo troca, e um atributo
-  // escrito fora do React não dispara re-render.
-  const flowMode = useCanvasStore((s) => s.flowMode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
   const setDobra = useCanvasStore((s) => s.setDobra);
+  // Com o grupo recolhido, a ponta da seta é a moldura (D-31). A dobra é
+  // guardada como fração do vão entre os localizadores; arrastá-la aqui
+  // gravaria uma fração medida no bloco, e a seta voltaria torta ao expandir.
+  const pontaNaMoldura = useCanvasStore((s) =>
+    s.grupos.some((g) => g.id === source || g.id === target),
+  );
 
   /**
    * Enquanto o ponteiro está pressionado a dobra vive aqui, não na store:
@@ -108,7 +112,7 @@ export function PjEdge({
   const geo = { sourceX, sourceY, targetX, targetY };
   const dobra = preview ?? data?.dobra;
 
-  const isSharp = flowMode === 'sharp';
+  const isSharp = FLOW_MODE_DESENHO === 'sharp';
   const args = { sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition };
   const [path, labelX, labelY] = isSharp
     ? getSmoothStepPath({
@@ -122,7 +126,7 @@ export function PjEdge({
   const dasharray = kind === 'atp' ? '6 4' : style.strokeDasharray;
   const strokeWidth = selected ? style.strokeWidth + 0.7 : style.strokeWidth;
 
-  const podeArrastar = isSharp && !somenteLeitura && dobraArrastavel(geo);
+  const podeArrastar = isSharp && !somenteLeitura && !pontaNaMoldura && dobraArrastavel(geo);
   const segmento = segmentoDaDobra(geo, dobra);
   const arrastando = preview !== null;
   const showTooltip = hovered && !arrastando && resumo.length > 0;

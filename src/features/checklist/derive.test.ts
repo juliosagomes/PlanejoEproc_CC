@@ -493,3 +493,86 @@ describe('checklistToMarkdown', () => {
     expect(md).toContain('    L2');
   });
 });
+
+describe('ações preferenciais planejadas (D-28)', () => {
+  const comAcoes = (id: string, nome: string, sistema = false): Localizador => ({
+    id,
+    position: { x: 0, y: 0 },
+    data: {
+      nome,
+      ja_criado: true,
+      flags: [],
+      ...(sistema ? { sistema: true } : {}),
+      acoesPreferenciais: [
+        { id: `${id}-a1`, nome: 'Despacho — cite-se', ja_criado: true },
+        { id: `${id}-a2`, nome: 'Ofício INSS', ja_criado: false },
+      ],
+    },
+  });
+
+  it('cada vínculo planejado vira tarefa com o localizador de contexto', () => {
+    const g = deriveChecklist([comAcoes('n1', 'Minutar')], []);
+    expect(g['Ação preferencial']).toEqual([
+      { kind: 'acao', nodeId: 'n1', acaoId: 'n1-a1', nome: 'Despacho — cite-se', contexto: 'Minutar', ja_criado: true },
+      { kind: 'acao', nodeId: 'n1', acaoId: 'n1-a2', nome: 'Ofício INSS', contexto: 'Minutar', ja_criado: false },
+    ]);
+  });
+
+  it('entra mesmo quando o localizador é de sistema', () => {
+    const g = deriveChecklist([comAcoes('n1', 'CONCLUSOS', true)], []);
+    expect(g.Localizador).toEqual([]);
+    expect(g['Ação preferencial']).toHaveLength(2);
+  });
+
+  it('conta no progresso e sai no markdown com o contexto', () => {
+    const g = deriveChecklist([comAcoes('n1', 'Minutar')], []);
+    expect(contarChecklist(g)).toEqual({ total: 3, done: 2 });
+    const md = checklistToMarkdown('P', g);
+    expect(md).toContain('## Ação preferencial (1/2)');
+    expect(md).toContain('- [ ] Ofício INSS _(Minutar)_');
+  });
+});
+
+describe('atalhos (D-30)', () => {
+  it('atalho não vira localizador no checklist, e a aresta usa o nome do alvo', () => {
+    const alvo = noLocalizador('n1', 'Aguardando prazo');
+    const origem = noLocalizador('n2', 'Minutar');
+    const atalho: Localizador = {
+      id: 's1',
+      position: { x: 0, y: 0 },
+      data: { nome: '', ja_criado: false, flags: [], atalhoPara: 'n1' },
+    };
+    const aresta: Edge = {
+      id: 'e1',
+      source: 'n2',
+      target: 's1',
+      data: {
+        kind: 'manual',
+        resumo: '',
+        observacao: '',
+        subitems: [{ id: 'x', categoria: 'Modelo', nome: 'Vista', ja_criado: false }],
+      },
+    };
+    const g = deriveChecklist([alvo, origem, atalho], [aresta]);
+    expect(g.Localizador.map((i) => i.nome)).toEqual(['Aguardando prazo', 'Minutar']);
+    expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Aguardando prazo' });
+  });
+});
+
+describe('aresta no grupo (D-31)', () => {
+  it('a ponta que é moldura aparece pelo rótulo do grupo', () => {
+    const aresta: Edge = {
+      id: 'e1',
+      source: 'n1',
+      target: 'g1',
+      data: {
+        kind: 'manual',
+        resumo: '',
+        observacao: '',
+        subitems: [{ id: 'x', categoria: 'Modelo', nome: 'Vista', ja_criado: false }],
+      },
+    };
+    const g = deriveChecklist([noLocalizador('n1', 'Minutar')], [aresta], [{ id: 'g1', rotulo: 'Cumprimento' }]);
+    expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Grupo "Cumprimento"' });
+  });
+});

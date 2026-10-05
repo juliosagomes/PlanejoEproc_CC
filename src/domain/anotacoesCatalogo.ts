@@ -24,6 +24,9 @@ export const TIPOS_RECURSO = [
   'Preferência',
   'Modelo',
   'Texto padrão',
+  // As consultas salvas das telas de relatório (decisoes.md#D-32). A anotação é
+  // o único lugar onde os filtros delas ficam escritos: a coleta só traz o nome.
+  'Consulta salva',
 ] as const;
 
 export type TipoRecurso = (typeof TIPOS_RECURSO)[number];

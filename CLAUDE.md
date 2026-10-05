@@ -39,7 +39,7 @@ existindo (decisoes.md#D-16):
 
 - **"Sincronizar com a unidade"** lê direto do Eproc, na aba onde o usuário já
   está logado. Exige extensão instalada e sessão viva.
-- **"Catálogo órgão"** importa o XLS pelo file picker. É o caminho offline, e o
+- **"Catálogo do órgão"** importa o XLS pelo file picker. É o caminho offline, e o
   app **não consegue** ler esse arquivo sozinho — sempre pelo botão. O mesmo
   modal é a tela de **consulta** dos recursos mapeados dos dois caminhos, com as
   anotações do usuário (decisoes.md#D-25).
@@ -155,9 +155,11 @@ existem em nenhum outro arquivo do projeto:
   (`selTipoAcaoProgramada`, 24 tipos). Opcional, e pode ser mais de uma, em ordem.
 - **Localizador de Erro** — para onde o processo vai se a ação programada falhar.
 - **Unidade** — vara, cartório, gabinete.
-- **Ações Preferenciais Vinculadas** — rótulo do bloco que lista, no painel do
-  localizador, as preferências que já atuam nele segundo o Eproc. É informação,
-  não plano (`decisoes.md#D-16`).
+- **Ações Preferenciais Vinculadas** — rótulo do bloco, no painel do
+  localizador, que junta três origens com selo próprio: as que **já atuam** nele
+  segundo o Eproc (informação, `decisoes.md#D-16`), as **planejadas** pelo usuário
+  (`LocalizadorData.acoesPreferenciais`, viram tarefa no checklist) e as regras de
+  ATP **"Por Ação Manual"** que saem dele (derivadas da aresta) — decisoes.md#D-28.
 - **Flag do localizador** — marcador definido pelo usuário dizendo **quem
   trabalha** aquele localizador: um **setor** ("Setor de Cálculo") ou um
   **servidor** ("Joana Silva"), como a unidade preferir recortar. Os dois são o
@@ -167,6 +169,25 @@ existem em nenhum outro arquivo do projeto:
   plano exportado ou publicado, e é por ele que a lista se propaga entre colegas.
   Unidade nova nasce com `E` Espera e `F` Fixo de fluxo, e o usuário edita à
   vontade (decisoes.md#D-22).
+- **Atalho** — nó que representa outro localizador do mesmo plano, para evitar
+  setas longas; não tem nome próprio nem entra no checklist (decisoes.md#D-30).
+- **Grupo** — moldura que organiza o desenho; não é setor, não vai ao Eproc nem
+  ao checklist (decisoes.md#D-31).
+- **Conjunto de eventos** — atalho para selecionar e ler eventos da regra de ATP;
+  o plano continua gravando os eventos um a um (decisoes.md#D-29).
+- **Consulta salva** — filtro com nome salvo numa tela de relatório do Eproc (que
+  o Eproc chama de preferência da tela). Coletada só pelo nome (decisoes.md#D-32).
+- **Fila de trabalho** — o que um setor abre no Eproc para saber o que fazer: uma
+  consulta salva numa de três telas (Relatório Geral, Área de Trabalho de
+  Minutas, Lista de Processos por Localizador), com os localizadores que ela
+  olha (decisoes.md#D-37). Mora no **painel da unidade**, que confere a
+  **cobertura** (todo localizador do setor numa fila, ou fora de propósito com
+  motivo). Não chamar de "consulta": é o termo do usuário (decisoes.md#D-33).
+- **Grupo de preferências** — o agrupamento que o Eproc faz das preferências,
+  de qualquer tipo. No painel, qualquer fila pode estar num; os nomes do Eproc
+  chegam pela sincronização como sugestão (decisoes.md#D-37).
+- **Tipos de preferência** — Minuta, Movimentação e **Intimação**. A tela do
+  Eproc diz "Intimação Eletrônica em Bloco"; o tipo é Intimação.
 - **Modelagem** — preencher os campos da regra.
 - **Simulação** (≠ modelagem) — executar mentalmente o fluxo. **FORA do roadmap.**
 
@@ -198,6 +219,9 @@ Os JSONs originais ficam em `./listas_json/` na raiz. Vão para `src/data/` **s�
      avaliar `arrCamposPersonalizados` no MAIN world, ou seja `eval` — proibido
      pelo critério de "pronto" nº 7.
    - **ATPs cadastradas** (`automatizar_localizadores`).
+   - **Filtros das consultas salvas** nas telas de relatório. Os nomes já são
+     coletados (decisoes.md#D-32); os filtros só sairiam aplicando a consulta ou
+     com `eval`.
    - **Gerar arestas** a partir das ações preferenciais coletadas. Os vínculos já
      são sincronizados e aparecem como **informação** no painel do localizador
      ("Ações Preferenciais Vinculadas"). Convertê-los em arestas do plano é outra
@@ -276,6 +300,53 @@ Os JSONs originais ficam em `./listas_json/` na raiz. Vão para `src/data/` **s�
   (decisoes.md#D-27): domínio em `domain/atp/`, modal em
   `features/canvas/components/detalhe/`. Trouxe a `SCHEMA_VERSION = 4` e a
   terceira migração.
+
+### Cards de ideias (outubro/2026)
+
+Análise em `ideias/analise-cards.md`. Todos sem bump de schema — campos novos
+opcionais, como no D-23:
+
+- Descrição do recurso quebra linha; planos em ordem recente ou A–Z; câmera
+  lembrada por plano (`infra/storage/cameras.ts`, chave de UI por silo).
+- Cópias do mesmo localizador acendem juntas no hover (`features/canvas/gemeos.ts`).
+- Seleção múltipla: a verdade é o `selected` do ReactFlow nos nós e arestas;
+  `selectedId` é derivado. A assinatura de persistência ignora os campos de tela
+  (`CAMPOS_DE_TELA` em `features/canvas/store.ts`) — sem isso todo clique
+  regravaria o plano.
+- Ações preferenciais planejadas e ATP manual no painel do nó (D-28).
+- Conjuntos de eventos na regra de ATP (D-29), em `features/eventos/`.
+- Atalho de localizador (D-30) e grupos (D-31). As molduras ficam em
+  `CanvasState.grupos`, **fora** de `nodes`: o resto do app lê `nodes` como "os
+  localizadores". O `ReactFlowProvider` envolve também o painel lateral.
+- Consultas salvas na sincronização (D-32).
+- Painel da unidade (D-33), em `features/painel/`: filas de trabalho por setor,
+  cobertura e grupos de preferências. Chave `painel` por silo, fora do plano; as
+  filas guardam localizadores **por nome**. O cabeçalho alterna "Fluxo | Painel
+  da unidade", e o atalho Delete fica desligado no painel.
+- `components/SugestoesInput.tsx` substitui o `<datalist>` em todo o app: o
+  Chrome o desenha escuro e sem estilo possível. Não volte a usar `<datalist>`.
+  As barras de rolagem são globais (`::-webkit-scrollbar` em `index.css`); a
+  classe `.scroll` não é mais necessária.
+- Sigla de setor com até 3 caracteres; a sugestão automática continua em 2.
+- Tema escuro por padrão, claro a um clique (D-34). **Cor nova sempre como
+  token**, nos dois blocos do topo de `index.css`; cor escrita direto numa
+  regra vale para um tema só. Cores que o ReactFlow recebe como texto ficam em
+  `CORES_CANVAS` (`FlowCanvas.tsx`).
+- O canvas desenha sempre em Diagrama (`FLOW_MODE_DESENHO`); `Plano.flowMode`
+  continua no schema, mas não é lido para desenhar (D-34).
+- O Eproc passou a amarrar o hash do autocompletar ao `nomeAcao` da tela, e a
+  coleta das preferências parou (D-35). Na falha, `aplicarColeta` recebe o
+  catálogo anterior e mantém a lista, somada aos nomes das ações
+  preferenciais. O D-37 achou o caminho que não amarra o hash: a lista da
+  janela de preferências do Relatório Geral (`data_table_listar_v2`), que traz
+  o grupo. Não volte ao autocompletar para as preferências. Recusa de hash
+  chega como HTTP 200 com HTML: trate como falha, nunca como lista vazia.
+- Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
+  clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
+  (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.
+  Botão novo no cabeçalho vira item de menu, não botão solto. Mudou um rótulo
+  de menu? O tutorial (`roteiro.ts`, `Passo1Sincronizar.tsx`) e o aviso do
+  service worker citam esses nomes.
 
 ## Regras de ouro
 

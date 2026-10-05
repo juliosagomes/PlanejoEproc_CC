@@ -19,7 +19,20 @@ import { useCanvasStore } from '../store';
  * Não tem estado próprio — toda mutação flui pela store (Fase 5). Lê `flags`
  * dali porque as definições são do plano, não do nó: o nó guarda só ids.
  */
-export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorData>) {
+/**
+ * `copias` não é do domínio: o `FlowCanvas` acrescenta na decoração quando o
+ * mesmo localizador aparece mais de uma vez no plano.
+ */
+export type LocalizadorNodeData = LocalizadorData & { copias?: number };
+
+export function LocalizadorNode(props: NodeProps<LocalizadorNodeData>) {
+  if (props.data.atalhoPara !== undefined) {
+    return <AtalhoNode alvoId={props.data.atalhoPara} selected={props.selected ?? false} />;
+  }
+  return <LocalizadorCartao {...props} />;
+}
+
+function LocalizadorCartao({ data, selected }: NodeProps<LocalizadorNodeData>) {
   const definicoes = useCanvasStore((s) => s.flags);
 
   // A ordem é a da lista do plano, não a de marcação — assim dois nós com as
@@ -45,6 +58,16 @@ export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorData>) 
         </span>
       )}
 
+      {data.copias !== undefined && data.copias > 1 && (
+        <span
+          className="pj-node-copias mono"
+          title={`Este localizador aparece ${data.copias} vezes no plano`}
+          aria-label={`${data.copias} cópias no plano`}
+        >
+          ×{data.copias}
+        </span>
+      )}
+
       <div className="pj-node-name">
         {data.nome ? (
           data.nome
@@ -65,6 +88,41 @@ export function LocalizadorNode({ data, selected }: NodeProps<LocalizadorData>) 
         </div>
       )}
 
+      <Handle type="source" position={Position.Right} />
+    </div>
+  );
+}
+
+/**
+ * Atalho para outro localizador do plano (decisoes.md#D-30): uma pílula com o
+ * nome do alvo, lido da store a cada render — o atalho não guarda nome próprio,
+ * então renomear o alvo renomeia todos os atalhos. Alvo apagado deixa o atalho
+ * vermelho, em vez de sumir com ele e com as setas que chegam nele.
+ */
+function AtalhoNode({ alvoId, selected }: { alvoId: string; selected: boolean }) {
+  const nomeAlvo = useCanvasStore((s) => {
+    const alvo = s.nodes.find((n) => n.id === alvoId);
+    return alvo && alvo.data.atalhoPara === undefined ? alvo.data.nome : null;
+  });
+  const orfao = nomeAlvo === null;
+  return (
+    <div
+      className={cn('pj-atalho', { selected, orfao })}
+      title={
+        orfao
+          ? 'O localizador de destino foi apagado. Aponte o atalho para outro ou remova-o.'
+          : `Atalho para "${nomeAlvo || 'sem nome'}" — clique duas vezes para ir até lá`
+      }
+    >
+      <Handle type="target" position={Position.Left} />
+      <span className="pj-atalho-seta" aria-hidden>
+        {orfao ? '⚠' : '↪'}
+      </span>
+      {orfao ? (
+        <span>alvo removido</span>
+      ) : (
+        <span className="pj-atalho-nome">{nomeAlvo || <i>sem nome</i>}</span>
+      )}
       <Handle type="source" position={Position.Right} />
     </div>
   );

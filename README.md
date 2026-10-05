@@ -185,7 +185,7 @@ exceção deliberada — continua global ao navegador (`decisoes.md#D-7`).
 
 ### Baixar e enviar
 
-Dentro de uma lotação, o cabeçalho ganha dois botões:
+Dentro de uma lotação, o menu **Plano** do cabeçalho ganha a seção *Servidor da lotação*, com duas ações:
 
 - **Baixar do servidor** — traz a versão do servidor. Planos já conhecidos são
   atualizados no lugar; planos excluídos no servidor somem daqui também.
@@ -240,7 +240,7 @@ não** — só metadados (`decisoes.md#D-14`).
 
 ## Catálogo da unidade: sincronizar com o Eproc
 
-O botão **"Sincronizar com a unidade"**, no cabeçalho, lê da sua unidade no Eproc
+**"Sincronizar com a unidade"**, no menu **Unidade** do cabeçalho, lê da sua unidade no Eproc
 os **localizadores**, **preferências**, **modelos** e **textos padrão**, e passa a
 usá-los como sugestão no editor — no nome do localizador e nos recursos atrelados
 a uma transição.
@@ -282,7 +282,7 @@ sigla da unidade*. Trocar de unidade no Eproc e sincronizar de novo **não**
 sobrescreve o catálogo da anterior; trocar só de papel na mesma vara aproveita o
 mesmo catálogo.
 
-**O XLS continua funcionando.** O botão *Catálogo órgão* importa a planilha
+**O XLS continua funcionando.** *Catálogo do órgão*, no mesmo menu, importa a planilha
 exportada do Eproc, e é o caminho de quem não pode usar a coleta. As sugestões
 mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
 
@@ -309,7 +309,7 @@ mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
 - Se o JSON estiver malformado ou não passar no `PlanoSchema` (Zod), o conteúdo é **movido** para `planejoeproc:plano:corrompido:YYYY-MM-DD` e o app abre vazio. Não há perda silenciosa.
 - Toda gravação passa por um saver com debounce de 300 ms; mudanças muito próximas coalescem em uma única escrita.
 - O atalho `Delete` remove a seleção (nó ou aresta) — exceto quando o foco está em `INPUT`/`TEXTAREA`/`contenteditable`.
-- No modo **Diagrama**, o segmento central de cada seta é arrastável: puxe o cotovelo para onde a linha deve dobrar. O ajuste é salvo no plano e acompanha os localizadores quando você os move. Para voltar ao automático, dê dois cliques na alça ou use "Restaurar dobra automática" no painel da aresta (`decisoes.md#D-21`).
+- O segmento central de cada seta é arrastável: puxe o cotovelo para onde a linha deve dobrar. O ajuste é salvo no plano e acompanha os localizadores quando você os move. Para voltar ao automático, dê dois cliques na alça ou use "Restaurar dobra automática" no painel da aresta (`decisoes.md#D-21`).
 - `beforeunload` faz flush do save pendente.
 - Quando o `SCHEMA_VERSION` virar 2, a migração será escrita em `src/infra/storage/` com **teste de regressão** (importa arquivo da v1, confere que não perde dado).
 
@@ -330,7 +330,7 @@ mostram a união dos dois; em nome repetido, o que veio da unidade prevalece.
 ## Documentação relacionada
 
 - **`CLAUDE.md`** — guia de stack, arquitetura, glossário de domínio, padrões de código e regras de ouro. Lido por Claude e útil para qualquer dev novo no projeto.
-- **`decisoes.md`** — registro de decisões deliberadas (D-1: assunto livre; D-2: filtros como subset; D-3 e D-4: substituídos pelo D-27; D-8: backend Sheets+Drive; D-9: sessão por lotação; D-11: extensão como alvo principal; D-12: espelho síncrono do `chrome.storage`; D-13: sync de fundo só-pull; D-14: códigos via `chrome.storage.sync`; D-15: alvo único; D-27: a regra de ATP espelha a tela de cadastro do Eproc).
+- **`decisoes.md`** — registro de decisões deliberadas (D-1: assunto livre; D-2: filtros como subset; D-3 e D-4: substituídos pelo D-27; D-8: backend Sheets+Drive; D-9: sessão por lotação; D-11: extensão como alvo principal; D-12: espelho síncrono do `chrome.storage`; D-13: sync de fundo só-pull; D-14: códigos via `chrome.storage.sync`; D-15: alvo único; D-27: a regra de ATP espelha a tela de cadastro do Eproc; D-28 a D-32: ações preferenciais planejadas, conjuntos de eventos, atalhos, grupos e consultas salvas).
 - **`apps-script/README.md`** — deploy e republicação do backend de sincronização.
 - **`listas_json/`** — referência completa dos 48 JSONs do Eproc.
 
