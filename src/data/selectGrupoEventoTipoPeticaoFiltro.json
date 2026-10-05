@@ -1,0 +1,18 @@
+[
+  {
+    "value": "S",
+    "label": "Eventos de Sentença"
+  },
+  {
+    "value": "T",
+    "label": "Eventos de Trânsito em Julgado"
+  },
+  {
+    "value": "R1",
+    "label": "Petição de Recurso 1º Grau"
+  },
+  {
+    "value": "R2",
+    "label": "Petição de Recurso 2º Grau"
+  }
+]

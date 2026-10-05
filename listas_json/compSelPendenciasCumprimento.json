@@ -1,0 +1,16 @@
+[
+  { "value": "MPC", "label": "Mandado - COM Pendência de Cumprimento" },
+  { "value": "MPCR", "label": "Mandado - COM Pendência de Cumprimento - POLO PASSIVO" },
+  { "value": "MPCA", "label": "Mandado - COM Pendência de Cumprimento - POLO ATIVO" },
+  { "value": "MPCAP", "label": "Mandado - COM Pendência de Cumprimento após a Data de Urgência" },
+  { "value": "MPCAPP", "label": "Mandado - COM Pendência de Cumprimento após 30 dias da Data de Expedição" },
+  { "value": "OPC", "label": "Ofício - COM Pendência de Cumprimento" },
+  { "value": "OPCR", "label": "Ofício - COM Pendência de Cumprimento - POLO PASSIVO" },
+  { "value": "OPCA", "label": "Ofício - COM Pendência de Cumprimento - POLO ATIVO" },
+  { "value": "OPCAPP", "label": "Ofício - COM Pendência de Cumprimento - após 45 dias da Data de Expedição" },
+  { "value": "MOSP", "label": "Mandado e Ofício - SEM Pendência de Cumprimento" },
+  { "value": "MOISPCR", "label": "Mandado e Ofício - SEM Pendência de Cumprimento - POLO PASSIVO" },
+  { "value": "MOISPCA", "label": "Mandado e Ofício - SEM Pendência de Cumprimento - POLO ATIVO" },
+  { "value": "MOISPCN", "label": "Mandado e Ofício - SEM Pendência de Cumprimento - POLO NEUTRO" },
+  { "value": "MOISPCI", "label": "Mandado e Ofício - SEM Pendência de Cumprimento - POLO INTERESSADO" }
+]

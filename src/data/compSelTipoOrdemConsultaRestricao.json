@@ -1,0 +1,138 @@
+[
+  {
+    "value": "1|0",
+    "label": "BACEN - Bloqueio Consulta Prévia - NEGATIVO"
+  },
+  {
+    "value": "1|1",
+    "label": "BACEN - Bloqueio Consulta Prévia - POSITIVO (PARCIAL)"
+  },
+  {
+    "value": "1|2",
+    "label": "BACEN - Bloqueio Consulta Prévia - POSITIVO (TOTAL)"
+  },
+  {
+    "value": "1|5",
+    "label": "BACEN - Bloqueio Consulta Prévia - NÃO ENCONTRADO"
+  },
+  {
+    "value": "2|0",
+    "label": "BACEN - Bloqueio Efetivo - NEGATIVO"
+  },
+  {
+    "value": "2|1",
+    "label": "BACEN - Bloqueio Efetivo - POSITIVO (PARCIAL)"
+  },
+  {
+    "value": "2|2",
+    "label": "BACEN - Bloqueio Efetivo - POSITIVO (TOTAL)"
+  },
+  {
+    "value": "2|5",
+    "label": "BACEN - Bloqueio Efetivo - NÃO ENCONTRADO"
+  },
+  {
+    "value": "3|3",
+    "label": "BACEN - Desbloqueio - OK"
+  },
+  {
+    "value": "3|5",
+    "label": "BACEN - Desbloqueio - NÃO ENCONTRADO"
+  },
+  {
+    "value": "4|0",
+    "label": "RENAJUD - Resultado - NEGATIVO"
+  },
+  {
+    "value": "4|1",
+    "label": "RENAJUD - Resultado - POSITIVO (PARCIAL)"
+  },
+  {
+    "value": "4|2",
+    "label": "RENAJUD - Resultado - POSITIVO (TOTAL)"
+  },
+  {
+    "value": "4|5",
+    "label": "RENAJUD - Resultado - NÃO ENCONTRADO"
+  },
+  {
+    "value": "5|3",
+    "label": "INFOJUD - Consulta - OK"
+  },
+  {
+    "value": "5|5",
+    "label": "INFOJUD - Consulta - NÃO ENCONTRADO"
+  },
+  {
+    "value": "6|3",
+    "label": "BACEN - Informações - OK"
+  },
+  {
+    "value": "6|5",
+    "label": "BACEN - Informações - NÃO ENCONTRADO"
+  },
+  {
+    "value": "7|3",
+    "label": "GID-DETRAN - Consulta - OK"
+  },
+  {
+    "value": "7|5",
+    "label": "GID-DETRAN - Consulta - NÃO ENCONTRADO"
+  },
+  {
+    "value": "8|3",
+    "label": "CNIB - Inclusão - OK"
+  },
+  {
+    "value": "8|5",
+    "label": "CNIB - Inclusão - NÃO ENCONTRADO"
+  },
+  {
+    "value": "9|3",
+    "label": "CNIB - Cancelamento - OK"
+  },
+  {
+    "value": "9|5",
+    "label": "CNIB - Cancelamento - NÃO ENCONTRADO"
+  },
+  {
+    "value": "10|3",
+    "label": "SERASAJUD - Inclusão - OK"
+  },
+  {
+    "value": "10|5",
+    "label": "SERASAJUD - Inclusão - NÃO ENCONTRADO"
+  },
+  {
+    "value": "11|3",
+    "label": "SERASAJUD - Retirada - OK"
+  },
+  {
+    "value": "11|5",
+    "label": "SERASAJUD - Retirada - NÃO ENCONTRADO"
+  },
+  {
+    "value": "12|3",
+    "label": "SPC - Inclusão - OK"
+  },
+  {
+    "value": "12|5",
+    "label": "SPC - Inclusão - NÃO ENCONTRADO"
+  },
+  {
+    "value": "13|3",
+    "label": "SPC - Retirada - OK"
+  },
+  {
+    "value": "13|5",
+    "label": "SPC - Retirada - NÃO ENCONTRADO"
+  },
+  {
+    "value": "14|3",
+    "label": "BACEN - Transferência - OK"
+  },
+  {
+    "value": "14|5",
+    "label": "BACEN - Transferência - NÃO ENCONTRADO"
+  }
+]

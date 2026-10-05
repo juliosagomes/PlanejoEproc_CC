@@ -6,7 +6,7 @@
 
 Aplicação web React + TypeScript chamada **PlanejoEproc**, derivada do protótipo monolítico `PlanejoEproc__BETA_2.html.html` na raiz. O protótipo é a **fonte da verdade do domínio, dos fluxos de UI e do comportamento esperado**, mas o produto final é um projeto Vite estruturado, com testes, validação de schemas, e arquitetura por camadas.
 
-Estágio: **beta**, sem usuários reais. `SCHEMA_VERSION = 3` (as flags customizáveis do D-22 trouxeram a v2; a regra virando recurso da aresta, no D-24, trouxe a v3). As migrações moram em `infra/storage/migracoes.ts`, se **encadeiam** (v1→v2→v3) e são aplicadas **dentro do `PlanoSchema`**, para que os sete pontos que chamam `safeParse` as herdem — em especial `loadPlano`, que manda para a quarentena tudo que não valida. Toda versão nova segue esse molde, com teste de regressão — e **congelando** a forma anterior do schema: a v1 reusava o `EdgeSchema` corrente e por isso mudava junto com ele.
+Estágio: **beta**, sem usuários reais. `SCHEMA_VERSION = 4` (as flags customizáveis do D-22 trouxeram a v2; a regra virando recurso da aresta, no D-24, trouxe a v3; a regra de ATP espelhando a tela do Eproc, no D-27, trouxe a v4). As migrações moram em `infra/storage/migracoes.ts`, se **encadeiam** (v1→v2→v3→v4) e são aplicadas **dentro do `PlanoSchema`**, para que os sete pontos que chamam `safeParse` as herdem — em especial `loadPlano`, que manda para a quarentena tudo que não valida. Toda versão nova segue esse molde, com teste de regressão — e **congelando** a forma anterior do schema: a v1 reusava o `EdgeSchema` corrente e por isso mudava junto com ele.
 
 ## Para quem
 
@@ -143,11 +143,17 @@ existem em nenhum outro arquivo do projeto:
 - **Manual** — transição sem automação. Aresta cinza tracejada.
 - **Modelo** — minuta/template de texto.
 - **Texto padrão** — trecho reutilizável de redação.
-- **Regra de ATP** — gatilho + condição + ação. É um **recurso da aresta**, como
+- **Regra de ATP** — os três blocos da tela de cadastro do Eproc: **Regras**
+  (comportamento da origem, tipo de controle), **Executar Ação** (ações
+  programadas) e **Filtros Opcionais** (decisoes.md#D-27). É um **recurso da aresta**, como
   Modelo ou Texto padrão, e por isso uma transição comporta várias — duas ATPs,
   ou uma ATP e uma preferência (decisoes.md#D-24). Quem nomeia é o recurso; a
   regra guarda só o detalhamento.
-- **Gatilho** — evento que dispara automação. Espelha `selTipoControle` (9 tipos).
+- **Gatilho** — evento que dispara automação. Espelha `selTipoControle` (9 tipos),
+  que a tela do Eproc chama de **Tipo de Controle**.
+- **Ação programada** — o que o Eproc executa depois de mover o processo
+  (`selTipoAcaoProgramada`, 24 tipos). Opcional, e pode ser mais de uma, em ordem.
+- **Localizador de Erro** — para onde o processo vai se a ação programada falhar.
 - **Unidade** — vara, cartório, gabinete.
 - **Ações Preferenciais Vinculadas** — rótulo do bloco que lista, no painel do
   localizador, as preferências que já atuam nele segundo o Eproc. É informação,
@@ -169,21 +175,18 @@ existem em nenhum outro arquivo do projeto:
 A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por enquanto (texto/string), e ficarão tipados quando o catálogo entrar.
 
 - **Aresta** tem `kind` (`'atp' | 'pref' | 'manual'`), que é escolha do usuário e manda no traço no canvas. As regras são `Subitem`s dela, discriminados pela `categoria`; ATP tem `trigger` discriminado por `tipo` (9 valores espelhando `selTipoControle`).
-- **Schema versionado:** `SCHEMA_VERSION = 3`. Toda chave de localStorage e arquivo exportado carrega `version`. Cada migração vem com **teste de regressão** (abrir um plano da versão anterior e conferir que nada se perdeu) — ver `infra/storage/migracoes.test.ts`.
+- **As ações programadas e os filtros da ATP são descritores**, não tipos: `ACOES_PROGRAMADAS` e `FILTROS_DEF`, em `domain/atp/`, dizem quais campos existem; a UI (`CampoDinamico`) e o checklist os leem. As chaves são os **ids dos campos do Eproc**. Para acrescentar um campo, mexa no descritor — não crie JSX nem campo de schema para ele (decisoes.md#D-27).
+- **Schema versionado:** `SCHEMA_VERSION = 4`. Toda chave de localStorage e arquivo exportado carrega `version`. Cada migração vem com **teste de regressão** (abrir um plano da versão anterior e conferir que nada se perdeu) — ver `infra/storage/migracoes.test.ts`.
 - Decisões deliberadas de simplificação: ver `decisoes.md`.
 
 ## Catálogo do Eproc embutido (Caminho A)
 
-48 JSONs originais ficam em `./listas_json/` na raiz. Na **Fase 6**, copiar **apenas** estes para `src/data/`:
+Os JSONs originais ficam em `./listas_json/` na raiz. Vão para `src/data/` **só** os que um descritor da regra de ATP cita (`CatalogoId`, em `domain/atp/campos.ts`) — o `Record<CatalogoId, …>` de `data/index.ts` não compila se faltar um. As 24 ações programadas não são JSON: moram no domínio, com os campos de cada uma.
 
-- `compSelIdEvento.json` — eventos do gatilho ATP
-- `selTipoControle.json` — 9 tipos de controle
-- `selTipoAcaoProgramada.json` — 23 tipos de ação programada
-- `selClassesJudiciaisMultiplo.json` — classes judiciais
-- `selCompetencia.json` — competências
-- `selStatusProcessoMultiplo.json` — situações do processo
+**Não embutir**, e o motivo não é só tamanho (decisoes.md#D-27):
 
-**Não usar** `selAssuntoMultiplo.json` (1 MB / 3.260 itens — assunto vira texto livre).
+- `selAssuntoMultiplo.json` (1 MB), precedente, entidade, órgão de origem — grandes demais; viram campo de digitação.
+- `compSelIdLocalizador*.json`, `compSelVarJuizo.json`, `selClassificadorConteudo.json`, remessa, subseção — são **da unidade ou do tribunal** de quem exportou. O build é o mesmo para todos; lista de uma vara, e nome de gente, não entram nele.
 
 ## Roadmap FORA de escopo (não começar)
 
@@ -269,6 +272,10 @@ A **estrutura** dos tipos espelha o Eproc real; os **valores** são livres por e
 - O modal do catálogo lista os recursos mapeados e aceita anotação do usuário
   (decisoes.md#D-25), em `features/catalogo/`. Anotação mora em chave própria,
   fora dos catálogos, porque reimportar sobrescreve os dois.
+- O "Detalhar ATP" passou a espelhar a tela *Cadastrar Nova Regra de ATP*
+  (decisoes.md#D-27): domínio em `domain/atp/`, modal em
+  `features/canvas/components/detalhe/`. Trouxe a `SCHEMA_VERSION = 4` e a
+  terceira migração.
 
 ## Regras de ouro
 

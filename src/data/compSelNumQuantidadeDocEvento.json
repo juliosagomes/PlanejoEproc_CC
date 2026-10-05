@@ -1,0 +1,22 @@
+[
+  {
+    "value": "0",
+    "label": "Sem nenhum documento"
+  },
+  {
+    "value": "1",
+    "label": "Com apenas 1 documento"
+  },
+  {
+    "value": "2",
+    "label": "Com 2 documentos"
+  },
+  {
+    "value": "3",
+    "label": "Com 3 documentos"
+  },
+  {
+    "value": "4",
+    "label": "Com mais de 3 documentos"
+  }
+]

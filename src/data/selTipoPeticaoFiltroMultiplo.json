@@ -1,0 +1,1026 @@
+[
+  {
+    "value": "313",
+    "label": "ABERTURA DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "310",
+    "label": "ACORDO DE NAO-PERSECUÇAO PENAL"
+  },
+  {
+    "value": "206",
+    "label": "AGRAVO DE DEC DENEG DE PEDIDO DE UNIFORM DE INTERPRET DE LEI"
+  },
+  {
+    "value": "205",
+    "label": "AGRAVO DE DECISÃO DENEGATÓRIA DE REC. EXTRAORDINÁRIO"
+  },
+  {
+    "value": "204",
+    "label": "AGRAVO INTERNO"
+  },
+  {
+    "value": "306",
+    "label": "AGRAVO REGIMENTAL"
+  },
+  {
+    "value": "324",
+    "label": "AGRAVOS DE DECISÃO DENEGATÓRIA DE REC. ESPECIAL E EXT."
+  },
+  {
+    "value": "31",
+    "label": "ALEGAÇÕES FINAIS"
+  },
+  {
+    "value": "32",
+    "label": "APELAÇÃO"
+  },
+  {
+    "value": "180",
+    "label": "APRECIAÇÃO JUDICIAL"
+  },
+  {
+    "value": "184",
+    "label": "APRECIAÇÃO MP"
+  },
+  {
+    "value": "187",
+    "label": "APRECIAÇÃO POLICIAL"
+  },
+  {
+    "value": "201",
+    "label": "APRESENTAÇÃO DE QUESITOS"
+  },
+  {
+    "value": "307",
+    "label": "APROPRIAÇÃO EFETIVADA"
+  },
+  {
+    "value": "182",
+    "label": "CIÊNCIA, COM RENÚNCIA AO PRAZO"
+  },
+  {
+    "value": "102",
+    "label": "COMUNICAÇÕES"
+  },
+  {
+    "value": "311",
+    "label": "CONSTITUIÇÃO DE PROCURADOR"
+  },
+  {
+    "value": "35",
+    "label": "CONTESTAÇÃO"
+  },
+  {
+    "value": "344",
+    "label": "CONTESTAÇÃO - RECONHECIMENTO PARCIAL DO PEDIDO"
+  },
+  {
+    "value": "343",
+    "label": "CONTESTAÇÃO - RECONHECIMENTO TOTAL DO PEDIDO"
+  },
+  {
+    "value": "36",
+    "label": "CONTRARRAZÕES"
+  },
+  {
+    "value": "211",
+    "label": "CRIAÇÃO DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "317",
+    "label": "CRIAÇÃO/ABERTURA DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "38",
+    "label": "DEFESA PRÉVIA"
+  },
+  {
+    "value": "73",
+    "label": "DENÚNCIA"
+  },
+  {
+    "value": "318",
+    "label": "DESINTERESSE NA AUTOCOMPOSIÇÃO"
+  },
+  {
+    "value": "170",
+    "label": "DESPACHO"
+  },
+  {
+    "value": "166",
+    "label": "DILAÇÃO DE PRAZO DEFERIDA"
+  },
+  {
+    "value": "167",
+    "label": "DILAÇÃO DE PRAZO INDEFERIDA"
+  },
+  {
+    "value": "177",
+    "label": "DILIGÊNCIA CUMPRIDA COTA/MP"
+  },
+  {
+    "value": "181",
+    "label": "DILIGÊNCIA POLICIAL"
+  },
+  {
+    "value": "168",
+    "label": "DILIGÊNCIAS EXTERNAS"
+  },
+  {
+    "value": "169",
+    "label": "DILIGÊNCIAS INTERNAS"
+  },
+  {
+    "value": "104",
+    "label": "EMBARGOS À AÇÃO MONITÓRIA"
+  },
+  {
+    "value": "40",
+    "label": "EMBARGOS DE DECLARAÇÃO"
+  },
+  {
+    "value": "41",
+    "label": "EMBARGOS INFRINGENTES"
+  },
+  {
+    "value": "198",
+    "label": "ENCAMINHAMENTO PARA MUTIRÃO CONCILIAÇÃO"
+  },
+  {
+    "value": "316",
+    "label": "ENCERRAMENTO DE FÓRUM - COM CONCILIAÇÃO"
+  },
+  {
+    "value": "315",
+    "label": "ENCERRAMENTO DE FÓRUM - SEM CONCILIAÇÃO"
+  },
+  {
+    "value": "320",
+    "label": "ENCERRAMENTO DE FÓRUM PARA NEGOCIAÇÃO POSTERIOR"
+  },
+  {
+    "value": "192",
+    "label": "ENCERRAMENTO DE REPRESENTACAO"
+  },
+  {
+    "value": "189",
+    "label": "ENCERRAMENTO DE TC"
+  },
+  {
+    "value": "42",
+    "label": "EXCEÇÃO DE PRÉ-EXECUTIVIDADE"
+  },
+  {
+    "value": "92",
+    "label": "EXECUÇÃO/CUMPRIMENTO DE SENTENÇA"
+  },
+  {
+    "value": "43",
+    "label": "GUIAS DE RECOLHIMENTO / DEPÓSITO / CUSTAS"
+  },
+  {
+    "value": "210",
+    "label": "HABILITAÇÃO DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "86",
+    "label": "IMPUGNAÇÃO AO CUMPRIMENTO DE SENTENÇA"
+  },
+  {
+    "value": "44",
+    "label": "IMPUGNAÇÃO AOS EMBARGOS"
+  },
+  {
+    "value": "46",
+    "label": "INCIDENTE DE UNIFORMIZAÇÃO DE JURISPRUDÊNCIA"
+  },
+  {
+    "value": "101",
+    "label": "INFORMAÇÕES PRESTADAS"
+  },
+  {
+    "value": "305",
+    "label": "LAUDO COMPLEMENTAR"
+  },
+  {
+    "value": "48",
+    "label": "LAUDO PERICIAL"
+  },
+  {
+    "value": "49",
+    "label": "MANIFESTAÇÃO (ART. 402 CPP)"
+  },
+  {
+    "value": "188",
+    "label": "MANIFESTAÇÃO - APRECIAÇÃO MP"
+  },
+  {
+    "value": "185",
+    "label": "MANIFESTAÇÃO - APRECIAÇÃO POLICIAL"
+  },
+  {
+    "value": "207",
+    "label": "MEMORIAIS"
+  },
+  {
+    "value": "82100299",
+    "label": "MERA CIÊNCIA"
+  },
+  {
+    "value": "51",
+    "label": "OFÍCIO"
+  },
+  {
+    "value": "76",
+    "label": "PARECER"
+  },
+  {
+    "value": "174",
+    "label": "PEDIDO DE ARQUIVAMENTO"
+  },
+  {
+    "value": "165",
+    "label": "PEDIDO DE DILAÇÃO DE PRAZO"
+  },
+  {
+    "value": "186",
+    "label": "PEDIDO DE DILAÇÃO DE PRAZO/RÉU PRESO"
+  },
+  {
+    "value": "82400077",
+    "label": "Pedido de Expedição de Alvará de Levantamento - Formulário"
+  },
+  {
+    "value": "179",
+    "label": "PEDIDO DECLINAÇÃO DE COMPETÊNCIA"
+  },
+  {
+    "value": "52",
+    "label": "PETIÇÃO"
+  },
+  {
+    "value": "82100300",
+    "label": "PETIÇÃO - ACEITA PROPOSTA DE ACORDO"
+  },
+  {
+    "value": "72",
+    "label": "PETIÇÃO - ADITAMENTO À DENÚNCIA"
+  },
+  {
+    "value": "82400083",
+    "label": "PETIÇÃO - APRESENTAÇÃO GARANTIA"
+  },
+  {
+    "value": "82400079",
+    "label": "PETIÇÃO - DESASTRE CLIMÁTICO"
+  },
+  {
+    "value": "347",
+    "label": "PETIÇÃO - DESCONSTITUIÇÃO DE COISA JULGADA"
+  },
+  {
+    "value": "202",
+    "label": "PETIÇÃO - DESINTERESSE NA AUTOCOMPOSIÇÃO (ART. 334 CPC)"
+  },
+  {
+    "value": "82400082",
+    "label": "PETIÇÃO - DESISTÊNCIA DA AÇÃO"
+  },
+  {
+    "value": "79",
+    "label": "PETIÇÃO - EMENDA A INICIAL"
+  },
+  {
+    "value": "107",
+    "label": "PETIÇÃO - IMPUGNAÇÃO AOS CÁLCULOS"
+  },
+  {
+    "value": "82400091",
+    "label": "PETIÇÃO - INTERNAÇÃO DISPONIBILIZADA"
+  },
+  {
+    "value": "331",
+    "label": "PETIÇÃO - JUNTADA DE DOCUMENTO"
+  },
+  {
+    "value": "82400090",
+    "label": "PETIÇÃO - MEDICAMENTO DISPONIBILIZADO"
+  },
+  {
+    "value": "330",
+    "label": "PETIÇÃO - NÃO COMPARECIMENTO PERICIADO"
+  },
+  {
+    "value": "82400087",
+    "label": "PETIÇÃO - PAGAMENTO"
+  },
+  {
+    "value": "82400080",
+    "label": "PETIÇÃO - PARCELAMENTO PAGAMENTO"
+  },
+  {
+    "value": "332",
+    "label": "PETIÇÃO - PEDIDO DE ALVARÁ DE HONORÁRIOS"
+  },
+  {
+    "value": "348",
+    "label": "PETIÇÃO - PEDIDO DE CERTIDÃO DOS PODERES DA PROCURAÇÃO"
+  },
+  {
+    "value": "325",
+    "label": "PETIÇÃO - PEDIDO DE INSERÇÃO DE RESTRIÇÃO NO SERASAJUD"
+  },
+  {
+    "value": "82400088",
+    "label": "PETIÇÃO - PEDIDO DE INSERÇÃO DE RESTRIÇÃO NO SPC"
+  },
+  {
+    "value": "108",
+    "label": "PETIÇÃO - PEDIDO DE LIMINAR/ANTECIPAÇÃO DE TUTELA"
+  },
+  {
+    "value": "88",
+    "label": "PETIÇÃO - PEDIDO DE RECONSIDERAÇÃO"
+  },
+  {
+    "value": "82400078",
+    "label": "Petição - Pedido de retirada de pauta"
+  },
+  {
+    "value": "326",
+    "label": "PETIÇÃO - PEDIDO DE RETIRADA DE RESTRIÇÃO NO SERASAJUD"
+  },
+  {
+    "value": "82400089",
+    "label": "PETIÇÃO - PEDIDO DE RETIRADA DE RESTRIÇÃO NO SPC"
+  },
+  {
+    "value": "81",
+    "label": "PETIÇÃO - PEDIDO DE SUSPENSÃO CONDICIONAL DO PROCESSO"
+  },
+  {
+    "value": "82",
+    "label": "PETIÇÃO - PEDIDO DE TRANSAÇÃO PENAL"
+  },
+  {
+    "value": "209",
+    "label": "PETIÇÃO - PRIORIDADE DE TRAMITAÇÃO"
+  },
+  {
+    "value": "346",
+    "label": "PETIÇÃO - RECONHECIMENTO PARCIAL DO PEDIDO"
+  },
+  {
+    "value": "345",
+    "label": "PETIÇÃO - RECONHECIMENTO TOTAL DO PEDIDO"
+  },
+  {
+    "value": "329",
+    "label": "PETIÇÃO - RECUSA URGÊNCIA"
+  },
+  {
+    "value": "82400085",
+    "label": "PETIÇÃO - SOLICITAÇÃO RENAJUD"
+  },
+  {
+    "value": "82400086",
+    "label": "PETIÇÃO - SOLICITAÇÃO SERAJUD"
+  },
+  {
+    "value": "82400084",
+    "label": "PETIÇÃO - SOLICITAÇÃO SISBAJUD"
+  },
+  {
+    "value": "82400081",
+    "label": "PETIÇÃO - SUSPENSÃO ART. 40 LEF"
+  },
+  {
+    "value": "322",
+    "label": "PETIÇÃO - SUSPENSÃO POR PARCELAMENTO"
+  },
+  {
+    "value": "323",
+    "label": "PETIÇÃO - SUSPENSÃO/ARQUIVAMENTO - ART. 40 LEF"
+  },
+  {
+    "value": "105",
+    "label": "PROCURAÇÃO"
+  },
+  {
+    "value": "195",
+    "label": "PROCURAÇÃO RÉU"
+  },
+  {
+    "value": "191",
+    "label": "PROPOSTA DE CONCILIAÇÃO"
+  },
+  {
+    "value": "197",
+    "label": "PROPOSTA DE CONCILIAÇÃO - FORUM"
+  },
+  {
+    "value": "203",
+    "label": "PROPOSTA DE CONCILIAÇÃO PARCIAL"
+  },
+  {
+    "value": "314",
+    "label": "PRORROGAÇÃO DO PRAZO DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "53",
+    "label": "RAZÕES DE APELAÇÃO CRIMINAL"
+  },
+  {
+    "value": "95",
+    "label": "RAZÕES DE RECURSO EM SENTIDO ESTRITO"
+  },
+  {
+    "value": "80",
+    "label": "RECONVENÇÃO"
+  },
+  {
+    "value": "55",
+    "label": "RECURSO ADESIVO"
+  },
+  {
+    "value": "61",
+    "label": "RECURSO ESPECIAL"
+  },
+  {
+    "value": "63",
+    "label": "RECURSO EXTRAORDINÁRIO"
+  },
+  {
+    "value": "183",
+    "label": "RECURSO INOMINADO"
+  },
+  {
+    "value": "64",
+    "label": "RECURSO ORDINÁRIO"
+  },
+  {
+    "value": "196",
+    "label": "RECURSOS ESPECIAL E EXTRAORDINÁRIO"
+  },
+  {
+    "value": "172",
+    "label": "RELATÓRIO FINAL IPL"
+  },
+  {
+    "value": "171",
+    "label": "RENÚNCIA AO PRAZO"
+  },
+  {
+    "value": "106",
+    "label": "RENÚNCIA DE MANDATO"
+  },
+  {
+    "value": "65",
+    "label": "RÉPLICA"
+  },
+  {
+    "value": "178",
+    "label": "REQUISIÇÃO DE DILIGÊNCIA"
+  },
+  {
+    "value": "66",
+    "label": "RESPOSTA"
+  },
+  {
+    "value": "193",
+    "label": "SEM PROPOSTA DE CONCILIAÇÃO"
+  },
+  {
+    "value": "319",
+    "label": "SOLICITAÇÃO DE AUDIÊNCIA DE CONCILIAÇÃO"
+  },
+  {
+    "value": "321",
+    "label": "SUBMISSÃO DE DOCUMENTO(S) AO FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "164",
+    "label": "SUBSTABELECIMENTO COM RESERVA"
+  },
+  {
+    "value": "163",
+    "label": "SUBSTABELECIMENTO SEM RESERVA"
+  },
+  {
+    "value": "208",
+    "label": "TERMO DE ACORDO"
+  },
+  {
+    "value": "313",
+    "label": "ABERTURA DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "310",
+    "label": "ACORDO DE NAO-PERSECUÇAO PENAL"
+  },
+  {
+    "value": "206",
+    "label": "AGRAVO DE DEC DENEG DE PEDIDO DE UNIFORM DE INTERPRET DE LEI"
+  },
+  {
+    "value": "205",
+    "label": "AGRAVO DE DECISÃO DENEGATÓRIA DE REC. EXTRAORDINÁRIO"
+  },
+  {
+    "value": "204",
+    "label": "AGRAVO INTERNO"
+  },
+  {
+    "value": "306",
+    "label": "AGRAVO REGIMENTAL"
+  },
+  {
+    "value": "324",
+    "label": "AGRAVOS DE DECISÃO DENEGATÓRIA DE REC. ESPECIAL E EXT."
+  },
+  {
+    "value": "31",
+    "label": "ALEGAÇÕES FINAIS"
+  },
+  {
+    "value": "32",
+    "label": "APELAÇÃO"
+  },
+  {
+    "value": "180",
+    "label": "APRECIAÇÃO JUDICIAL"
+  },
+  {
+    "value": "184",
+    "label": "APRECIAÇÃO MP"
+  },
+  {
+    "value": "187",
+    "label": "APRECIAÇÃO POLICIAL"
+  },
+  {
+    "value": "201",
+    "label": "APRESENTAÇÃO DE QUESITOS"
+  },
+  {
+    "value": "307",
+    "label": "APROPRIAÇÃO EFETIVADA"
+  },
+  {
+    "value": "182",
+    "label": "CIÊNCIA, COM RENÚNCIA AO PRAZO"
+  },
+  {
+    "value": "102",
+    "label": "COMUNICAÇÕES"
+  },
+  {
+    "value": "311",
+    "label": "CONSTITUIÇÃO DE PROCURADOR"
+  },
+  {
+    "value": "35",
+    "label": "CONTESTAÇÃO"
+  },
+  {
+    "value": "344",
+    "label": "CONTESTAÇÃO - RECONHECIMENTO PARCIAL DO PEDIDO"
+  },
+  {
+    "value": "343",
+    "label": "CONTESTAÇÃO - RECONHECIMENTO TOTAL DO PEDIDO"
+  },
+  {
+    "value": "36",
+    "label": "CONTRARRAZÕES"
+  },
+  {
+    "value": "211",
+    "label": "CRIAÇÃO DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "317",
+    "label": "CRIAÇÃO/ABERTURA DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "38",
+    "label": "DEFESA PRÉVIA"
+  },
+  {
+    "value": "73",
+    "label": "DENÚNCIA"
+  },
+  {
+    "value": "318",
+    "label": "DESINTERESSE NA AUTOCOMPOSIÇÃO"
+  },
+  {
+    "value": "170",
+    "label": "DESPACHO"
+  },
+  {
+    "value": "166",
+    "label": "DILAÇÃO DE PRAZO DEFERIDA"
+  },
+  {
+    "value": "167",
+    "label": "DILAÇÃO DE PRAZO INDEFERIDA"
+  },
+  {
+    "value": "177",
+    "label": "DILIGÊNCIA CUMPRIDA COTA/MP"
+  },
+  {
+    "value": "181",
+    "label": "DILIGÊNCIA POLICIAL"
+  },
+  {
+    "value": "168",
+    "label": "DILIGÊNCIAS EXTERNAS"
+  },
+  {
+    "value": "169",
+    "label": "DILIGÊNCIAS INTERNAS"
+  },
+  {
+    "value": "104",
+    "label": "EMBARGOS À AÇÃO MONITÓRIA"
+  },
+  {
+    "value": "40",
+    "label": "EMBARGOS DE DECLARAÇÃO"
+  },
+  {
+    "value": "41",
+    "label": "EMBARGOS INFRINGENTES"
+  },
+  {
+    "value": "198",
+    "label": "ENCAMINHAMENTO PARA MUTIRÃO CONCILIAÇÃO"
+  },
+  {
+    "value": "316",
+    "label": "ENCERRAMENTO DE FÓRUM - COM CONCILIAÇÃO"
+  },
+  {
+    "value": "315",
+    "label": "ENCERRAMENTO DE FÓRUM - SEM CONCILIAÇÃO"
+  },
+  {
+    "value": "320",
+    "label": "ENCERRAMENTO DE FÓRUM PARA NEGOCIAÇÃO POSTERIOR"
+  },
+  {
+    "value": "192",
+    "label": "ENCERRAMENTO DE REPRESENTACAO"
+  },
+  {
+    "value": "189",
+    "label": "ENCERRAMENTO DE TC"
+  },
+  {
+    "value": "42",
+    "label": "EXCEÇÃO DE PRÉ-EXECUTIVIDADE"
+  },
+  {
+    "value": "92",
+    "label": "EXECUÇÃO/CUMPRIMENTO DE SENTENÇA"
+  },
+  {
+    "value": "43",
+    "label": "GUIAS DE RECOLHIMENTO / DEPÓSITO / CUSTAS"
+  },
+  {
+    "value": "210",
+    "label": "HABILITAÇÃO DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "86",
+    "label": "IMPUGNAÇÃO AO CUMPRIMENTO DE SENTENÇA"
+  },
+  {
+    "value": "44",
+    "label": "IMPUGNAÇÃO AOS EMBARGOS"
+  },
+  {
+    "value": "46",
+    "label": "INCIDENTE DE UNIFORMIZAÇÃO DE JURISPRUDÊNCIA"
+  },
+  {
+    "value": "101",
+    "label": "INFORMAÇÕES PRESTADAS"
+  },
+  {
+    "value": "305",
+    "label": "LAUDO COMPLEMENTAR"
+  },
+  {
+    "value": "48",
+    "label": "LAUDO PERICIAL"
+  },
+  {
+    "value": "49",
+    "label": "MANIFESTAÇÃO (ART. 402 CPP)"
+  },
+  {
+    "value": "188",
+    "label": "MANIFESTAÇÃO - APRECIAÇÃO MP"
+  },
+  {
+    "value": "185",
+    "label": "MANIFESTAÇÃO - APRECIAÇÃO POLICIAL"
+  },
+  {
+    "value": "207",
+    "label": "MEMORIAIS"
+  },
+  {
+    "value": "82100299",
+    "label": "MERA CIÊNCIA"
+  },
+  {
+    "value": "51",
+    "label": "OFÍCIO"
+  },
+  {
+    "value": "76",
+    "label": "PARECER"
+  },
+  {
+    "value": "174",
+    "label": "PEDIDO DE ARQUIVAMENTO"
+  },
+  {
+    "value": "165",
+    "label": "PEDIDO DE DILAÇÃO DE PRAZO"
+  },
+  {
+    "value": "186",
+    "label": "PEDIDO DE DILAÇÃO DE PRAZO/RÉU PRESO"
+  },
+  {
+    "value": "82400077",
+    "label": "Pedido de Expedição de Alvará de Levantamento - Formulário"
+  },
+  {
+    "value": "179",
+    "label": "PEDIDO DECLINAÇÃO DE COMPETÊNCIA"
+  },
+  {
+    "value": "52",
+    "label": "PETIÇÃO"
+  },
+  {
+    "value": "82100300",
+    "label": "PETIÇÃO - ACEITA PROPOSTA DE ACORDO"
+  },
+  {
+    "value": "72",
+    "label": "PETIÇÃO - ADITAMENTO À DENÚNCIA"
+  },
+  {
+    "value": "82400083",
+    "label": "PETIÇÃO - APRESENTAÇÃO GARANTIA"
+  },
+  {
+    "value": "82400079",
+    "label": "PETIÇÃO - DESASTRE CLIMÁTICO"
+  },
+  {
+    "value": "347",
+    "label": "PETIÇÃO - DESCONSTITUIÇÃO DE COISA JULGADA"
+  },
+  {
+    "value": "202",
+    "label": "PETIÇÃO - DESINTERESSE NA AUTOCOMPOSIÇÃO (ART. 334 CPC)"
+  },
+  {
+    "value": "82400082",
+    "label": "PETIÇÃO - DESISTÊNCIA DA AÇÃO"
+  },
+  {
+    "value": "79",
+    "label": "PETIÇÃO - EMENDA A INICIAL"
+  },
+  {
+    "value": "107",
+    "label": "PETIÇÃO - IMPUGNAÇÃO AOS CÁLCULOS"
+  },
+  {
+    "value": "82400091",
+    "label": "PETIÇÃO - INTERNAÇÃO DISPONIBILIZADA"
+  },
+  {
+    "value": "331",
+    "label": "PETIÇÃO - JUNTADA DE DOCUMENTO"
+  },
+  {
+    "value": "82400090",
+    "label": "PETIÇÃO - MEDICAMENTO DISPONIBILIZADO"
+  },
+  {
+    "value": "330",
+    "label": "PETIÇÃO - NÃO COMPARECIMENTO PERICIADO"
+  },
+  {
+    "value": "82400087",
+    "label": "PETIÇÃO - PAGAMENTO"
+  },
+  {
+    "value": "82400080",
+    "label": "PETIÇÃO - PARCELAMENTO PAGAMENTO"
+  },
+  {
+    "value": "332",
+    "label": "PETIÇÃO - PEDIDO DE ALVARÁ DE HONORÁRIOS"
+  },
+  {
+    "value": "348",
+    "label": "PETIÇÃO - PEDIDO DE CERTIDÃO DOS PODERES DA PROCURAÇÃO"
+  },
+  {
+    "value": "325",
+    "label": "PETIÇÃO - PEDIDO DE INSERÇÃO DE RESTRIÇÃO NO SERASAJUD"
+  },
+  {
+    "value": "82400088",
+    "label": "PETIÇÃO - PEDIDO DE INSERÇÃO DE RESTRIÇÃO NO SPC"
+  },
+  {
+    "value": "108",
+    "label": "PETIÇÃO - PEDIDO DE LIMINAR/ANTECIPAÇÃO DE TUTELA"
+  },
+  {
+    "value": "88",
+    "label": "PETIÇÃO - PEDIDO DE RECONSIDERAÇÃO"
+  },
+  {
+    "value": "82400078",
+    "label": "Petição - Pedido de retirada de pauta"
+  },
+  {
+    "value": "326",
+    "label": "PETIÇÃO - PEDIDO DE RETIRADA DE RESTRIÇÃO NO SERASAJUD"
+  },
+  {
+    "value": "82400089",
+    "label": "PETIÇÃO - PEDIDO DE RETIRADA DE RESTRIÇÃO NO SPC"
+  },
+  {
+    "value": "81",
+    "label": "PETIÇÃO - PEDIDO DE SUSPENSÃO CONDICIONAL DO PROCESSO"
+  },
+  {
+    "value": "82",
+    "label": "PETIÇÃO - PEDIDO DE TRANSAÇÃO PENAL"
+  },
+  {
+    "value": "209",
+    "label": "PETIÇÃO - PRIORIDADE DE TRAMITAÇÃO"
+  },
+  {
+    "value": "346",
+    "label": "PETIÇÃO - RECONHECIMENTO PARCIAL DO PEDIDO"
+  },
+  {
+    "value": "345",
+    "label": "PETIÇÃO - RECONHECIMENTO TOTAL DO PEDIDO"
+  },
+  {
+    "value": "329",
+    "label": "PETIÇÃO - RECUSA URGÊNCIA"
+  },
+  {
+    "value": "82400085",
+    "label": "PETIÇÃO - SOLICITAÇÃO RENAJUD"
+  },
+  {
+    "value": "82400086",
+    "label": "PETIÇÃO - SOLICITAÇÃO SERAJUD"
+  },
+  {
+    "value": "82400084",
+    "label": "PETIÇÃO - SOLICITAÇÃO SISBAJUD"
+  },
+  {
+    "value": "82400081",
+    "label": "PETIÇÃO - SUSPENSÃO ART. 40 LEF"
+  },
+  {
+    "value": "322",
+    "label": "PETIÇÃO - SUSPENSÃO POR PARCELAMENTO"
+  },
+  {
+    "value": "323",
+    "label": "PETIÇÃO - SUSPENSÃO/ARQUIVAMENTO - ART. 40 LEF"
+  },
+  {
+    "value": "105",
+    "label": "PROCURAÇÃO"
+  },
+  {
+    "value": "195",
+    "label": "PROCURAÇÃO RÉU"
+  },
+  {
+    "value": "191",
+    "label": "PROPOSTA DE CONCILIAÇÃO"
+  },
+  {
+    "value": "197",
+    "label": "PROPOSTA DE CONCILIAÇÃO - FORUM"
+  },
+  {
+    "value": "203",
+    "label": "PROPOSTA DE CONCILIAÇÃO PARCIAL"
+  },
+  {
+    "value": "314",
+    "label": "PRORROGAÇÃO DO PRAZO DE FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "53",
+    "label": "RAZÕES DE APELAÇÃO CRIMINAL"
+  },
+  {
+    "value": "95",
+    "label": "RAZÕES DE RECURSO EM SENTIDO ESTRITO"
+  },
+  {
+    "value": "80",
+    "label": "RECONVENÇÃO"
+  },
+  {
+    "value": "55",
+    "label": "RECURSO ADESIVO"
+  },
+  {
+    "value": "61",
+    "label": "RECURSO ESPECIAL"
+  },
+  {
+    "value": "63",
+    "label": "RECURSO EXTRAORDINÁRIO"
+  },
+  {
+    "value": "183",
+    "label": "RECURSO INOMINADO"
+  },
+  {
+    "value": "64",
+    "label": "RECURSO ORDINÁRIO"
+  },
+  {
+    "value": "196",
+    "label": "RECURSOS ESPECIAL E EXTRAORDINÁRIO"
+  },
+  {
+    "value": "172",
+    "label": "RELATÓRIO FINAL IPL"
+  },
+  {
+    "value": "171",
+    "label": "RENÚNCIA AO PRAZO"
+  },
+  {
+    "value": "106",
+    "label": "RENÚNCIA DE MANDATO"
+  },
+  {
+    "value": "65",
+    "label": "RÉPLICA"
+  },
+  {
+    "value": "178",
+    "label": "REQUISIÇÃO DE DILIGÊNCIA"
+  },
+  {
+    "value": "66",
+    "label": "RESPOSTA"
+  },
+  {
+    "value": "193",
+    "label": "SEM PROPOSTA DE CONCILIAÇÃO"
+  },
+  {
+    "value": "319",
+    "label": "SOLICITAÇÃO DE AUDIÊNCIA DE CONCILIAÇÃO"
+  },
+  {
+    "value": "321",
+    "label": "SUBMISSÃO DE DOCUMENTO(S) AO FÓRUM DE CONCILIAÇÃO"
+  },
+  {
+    "value": "164",
+    "label": "SUBSTABELECIMENTO COM RESERVA"
+  },
+  {
+    "value": "163",
+    "label": "SUBSTABELECIMENTO SEM RESERVA"
+  },
+  {
+    "value": "208",
+    "label": "TERMO DE ACORDO"
+  }
+]

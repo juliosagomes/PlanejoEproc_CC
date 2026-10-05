@@ -1,0 +1,462 @@
+[
+  {
+    "value": "1",
+    "label": "Autor - AUTOR"
+  },
+  {
+    "value": "4",
+    "label": "Autor - AGRAVANTE"
+  },
+  {
+    "value": "5",
+    "label": "Autor - REQUERENTE"
+  },
+  {
+    "value": "6",
+    "label": "Autor - APELANTE"
+  },
+  {
+    "value": "7",
+    "label": "Autor - ARGÜENTE"
+  },
+  {
+    "value": "9",
+    "label": "Autor - SUSCITANTE"
+  },
+  {
+    "value": "11",
+    "label": "Autor - AUTORIDADE"
+  },
+  {
+    "value": "12",
+    "label": "Autor - CORRIGENTE"
+  },
+  {
+    "value": "13",
+    "label": "Autor - EMBARGANTE"
+  },
+  {
+    "value": "14",
+    "label": "Autor - EXCIPIENTE"
+  },
+  {
+    "value": "15",
+    "label": "Autor - EXEQUENTE"
+  },
+  {
+    "value": "16",
+    "label": "Autor - IMPETRANTE"
+  },
+  {
+    "value": "17",
+    "label": "Autor - IMPUGNANTE"
+  },
+  {
+    "value": "18",
+    "label": "Autor - ARGUINTE"
+  },
+  {
+    "value": "19",
+    "label": "Autor - NOTIFICANTE"
+  },
+  {
+    "value": "20",
+    "label": "Autor - OPOENTE"
+  },
+  {
+    "value": "21",
+    "label": "Autor - REPTE."
+  },
+  {
+    "value": "22",
+    "label": "Autor - QUERELANTE"
+  },
+  {
+    "value": "23",
+    "label": "Autor - RECLAMANTE"
+  },
+  {
+    "value": "24",
+    "label": "Autor - RECORRENTE"
+  },
+  {
+    "value": "25",
+    "label": "Autor - AUTORID. POL."
+  },
+  {
+    "value": "41",
+    "label": "Autor - VITIMA"
+  },
+  {
+    "value": "51",
+    "label": "Autor - PACIENTE/IMPETRANTE"
+  },
+  {
+    "value": "82100001",
+    "label": "Autor - RELATANTE"
+  },
+  {
+    "value": "82100027",
+    "label": "Autor - ORDENANTE"
+  },
+  {
+    "value": "82100029",
+    "label": "Autor - DEPRECANTE"
+  },
+  {
+    "value": "82100031",
+    "label": "Autor - ROGANTE"
+  },
+  {
+    "value": "82100054",
+    "label": "Autor - PROCESSANTE"
+  },
+  {
+    "value": "119",
+    "label": "Deprecante - DEPRECANTE"
+  },
+  {
+    "value": "116",
+    "label": "Interessado - INTERESSADO"
+  },
+  {
+    "value": "114",
+    "label": "Neutro - MINISTÉRIO PÚBLICO"
+  },
+  {
+    "value": "117",
+    "label": "Neutro - AGÊNCIA DA PREVIDÊNCIA SOCIAL"
+  },
+  {
+    "value": "118",
+    "label": "Neutro - PERITO"
+  },
+  {
+    "value": "120",
+    "label": "Neutro - UNIDADE EXTERNA"
+  },
+  {
+    "value": "124",
+    "label": "Neutro - AMICUS CURIAE"
+  },
+  {
+    "value": "125",
+    "label": "Neutro - CONCILIADOR/JUIZ LEIGO"
+  },
+  {
+    "value": "127",
+    "label": "Neutro - ORDENANTE"
+  },
+  {
+    "value": "128",
+    "label": "Neutro - ROGANTE"
+  },
+  {
+    "value": "129",
+    "label": "Neutro - ASSISTENTE DE ACUSAÇÃO"
+  },
+  {
+    "value": "130",
+    "label": "Neutro - OFENDIDO"
+  },
+  {
+    "value": "131",
+    "label": "Neutro - ASSISTENTE DE DEFESA"
+  },
+  {
+    "value": "140",
+    "label": "Neutro - FACILITADOR JUSTIÇA RESTAUR."
+  },
+  {
+    "value": "82100000",
+    "label": "Neutro - TESTEMUNHA"
+  },
+  {
+    "value": "82100002",
+    "label": "Neutro - ADMINISTRADOR"
+  },
+  {
+    "value": "82100003",
+    "label": "Neutro - ARREMATANTE"
+  },
+  {
+    "value": "82100004",
+    "label": "Neutro - ASSISTENTE LEGAL"
+  },
+  {
+    "value": "82100005",
+    "label": "Neutro - CIENTIFICADO OBRIGATÓRIO"
+  },
+  {
+    "value": "82100006",
+    "label": "Neutro - COMISSÁRIO"
+  },
+  {
+    "value": "82100007",
+    "label": "Neutro - CONFRONTANTE"
+  },
+  {
+    "value": "82100008",
+    "label": "Neutro - CÔNJUGE"
+  },
+  {
+    "value": "82100009",
+    "label": "Neutro - CREDOR FIDUCIÁRIO"
+  },
+  {
+    "value": "82100010",
+    "label": "Neutro - CREDOR PIGNORATÍCIO"
+  },
+  {
+    "value": "82100011",
+    "label": "Neutro - CURADOR ESPECIAL"
+  },
+  {
+    "value": "82100012",
+    "label": "Neutro - DEPOSITÁRIO"
+  },
+  {
+    "value": "82100013",
+    "label": "Neutro - FIADOR"
+  },
+  {
+    "value": "82100014",
+    "label": "Neutro - HERDEIRO"
+  },
+  {
+    "value": "82100015",
+    "label": "Neutro - INTERVENTOR"
+  },
+  {
+    "value": "82100016",
+    "label": "Neutro - INTIMADO"
+  },
+  {
+    "value": "82100017",
+    "label": "Neutro - LEGATÁRIO"
+  },
+  {
+    "value": "82100018",
+    "label": "Neutro - LEILOEIRO"
+  },
+  {
+    "value": "82100019",
+    "label": "Neutro - OCUPANTE"
+  },
+  {
+    "value": "82100020",
+    "label": "Neutro - REPRESENTANTE LEGAL"
+  },
+  {
+    "value": "82100021",
+    "label": "Neutro - SÍNDICO"
+  },
+  {
+    "value": "82100022",
+    "label": "Neutro - TERCEIRO DEPOSITANTE"
+  },
+  {
+    "value": "82100023",
+    "label": "Neutro - TERCEIRO INTERESSADO"
+  },
+  {
+    "value": "82100024",
+    "label": "Neutro - TESTAMENTEIRO"
+  },
+  {
+    "value": "82100025",
+    "label": "Neutro - RECONVINDO TERCEIRO"
+  },
+  {
+    "value": "82100026",
+    "label": "Neutro - JUÍZO RECORRENTE"
+  },
+  {
+    "value": "82100034",
+    "label": "Neutro - CRIANÇA/ADOLESCENTE"
+  },
+  {
+    "value": "82100041",
+    "label": "Neutro - CURADOR"
+  },
+  {
+    "value": "82100042",
+    "label": "Neutro - INVENTARIANTE DATIVO"
+  },
+  {
+    "value": "82100043",
+    "label": "Neutro - MEDIADOR"
+  },
+  {
+    "value": "82100044",
+    "label": "Neutro - TESTEMUNHA DEFESA"
+  },
+  {
+    "value": "82100045",
+    "label": "Neutro - TESTEMUNHA ACUSAÇÃO"
+  },
+  {
+    "value": "82100051",
+    "label": "Neutro - TESTEMUNHA AUTOR"
+  },
+  {
+    "value": "82100052",
+    "label": "Neutro - TESTEMUNHA RÉU"
+  },
+  {
+    "value": "82100053",
+    "label": "Neutro - JURADO"
+  },
+  {
+    "value": "52",
+    "label": "Réu - RÉU"
+  },
+  {
+    "value": "55",
+    "label": "Réu - AGRAVADO"
+  },
+  {
+    "value": "57",
+    "label": "Réu - APELADO"
+  },
+  {
+    "value": "58",
+    "label": "Réu - REQUERIDO"
+  },
+  {
+    "value": "59",
+    "label": "Réu - ARGUÍDO"
+  },
+  {
+    "value": "61",
+    "label": "Réu - SUSCITADO"
+  },
+  {
+    "value": "62",
+    "label": "Réu - DENUNCIADO"
+  },
+  {
+    "value": "64",
+    "label": "Réu - INDICIADO"
+  },
+  {
+    "value": "65",
+    "label": "Réu - CORRIGIDO"
+  },
+  {
+    "value": "66",
+    "label": "Réu - AUSENTE"
+  },
+  {
+    "value": "67",
+    "label": "Réu - EMBARGADO"
+  },
+  {
+    "value": "68",
+    "label": "Réu - EXCEPTO"
+  },
+  {
+    "value": "69",
+    "label": "Réu - EXECUTADO"
+  },
+  {
+    "value": "70",
+    "label": "Réu - CONDENADO"
+  },
+  {
+    "value": "71",
+    "label": "Réu - IMPETRADO"
+  },
+  {
+    "value": "72",
+    "label": "Réu - IMPUGNADO"
+  },
+  {
+    "value": "74",
+    "label": "Réu - ACUSADO"
+  },
+  {
+    "value": "75",
+    "label": "Réu - NOTIFICADO"
+  },
+  {
+    "value": "77",
+    "label": "Réu - OPOSTO"
+  },
+  {
+    "value": "78",
+    "label": "Réu - REPDO."
+  },
+  {
+    "value": "79",
+    "label": "Réu - QUERELADO"
+  },
+  {
+    "value": "80",
+    "label": "Réu - RECLAMADO"
+  },
+  {
+    "value": "81",
+    "label": "Réu - RECORRIDO"
+  },
+  {
+    "value": "82",
+    "label": "Réu - AUTOR FATO"
+  },
+  {
+    "value": "86",
+    "label": "Réu - INVESTIGADO"
+  },
+  {
+    "value": "115",
+    "label": "Réu - A APURAR"
+  },
+  {
+    "value": "132",
+    "label": "Réu - COLABORADOR"
+  },
+  {
+    "value": "82100028",
+    "label": "Réu - ORDENADO"
+  },
+  {
+    "value": "82100030",
+    "label": "Réu - DEPRECADO"
+  },
+  {
+    "value": "82100032",
+    "label": "Réu - ROGADO"
+  },
+  {
+    "value": "82100033",
+    "label": "Réu - COLABORADOR"
+  },
+  {
+    "value": "82100035",
+    "label": "Réu - ADOLESCENTE"
+  },
+  {
+    "value": "82100036",
+    "label": "Réu - AVALIADO"
+  },
+  {
+    "value": "82100037",
+    "label": "Réu - AUTOR DO FATO/OFENDIDO"
+  },
+  {
+    "value": "82100038",
+    "label": "Réu - INDICIADO/OFENDIDO"
+  },
+  {
+    "value": "82100039",
+    "label": "Réu - INVESTIGADO/OFENDIDO"
+  },
+  {
+    "value": "82100040",
+    "label": "Réu - RÉU/OFENDIDO"
+  },
+  {
+    "value": "82100055",
+    "label": "Réu - PROCESSADO"
+  }
+]

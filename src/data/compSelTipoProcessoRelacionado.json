@@ -1,0 +1,21 @@
+[
+  { "value": "N", "label": "Nenhum processo relacionado" },
+  { "value": "P", "label": "Possui processo relacionado" },
+  { "value": "3", "label": "Apenso" },
+  { "value": "9", "label": "Apenso - art. 28 LEF - Principal" },
+  { "value": "10", "label": "Apenso - art. 28 LEF - Relacionado" },
+  { "value": "1", "label": "Dependente" },
+  { "value": "6", "label": "Digitalizado" },
+  { "value": "16", "label": "Migrado" },
+  { "value": "18", "label": "Migrado TR" },
+  { "value": "2", "label": "Originário" },
+  { "value": "12", "label": "Originário (Ação Coletiva)" },
+  { "value": "17", "label": "PEC SEEU" },
+  { "value": "15", "label": "Precatório" },
+  { "value": "11", "label": "Relacionado" },
+  { "value": "8", "label": "Relacionado na TR" },
+  { "value": "5", "label": "Relacionado no 1o. grau" },
+  { "value": "13", "label": "Relacionado no 1o. grau (Ação Coletiva)" },
+  { "value": "4", "label": "Relacionado no 2o. grau" },
+  { "value": "7", "label": "Relacionado sem Prevenção" }
+]

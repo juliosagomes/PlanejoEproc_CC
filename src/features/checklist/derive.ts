@@ -9,15 +9,7 @@ import {
   type Subitem,
   type SubitemCategoria,
 } from '@/domain';
-import {
-  CLASSES_JUDICIAIS,
-  COMPETENCIAS,
-  EVENTOS,
-  STATUS_PROCESSO,
-  TIPOS_ACAO_PROGRAMADA,
-  TIPOS_CONTROLE,
-  buscarLabel,
-} from '@/data';
+import { detalhesAtp } from './detalhesAtp';
 
 /**
  * Deriva o checklist do plano. Função pura, sem dependência de React/store —
@@ -132,70 +124,6 @@ function implantavel(s: Subitem): boolean {
 
 function categoriaValida(c: string): c is SubitemCategoria {
   return SUBITEM_CATS_SET.has(c as SubitemCategoria);
-}
-
-/** "código — rótulo" se o catálogo conhece o código; senão só o código. */
-function fmtCodigo(catalogo: ReadonlyArray<{ value: string; label: string }>, code: string): string {
-  const label = buscarLabel(catalogo as never, code);
-  return label ? `${code} — ${label}` : code;
-}
-
-function fmtIds(
-  catalogo: ReadonlyArray<{ value: string; label: string }>,
-  ids: ReadonlyArray<string>,
-): string {
-  return ids.map((id) => buscarLabel(catalogo as never, id) ?? id).join(', ');
-}
-
-function detalhesAtp(rule: AtpRule): ChecklistDetail[] {
-  const out: ChecklistDetail[] = [];
-  const t = rule.trigger;
-  if (t) {
-    out.push({ label: 'Gatilho', valor: fmtCodigo(TIPOS_CONTROLE, t.tipo) });
-    if ((t.tipo === 'E' || t.tipo === 'A') && t.eventoIds && t.eventoIds.length > 0) {
-      out.push({ label: 'Eventos', valor: fmtIds(EVENTOS, t.eventoIds) });
-    }
-    if (t.tipo === 'D') {
-      if (t.data) out.push({ label: 'Data', valor: t.data });
-      if (t.periodicidadeDias != null) {
-        out.push({ label: 'Periodicidade', valor: `${t.periodicidadeDias} dia(s)` });
-      }
-    }
-    if (t.tipo === 'L' && t.diasNoLocalizador != null) {
-      out.push({ label: 'Dias no localizador', valor: String(t.diasNoLocalizador) });
-    }
-    if (t.tipo === 'S' && t.diasNaSituacao != null) {
-      out.push({ label: 'Dias na situação', valor: String(t.diasNaSituacao) });
-    }
-    if (t.tipo === 'V' && t.diasSemMovimentacao != null) {
-      out.push({ label: 'Dias sem movimentação', valor: String(t.diasSemMovimentacao) });
-    }
-  }
-  if (rule.acaoTipo) {
-    out.push({ label: 'Ação programada', valor: fmtCodigo(TIPOS_ACAO_PROGRAMADA, rule.acaoTipo) });
-  }
-  if (rule.acao?.trim()) {
-    out.push({ label: 'Detalhes da ação', valor: rule.acao.trim() });
-  }
-  if (rule.condicoes?.trim()) {
-    out.push({ label: 'Condições', valor: rule.condicoes.trim() });
-  }
-  const f = rule.filtros;
-  if (f) {
-    if (f.classesJudiciaisIds?.length) {
-      out.push({ label: 'Classes judiciais', valor: fmtIds(CLASSES_JUDICIAIS, f.classesJudiciaisIds) });
-    }
-    if (f.competenciaIds?.length) {
-      out.push({ label: 'Competência', valor: fmtIds(COMPETENCIAS, f.competenciaIds) });
-    }
-    if (f.statusProcessoIds?.length) {
-      out.push({ label: 'Situação do processo', valor: fmtIds(STATUS_PROCESSO, f.statusProcessoIds) });
-    }
-  }
-  if (rule.observacoes?.trim()) {
-    out.push({ label: 'Observações', valor: rule.observacoes.trim() });
-  }
-  return out;
 }
 
 const MINUTA_MODO_LABEL = { modelo: 'Modelo', texto_padrao: 'Texto padrão' } as const;

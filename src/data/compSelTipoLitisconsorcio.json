@@ -1,0 +1,18 @@
+[
+  {
+    "value": "R-1",
+    "label": "Processos com APENAS UMA parte no PÓLO PASSIVO"
+  },
+  {
+    "value": "R-N",
+    "label": "Processos com MAIS DE UMA parte no PÓLO PASSIVO"
+  },
+  {
+    "value": "A-1",
+    "label": "Processos com APENAS UMA parte no PÓLO ATIVO"
+  },
+  {
+    "value": "A-N",
+    "label": "Processos com MAIS DE UMA parte no PÓLO ATIVO"
+  }
+]

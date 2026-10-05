@@ -1,0 +1,38 @@
+[
+  {
+    "value": "EXISTE_LAUDO",
+    "label": "--- HÁ Laudo Pericial (QUALQUER RESULTADO) ---"
+  },
+  {
+    "value": "NAO_EXISTE_LAUDO",
+    "label": "--- NÃO HÁ Laudo Pericial ---"
+  },
+  {
+    "value": "SEM_INCAPACIDADE",
+    "label": "Laudo Pericial Capaz"
+  },
+  {
+    "value": "COM_REDUCAO_CAPACIDADE",
+    "label": "Laudo Pericial Incapaz (Redução da Capacidade)"
+  },
+  {
+    "value": "COM_INCAPACIDADE_PRETERITA",
+    "label": "Laudo Pericial Incapaz (Incapacidade Pretérita)"
+  },
+  {
+    "value": "COM_INCAPACIDADE_TEMPORARIA",
+    "label": "Laudo Pericial Incapaz (Incapacidade Temporária)"
+  },
+  {
+    "value": "PERITO_IMPEDIDO_SUSPEITO",
+    "label": "Perito Impedido/Suspeito"
+  },
+  {
+    "value": "COM_INCAPACIDADE_PERMANENTE_ATIVIDADE_HABITUAL",
+    "label": "Laudo Pericial Incapaz (Permanente - Atividade Habitual)"
+  },
+  {
+    "value": "COM_INCAPACIDADE_PERMANENTE_QUALQUER_ATIVIDADE",
+    "label": "Laudo Pericial Incapaz (Permanente - Qualquer Atividade)"
+  }
+]

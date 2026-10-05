@@ -1,0 +1,134 @@
+[
+  {
+    "value": "76|2",
+    "label": "Autor em InternaÃ§Ã£o Hospitalar-Não"
+  },
+  {
+    "value": "76|1",
+    "label": "Autor em InternaÃ§Ã£o Hospitalar-Sim"
+  },
+  {
+    "value": "75|2",
+    "label": "Autor Preso-Não"
+  },
+  {
+    "value": "75|1",
+    "label": "Autor Preso-Sim"
+  },
+  {
+    "value": "97|2",
+    "label": "Dados Criminais copiados do Processo Originário-Não"
+  },
+  {
+    "value": "97|1",
+    "label": "Dados Criminais copiados do Processo Originário-Sim"
+  },
+  {
+    "value": "98|2",
+    "label": "Dados Infracionais copiados do Processo Originário-Não"
+  },
+  {
+    "value": "98|1",
+    "label": "Dados Infracionais copiados do Processo Originário-Sim"
+  },
+  {
+    "value": "81|2",
+    "label": "Informação referente Honorários Contratuais-Não"
+  },
+  {
+    "value": "81|1",
+    "label": "Informação referente Honorários Contratuais-Sim"
+  },
+  {
+    "value": "94|2",
+    "label": "Informação referente Honorários Sucumbenciais-Não"
+  },
+  {
+    "value": "94|1",
+    "label": "Informação referente Honorários Sucumbenciais-Sim"
+  },
+  {
+    "value": "100|2",
+    "label": "Julgamento sob perspectiva de gênero-Não"
+  },
+  {
+    "value": "100|1",
+    "label": "Julgamento sob perspectiva de gênero-Sim"
+  },
+  {
+    "value": "4|1",
+    "label": "Justiça Gratuita-Deferida"
+  },
+  {
+    "value": "4|2",
+    "label": "Justiça Gratuita-Indeferida"
+  },
+  {
+    "value": "4|3",
+    "label": "Justiça Gratuita-Não requerida"
+  },
+  {
+    "value": "4|4",
+    "label": "Justiça Gratuita-Parcialmente Deferida"
+  },
+  {
+    "value": "4|6",
+    "label": "Justiça Gratuita-Requerida"
+  },
+  {
+    "value": "4|7",
+    "label": "Justiça Gratuita-Requerida em Recurso"
+  },
+  {
+    "value": "4|5",
+    "label": "Justiça Gratuita-Revogada"
+  },
+  {
+    "value": "40|2",
+    "label": "Óbito parte-Não"
+  },
+  {
+    "value": "40|1",
+    "label": "Óbito parte-Sim"
+  },
+  {
+    "value": "65|2",
+    "label": "Parte com anotação de situação em outros processos-Não"
+  },
+  {
+    "value": "65|1",
+    "label": "Parte com anotação de situação em outros processos-Sim"
+  },
+  {
+    "value": "66|2",
+    "label": "Parte excluída digital-Não"
+  },
+  {
+    "value": "66|1",
+    "label": "Parte excluída digital-Sim"
+  },
+  {
+    "value": "61|2",
+    "label": "Parte possui mandado de prisão pendente-Não"
+  },
+  {
+    "value": "61|1",
+    "label": "Parte possui mandado de prisão pendente-Sim"
+  },
+  {
+    "value": "107|2",
+    "label": "Réu com endereço desconhecido-Não"
+  },
+  {
+    "value": "107|1",
+    "label": "Réu com endereço desconhecido-Sim"
+  },
+  {
+    "value": "30|2",
+    "label": "Réu sob Monitoramento-Não"
+  },
+  {
+    "value": "30|1",
+    "label": "Réu sob Monitoramento-Sim"
+  }
+]

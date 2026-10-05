@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import Select, { type MultiValue, type StylesConfig } from 'react-select';
+import CreatableSelect from 'react-select/creatable';
 import type { ItemCatalogo } from '@/data';
 
 /**
@@ -14,10 +15,16 @@ import type { ItemCatalogo } from '@/data';
 
 interface CatalogMultiProps {
   values: string[];
-  options: ItemCatalogo[];
+  options: ReadonlyArray<ItemCatalogo>;
   onChange: (values: string[]) => void;
   placeholder?: string;
   ariaLabel?: string;
+  /**
+   * Aceita valor digitado, além dos de `options`. Para as listas que não são
+   * embutidas no build — grandes demais ou da unidade (decisoes.md#D-27) —,
+   * onde `options` é sugestão, ou está vazio.
+   */
+  criavel?: boolean;
 }
 
 export function CatalogMulti({
@@ -26,6 +33,7 @@ export function CatalogMulti({
   onChange,
   placeholder = 'Selecione…',
   ariaLabel,
+  criavel = false,
 }: CatalogMultiProps) {
   const byValue = useMemo(() => {
     const m = new Map<string, ItemCatalogo>();
@@ -33,27 +41,37 @@ export function CatalogMulti({
     return m;
   }, [options]);
 
+  // Valor fora de `options` continua aparecendo, com o próprio código como
+  // rótulo: sumir com ele esconderia do usuário algo que está gravado no plano.
   const selected = useMemo(
-    () => values.map((v) => byValue.get(v)).filter((x): x is ItemCatalogo => Boolean(x)),
+    () => values.map((v) => byValue.get(v) ?? { value: v, label: v }),
     [values, byValue],
   );
 
-  return (
-    <Select<ItemCatalogo, true>
-      isMulti
-      options={options}
-      value={selected}
-      onChange={(next: MultiValue<ItemCatalogo>) => onChange(next.map((n) => n.value))}
-      placeholder={placeholder}
-      noOptionsMessage={() => 'Sem resultados'}
-      aria-label={ariaLabel}
-      classNamePrefix="rs"
-      styles={styles}
-      menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-      menuPosition="fixed"
-      closeMenuOnSelect={false}
-    />
-  );
+  const comuns = {
+    isMulti: true as const,
+    options,
+    value: selected,
+    onChange: (next: MultiValue<ItemCatalogo>) => onChange(next.map((n) => n.value)),
+    placeholder,
+    'aria-label': ariaLabel,
+    classNamePrefix: 'rs',
+    styles,
+    menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
+    menuPosition: 'fixed' as const,
+    closeMenuOnSelect: false,
+  };
+
+  if (criavel) {
+    return (
+      <CreatableSelect<ItemCatalogo, true>
+        {...comuns}
+        formatCreateLabel={(texto) => `Incluir "${texto}"`}
+        noOptionsMessage={() => 'Digite e tecle Enter para incluir'}
+      />
+    );
+  }
+  return <Select<ItemCatalogo, true> {...comuns} noOptionsMessage={() => 'Sem resultados'} />;
 }
 
 const styles: StylesConfig<ItemCatalogo, true> = {

@@ -128,7 +128,7 @@ describe('deriveChecklist', () => {
           subitems: [
             regraAtp('ATP citação', {
               implantar: true,
-              acao: 'mover para conclusão',
+              observacoes: 'mover para conclusão',
             }),
             { id: 's1', categoria: 'Modelo', nome: 'modelo X', ja_criado: false },
           ],
@@ -141,10 +141,10 @@ describe('deriveChecklist', () => {
     if (rule?.kind !== 'rule') throw new Error('esperava rule');
     expect(rule.nome).toBe('ATP citação');
     expect(rule.contexto).toBe('A → B');
-    // `descricao` saiu — `acao` aparece em `detalhes` rotulado.
+    // `descricao` saiu — o texto da regra aparece em `detalhes`, rotulado.
     expect(rule.descricao).toBeUndefined();
     expect(rule.detalhes).toEqual([
-      { label: 'Detalhes da ação', valor: 'mover para conclusão' },
+      { label: 'Observações', valor: 'mover para conclusão' },
     ]);
     expect(rule.children).toHaveLength(1);
     expect(rule.children[0]?.categoria).toBe('Modelo');
@@ -152,7 +152,7 @@ describe('deriveChecklist', () => {
     expect(g['Modelo']).toEqual([]);
   });
 
-  it('detalhes ATP resolvem códigos de gatilho/ação e listam IDs de filtros', () => {
+  it('detalhes ATP seguem os três blocos do Eproc e resolvem os códigos', () => {
     const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
     const edges: Edge[] = [
       {
@@ -166,10 +166,21 @@ describe('deriveChecklist', () => {
           subitems: [
             regraAtp('R', {
               implantar: true,
-              trigger: { tipo: 'L', diasNoLocalizador: 5 },
-              acaoTipo: 'CMA',
-              condicoes: 'condição livre',
-              filtros: { competenciaIds: ['__cod_inexistente__'] },
+              comportamentoOrigem: '0',
+              trigger: { tipo: 'L', dias: 30, diasUteis: true },
+              acoes: [
+                {
+                  id: 'ac-1',
+                  tipo: 'CMA',
+                  parametros: { TipoComunicacao: 'C', PrazoCMA: 15, CitarDJE: false },
+                  localizadorErro: 'ERRO',
+                },
+              ],
+              filtros: {
+                selCompetencia: { selCompetencia: ['__cod_inexistente__'] },
+                // Adicionado e deixado em branco: não é modelagem, não aparece.
+                selRitoProcesso: {},
+              },
               observacoes: 'obs',
             }),
           ],
@@ -178,21 +189,67 @@ describe('deriveChecklist', () => {
     ];
     const rule = deriveChecklist(nodes, edges)['Regra de ATP'][0];
     if (rule?.kind !== 'rule') throw new Error('esperava rule');
-    const labels = rule.detalhes.map((d) => d.label);
-    expect(labels).toEqual([
-      'Gatilho',
-      'Dias no localizador',
-      'Ação programada',
-      'Condições',
-      'Competência',
-      'Observações',
+    expect(rule.detalhes).toEqual([
+      {
+        label: 'Comportamento do Localizador ORIGEM',
+        valor: 'Remover o processo do(s) localizador(es) informado(s)',
+      },
+      {
+        label: 'Tipo de controle',
+        valor: 'Por Tempo no Localizador / 30 dias (contar apenas dias úteis)',
+      },
+      {
+        label: 'Ação programada',
+        valor: [
+          'Citação/Intimação por Mandado',
+          'Tipo de comunicação: Citação',
+          'Prazo: 15',
+          'Citação de partes com DJE: Não',
+          'Localizador de Erro: ERRO',
+        ].join('\n'),
+      },
+      // Código inexistente vira fallback para o próprio ID.
+      { label: 'Competência', valor: '__cod_inexistente__' },
+      { label: 'Observações', valor: 'obs' },
     ]);
-    // Gatilho começa com o código L; resolução do label (se o catálogo
-    // contiver) acrescenta " — <rótulo>", senão fica só "L".
-    expect(rule.detalhes[0]?.valor.startsWith('L')).toBe(true);
-    expect(rule.detalhes[1]?.valor).toBe('5');
-    // Código inexistente vira fallback para o próprio ID.
-    expect(rule.detalhes[4]?.valor).toBe('__cod_inexistente__');
+  });
+
+  it('duas ações programadas saem numeradas, na ordem de execução', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'atp',
+          resumo: '',
+          observacao: '',
+          subitems: [
+            regraAtp('R', {
+              implantar: true,
+              acoes: [
+                { id: 'a', tipo: 'E', parametros: { txtEventoAutomatico: 'Conclusos' } },
+                { id: 'b', tipo: 'LBT', descricao: 'aviso', parametros: { Validade: 0 } },
+              ],
+            }),
+          ],
+        },
+      },
+    ];
+    const rule = deriveChecklist(nodes, edges)['Regra de ATP'][0];
+    if (rule?.kind !== 'rule') throw new Error('esperava rule');
+    expect(rule.detalhes).toEqual([
+      {
+        label: 'Ação programada #1',
+        valor: 'Lançar evento automatizado\nEvento Automatizado: Conclusos',
+      },
+      {
+        label: 'Ação programada #2',
+        // Zero é valor, não ausência: "Dias Validade: 0" é "sem validade".
+        valor: 'Incluir Lembrete\nDescrição: aviso\nDias Validade: 0',
+      },
+    ]);
   });
 
   it('detalhes Pref expõem Minuta + conteúdo do Texto padrão', () => {
