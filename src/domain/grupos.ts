@@ -1,6 +1,7 @@
 import { nomeEfetivo } from './atalhos';
 import type { CorFlag } from './flags';
 import type { Position } from './plano';
+import { nomeEntrada, type EntradaEvento } from './quadro';
 
 /* ============================================================================
  * GRUPOS DE LOCALIZADORES (decisoes.md#D-31)
@@ -104,13 +105,17 @@ export function reagruparSoltos(
 
 /**
  * Nome de uma ponta de aresta. A seta pode chegar no grupo, e não num
- * localizador dele: aí a ponta é a moldura, e o nome vem do rótulo.
+ * localizador dele: aí a ponta é a moldura, e o nome vem do rótulo. E pode
+ * sair de uma entrada por evento (D-38).
  */
 export function nomeDaPonta(
   nodes: Parameters<typeof nomeEfetivo>[0],
   grupos: readonly Pick<GrupoLocalizadores, 'id' | 'rotulo'>[],
   id: string,
+  entradas: readonly Pick<EntradaEvento, 'id' | 'rotulo'>[] = [],
 ): string {
+  const entrada = entradas.find((e) => e.id === id);
+  if (entrada) return nomeEntrada(entrada.rotulo);
   const grupo = grupos.find((g) => g.id === id);
   if (!grupo) return nomeEfetivo(nodes, id);
   return `Grupo "${grupo.rotulo.trim() || 'sem nome'}"`;

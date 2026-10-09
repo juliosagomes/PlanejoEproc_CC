@@ -173,6 +173,18 @@ existem em nenhum outro arquivo do projeto:
   setas longas; não tem nome próprio nem entra no checklist (decisoes.md#D-30).
 - **Grupo** — moldura que organiza o desenho; não é setor, não vai ao Eproc nem
   ao checklist (decisoes.md#D-31).
+- **Regra que não move** — regra de ATP que não leva o processo a lugar
+  nenhum: só executa ação, é "Por Ação Manual" sem destino real, ou tira um
+  localizador (limpeza). Fica **pendurada no localizador de origem**
+  (`LocalizadorData.regrasSemMover`), não vira seta (decisoes.md#D-38).
+- **Destino de descarte** — localizador que só preenche o destino exigido pelo
+  Eproc numa regra que não move ("P", o de nome invisível). Lista da unidade,
+  por nome, no menu Unidade (decisoes.md#D-38).
+- **Entrada por evento** — peça do quadro para a regra de origem "Nenhum": um
+  rótulo com o evento, de onde sai uma seta comum que carrega a regra
+  (decisoes.md#D-38).
+- **Nota** — texto livre no quadro, que cita regras pelo número. Não vai ao
+  Eproc nem ao checklist (decisoes.md#D-38).
 - **Conjunto de eventos** — atalho para selecionar e ler eventos da regra de ATP;
   o plano continua gravando os eventos um a um (decisoes.md#D-29).
 - **Consulta salva** — filtro com nome salvo numa tela de relatório do Eproc (que
@@ -341,6 +353,12 @@ opcionais, como no D-23:
   janela de preferências do Relatório Geral (`data_table_listar_v2`), que traz
   o grupo. Não volte ao autocompletar para as preferências. Recusa de hash
   chega como HTTP 200 com HTML: trate como falha, nunca como lista vazia.
+- Regras que não movem, entradas por evento e notas (D-38), da demo 12. Notas
+  e entradas moram em `CanvasState.notas`/`entradas`, fora de `nodes`, como as
+  molduras (`features/canvas/pecasQuadro.ts`); a seta que sai da entrada é
+  aresta comum. Destinos de descarte em `features/descarte/`, chave `descarte`
+  por silo. A regra pendurada entra **sempre** no checklist, sem "Implantar".
+  O assistente que converte nós sem nome em notas ficou para depois.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.

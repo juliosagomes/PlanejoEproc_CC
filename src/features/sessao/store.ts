@@ -3,6 +3,7 @@ import type { Sessao } from '@/domain';
 import { flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { useConjuntosEventoStore } from '@/features/eventos/store';
 import { usePainelStore } from '@/features/painel/store';
+import { useDescarteStore } from '@/features/descarte/store';
 import { useSetoresStore } from '@/features/setores/store';
 import { aplicarSincronizacao, garantirAtivoValido } from '@/infra/sync/aplicar';
 import {
@@ -108,6 +109,7 @@ function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
   useSetoresStore.getState().hidratar(somenteLeitura);
   useConjuntosEventoStore.getState().hidratar();
   usePainelStore.getState().hidratar();
+  useDescarteStore.getState().hidratar();
 
   garantirAtivoValido();
   if (listPlanos().length === 0) {

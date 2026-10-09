@@ -766,6 +766,131 @@ body {
     border-color: var(--aviso);
   }
 
+  /* ---------- Notas, entradas por evento e regras que não movem (D-38) ---------- */
+  .pj-nota {
+    width: 220px;
+    padding: 10px 12px;
+    border-radius: 4px 4px 4px 14px;
+    background: color-mix(in oklch, var(--aviso) 16%, var(--superficie));
+    border: 1px solid var(--aviso-borda);
+    color: var(--texto);
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    box-shadow: 0 6px 16px -10px rgba(var(--sombra-cor), 0.6);
+  }
+  .pj-nota.selected {
+    box-shadow: 0 0 0 2px var(--aviso);
+  }
+  .pj-nota-vazia {
+    color: var(--texto-3);
+    font-style: italic;
+  }
+  .pj-nota-refs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 7px;
+  }
+  .pj-nota-refs span,
+  .regra-ref {
+    font: 700 10px/1.2 ui-monospace, Consolas, monospace;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: var(--destaque-suave);
+    color: var(--destaque-texto);
+    border: 1px solid var(--destaque-borda);
+  }
+  .pj-entrada {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    max-width: 260px;
+    padding: 0 12px 0 10px;
+    border-radius: 999px;
+    border: 1px dashed var(--aviso-borda);
+    background: var(--superficie-2);
+    color: var(--aviso-texto);
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .pj-entrada.selected {
+    box-shadow: 0 0 0 2px var(--aviso);
+  }
+  .pj-entrada-rotulo {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pj-node-semmover {
+    position: absolute;
+    top: -10px;
+    right: 14px;
+    display: flex;
+    gap: 3px;
+  }
+  .pj-node.created .pj-node-semmover {
+    right: 16px;
+  }
+  .bdg-semmover {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font: 700 10px/1 ui-monospace, Consolas, monospace;
+    padding: 3px 5px;
+    border-radius: 999px;
+    border: 1px solid var(--borda-forte);
+    background: var(--superficie-2);
+    color: var(--texto-2);
+  }
+  .bdg-semmover.automatica {
+    color: var(--aviso-texto);
+    border-color: var(--aviso-borda);
+    background: var(--aviso-suave);
+  }
+  .bdg-semmover.manual {
+    color: var(--ok-texto);
+    border-color: var(--ok-borda);
+    background: var(--ok-suave);
+  }
+  .descarte-membro {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 3px 4px 3px 10px;
+    border-radius: 999px;
+    background: var(--superficie-2);
+    border: 1px solid var(--borda-forte);
+  }
+  .descarte-membro button {
+    display: inline-flex;
+    border: 0;
+    background: none;
+    color: var(--texto-3);
+    cursor: pointer;
+    padding: 2px;
+  }
+  .regra-sem-mover {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 6px 2px;
+    border-top: 1px solid var(--borda);
+    font-size: 12px;
+  }
+  .regra-sem-mover:first-child {
+    border-top: 0;
+  }
+  .regra-sem-mover small {
+    display: block;
+    color: var(--texto-3);
+    font-size: 11px;
+    margin-top: 1px;
+  }
+
   /* ---------- Moldura de grupo (D-31) ---------- */
   .pj-grupo {
     --g-h: 265;

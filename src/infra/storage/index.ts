@@ -49,6 +49,7 @@ export {
 export { consolidarSetores } from './consolidarSetores';
 export { loadCamera, saveCamera, type Camera } from './cameras';
 export { loadConjuntosEvento, saveConjuntosEvento } from './conjuntosEvento';
+export { loadDestinosDescarte, saveDestinosDescarte } from './descarte';
 export { PAINEL_KEY_SUFIXO, painelKey, loadPainel, savePainel } from './painel';
 export {
   ORDENS_PLANOS,

@@ -8,7 +8,9 @@ import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
 import { confirmarApagarSelecao } from '@/features/canvas/selecao';
+import { EntradaPanel } from '@/features/canvas/components/EntradaPanel';
 import { GrupoPanel } from '@/features/canvas/components/GrupoPanel';
+import { NotaPanel } from '@/features/canvas/components/NotaPanel';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
@@ -21,6 +23,7 @@ import { contarChecklist, deriveChecklist } from '@/features/checklist/derive';
 import { PainelUnidade } from '@/features/painel/components/PainelUnidade';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { SetoresModal } from '@/features/setores/components/SetoresModal';
+import { DescarteModal } from '@/features/descarte/components/DescarteModal';
 import { useSetoresStore } from '@/features/setores/store';
 import { TelaLogin } from '@/features/sessao/components/TelaLogin';
 import { useSessaoStore } from '@/features/sessao/store';
@@ -92,10 +95,13 @@ function Editor() {
   const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
   const loadPlanoAcao = useCanvasStore((s) => s.loadPlano);
   const createNode = useCanvasStore((s) => s.createNode);
+  const criarNota = useCanvasStore((s) => s.criarNota);
+  const criarEntrada = useCanvasStore((s) => s.criarEntrada);
 
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
   const [showSetores, setShowSetores] = useState(false);
+  const [showDescarte, setShowDescarte] = useState(false);
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
@@ -184,6 +190,16 @@ function Editor() {
     () => (selectedId ? grupos.find((g) => g.id === selectedId) ?? null : null),
     [selectedId, grupos],
   );
+  const notas = useCanvasStore((s) => s.notas);
+  const entradas = useCanvasStore((s) => s.entradas);
+  const selectedNota = useMemo(
+    () => (selectedId ? notas.find((n) => n.id === selectedId) ?? null : null),
+    [selectedId, notas],
+  );
+  const selectedEntrada = useMemo(
+    () => (selectedId ? entradas.find((e) => e.id === selectedId) ?? null : null),
+    [selectedId, entradas],
+  );
   const selectedEdge = useMemo(
     () =>
       !selectedNode && selectedId
@@ -222,15 +238,17 @@ function Editor() {
       const nos = store.nodes.filter((n) => n.selected).length;
       const arestas = store.edges.filter((edge) => edge.selected).length;
       const molduras = store.grupos.filter((g) => g.selected).length;
-      if (nos + arestas + molduras > 1) {
+      const pecas = [...store.notas, ...store.entradas].filter((p) => p.selected).length;
+      if (nos + arestas + molduras + pecas > 1) {
         e.preventDefault();
-        if (confirmarApagarSelecao(nos, arestas)) store.deleteSelecao();
+        if (confirmarApagarSelecao(nos, arestas, pecas)) store.deleteSelecao();
         return;
       }
       const id = store.selectedId;
       if (!id) return;
       e.preventDefault();
       if (store.grupos.some((g) => g.id === id)) store.removerGrupo(id);
+      else if ([...store.notas, ...store.entradas].some((p) => p.id === id)) store.removerPeca(id);
       else if (store.nodes.some((n) => n.id === id)) store.deleteNode(id);
       else if (store.edges.some((edge) => edge.id === id)) store.deleteEdge(id);
     };
@@ -496,7 +514,10 @@ function Editor() {
     });
   };
 
-  const painelAberto = !!(selectedNode || selectedEdge || selectedGrupo);
+  const painelAberto = !!(selectedNode || selectedEdge || selectedGrupo || selectedNota || selectedEntrada);
+
+  // Ao lado do nó novo, para a peça não nascer em cima de nada que o usuário vê.
+  const posicaoNova = () => ({ x: 200 + Math.random() * 80, y: 120 + Math.random() * 80 });
 
   // `Editor` só é montado com sessão ativa (ver `App`), mas o seletor devolve
   // o tipo anulável — este guarda mantém o Header com prop não-anulável.
@@ -530,6 +551,7 @@ function Editor() {
         onSalvarCopiaAtivo={onSalvarCopiaAtivo}
         onSalvarTodos={onSalvarTodos}
         onSetores={() => setShowSetores(true)}
+        onDescarte={() => setShowDescarte(true)}
         onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
         onSincronizarUnidade={() => void sincronizarUnidade()}
         sincronizandoUnidade={sincronizandoUnidade}
@@ -546,6 +568,8 @@ function Editor() {
         {tela === 'fluxo' && sidebarVisivel && (
           <Sidebar
             onCreateNode={criarNoCentro}
+            onCriarNota={() => criarNota(posicaoNova())}
+            onCriarEntrada={() => criarEntrada(posicaoNova())}
             somenteLeitura={somenteLeitura}
             onVerTutorial={() => setTutorialManual(true)}
             flags={flags}
@@ -578,6 +602,8 @@ function Editor() {
           )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}
           {selectedGrupo && <GrupoPanel key={selectedGrupo.id} grupo={selectedGrupo} />}
+          {selectedNota && <NotaPanel key={selectedNota.id} nota={selectedNota} />}
+          {selectedEntrada && <EntradaPanel key={selectedEntrada.id} entrada={selectedEntrada} />}
         </aside>
         </ReactFlowProvider>
         )}
@@ -590,6 +616,7 @@ function Editor() {
       <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
       <SetoresModal open={showSetores} onClose={() => setShowSetores(false)} />
+      <DescarteModal open={showDescarte} onClose={() => setShowDescarte(false)} />
       <SyncResultadoModal onFechar={resetMensagensSync} />
       <CodigosLotacaoModal />
       <TutorialModal open={tutorialAberto} onFechar={fecharTutorial} />

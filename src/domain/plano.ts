@@ -1,6 +1,8 @@
 import type { DefinicaoFlag } from './flags';
 import type { EdgeData } from './edges';
 import type { GrupoLocalizadores } from './grupos';
+import type { EntradaEvento, NotaQuadro } from './quadro';
+import type { RegraSemMover } from './regrasSemMover';
 
 /**
  * Versão do schema do plano. Toda persistência (localStorage, JSON exportado)
@@ -74,6 +76,11 @@ export interface LocalizadorData {
    * checklist; opcional, sem migração.
    */
   atalhoPara?: string;
+  /**
+   * Regras de ATP que não movem o processo, penduradas aqui em vez de virarem
+   * seta para um destino de descarte (decisoes.md#D-38). Opcional, sem migração.
+   */
+  regrasSemMover?: RegraSemMover[];
 }
 
 export interface Localizador {
@@ -133,5 +140,12 @@ export interface Plano {
    * quando não há nenhuma, para que plano sem grupo não mude de forma.
    */
   grupos?: GrupoLocalizadores[];
+  /** Notas do quadro (decisoes.md#D-38). Ausente quando não há nenhuma. */
+  notas?: NotaQuadro[];
+  /**
+   * Entradas por evento — origem das regras de origem "Nenhum" (D-38). As
+   * setas que saem delas são arestas comuns, com `source` no id da entrada.
+   */
+  entradas?: EntradaEvento[];
   exportedAt?: string;
 }

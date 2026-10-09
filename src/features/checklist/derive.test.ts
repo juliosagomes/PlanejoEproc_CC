@@ -576,3 +576,71 @@ describe('aresta no grupo (D-31)', () => {
     expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Grupo "Cumprimento"' });
   });
 });
+
+describe('regras que não movem e entradas por evento (D-38)', () => {
+  const no: Localizador = {
+    id: 'pi',
+    position: { x: 0, y: 0 },
+    data: {
+      nome: 'PETIÇÃO INICIAL',
+      ja_criado: true,
+      flags: [],
+      regrasSemMover: [
+        { id: 'r92', categoria: 'Regra de ATP', nome: 'Regra 92', ja_criado: false, efeito: 'automatica', destino: 'P' },
+        { id: 'r55', categoria: 'Regra de ATP', nome: 'Regra 55', ja_criado: true, efeito: 'limpeza', tira: 'PETIÇÃO' },
+        {
+          id: 'r201',
+          categoria: 'Regra de ATP',
+          nome: '',
+          ja_criado: false,
+          efeito: 'manual',
+          atp: { implantar: false, trigger: { tipo: 'M' } },
+        },
+      ],
+    },
+  };
+
+  it('a regra pendurada entra em "Regra de ATP" mesmo sem implantar', () => {
+    const itens = deriveChecklist([no], [])['Regra de ATP'];
+    expect(itens.map((i) => i.nome)).toEqual(['Regra 92', 'Regra 55', '(sem nome)']);
+    expect(itens[0]).toMatchObject({
+      kind: 'semMover',
+      contexto: 'PETIÇÃO INICIAL · automática, sem mover',
+      detalhes: [{ label: 'Destino no Eproc', valor: 'P' }],
+    });
+    expect(itens[1]).toMatchObject({
+      ja_criado: true,
+      detalhes: [{ label: 'Tira o localizador', valor: 'PETIÇÃO' }],
+    });
+    expect(contarChecklist(deriveChecklist([no], []))).toEqual({ total: 4, done: 2 });
+  });
+
+  it('o Markdown mostra os detalhes da regra pendurada', () => {
+    const md = checklistToMarkdown('Triagem', deriveChecklist([no], []));
+    expect(md).toContain('- [ ] Regra 92 _(PETIÇÃO INICIAL · automática, sem mover)_');
+    expect(md).toContain('  - **Destino no Eproc:** P');
+  });
+
+  it('a seta que sai de uma entrada leva o nome da entrada no contexto', () => {
+    const aresta: Edge = {
+      id: 'e1',
+      source: 'ev1',
+      target: 'hom',
+      data: {
+        kind: 'atp',
+        resumo: '',
+        observacao: '',
+        subitems: [{ id: 's', categoria: 'Modelo', nome: 'M', ja_criado: false }],
+      },
+    };
+    const g = deriveChecklist(
+      [noLocalizador('hom', '.Homologatórias')],
+      [aresta],
+      [],
+      [{ id: 'ev1', rotulo: 'Classe Processual Retificada' }],
+    );
+    expect(g.Modelo[0]).toMatchObject({
+      contexto: 'Entrada por evento "Classe Processual Retificada" → .Homologatórias',
+    });
+  });
+});

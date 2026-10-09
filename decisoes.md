@@ -1747,6 +1747,65 @@ leva a `buscar_request_por_id` (D-32), o caminho para os filtros. Se o Eproc
 mudar a janela, o coletor cai no autocompletar para as consultas, mas as
 preferências ficam com a reserva do D-35.
 
+---
+
+## D-38 · Regras que não movem, entradas por evento e notas
+
+**Decisão.** Três peças novas no quadro, a partir da demo 12 e do mapeamento do
+"Plano Trabalhado" (06/10/2026): regra de ATP **pendurada no localizador**
+(`LocalizadorData.regrasSemMover`), **entrada por evento** (`Plano.entradas`) e
+**nota** (`Plano.notas`). A unidade ganha a lista de **destinos de descarte**
+(chave `descarte` por silo, menu Unidade). Todos os campos são opcionais e
+ausentes quando vazios: sem bump de schema.
+
+**Por que.** 42 regras da unidade mandam para "P" ou para o localizador de nome
+invisível, e outras 26 têm origem "Nenhum" ou "Todos". Nenhuma cabe na seta
+localizador → localizador. Os planos imitavam isso com 22 nós sem nome usados
+como anotação e 4 de nome invisível. O checklist os contava como localizadores
+a criar.
+
+- **Regra pendurada.** É o mesmo `Subitem` de categoria "Regra de ATP", com
+  `efeito` (`automatica` | `manual` | `limpeza`), `destino` (o descarte) e `tira`
+  (o localizador que a limpeza remove). O **grupo é escolha do usuário**, não
+  dedução da `AtpRule`. A limpeza, como a regra 55, tem destino real (uma das
+  origens) e só se distingue pela intenção. A manual nasce com tipo de controle
+  "Por Ação Manual".
+- **Entra sempre no checklist**, em "Regra de ATP", com o localizador e o grupo
+  como contexto. A caixa "Implantar" não vale aqui. Pendurar a regra já declara
+  a tarefa. Pela regra das arestas (D-24), a manual sumiria do checklist no
+  momento de ser criada, porque já nasce com detalhe. O modal de detalhe abre em
+  modo `pendurada`, sem "Implantar" e sem o resumo de recursos da aresta.
+- **A entrada por evento é só o rótulo.** A regra mora na seta que sai dela, uma
+  aresta comum com `source` no id da entrada. Assim o painel da aresta, o
+  detalhe da ATP e o checklist servem sem mudança. `nomeDaPonta` aceita as
+  entradas, e o contexto vira `Entrada por evento "X" → destino`.
+- **A nota não liga a nada** e não vai ao Eproc nem ao checklist. As regras
+  citadas no texto ("Regra 54 e 55") viram chips só de leitura, porque o plano
+  não sabe o número das regras no Eproc.
+- **Notas e entradas ficam fora de `nodes`**, como as molduras do D-31. A store
+  guarda a medida que o ReactFlow escreve (`width`/`height`, campos de tela),
+  porque sem ela a seta que sai da entrada não é desenhada.
+- **O descarte é guardado por nome**, como as filas do D-33. A comparação
+  ignora espaço e caixa, mas **não** os caracteres invisíveis. Se ignorasse, o
+  "‎" (U+200E) seria igual a um nome vazio. A lista serve de destino padrão das
+  regras penduradas e faz o painel avisar quando um localizador do plano é
+  descarte.
+
+**O que precisaria mudar para evoluir.**
+- O **assistente de migração** ficou para depois, por decisão do usuário. Ele
+  converteria nós sem nome em notas e setas para descarte em regras penduradas,
+  sempre com confirmação.
+- A **detecção automática** dos destinos de descarte ("recebe regras de muitos
+  grupos e não é origem de nenhuma") depende das regras de ATP na
+  sincronização, que ainda não existem. Hoje a sugestão é só por nome: invisível
+  ou de um caractere.
+- Com as regras na sincronização, os chips da nota poderiam abrir a regra, e a
+  conferência da demo 10 compararia também as penduradas.
+- As ações manuais penduradas ainda não aparecem em "Ações Preferenciais
+  Vinculadas" (D-28), que só lê as ATPs "Por Ação Manual" das arestas.
+
+---
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

@@ -39,7 +39,7 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   // As pontas da aresta são a origem e o destino da regra de ATP: o modal de
   // detalhamento as mostra em vez de pedi-las de novo.
   const origem = useCanvasStore(
-    (s) => nomeDaPonta(s.nodes, s.grupos, edge.source),
+    (s) => nomeDaPonta(s.nodes, s.grupos, edge.source, s.entradas),
   );
   const destino = useCanvasStore(
     (s) => nomeDaPonta(s.nodes, s.grupos, edge.target),

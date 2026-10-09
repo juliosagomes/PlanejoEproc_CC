@@ -9,6 +9,9 @@ export const NEW_NODE_DATATYPE = 'application/x-pj-newnode';
 interface SidebarProps {
   /** Disparado quando o usuário clica no botão (ou faz double-click no card). */
   onCreateNode: () => void;
+  /** Notas e entradas por evento (decisoes.md#D-38): peças do quadro que não são localizador. */
+  onCriarNota: () => void;
+  onCriarEntrada: () => void;
   /** Sessão de visualização: some com a área de "Adicionar". */
   somenteLeitura?: boolean;
   /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
@@ -38,6 +41,8 @@ interface SidebarProps {
  */
 export function Sidebar({
   onCreateNode,
+  onCriarNota,
+  onCriarEntrada,
   somenteLeitura = false,
   onVerTutorial,
   flags,
@@ -101,6 +106,24 @@ export function Sidebar({
         >
           <Icon.Plus /> Criar nó
         </button>
+        <div className="flex gap-1.5 mt-1.5">
+          <button
+            type="button"
+            className="btn btn-sm flex-1 justify-center"
+            onClick={onCriarNota}
+            title="Texto livre no quadro. Não vai ao Eproc nem ao checklist"
+          >
+            <Icon.Pencil /> Nota
+          </button>
+          <button
+            type="button"
+            className="btn btn-sm flex-1 justify-center"
+            onClick={onCriarEntrada}
+            title="Origem de regra disparada por evento, venha o processo de onde vier (origem “Nenhum”)"
+          >
+            <Icon.Bolt /> Entrada
+          </button>
+        </div>
       </div>
       )}
 

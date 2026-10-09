@@ -20,12 +20,20 @@ import { acharGemeos } from '../gemeos';
 import { useIrParaNo } from '../irParaNo';
 import { useCanvasStore } from '../store';
 import { moldurasParaFlow } from '../grupoMudancas';
+import { pecasParaFlow } from '../pecasQuadro';
+import { EntradaNode } from './EntradaNode';
 import { GrupoNode } from './GrupoNode';
 import { LocalizadorNode } from './LocalizadorNode';
+import { NotaNode } from './NotaNode';
 import { PjEdge } from './PjEdge';
 import { SelecaoLoteBar } from './SelecaoLoteBar';
 
-const nodeTypes = { localizador: LocalizadorNode, grupo: GrupoNode };
+const nodeTypes = {
+  localizador: LocalizadorNode,
+  grupo: GrupoNode,
+  nota: NotaNode,
+  entrada: EntradaNode,
+};
 
 const edgeTypes = { pj: PjEdge };
 
@@ -88,6 +96,8 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
   const setSelectedId = useCanvasStore((s) => s.setSelectedId);
   const createNode = useCanvasStore((s) => s.createNode);
   const grupos = useCanvasStore((s) => s.grupos);
+  const notas = useCanvasStore((s) => s.notas);
+  const entradas = useCanvasStore((s) => s.entradas);
 
   // Membro de grupo recolhido some da tela; as setas dele passam a chegar na
   // moldura (D-31).
@@ -97,6 +107,10 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
     return m;
   }, [grupos]);
   const molduras = useMemo(() => moldurasParaFlow(grupos, somenteLeitura), [grupos, somenteLeitura]);
+  const pecas = useMemo(
+    () => pecasParaFlow(notas, entradas, somenteLeitura),
+    [notas, entradas, somenteLeitura],
+  );
 
   // Trocar de plano não remonta o ReactFlow, e o `defaultViewport` só vale na
   // montagem: sem isto o plano novo abria onde a câmera estava no anterior.
@@ -224,7 +238,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
     [edges, esmaecidos, recolhidoDe, tema],
   );
 
-  const isEmpty = nodes.length === 0;
+  const isEmpty = nodes.length === 0 && pecas.length === 0;
 
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     if (somenteLeitura) return;
@@ -263,7 +277,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
       onDrop={onDrop}
     >
       <ReactFlow
-        nodes={[...molduras, ...decoratedNodes]}
+        nodes={[...molduras, ...decoratedNodes, ...pecas]}
         edges={decoratedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}

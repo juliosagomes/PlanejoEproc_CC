@@ -19,6 +19,8 @@ const ESTADO_INICIAL = {
   filtroFlags: [],
   somenteLeitura: false,
   grupos: [],
+  notas: [],
+  entradas: [],
 };
 
 beforeEach(() => {
@@ -878,5 +880,123 @@ describe('grupos (D-31)', () => {
     ]);
     expect(pos(a)).toEqual({ x: 100, y: 100 });
     expect(useCanvasStore.getState().criarGrupo([a])).toBe('');
+  });
+});
+
+describe('notas e entradas por evento (D-38)', () => {
+  it('criam selecionadas e vão ao plano sem os campos de tela', () => {
+    const nota = useCanvasStore.getState().criarNota({ x: 1, y: 2 });
+    useCanvasStore.getState().atualizarNota(nota, 'Regra 54 e 55');
+    const ev = useCanvasStore.getState().criarEntrada({ x: 3, y: 4 });
+    useCanvasStore.getState().atualizarEntrada(ev, 'Classe Processual Retificada');
+    useCanvasStore.getState().onNodesChange([
+      { type: 'dimensions', id: ev, dimensions: { width: 180, height: 30 } },
+    ]);
+
+    const s = useCanvasStore.getState();
+    expect(s.selectedId).toBe(ev);
+    expect(s.notas[0]?.selected).toBe(false);
+    expect(s.entradas[0]?.width).toBe(180);
+    const plano = s.getPlano();
+    expect(plano.notas).toEqual([{ id: nota, position: { x: 1, y: 2 }, texto: 'Regra 54 e 55' }]);
+    expect(plano.entradas).toEqual([
+      { id: ev, position: { x: 3, y: 4 }, rotulo: 'Classe Processual Retificada' },
+    ]);
+    expect(plano.nodes).toEqual([]);
+  });
+
+  it('plano sem nota nem entrada não ganha as chaves', () => {
+    useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const plano = useCanvasStore.getState().getPlano();
+    expect('notas' in plano).toBe(false);
+    expect('entradas' in plano).toBe(false);
+  });
+
+  it('remover a entrada leva as setas que saem dela', () => {
+    const ev = useCanvasStore.getState().criarEntrada({ x: 0, y: 0 });
+    const no = useCanvasStore.getState().createNode({ x: 200, y: 0 });
+    useCanvasStore
+      .getState()
+      .onConnect({ source: ev, target: no, sourceHandle: null, targetHandle: null });
+    expect(useCanvasStore.getState().edges).toHaveLength(1);
+
+    useCanvasStore.getState().deleteNode(ev);
+    const s = useCanvasStore.getState();
+    expect(s.entradas).toEqual([]);
+    expect(s.edges).toEqual([]);
+    expect(s.nodes).toHaveLength(1);
+  });
+
+  it('arrastar e selecionar pelo ReactFlow chegam na peça, não nos localizadores', () => {
+    const nota = useCanvasStore.getState().criarNota({ x: 0, y: 0 });
+    useCanvasStore.getState().setSelectedId(null);
+    useCanvasStore.getState().onNodesChange([
+      { type: 'position', id: nota, position: { x: 50, y: 60 }, dragging: true },
+      { type: 'select', id: nota, selected: true },
+    ]);
+    const s = useCanvasStore.getState();
+    expect(s.notas[0]?.position).toEqual({ x: 50, y: 60 });
+    expect(s.selectedId).toBe(nota);
+    expect(s.nodes).toEqual([]);
+  });
+
+  it('apagar a seleção leva notas e entradas marcadas', () => {
+    useCanvasStore.getState().criarNota({ x: 0, y: 0 });
+    useCanvasStore.getState().criarEntrada({ x: 0, y: 0 });
+    useCanvasStore.setState((s) => ({
+      notas: s.notas.map((n) => ({ ...n, selected: true })),
+      entradas: s.entradas.map((e) => ({ ...e, selected: true })),
+    }));
+    useCanvasStore.getState().deleteSelecao();
+    expect(useCanvasStore.getState().notas).toEqual([]);
+    expect(useCanvasStore.getState().entradas).toEqual([]);
+  });
+
+  it('loadPlano devolve as peças', () => {
+    const plano: Plano = {
+      version: SCHEMA_VERSION,
+      planoNome: 'P',
+      flowMode: 'sharp',
+      flags: [],
+      nodes: [],
+      edges: [],
+      notas: [{ id: 'nt1', position: { x: 0, y: 0 }, texto: 'oi' }],
+      entradas: [{ id: 'ev1', position: { x: 0, y: 0 }, rotulo: 'X' }],
+    };
+    useCanvasStore.getState().loadPlano(plano);
+    expect(useCanvasStore.getState().getPlano()).toMatchObject({
+      notas: plano.notas,
+      entradas: plano.entradas,
+    });
+  });
+
+  it('não cria nada em visualização', () => {
+    useCanvasStore.setState({ somenteLeitura: true });
+    expect(useCanvasStore.getState().criarNota({ x: 0, y: 0 })).toBe('');
+    expect(useCanvasStore.getState().criarEntrada({ x: 0, y: 0 })).toBe('');
+    expect(useCanvasStore.getState().notas).toEqual([]);
+  });
+});
+
+describe('regras que não movem (D-38)', () => {
+  it('a manual nasce com o tipo de controle "Por Ação Manual"', () => {
+    const no = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const id = useCanvasStore.getState().addRegraSemMover(no, 'manual');
+    const regra = useCanvasStore.getState().nodes[0]?.data.regrasSemMover?.[0];
+    expect(regra).toMatchObject({ id, efeito: 'manual', categoria: 'Regra de ATP', ja_criado: false });
+    expect(regra?.atp?.trigger?.tipo).toBe('M');
+  });
+
+  it('atualiza e, ao remover a última, o campo some do nó', () => {
+    const no = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const id = useCanvasStore.getState().addRegraSemMover(no, 'limpeza');
+    useCanvasStore.getState().updateRegraSemMover(no, id, { tira: 'PETIÇÃO', ja_criado: true });
+    expect(useCanvasStore.getState().nodes[0]?.data.regrasSemMover?.[0]).toMatchObject({
+      tira: 'PETIÇÃO',
+      ja_criado: true,
+    });
+
+    useCanvasStore.getState().removeRegraSemMover(no, id);
+    expect('regrasSemMover' in (useCanvasStore.getState().nodes[0]?.data ?? {})).toBe(false);
   });
 });
