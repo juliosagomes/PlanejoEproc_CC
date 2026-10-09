@@ -23,11 +23,13 @@ import {
   type DefinicaoFlag,
   type DobraAresta,
   type EdgeData,
+  type EfeitoSemMover,
   type FlowMode,
   type LocalizadorData,
   type Plano,
   type Position,
   type PrefRule,
+  type RegraSemMover,
 } from '@/domain';
 import { flushPlataforma } from '@/infra/plataforma';
 import { criarSavePlanoDebounced, planoVazio } from '@/infra/storage';
@@ -38,6 +40,12 @@ import {
   retanguloDoNo,
   type GrupoFlow,
 } from './grupoMudancas';
+import {
+  aplicarMudancasPecas,
+  paraPlano,
+  type EntradaFlow,
+  type NotaFlow,
+} from './pecasQuadro';
 
 /* ============================================================================
  * STORE DO CANVAS
@@ -105,6 +113,12 @@ interface CanvasState {
    * listas na hora de desenhar.
    */
   grupos: GrupoFlow[];
+  /**
+   * Notas e entradas por evento (decisoes.md#D-38). Fora de `nodes` pelo mesmo
+   * motivo das molduras.
+   */
+  notas: NotaFlow[];
+  entradas: EntradaFlow[];
 }
 
 interface CanvasActions {
@@ -156,6 +170,25 @@ interface CanvasActions {
   ) => void;
   /** Desfaz a moldura; os localizadores ficam onde estão. */
   removerGrupo: (id: string) => void;
+
+  // Notas e entradas por evento (decisoes.md#D-38)
+  /** Cria e seleciona. Devolve o id, ou `''` em visualização. */
+  criarNota: (position: Position) => string;
+  atualizarNota: (id: string, texto: string) => void;
+  criarEntrada: (position: Position) => string;
+  atualizarEntrada: (id: string, rotulo: string) => void;
+  /** Apaga nota ou entrada; as setas que saem da entrada vão junto. */
+  removerPeca: (id: string) => void;
+
+  // Regras que não movem (decisoes.md#D-38)
+  /** Pendura uma regra no localizador. Devolve o id, ou `''` em visualização. */
+  addRegraSemMover: (nodeId: string, efeito: EfeitoSemMover) => string;
+  updateRegraSemMover: (
+    nodeId: string,
+    regraId: string,
+    patch: Partial<Omit<RegraSemMover, 'id' | 'categoria'>>,
+  ) => void;
+  removeRegraSemMover: (nodeId: string, regraId: string) => void;
 
   // Seleção múltipla (Card 7)
   /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
@@ -225,6 +258,8 @@ function planoParaFlow(plano: Plano): {
   planoNome: string;
   flowMode: FlowMode;
   grupos: GrupoFlow[];
+  notas: NotaFlow[];
+  entradas: EntradaFlow[];
 } {
   return {
     nodes: plano.nodes.map((n) => ({
@@ -245,6 +280,8 @@ function planoParaFlow(plano: Plano): {
     planoNome: plano.planoNome,
     flowMode: plano.flowMode,
     grupos: plano.grupos ?? [],
+    notas: plano.notas ?? [],
+    entradas: plano.entradas ?? [],
   };
 }
 
@@ -271,6 +308,8 @@ function flowParaPlano(state: CanvasState): Plano {
     ...(state.grupos.length > 0
       ? { grupos: state.grupos.map(({ selected: _s, ...g }) => g) }
       : {}),
+    ...(state.notas.length > 0 ? { notas: paraPlano(state.notas) } : {}),
+    ...(state.entradas.length > 0 ? { entradas: paraPlano(state.entradas) } : {}),
   };
 }
 
@@ -295,6 +334,18 @@ function comSelecao<T extends { id: string; selected?: boolean }>(
   return itens.map((i) => (!!i.selected === ids.has(i.id) ? i : { ...i, selected: ids.has(i.id) }));
 }
 
+/** Desmarca tudo — o item recém-criado é que fica selecionado. */
+function semSelecaoNenhuma(s: CanvasState) {
+  const nada = new Set<string>();
+  return {
+    nodes: comSelecao(s.nodes, nada),
+    edges: comSelecao(s.edges, nada),
+    grupos: comSelecao(s.grupos, nada),
+    notas: comSelecao(s.notas, nada),
+    entradas: comSelecao(s.entradas, nada),
+  };
+}
+
 /** Tira os ids de todo grupo, preservando a identidade dos grupos que não mudam. */
 function semMembros(grupos: GrupoFlow[], ids: ReadonlySet<string>): GrupoFlow[] {
   return grupos.map((g) =>
@@ -306,12 +357,26 @@ function unicoSelecionado(
   nodes: FlowNode[],
   edges: FlowEdge[],
   grupos: GrupoFlow[] = [],
+  pecas: ReadonlyArray<{ id: string; selected?: boolean }> = [],
 ): string | null {
   const ns = nodes.filter((n) => n.selected);
   const es = edges.filter((e) => e.selected);
   const gs = grupos.filter((g) => g.selected);
-  if (ns.length + es.length + gs.length !== 1) return null;
-  return ns[0]?.id ?? es[0]?.id ?? gs[0]?.id ?? null;
+  const ps = pecas.filter((p) => p.selected);
+  if (ns.length + es.length + gs.length + ps.length !== 1) return null;
+  return ns[0]?.id ?? es[0]?.id ?? gs[0]?.id ?? ps[0]?.id ?? null;
+}
+
+const pecasDe = (s: Pick<CanvasState, 'notas' | 'entradas'>) => [...s.notas, ...s.entradas];
+
+/** Atualiza as regras penduradas de um nó; a lista vazia some, como a das ações (D-28). */
+function comRegrasSemMover(
+  n: FlowNode,
+  f: (regras: RegraSemMover[]) => RegraSemMover[],
+): FlowNode {
+  const regras = f(n.data.regrasSemMover ?? []);
+  const { regrasSemMover: _antigas, ...data } = n.data;
+  return { ...n, data: regras.length > 0 ? { ...data, regrasSemMover: regras } : data };
 }
 
 export const useCanvasStore = create<CanvasStore>()(
@@ -325,6 +390,8 @@ export const useCanvasStore = create<CanvasStore>()(
     filtroFlags: [],
     somenteLeitura: false,
     grupos: [],
+    notas: [],
+    entradas: [],
 
     // Em visualização, filtramos em vez de ignorar: `dimensions` e `select` são
     // o ReactFlow medindo e destacando o que já está na tela, e barrá-las
@@ -338,16 +405,27 @@ export const useCanvasStore = create<CanvasStore>()(
         // As molduras chegam no mesmo fluxo que os localizadores; cada uma vai
         // para o seu lado.
         const idsGrupo = new Set(s.grupos.map((g) => g.id));
-        const deGrupo = efetivas.filter((c) => 'id' in c && idsGrupo.has(c.id));
-        const deNo = efetivas.filter((c) => !('id' in c && idsGrupo.has(c.id)));
+        const idsPeca = new Set(pecasDe(s).map((p) => p.id));
+        const idDe = (c: NodeChange) => ('id' in c ? c.id : '');
+        const deGrupo = efetivas.filter((c) => idsGrupo.has(idDe(c)));
+        const dePeca = efetivas.filter((c) => idsPeca.has(idDe(c)));
+        const deNo = efetivas.filter((c) => !idsGrupo.has(idDe(c)) && !idsPeca.has(idDe(c)));
         let nodes = deNo.length > 0 ? (applyNodeChanges(deNo, s.nodes) as FlowNode[]) : s.nodes;
         let grupos = s.grupos;
         if (deGrupo.length > 0) ({ grupos, nodes } = aplicarMudancasGrupos(grupos, nodes, deGrupo));
         grupos = reagruparAposArrasto(grupos, nodes, deNo);
+        const notas = dePeca.length > 0 ? aplicarMudancasPecas(s.notas, dePeca) : s.notas;
+        const entradas = dePeca.length > 0 ? aplicarMudancasPecas(s.entradas, dePeca) : s.entradas;
         if (!efetivas.some((c) => c.type === 'select' || c.type === 'remove')) {
-          return { nodes, grupos };
+          return { nodes, grupos, notas, entradas };
         }
-        return { nodes, grupos, selectedId: unicoSelecionado(nodes, s.edges, grupos) };
+        return {
+          nodes,
+          grupos,
+          notas,
+          entradas,
+          selectedId: unicoSelecionado(nodes, s.edges, grupos, [...notas, ...entradas]),
+        };
       });
     },
 
@@ -359,7 +437,7 @@ export const useCanvasStore = create<CanvasStore>()(
       set((s) => {
         const edges = applyEdgeChanges(efetivas, s.edges) as FlowEdge[];
         if (!efetivas.some((c) => c.type === 'select')) return { edges };
-        return { edges, selectedId: unicoSelecionado(s.nodes, edges, s.grupos) };
+        return { edges, selectedId: unicoSelecionado(s.nodes, edges, s.grupos, pecasDe(s)) };
       });
     },
 
@@ -397,6 +475,8 @@ export const useCanvasStore = create<CanvasStore>()(
             reagruparSoltos(s.grupos, [retanguloDoNo(novo)]) as GrupoFlow[],
             new Set(),
           ),
+          notas: comSelecao(s.notas, new Set()),
+          entradas: comSelecao(s.entradas, new Set()),
           selectedId: id,
         };
       });
@@ -440,6 +520,10 @@ export const useCanvasStore = create<CanvasStore>()(
       if (get().somenteLeitura) return;
       if (get().grupos.some((g) => g.id === id)) {
         get().removerGrupo(id);
+        return;
+      }
+      if (pecasDe(get()).some((p) => p.id === id)) {
+        get().removerPeca(id);
         return;
       }
       set((s) => ({
@@ -534,6 +618,87 @@ export const useCanvasStore = create<CanvasStore>()(
       }));
     },
 
+    criarNota: (position) => {
+      if (get().somenteLeitura) return '';
+      const id = uid('nt');
+      set((s) => ({
+        ...semSelecaoNenhuma(s),
+        notas: [...comSelecao(s.notas, new Set()), { id, position, texto: '', selected: true }],
+        selectedId: id,
+      }));
+      return id;
+    },
+
+    atualizarNota: (id, texto) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({ notas: s.notas.map((n) => (n.id === id ? { ...n, texto } : n)) }));
+    },
+
+    criarEntrada: (position) => {
+      if (get().somenteLeitura) return '';
+      const id = uid('ev');
+      set((s) => ({
+        ...semSelecaoNenhuma(s),
+        entradas: [...comSelecao(s.entradas, new Set()), { id, position, rotulo: '', selected: true }],
+        selectedId: id,
+      }));
+      return id;
+    },
+
+    atualizarEntrada: (id, rotulo) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({ entradas: s.entradas.map((e) => (e.id === id ? { ...e, rotulo } : e)) }));
+    },
+
+    removerPeca: (id) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        notas: s.notas.filter((n) => n.id !== id),
+        entradas: s.entradas.filter((e) => e.id !== id),
+        edges: s.edges.filter((e) => e.source !== id && e.target !== id),
+        selectedId: s.selectedId === id ? null : s.selectedId,
+      }));
+    },
+
+    // Nasce com o grupo escolhido e a categoria fixa; a manual já vem com o
+    // tipo de controle que a define, para o detalhe abrir no lugar certo.
+    addRegraSemMover: (nodeId, efeito) => {
+      if (get().somenteLeitura) return '';
+      const id = uid('rs');
+      const regra: RegraSemMover = {
+        id,
+        categoria: 'Regra de ATP',
+        nome: '',
+        ja_criado: false,
+        efeito,
+        ...(efeito === 'manual' ? { atp: { implantar: false, trigger: { tipo: 'M' } } } : {}),
+      };
+      set((s) => ({
+        nodes: s.nodes.map((n) => (n.id === nodeId ? comRegrasSemMover(n, (rs) => [...rs, regra]) : n)),
+      }));
+      return id;
+    },
+
+    updateRegraSemMover: (nodeId, regraId, patch) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) =>
+          n.id === nodeId
+            ? comRegrasSemMover(n, (rs) => rs.map((r) => (r.id === regraId ? { ...r, ...patch } : r)))
+            : n,
+        ),
+      }));
+    },
+
+    removeRegraSemMover: (nodeId, regraId) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) =>
+          n.id === nodeId ? comRegrasSemMover(n, (rs) => rs.filter((r) => r.id !== regraId)) : n,
+        ),
+      }));
+    },
+
     criarGrupo: (nodeIds) => {
       if (get().somenteLeitura) return '';
       const alvo = new Set(nodeIds);
@@ -557,6 +722,8 @@ export const useCanvasStore = create<CanvasStore>()(
         grupos: [...comSelecao(semMembros(s.grupos, alvo), new Set()), grupo],
         nodes: comSelecao(s.nodes, new Set()),
         edges: comSelecao(s.edges, new Set()),
+        notas: comSelecao(s.notas, new Set()),
+        entradas: comSelecao(s.entradas, new Set()),
         selectedId: id,
       }));
       return id;
@@ -580,7 +747,7 @@ export const useCanvasStore = create<CanvasStore>()(
         ): T[] => itens.map((i) => (i.selected && some(i) ? { ...i, selected: false } : i));
         const nodes = desmarcar(s.nodes, (n) => membros.has(n.id));
         const edges = desmarcar(s.edges, (e) => membros.has(e.source) && membros.has(e.target));
-        return { grupos, nodes, edges, selectedId: unicoSelecionado(nodes, edges, grupos) };
+        return { grupos, nodes, edges, selectedId: unicoSelecionado(nodes, edges, grupos, pecasDe(s)) };
       });
     },
 
@@ -598,9 +765,15 @@ export const useCanvasStore = create<CanvasStore>()(
       if (get().somenteLeitura) return;
       set((s) => {
         const nos = new Set(s.nodes.filter((n) => n.selected).map((n) => n.id));
-        const pontas = new Set([...nos, ...s.grupos.filter((g) => g.selected).map((g) => g.id)]);
+        const pontas = new Set([
+          ...nos,
+          ...s.grupos.filter((g) => g.selected).map((g) => g.id),
+          ...s.entradas.filter((e) => e.selected).map((e) => e.id),
+        ]);
         return {
           grupos: semMembros(s.grupos.filter((g) => !g.selected), nos),
+          notas: s.notas.filter((n) => !n.selected),
+          entradas: s.entradas.filter((e) => !e.selected),
           nodes: s.nodes.filter((n) => !nos.has(n.id)),
           edges: s.edges.filter((e) => !e.selected && !pontas.has(e.source) && !pontas.has(e.target)),
           selectedId: null,
@@ -687,6 +860,8 @@ export const useCanvasStore = create<CanvasStore>()(
           nodes: comSelecao(s.nodes, ids),
           edges: comSelecao(s.edges, ids),
           grupos: comSelecao(s.grupos, ids),
+          notas: comSelecao(s.notas, ids),
+          entradas: comSelecao(s.entradas, ids),
         };
       }),
 
@@ -740,6 +915,8 @@ export const useCanvasStore = create<CanvasStore>()(
         planoNome: flow.planoNome,
         flowMode: flow.flowMode,
         grupos: flow.grupos,
+        notas: flow.notas,
+        entradas: flow.entradas,
         filtroFlags: [],
         selectedId: null,
       });
@@ -789,7 +966,7 @@ function mesmaListaPersistida(a: readonly object[], b: readonly object[]): boole
 }
 
 useCanvasStore.subscribe(
-  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags, s.grupos] as const,
+  (s) => [s.nodes, s.edges, s.planoNome, s.flowMode, s.flags, s.grupos, s.notas, s.entradas] as const,
   () => {
     // Em visualização, o que sobra de mutação são as medições do ReactFlow e o
     // modo de desenho — nada que valha gravar, e gravar carimbaria
@@ -805,7 +982,9 @@ useCanvasStore.subscribe(
       a[2] === b[2] &&
       a[3] === b[3] &&
       a[4] === b[4] &&
-      mesmaListaPersistida(a[5], b[5]),
+      mesmaListaPersistida(a[5], b[5]) &&
+      mesmaListaPersistida(a[6], b[6]) &&
+      mesmaListaPersistida(a[7], b[7]),
   },
 );
 

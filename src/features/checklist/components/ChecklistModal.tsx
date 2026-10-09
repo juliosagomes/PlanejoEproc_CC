@@ -30,6 +30,8 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const toggleNodeCreated = useCanvasStore((s) => s.toggleNodeCreated);
   const toggleSubitemCreated = useCanvasStore((s) => s.toggleSubitemCreated);
   const updateAcaoPreferencial = useCanvasStore((s) => s.updateAcaoPreferencial);
+  const updateRegraSemMover = useCanvasStore((s) => s.updateRegraSemMover);
+  const entradas = useCanvasStore((s) => s.entradas);
   // O checklist é útil como leitura numa sessão de visualização; só as marcações
   // de "já criado" ficam travadas — elas são edição do plano.
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);
@@ -37,7 +39,10 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
   const [copiado, setCopiado] = useState(false);
 
   // `deriveChecklist` aceita o shape estrutural — passamos `nodes/edges` direto.
-  const groups = useMemo(() => deriveChecklist(nodes, edges, grupos), [nodes, edges, grupos]);
+  const groups = useMemo(
+    () => deriveChecklist(nodes, edges, grupos, entradas),
+    [nodes, edges, grupos, entradas],
+  );
   const { total, done } = contarChecklist(groups);
 
   if (!open) return null;
@@ -150,17 +155,18 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                 </div>
                 <div className="flex flex-col">
                   {items.map((it, i) => {
-                    const isRule = it.kind === 'rule';
-                    const childCount = isRule ? it.children.length : 0;
-                    const childDoneCount = isRule
-                      ? it.children.filter((c) => c.ja_criado).length
-                      : 0;
+                    const isRule = it.kind === 'rule' || it.kind === 'semMover';
+                    const childCount = it.kind === 'rule' ? it.children.length : 0;
+                    const childDoneCount =
+                      it.kind === 'rule' ? it.children.filter((c) => c.ja_criado).length : 0;
                     const onToggle = () => {
                       // Regra e recurso comum são ambos subitens da aresta
                       // desde o D-24, então um toggle só dá conta dos dois.
                       if (it.kind === 'node') toggleNodeCreated(it.nodeId);
                       else if (it.kind === 'acao')
                         updateAcaoPreferencial(it.nodeId, it.acaoId, { ja_criado: !it.ja_criado });
+                      else if (it.kind === 'semMover')
+                        updateRegraSemMover(it.nodeId, it.regraId, { ja_criado: !it.ja_criado });
                       else toggleSubitemCreated(it.edgeId, it.index);
                     };
                     return (
@@ -226,7 +232,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                                 {it.descricao}
                               </div>
                             )}
-                            {it.kind === 'rule' && it.detalhes.length > 0 && (
+                            {(it.kind === 'rule' || it.kind === 'semMover') && it.detalhes.length > 0 && (
                               <div className="mt-1.5 flex flex-col gap-1">
                                 {it.detalhes.map((d, di) => {
                                   const multilinha = d.valor.includes('\n');
@@ -267,7 +273,7 @@ export function ChecklistModal({ open, onClose }: ChecklistModalProps) {
                             )}
                           </div>
                         </label>
-                        {isRule && childCount > 0 && (
+                        {it.kind === 'rule' && childCount > 0 && (
                           <div
                             style={{
                               marginLeft: 28,

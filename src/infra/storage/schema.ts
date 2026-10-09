@@ -5,6 +5,8 @@ import {
   CATALOGO_UNIDADE_VERSION,
   CONJUNTOS_EVENTO_VERSION,
   CORES_FLAG,
+  DESCARTE_VERSION,
+  EFEITOS_SEM_MOVER,
   ORIGENS_FILA,
   PAINEL_VERSION,
   PREF_TIPOS,
@@ -21,19 +23,23 @@ import {
   type ConjuntosEventoUnidade,
   type ConsultaSalvaUnidade,
   type DefinicaoFlag,
+  type DestinosDescarteUnidade,
   type DobraAresta,
   type AtpRule,
   type AtpTrigger,
   type Edge,
   type EdgeData,
+  type EntradaEvento,
   type ItemCatalogoUnidade,
   type Localizador,
   type LocalizadorOrgao,
   type LocalizadorUnidade,
+  type NotaQuadro,
   type OrigemFila,
   type PainelUnidade,
   type Plano,
   type PrefRule,
+  type RegraSemMover,
   type SetoresUnidade,
   type Subitem,
   type UnidadeEproc,
@@ -114,6 +120,12 @@ export const PainelUnidadeSchema = z.object({
   grupos: z.array(z.object({ id: z.string(), nome: z.string() })),
   foraDasFilas: z.array(z.object({ nome: z.string(), motivo: z.string() })),
 }) satisfies z.ZodType<PainelUnidade>;
+
+/** Destinos de descarte da unidade (decisoes.md#D-38). Chave por escopo, como os setores. */
+export const DestinosDescarteUnidadeSchema = z.object({
+  version: z.literal(DESCARTE_VERSION),
+  nomes: z.array(z.string()),
+}) satisfies z.ZodType<DestinosDescarteUnidade>;
 
 /** Conjuntos de eventos criados pelo usuário (decisoes.md#D-29). Chave por escopo, como os setores. */
 export const ConjuntosEventoUnidadeSchema = z.object({
@@ -247,6 +259,14 @@ const SubitemSchema = z.object({
   pref: PrefRuleSchema.optional(),
 }) satisfies z.ZodType<Subitem>;
 
+/** Regra de ATP pendurada no localizador (decisoes.md#D-38): o mesmo recurso, com o grupo. */
+const RegraSemMoverSchema = SubitemSchema.extend({
+  categoria: z.literal('Regra de ATP'),
+  efeito: z.enum(EFEITOS_SEM_MOVER),
+  destino: z.string().optional(),
+  tira: z.string().optional(),
+}) satisfies z.ZodType<RegraSemMover>;
+
 const EdgeKindSchema = z.enum(['atp', 'pref', 'manual']);
 
 // `.finite()` porque `z.number()` sozinho barra NaN mas deixa passar
@@ -280,6 +300,7 @@ const LocalizadorDataSchema = z.object({
     .array(z.object({ id: z.string(), nome: z.string(), ja_criado: z.boolean() }))
     .optional(),
   atalhoPara: z.string().optional(),
+  regrasSemMover: z.array(RegraSemMoverSchema).optional(),
 });
 
 const LocalizadorSchema = z.object({
@@ -311,6 +332,22 @@ const GrupoSchema = z.object({
   membros: z.array(z.string()),
 });
 
+const PosicaoFinitaSchema = z.object({ x: z.number().finite(), y: z.number().finite() });
+
+/** Nota do quadro (decisoes.md#D-38). */
+const NotaQuadroSchema = z.object({
+  id: z.string(),
+  position: PosicaoFinitaSchema,
+  texto: z.string(),
+}) satisfies z.ZodType<NotaQuadro>;
+
+/** Entrada por evento (decisoes.md#D-38). */
+const EntradaEventoSchema = z.object({
+  id: z.string(),
+  position: PosicaoFinitaSchema,
+  rotulo: z.string(),
+}) satisfies z.ZodType<EntradaEvento>;
+
 const PlanoV4Schema = z.object({
   version: z.literal(SCHEMA_VERSION),
   planoNome: z.string(),
@@ -319,6 +356,8 @@ const PlanoV4Schema = z.object({
   nodes: z.array(LocalizadorSchema),
   edges: z.array(EdgeSchema),
   grupos: z.array(GrupoSchema).optional(),
+  notas: z.array(NotaQuadroSchema).optional(),
+  entradas: z.array(EntradaEventoSchema).optional(),
   exportedAt: z.string().optional(),
 }) satisfies z.ZodType<Plano>;
 

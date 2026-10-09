@@ -26,6 +26,12 @@ interface AtpModalProps extends RegraModalProps {
   /** Nomes dos localizadores nas pontas da aresta. */
   origem: string;
   destino: string;
+  /**
+   * Regra pendurada num localizador (decisoes.md#D-38): entra sempre no
+   * checklist, então a caixa "Implantar" e o resumo dos recursos da aresta
+   * não dizem nada — sobra o "já criado".
+   */
+  pendurada?: boolean;
 }
 
 interface SecaoProps {
@@ -77,6 +83,7 @@ export function AtpModal({
   somenteLeitura,
   onClose,
   onChange,
+  pendurada = false,
 }: AtpModalProps) {
   const r: AtpRule = rule ?? { implantar: false };
   const setR = (patch: Partial<AtpRule>) => onChange({ atp: { ...r, ...patch } });
@@ -90,13 +97,28 @@ export function AtpModal({
       onClose={onClose}
     >
       <SugestoesProvider>
-        <ImplantarRow
-          implantar={r.implantar}
-          jaCriado={jaCriado}
-          setImplantar={(v) => setR({ implantar: v })}
-          setJaCriado={(v) => onChange({ ja_criado: v })}
-          cat="Regra de ATP"
-        />
+        {pendurada ? (
+          <label className="flex items-center gap-2 cursor-pointer text-[12.5px]">
+            <input
+              type="checkbox"
+              className="pj-check"
+              checked={jaCriado}
+              onChange={(e) => onChange({ ja_criado: e.target.checked })}
+            />
+            Já criada no Eproc
+            <span className="text-[11.5px] text-texto-3">
+              · regra que não move: entra sempre no checklist
+            </span>
+          </label>
+        ) : (
+          <ImplantarRow
+            implantar={r.implantar}
+            jaCriado={jaCriado}
+            setImplantar={(v) => setR({ implantar: v })}
+            setJaCriado={(v) => onChange({ ja_criado: v })}
+            cat="Regra de ATP"
+          />
+        )}
 
         <Field
           label="Nome da regra"
@@ -179,11 +201,13 @@ export function AtpModal({
           />
         </Field>
 
-        <RecursosResumo
-          comuns={recursosComuns}
-          outrasRegras={outrasRegras}
-          cat="Regra de ATP"
-        />
+        {!pendurada && (
+          <RecursosResumo
+            comuns={recursosComuns}
+            outrasRegras={outrasRegras}
+            cat="Regra de ATP"
+          />
+        )}
       </SugestoesProvider>
     </ModalShell>
   );

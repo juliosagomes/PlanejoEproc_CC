@@ -51,6 +51,7 @@ export interface HeaderProps {
   sincronizandoUnidade: boolean;
   /** Abre a tela geral dos setores da unidade (decisoes.md#D-26). */
   onSetores: () => void;
+  onDescarte: () => void;
   onChecklist: () => void;
   onVerTutorial: () => void;
   stats: HeaderStats;
@@ -224,6 +225,7 @@ interface MenuUnidadeProps {
   onSincronizarUnidade: () => void;
   onCatalogoOrgao: () => void;
   onSetores: () => void;
+  onDescarte: () => void;
 }
 
 function MenuUnidade(p: MenuUnidadeProps) {
@@ -259,6 +261,12 @@ function MenuUnidade(p: MenuUnidadeProps) {
         rotulo="Setores"
         descricao="Quem trabalha cada localizador, em todos os planos"
         onSelect={p.onSetores}
+      />
+      <ItemMenu
+        icone={<Icon.Trash />}
+        rotulo="Destinos de descarte"
+        descricao="Localizadores como “P”, que só preenchem o destino de regra que não move"
+        onSelect={p.onDescarte}
       />
     </MenuSuspenso>
   );
@@ -373,6 +381,7 @@ export function Header(props: HeaderProps) {
           onSincronizarUnidade={props.onSincronizarUnidade}
           onCatalogoOrgao={props.onCatalogoOrgao}
           onSetores={props.onSetores}
+          onDescarte={props.onDescarte}
         />
         <MenuMais onVerTutorial={props.onVerTutorial} />
         {noFluxo && (

@@ -1,5 +1,7 @@
 import {
+  EFEITO_SEM_MOVER_CURTO,
   SUBITEM_CATS,
+  rotuloDescarte,
   ehAtalho,
   nomeDaPonta,
   ehRecursoRegra,
@@ -8,6 +10,7 @@ import {
   type EdgeData,
   type LocalizadorData,
   type PrefRule,
+  type RegraSemMover,
   type Subitem,
   type SubitemCategoria,
 } from '@/domain';
@@ -34,6 +37,11 @@ import { detalhesAtp } from './detalhesAtp';
  *    pendurá-los sem inventar um vínculo que o usuário nunca declarou, então
  *    cada um vai para a própria categoria, com o contexto "L1 → L2" — a mesma
  *    saída de quando nenhuma regra pede implantação.
+ *  - Cada regra pendurada num localizador (decisoes.md#D-38) vira item em
+ *    "Regra de ATP", com o localizador e o grupo como contexto. Entra sempre,
+ *    com ou sem `implantar`: pendurar a regra já é declarar a tarefa, e a
+ *    manual nasce com tipo de controle — pela regra das arestas, ela sumiria
+ *    do checklist no instante em que foi criada.
  *  - Categoria desconhecida (improvável) cai em "Outro".
  */
 
@@ -102,11 +110,21 @@ export interface RuleChecklistItem extends ItemBase {
   detalhes: ChecklistDetail[];
 }
 
+/** Regra de ATP pendurada no localizador, que não move o processo (D-38). */
+export interface SemMoverChecklistItem extends ItemBase {
+  kind: 'semMover';
+  nodeId: string;
+  regraId: string;
+  contexto: string;
+  detalhes: ChecklistDetail[];
+}
+
 export type ChecklistItem =
   | NodeChecklistItem
   | SubChecklistItem
   | RuleChecklistItem
-  | AcaoChecklistItem;
+  | AcaoChecklistItem
+  | SemMoverChecklistItem;
 
 export type ChecklistGroups = Record<ChecklistGroupKey, ChecklistItem[]>;
 
@@ -118,6 +136,8 @@ type NodeLike = { id: string; data: LocalizadorData };
 type EdgeLike = { id: string; source: string; target: string; data?: EdgeData };
 /** A aresta pode chegar num grupo (D-31): só o rótulo dele serve ao contexto. */
 type GrupoLike = { id: string; rotulo: string };
+/** E pode sair de uma entrada por evento (D-38). */
+type EntradaLike = { id: string; rotulo: string };
 
 function novoGrupo(): ChecklistGroups {
   return {
@@ -169,10 +189,25 @@ function detalhesPref(rule: PrefRule): ChecklistDetail[] {
   return out;
 }
 
+function detalhesSemMover(r: RegraSemMover): ChecklistDetail[] {
+  const out: ChecklistDetail[] = [];
+  if (r.efeito === 'limpeza') {
+    if (r.tira?.trim()) out.push({ label: 'Tira o localizador', valor: r.tira.trim() });
+  } else {
+    out.push({
+      label: 'Destino no Eproc',
+      valor: r.destino ? rotuloDescarte(r.destino) : 'destino de descarte da unidade',
+    });
+  }
+  if (r.descricao?.trim()) out.push({ label: 'Descrição', valor: r.descricao.trim() });
+  return r.atp ? [...out, ...detalhesAtp(r.atp)] : out;
+}
+
 export function deriveChecklist(
   nodes: ReadonlyArray<NodeLike>,
   edges: ReadonlyArray<EdgeLike>,
   grupos: ReadonlyArray<GrupoLike> = [],
+  entradas: ReadonlyArray<EntradaLike> = [],
 ): ChecklistGroups {
   const groups = novoGrupo();
 
@@ -210,11 +245,26 @@ export function deriveChecklist(
     }
   }
 
+  for (const n of nodes) {
+    if (ehAtalho(n)) continue;
+    for (const r of n.data.regrasSemMover ?? []) {
+      groups['Regra de ATP'].push({
+        kind: 'semMover',
+        nodeId: n.id,
+        regraId: r.id,
+        nome: nomeOuPlaceholder(r.nome),
+        contexto: `${nomeOuPlaceholder(n.data.nome)} · ${EFEITO_SEM_MOVER_CURTO[r.efeito]}`,
+        ja_criado: r.ja_criado,
+        detalhes: detalhesSemMover(r),
+      });
+    }
+  }
+
   for (const e of edges) {
     const data = e.data;
     if (!data) continue;
     const subs = data.subitems;
-    const src = nomeOuPlaceholder(nomeDaPonta(nodes, grupos, e.source));
+    const src = nomeOuPlaceholder(nomeDaPonta(nodes, grupos, e.source, entradas));
     const tgt = nomeOuPlaceholder(nomeDaPonta(nodes, grupos, e.target));
     const contexto = `${src} → ${tgt}`;
 
@@ -339,7 +389,7 @@ export function checklistToMarkdown(planoNome: string, groups: ChecklistGroups):
         it.kind === 'node' || !it.contexto ? '' : ` _(${it.contexto})_`;
       const desc = it.descricao ? ` — ${it.descricao}` : '';
       linhas.push(`- [${mark}] ${it.nome}${ctx}${desc}`);
-      if (it.kind === 'rule') {
+      if (it.kind === 'rule' || it.kind === 'semMover') {
         // Detalhes rotulados (sem checkbox — só info). Valores multi-linha
         // ganham continuação com indent de 4 espaços, que markdown trata
         // como continuação do item da lista.
@@ -348,6 +398,8 @@ export function checklistToMarkdown(planoNome: string, groups: ChecklistGroups):
           linhas.push(`  - **${d.label}:** ${primeira ?? ''}`);
           for (const linha of resto) linhas.push(`    ${linha}`);
         }
+      }
+      if (it.kind === 'rule') {
         for (const ch of it.children) {
           const cm = ch.ja_criado ? 'x' : ' ';
           const cat2 = ch.categoria ? ` _[${ch.categoria}]_` : '';

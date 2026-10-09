@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
-import type { LocalizadorData } from '@/domain';
+import { contarPorEfeito, type LocalizadorData } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/utils/cn';
 import { useCanvasStore } from '../store';
@@ -68,6 +68,8 @@ function LocalizadorCartao({ data, selected }: NodeProps<LocalizadorNodeData>) {
         </span>
       )}
 
+      <SelosSemMover data={data} />
+
       <div className="pj-node-name">
         {data.nome ? (
           data.nome
@@ -90,6 +92,32 @@ function LocalizadorCartao({ data, selected }: NodeProps<LocalizadorNodeData>) {
 
       <Handle type="source" position={Position.Right} />
     </div>
+  );
+}
+
+/** Quantas regras que não movem estão penduradas aqui, por grupo (D-38). */
+function SelosSemMover({ data }: { data: LocalizadorData }) {
+  const regras = data.regrasSemMover ?? [];
+  if (regras.length === 0) return null;
+  const c = contarPorEfeito(regras);
+  return (
+    <span className="pj-node-semmover" aria-label={`${regras.length} regras que não movem`}>
+      {c.automatica > 0 && (
+        <span className="bdg-semmover automatica" title="Automáticas, sem mover">
+          ⚡{c.automatica}
+        </span>
+      )}
+      {c.manual > 0 && (
+        <span className="bdg-semmover manual" title="Ações manuais">
+          👆{c.manual}
+        </span>
+      )}
+      {c.limpeza > 0 && (
+        <span className="bdg-semmover" title="Limpeza de localizador">
+          🧹{c.limpeza}
+        </span>
+      )}
+    </span>
   );
 }
 

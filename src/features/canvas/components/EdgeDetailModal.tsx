@@ -26,6 +26,8 @@ interface EdgeDetailModalProps {
   /** Outras regras da mesma aresta — mudam como o checklist agrupa. */
   outrasRegras: number;
   onChange: (patch: Partial<Subitem>) => void;
+  /** Regra pendurada num localizador (D-38); só vale para ATP. */
+  pendurada?: boolean;
 }
 
 /**
@@ -44,6 +46,7 @@ export function EdgeDetailModal({
   recursosComuns,
   outrasRegras,
   onChange,
+  pendurada,
 }: EdgeDetailModalProps) {
   // Numa sessão de visualização o modal continua abrindo: o detalhamento é
   // conteúdo do plano, e esconder é pior do que mostrar travado. O que muda é
@@ -64,7 +67,9 @@ export function EdgeDetailModal({
   };
 
   if (subitem.categoria === 'Regra de ATP') {
-    return <AtpModal {...comuns} rule={subitem.atp} origem={origem} destino={destino} />;
+    return (
+      <AtpModal {...comuns} rule={subitem.atp} origem={origem} destino={destino} pendurada={pendurada} />
+    );
   }
   if (subitem.categoria === 'Preferência') {
     return <PrefModal {...comuns} rule={subitem.pref} />;

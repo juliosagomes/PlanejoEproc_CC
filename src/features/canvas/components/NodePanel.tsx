@@ -1,13 +1,15 @@
-import type { LocalizadorOrgao } from '@/domain';
+import { ehDestinoDescarte, type LocalizadorOrgao } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
 import { LocalizadorNomeInput } from '@/features/catalogo/components/LocalizadorNomeInput';
 import { useSugestoesLocalizador } from '@/features/catalogo/sugestoes';
+import { useDescarteStore } from '@/features/descarte/store';
 import { cn } from '@/utils/cn';
 import { useCanvasStore, type FlowNode } from '../store';
 import { AcoesPreferenciaisBloco } from './AcoesPreferenciaisBloco';
 import { AtalhoPanel } from './AtalhoPanel';
 import { AtalhosDoLocalizador } from './AtalhosDoLocalizador';
+import { RegrasSemMoverBloco } from './RegrasSemMoverBloco';
 
 interface NodePanelProps {
   node: FlowNode;
@@ -28,6 +30,7 @@ function LocalizadorPanel({ node, onGerenciarSetores }: NodePanelProps) {
   const toggleFlagNoNo = useCanvasStore((s) => s.toggleFlagNoNo);
   const itensCatalogo = useSugestoesLocalizador();
   const data = node.data;
+  const ehDescarte = useDescarteStore((s) => ehDestinoDescarte(data.nome, s.nomes));
 
   // Localizador de sistema não recebe `ja_criado`: o eixo "a secretaria já criou
   // isto no Eproc?" não se aplica a um padrão que existe em todas as unidades, e
@@ -88,7 +91,17 @@ function LocalizadorPanel({ node, onGerenciarSetores }: NodePanelProps) {
           )}
         </div>
 
+        {ehDescarte && (
+          <div className="text-[11.5px] leading-snug rounded-lg px-3 py-2" style={{ background: 'var(--aviso-suave)', border: '1px solid var(--aviso-borda)', color: 'var(--aviso-texto)' }}>
+            Este é um destino de descarte da unidade. Regra que termina aqui não
+            move o processo: em vez da seta, pendure-a no localizador de origem,
+            em “Regras que não movem”.
+          </div>
+        )}
+
         <AcoesPreferenciaisBloco node={node} />
+
+        <RegrasSemMoverBloco node={node} />
 
         <div>
           <label className="label">Descrição</label>
