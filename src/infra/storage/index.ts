@@ -52,6 +52,15 @@ export { loadConjuntosEvento, saveConjuntosEvento } from './conjuntosEvento';
 export { loadDestinosDescarte, saveDestinosDescarte } from './descarte';
 export { PAINEL_KEY_SUFIXO, painelKey, loadPainel, savePainel } from './painel';
 export {
+  MAPAS_INDEX_SUFIXO,
+  mapasIndexKey,
+  mapaKey,
+  listMapas,
+  loadMapa,
+  saveMapa,
+  excluirMapa,
+} from './mapas';
+export {
   ORDENS_PLANOS,
   getOrdemPlanos,
   setOrdemPlanos,
