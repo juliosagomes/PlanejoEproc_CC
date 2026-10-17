@@ -25,6 +25,7 @@ export type Parametros = Record<string, ValorCampo>;
 export const CATALOGO_IDS = [
   'eventos',
   'tiposPeticao',
+  'documentos',
   'classes',
   'competencias',
   'statusProcesso',

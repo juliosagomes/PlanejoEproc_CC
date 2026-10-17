@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { Sessao } from '@/domain';
 import { flushPersist, useCanvasStore } from '@/features/canvas/store';
-import { useConjuntosEventoStore } from '@/features/eventos/store';
+import { useConjuntosStore } from '@/features/conjuntos/store';
 import { usePainelStore } from '@/features/painel/store';
 import { useDescarteStore } from '@/features/descarte/store';
 import { useSetoresStore } from '@/features/setores/store';
@@ -107,7 +107,7 @@ function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
   const canvas = useCanvasStore.getState();
   canvas.setSomenteLeitura(somenteLeitura);
   useSetoresStore.getState().hidratar(somenteLeitura);
-  useConjuntosEventoStore.getState().hidratar();
+  useConjuntosStore.getState().hidratar();
   usePainelStore.getState().hidratar();
   useDescarteStore.getState().hidratar();
 
@@ -270,7 +270,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     useCanvasStore.getState().setSomenteLeitura(false);
     useCanvasStore.getState().loadPlano(planoVazio());
     useSetoresStore.getState().limpar();
-    useConjuntosEventoStore.getState().limpar();
+    useConjuntosStore.getState().limpar();
     usePainelStore.getState().limpar();
     set({
       sessao: null,

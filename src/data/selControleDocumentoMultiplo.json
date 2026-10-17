@@ -1,0 +1,3042 @@
+[
+  {
+    "value": "82400275",
+    "label": "Abordagem - Infância e Juventude"
+  },
+  {
+    "value": "82400269",
+    "label": "Acolhimento - Infância e Juventude"
+  },
+  {
+    "value": "21",
+    "label": "Acórdão"
+  },
+  {
+    "value": "65",
+    "label": "Acordo"
+  },
+  {
+    "value": "247",
+    "label": "Adesivo"
+  },
+  {
+    "value": "336",
+    "label": "Aditamento à Denúncia"
+  },
+  {
+    "value": "82400608",
+    "label": "Admissibilidade do Incidente de Uniformização"
+  },
+  {
+    "value": "82400609",
+    "label": "Admissibilidade do Pedido de Uniformização"
+  },
+  {
+    "value": "82400221",
+    "label": "Agravo em Recurso Especial"
+  },
+  {
+    "value": "82400222",
+    "label": "Agravo em Recurso Extraordinário"
+  },
+  {
+    "value": "349",
+    "label": "Agravo Inominado ou Legal"
+  },
+  {
+    "value": "82400192",
+    "label": "Agravo Interno"
+  },
+  {
+    "value": "201",
+    "label": "Agravo Retido"
+  },
+  {
+    "value": "202",
+    "label": "Alegações Finais"
+  },
+  {
+    "value": "54",
+    "label": "Alvará"
+  },
+  {
+    "value": "82400438",
+    "label": "Alvará"
+  },
+  {
+    "value": "82400439",
+    "label": "Alvará (Outros)"
+  },
+  {
+    "value": "158",
+    "label": "Alvará de Levantamento"
+  },
+  {
+    "value": "82400178",
+    "label": "Alvará de Levantamento (Outros)"
+  },
+  {
+    "value": "82400440",
+    "label": "Alvará de Liberação"
+  },
+  {
+    "value": "82400441",
+    "label": "Alvará de Liberação (Outros)"
+  },
+  {
+    "value": "295",
+    "label": "Alvará de Liberação de Coisa Apreendida"
+  },
+  {
+    "value": "82400226",
+    "label": "Alvará de Pagamento"
+  },
+  {
+    "value": "82400442",
+    "label": "Alvará de Pagamento de GRU"
+  },
+  {
+    "value": "82400443",
+    "label": "Alvará de Pagamento de IRPF"
+  },
+  {
+    "value": "82400444",
+    "label": "Alvará de Pagamento do INSS"
+  },
+  {
+    "value": "82400445",
+    "label": "Alvará de Recambiamento"
+  },
+  {
+    "value": "82400446",
+    "label": "Alvará de Sepultamento"
+  },
+  {
+    "value": "82400447",
+    "label": "Alvará de Soltura (Outros)"
+  },
+  {
+    "value": "82400448",
+    "label": "Alvará de Soltura - Audiência de Custódia - Fiança"
+  },
+  {
+    "value": "82400449",
+    "label": "Alvará de Soltura - Audiência de Custódia - Termo"
+  },
+  {
+    "value": "82400450",
+    "label": "Alvará de Soltura - Com Fiança"
+  },
+  {
+    "value": "82400451",
+    "label": "Alvará de Soltura - Flagrante - Audiência de Custó"
+  },
+  {
+    "value": "82400452",
+    "label": "Alvará de Soltura - Prisão Preventiva"
+  },
+  {
+    "value": "82400453",
+    "label": "Alvará de Soltura - Relaxamento de Prisão"
+  },
+  {
+    "value": "82400454",
+    "label": "Alvará de Soltura - Sem Fiança"
+  },
+  {
+    "value": "82400455",
+    "label": "Alvará de Soltura com Termo"
+  },
+  {
+    "value": "82400456",
+    "label": "Alvará de Soltura em Execução de Alimentos"
+  },
+  {
+    "value": "82400457",
+    "label": "Alvará de Transferência"
+  },
+  {
+    "value": "82400458",
+    "label": "Alvará de Transferência (Outros)"
+  },
+  {
+    "value": "82400459",
+    "label": "Alvará de Transferência - Credor"
+  },
+  {
+    "value": "82400460",
+    "label": "Alvará de Transferência - Imposto de Renda de Pess"
+  },
+  {
+    "value": "82400461",
+    "label": "Alvará de Transferência - Sisbajud"
+  },
+  {
+    "value": "82400462",
+    "label": "Alvará de Viagem"
+  },
+  {
+    "value": "82400463",
+    "label": "Alvará de Viagem ao Exterior e/ou Passaporte"
+  },
+  {
+    "value": "82400464",
+    "label": "Alvará de Viagem Nacional"
+  },
+  {
+    "value": "82400465",
+    "label": "Alvará para Festa"
+  },
+  {
+    "value": "82400466",
+    "label": "Alvará para Trabalhar"
+  },
+  {
+    "value": "82400264",
+    "label": "Alvarás - Infância e Juventude"
+  },
+  {
+    "value": "262",
+    "label": "Anexo"
+  },
+  {
+    "value": "82400589",
+    "label": "Anulação e Substituição de Títulos ao Portador"
+  },
+  {
+    "value": "204",
+    "label": "Apelação"
+  },
+  {
+    "value": "85",
+    "label": "Apresentação de Quesitos/Indicação de Assistente Técnico"
+  },
+  {
+    "value": "173",
+    "label": "Ata"
+  },
+  {
+    "value": "273",
+    "label": "Ata"
+  },
+  {
+    "value": "303",
+    "label": "ATA DA SESSÃO DO JÚRI"
+  },
+  {
+    "value": "82400467",
+    "label": "Ata de Acompanhamento"
+  },
+  {
+    "value": "29",
+    "label": "Ata de Audiência"
+  },
+  {
+    "value": "82400468",
+    "label": "Ata de Audiência (Outras)"
+  },
+  {
+    "value": "82400469",
+    "label": "Ata de Audiência Admonitória"
+  },
+  {
+    "value": "82400470",
+    "label": "Ata de Audiência de Acolhimento"
+  },
+  {
+    "value": "82400471",
+    "label": "Ata de Audiência de Apresentação (ECA)"
+  },
+  {
+    "value": "82400472",
+    "label": "Ata de Audiência de Conciliação"
+  },
+  {
+    "value": "82400473",
+    "label": "Ata de Audiência de Custódia"
+  },
+  {
+    "value": "82400474",
+    "label": "Ata de Audiência de Instrução"
+  },
+  {
+    "value": "82400475",
+    "label": "Ata de Audiência de Instrução e Julgamento"
+  },
+  {
+    "value": "82400476",
+    "label": "Ata de Audiência de Julgamento"
+  },
+  {
+    "value": "82400477",
+    "label": "Ata de Audiência de Justificação"
+  },
+  {
+    "value": "82400478",
+    "label": "Ata de Audiência de Mediação"
+  },
+  {
+    "value": "82400479",
+    "label": "Ata de Audiência do Art. 16 da Lei Maria da Penha"
+  },
+  {
+    "value": "82400480",
+    "label": "Ata de Inspeção"
+  },
+  {
+    "value": "82400481",
+    "label": "Ata de Julgamento"
+  },
+  {
+    "value": "82400482",
+    "label": "Ata de Sessão"
+  },
+  {
+    "value": "82400483",
+    "label": "Ata de Sessão Extraordinária"
+  },
+  {
+    "value": "82400484",
+    "label": "Ata de Sessão Ordinária"
+  },
+  {
+    "value": "82",
+    "label": "Atestado de Saúde"
+  },
+  {
+    "value": "109",
+    "label": "Ato Ordinatório"
+  },
+  {
+    "value": "82400661",
+    "label": "Audiência"
+  },
+  {
+    "value": "81",
+    "label": "Áudio Probatório"
+  },
+  {
+    "value": "124",
+    "label": "Auto"
+  },
+  {
+    "value": "82400485",
+    "label": "Auto"
+  },
+  {
+    "value": "282",
+    "label": "Auto de Acareação"
+  },
+  {
+    "value": "344",
+    "label": "Auto de Adjudicação"
+  },
+  {
+    "value": "165",
+    "label": "Auto de Apreensão"
+  },
+  {
+    "value": "343",
+    "label": "Auto de Arrematação"
+  },
+  {
+    "value": "82400486",
+    "label": "Auto de Arresto"
+  },
+  {
+    "value": "82400487",
+    "label": "Auto de Avaliação"
+  },
+  {
+    "value": "284",
+    "label": "Auto de Busca e Apreensão"
+  },
+  {
+    "value": "267",
+    "label": "Auto de Colheita de Material Gráfico"
+  },
+  {
+    "value": "82400488",
+    "label": "Auto de Constatação"
+  },
+  {
+    "value": "82400489",
+    "label": "Auto de Depósito"
+  },
+  {
+    "value": "82400710",
+    "label": "Auto de Divisão"
+  },
+  {
+    "value": "329",
+    "label": "Auto de Entrega de Objeto Apreendido"
+  },
+  {
+    "value": "342",
+    "label": "Auto de Hasta Negativa"
+  },
+  {
+    "value": "82400490",
+    "label": "Auto de Hasta Única"
+  },
+  {
+    "value": "292",
+    "label": "Auto de Infração"
+  },
+  {
+    "value": "345",
+    "label": "Auto de Penhora"
+  },
+  {
+    "value": "102",
+    "label": "Auto de Prisão em Flagrante Delito"
+  },
+  {
+    "value": "169",
+    "label": "Auto de Qualificação"
+  },
+  {
+    "value": "283",
+    "label": "Auto de Reconhecimento"
+  },
+  {
+    "value": "82400491",
+    "label": "Auto de Restauração de Autos"
+  },
+  {
+    "value": "119",
+    "label": "Autorização de Viagem"
+  },
+  {
+    "value": "82400591",
+    "label": "Autorização de Visita"
+  },
+  {
+    "value": "82400590",
+    "label": "Autorização Judicial"
+  },
+  {
+    "value": "82400592",
+    "label": "Autorização Judicial (Outros)"
+  },
+  {
+    "value": "82400593",
+    "label": "Autorização Judicial - Art. 122, I e III, LEP"
+  },
+  {
+    "value": "82400492",
+    "label": "Averbação"
+  },
+  {
+    "value": "82400493",
+    "label": "Averbação ao Mandado"
+  },
+  {
+    "value": "82400494",
+    "label": "Averbação ao Mandado de Acompanhamento de Medidas"
+  },
+  {
+    "value": "505",
+    "label": "Averbação ao Mandado de Monitoração"
+  },
+  {
+    "value": "53",
+    "label": "Aviso de Recebimento (AR) - Negativo"
+  },
+  {
+    "value": "44",
+    "label": "Aviso de Recebimento - AR"
+  },
+  {
+    "value": "409",
+    "label": "Boletim de Ocorrência"
+  },
+  {
+    "value": "82400265",
+    "label": "Busca e Apreensão/Acolhimento Infância e Juventude"
+  },
+  {
+    "value": "514",
+    "label": "CADASTRO AMBIENTAL RURAL - CAR"
+  },
+  {
+    "value": "4",
+    "label": "Cálculo Judicial"
+  },
+  {
+    "value": "82400187",
+    "label": "Carta"
+  },
+  {
+    "value": "82400712",
+    "label": "CARTA AR - Notificação Autoridade Coatora"
+  },
+  {
+    "value": "366",
+    "label": "Carta Arbitral"
+  },
+  {
+    "value": "82400496",
+    "label": "Carta Convite"
+  },
+  {
+    "value": "156",
+    "label": "Carta de Adjudicação"
+  },
+  {
+    "value": "155",
+    "label": "Carta de Arrematação"
+  },
+  {
+    "value": "3",
+    "label": "Carta de Concessão"
+  },
+  {
+    "value": "82400497",
+    "label": "Carta de Guia"
+  },
+  {
+    "value": "327",
+    "label": "Carta de Indeferimento"
+  },
+  {
+    "value": "82400498",
+    "label": "Carta de Ordem"
+  },
+  {
+    "value": "170",
+    "label": "Carta de Ordem (Petição Inicial)"
+  },
+  {
+    "value": "82400499",
+    "label": "Carta de Preposto"
+  },
+  {
+    "value": "82400500",
+    "label": "Carta de Sentença"
+  },
+  {
+    "value": "82400495",
+    "label": "Carta Interna"
+  },
+  {
+    "value": "41",
+    "label": "Carta Precatória"
+  },
+  {
+    "value": "82400501",
+    "label": "Carta Precatória"
+  },
+  {
+    "value": "82400502",
+    "label": "Carta Precatória (Outras)"
+  },
+  {
+    "value": "82400503",
+    "label": "Carta Precatória Citatória"
+  },
+  {
+    "value": "82400504",
+    "label": "Carta Precatória Intimatória"
+  },
+  {
+    "value": "153",
+    "label": "Carta Rogatória"
+  },
+  {
+    "value": "62",
+    "label": "Carteira de Habilitação"
+  },
+  {
+    "value": "8",
+    "label": "Cédula de Identidade"
+  },
+  {
+    "value": "16",
+    "label": "Certidão"
+  },
+  {
+    "value": "82400506",
+    "label": "Certidão (Outras)"
+  },
+  {
+    "value": "82400507",
+    "label": "Certidão - Ausência de Manifestação do Exequente"
+  },
+  {
+    "value": "82400508",
+    "label": "Certidão - Ausência de Manifestação sobre a Penhor"
+  },
+  {
+    "value": "82400509",
+    "label": "Certidão - Ausência de Manifestação sobre Depósito"
+  },
+  {
+    "value": "82400510",
+    "label": "Certidão - Ausência de Pagamento"
+  },
+  {
+    "value": "82400511",
+    "label": "Certidão - Ausência de Réplica"
+  },
+  {
+    "value": "82400512",
+    "label": "Certidão 2ª Remessa"
+  },
+  {
+    "value": "517",
+    "label": "Certidão da Contadoria"
+  },
+  {
+    "value": "82400513",
+    "label": "Certidão de Afastamento"
+  },
+  {
+    "value": "271",
+    "label": "Certidão de Antecedentes Penais"
+  },
+  {
+    "value": "82400514",
+    "label": "Certidão de Arquivamento"
+  },
+  {
+    "value": "82400515",
+    "label": "Certidão de Ausência"
+  },
+  {
+    "value": "82400516",
+    "label": "Certidão de Ausência de CPF/CNPJ"
+  },
+  {
+    "value": "82400517",
+    "label": "Certidão de Ausência de Procuração"
+  },
+  {
+    "value": "82400518",
+    "label": "Certidão de Ausência de Recolhimento de Custas"
+  },
+  {
+    "value": "82400519",
+    "label": "Certidão de Baixa"
+  },
+  {
+    "value": "82400520",
+    "label": "Certidão de Baixa (Outras)"
+  },
+  {
+    "value": "82400521",
+    "label": "Certidão de Baixa de Parte"
+  },
+  {
+    "value": "82400522",
+    "label": "Certidão de Cancelamento da Distribuição"
+  },
+  {
+    "value": "69",
+    "label": "Certidão de Casamento"
+  },
+  {
+    "value": "82400523",
+    "label": "Certidão de Conclusão"
+  },
+  {
+    "value": "103",
+    "label": "Certidão de Consulta"
+  },
+  {
+    "value": "316",
+    "label": "Certidão de Consulta de Infojud"
+  },
+  {
+    "value": "82400530",
+    "label": "Certidão de Consulta de Infojud - Negativa"
+  },
+  {
+    "value": "82400531",
+    "label": "Certidão de Consulta de Infojud - Positiva"
+  },
+  {
+    "value": "317",
+    "label": "Certidão de Consulta de Renajud"
+  },
+  {
+    "value": "82400524",
+    "label": "Certidão de Consulta de Renajud Negativa"
+  },
+  {
+    "value": "82400525",
+    "label": "Certidão de Consulta de Renajud Positiva"
+  },
+  {
+    "value": "82400526",
+    "label": "Certidão de Consulta de Serasajud"
+  },
+  {
+    "value": "82400527",
+    "label": "Certidão de Consulta de Serasajud Negativa"
+  },
+  {
+    "value": "82400528",
+    "label": "Certidão de Consulta de SerasajudPositiva"
+  },
+  {
+    "value": "82400532",
+    "label": "Certidão de Crédito"
+  },
+  {
+    "value": "82400533",
+    "label": "Certidão de Crédito Judicial"
+  },
+  {
+    "value": "82400534",
+    "label": "Certidão de Crédito para Habilitação no Juízo Fali"
+  },
+  {
+    "value": "82400535",
+    "label": "Certidão de Crédito Trabalhista"
+  },
+  {
+    "value": "82400282",
+    "label": "Certidão de Cumprimento de Mandado de Prisão"
+  },
+  {
+    "value": "82400536",
+    "label": "Certidão de Custas"
+  },
+  {
+    "value": "338",
+    "label": "Certidão de Decurso de Prazo"
+  },
+  {
+    "value": "82400537",
+    "label": "Certidão de Desarquivamento"
+  },
+  {
+    "value": "82400538",
+    "label": "Certidão de Desconstituição da Penhora"
+  },
+  {
+    "value": "82400539",
+    "label": "Certidão de Devolução de AR"
+  },
+  {
+    "value": "82400540",
+    "label": "Certidão de Devolução de AR por Ausência"
+  },
+  {
+    "value": "82400541",
+    "label": "Certidão de Devolução de AR por Cumprimento"
+  },
+  {
+    "value": "82400542",
+    "label": "Certidão de Devolução de AR por Desconhecimento"
+  },
+  {
+    "value": "82400543",
+    "label": "Certidão de Devolução de AR por Insuficiência de E"
+  },
+  {
+    "value": "82400544",
+    "label": "Certidão de Devolução de AR por Mudança de Endereç"
+  },
+  {
+    "value": "82400545",
+    "label": "Certidão de Digitalização"
+  },
+  {
+    "value": "506",
+    "label": "Certidão de Distribuição"
+  },
+  {
+    "value": "100",
+    "label": "Certidão de Dívida Ativa"
+  },
+  {
+    "value": "82400546",
+    "label": "Certidão de Dívida Ativa (CDA)"
+  },
+  {
+    "value": "82400547",
+    "label": "Certidão de Expedição"
+  },
+  {
+    "value": "82400548",
+    "label": "Certidão de Expedição (Outras)"
+  },
+  {
+    "value": "82400549",
+    "label": "Certidão de Expedição de AR"
+  },
+  {
+    "value": "82400550",
+    "label": "Certidão de Expedição de Documento"
+  },
+  {
+    "value": "82400551",
+    "label": "Certidão de Extinção de Punibilidade por Morte"
+  },
+  {
+    "value": "257",
+    "label": "Certidão de Falta de Páginas"
+  },
+  {
+    "value": "82400552",
+    "label": "Certidão de Fatos"
+  },
+  {
+    "value": "82400554",
+    "label": "Certidão de Inadimplência"
+  },
+  {
+    "value": "82400553",
+    "label": "Certidão de Inclusão"
+  },
+  {
+    "value": "82400555",
+    "label": "Certidão de Inclusão em Cadastro de Inadimplente"
+  },
+  {
+    "value": "82400189",
+    "label": "Certidão de Inclusão em Pauta"
+  },
+  {
+    "value": "82400556",
+    "label": "Certidão de Inscrição de Penhora"
+  },
+  {
+    "value": "351",
+    "label": "Certidão de Inspeção"
+  },
+  {
+    "value": "82400557",
+    "label": "Certidão de Inteiro Teor"
+  },
+  {
+    "value": "82400558",
+    "label": "Certidão de Interposição de Recurso"
+  },
+  {
+    "value": "145",
+    "label": "Certidão de Intimação"
+  },
+  {
+    "value": "82400219",
+    "label": "Certidão de Intimação"
+  },
+  {
+    "value": "82400559",
+    "label": "Certidão de Intimação (Outros)"
+  },
+  {
+    "value": "82400560",
+    "label": "Certidão de Intimação por Telefone"
+  },
+  {
+    "value": "82400561",
+    "label": "Certidão de Inventariante"
+  },
+  {
+    "value": "143",
+    "label": "Certidão de Julgamento"
+  },
+  {
+    "value": "82400562",
+    "label": "Certidão de Julgamento (Outros)"
+  },
+  {
+    "value": "144",
+    "label": "Certidão de Julgamento Colegiado"
+  },
+  {
+    "value": "82400565",
+    "label": "Certidão de Juntada"
+  },
+  {
+    "value": "82400433",
+    "label": "CERTIDÃO DE MIGRAÇÃO"
+  },
+  {
+    "value": "82400566",
+    "label": "Certidão de Militância"
+  },
+  {
+    "value": "82400567",
+    "label": "Certidão de Não Apresentação de Contrarrazões"
+  },
+  {
+    "value": "82400568",
+    "label": "Certidão de Não Interposição de Recurso"
+  },
+  {
+    "value": "146",
+    "label": "Certidão de Narrativa/Andamento"
+  },
+  {
+    "value": "68",
+    "label": "Certidão de Nascimento"
+  },
+  {
+    "value": "70",
+    "label": "Certidão de Óbito"
+  },
+  {
+    "value": "82400569",
+    "label": "Certidão de Oficial de Justiça"
+  },
+  {
+    "value": "258",
+    "label": "Certidão de Página Ilegível"
+  },
+  {
+    "value": "82400570",
+    "label": "Certidão de Pedido de Assistência Judiciária"
+  },
+  {
+    "value": "82400571",
+    "label": "Certidão de Penhora no Rosto dos Autos"
+  },
+  {
+    "value": "82400572",
+    "label": "Certidão de Protesto"
+  },
+  {
+    "value": "82400573",
+    "label": "Certidão de Registro de Impedimento"
+  },
+  {
+    "value": "77",
+    "label": "Certidão de Registro Imobiliário"
+  },
+  {
+    "value": "82400574",
+    "label": "Certidão de Republicação"
+  },
+  {
+    "value": "82400575",
+    "label": "Certidão de Retificação"
+  },
+  {
+    "value": "82400576",
+    "label": "Certidão de Retirada de Pauta"
+  },
+  {
+    "value": "82400577",
+    "label": "Certidão de Suspensão de Direitos Políticos"
+  },
+  {
+    "value": "259",
+    "label": "Certidão de Tramitação Física"
+  },
+  {
+    "value": "82400578",
+    "label": "Certidão de Transcurso de Prazo"
+  },
+  {
+    "value": "312",
+    "label": "Certidão de Trânsito em Julgado"
+  },
+  {
+    "value": "528",
+    "label": "CERTIDÃO DE TRIAGEM"
+  },
+  {
+    "value": "529",
+    "label": "CERTIDÃO DE TRIAGEM - Retificar"
+  },
+  {
+    "value": "260",
+    "label": "Certidão de Validação de Peças Digitalizadas"
+  },
+  {
+    "value": "82400579",
+    "label": "Certidão Geral de Curatela"
+  },
+  {
+    "value": "82400505",
+    "label": "Certidão Interna"
+  },
+  {
+    "value": "82400580",
+    "label": "Certidão Judicial"
+  },
+  {
+    "value": "82400581",
+    "label": "Certidão Negativa de Débitos Trabalhistas (CNDT)"
+  },
+  {
+    "value": "82400617",
+    "label": "Certificação do Decurso de Prazo"
+  },
+  {
+    "value": "82400193",
+    "label": "Ciência"
+  },
+  {
+    "value": "152",
+    "label": "Citação"
+  },
+  {
+    "value": "82400618",
+    "label": "Citação (Outros)"
+  },
+  {
+    "value": "82400619",
+    "label": "Citação e Intimação para Audiência de Conciliação"
+  },
+  {
+    "value": "176",
+    "label": "Comprovante"
+  },
+  {
+    "value": "10",
+    "label": "Comprovante de Endereço"
+  },
+  {
+    "value": "57",
+    "label": "Comprovante de Implantação de Benefício"
+  },
+  {
+    "value": "90",
+    "label": "Comprovante de Pagamento"
+  },
+  {
+    "value": "239",
+    "label": "Comunicação"
+  },
+  {
+    "value": "82400582",
+    "label": "Comunicação"
+  },
+  {
+    "value": "82400583",
+    "label": "Comunicação de Alteração de Regime Prisional"
+  },
+  {
+    "value": "82400584",
+    "label": "Comunicação de Alteração de Unidade Prisional"
+  },
+  {
+    "value": "82400585",
+    "label": "Comunicação de Evasão"
+  },
+  {
+    "value": "82400586",
+    "label": "Comunicação de Fuga"
+  },
+  {
+    "value": "82400587",
+    "label": "Comunicação de Saída Temporária"
+  },
+  {
+    "value": "82400604",
+    "label": "Concessão Liminar dos Efeitos da Tutela Antecipada"
+  },
+  {
+    "value": "82400605",
+    "label": "Concessão Liminar em Parte dos Efeitos da Tutela A"
+  },
+  {
+    "value": "82400266",
+    "label": "Condução Coercitiva - Infância e Juventude"
+  },
+  {
+    "value": "82400184",
+    "label": "CONFLITO DE COMPETÊNCIA CÍVEL"
+  },
+  {
+    "value": "6",
+    "label": "Contestação"
+  },
+  {
+    "value": "392",
+    "label": "Contestação (Outros)"
+  },
+  {
+    "value": "393",
+    "label": "Contestação - Ausência de Requisitos"
+  },
+  {
+    "value": "38",
+    "label": "Contracheque"
+  },
+  {
+    "value": "408",
+    "label": "Contrafé"
+  },
+  {
+    "value": "513",
+    "label": "Contramandado"
+  },
+  {
+    "value": "389",
+    "label": "Contraminuta"
+  },
+  {
+    "value": "45",
+    "label": "Contrarrazões"
+  },
+  {
+    "value": "359",
+    "label": "Contrarrazões ao Recurso Especial"
+  },
+  {
+    "value": "360",
+    "label": "Contrarrazões ao Recurso Extraordinário"
+  },
+  {
+    "value": "358",
+    "label": "Contrarrazões da Apelação"
+  },
+  {
+    "value": "40",
+    "label": "Contrato"
+  },
+  {
+    "value": "96",
+    "label": "Contrato de Honorários Advocatícios"
+  },
+  {
+    "value": "321",
+    "label": "Contrato Social"
+  },
+  {
+    "value": "82400597",
+    "label": "Conversão (Decisão - Interlocutória)"
+  },
+  {
+    "value": "82400620",
+    "label": "Conversão (Despacho)"
+  },
+  {
+    "value": "82400598",
+    "label": "Conversão de Ação Monitória em Execução"
+  },
+  {
+    "value": "82400599",
+    "label": "Conversão de Prisão em Flagrante para Preventiva"
+  },
+  {
+    "value": "82400600",
+    "label": "Conversão de Prisão em Flagrante para Temporária"
+  },
+  {
+    "value": "82400621",
+    "label": "Conversão do Arresto em Penhora"
+  },
+  {
+    "value": "82400622",
+    "label": "Conversão em Diligência"
+  },
+  {
+    "value": "82400588",
+    "label": "Cópia"
+  },
+  {
+    "value": "9",
+    "label": "CPF/CNPJ"
+  },
+  {
+    "value": "49",
+    "label": "Custas Judiciais"
+  },
+  {
+    "value": "64",
+    "label": "DARF"
+  },
+  {
+    "value": "32",
+    "label": "Decisão"
+  },
+  {
+    "value": "82400594",
+    "label": "Decisão Agravada"
+  },
+  {
+    "value": "319",
+    "label": "Decisão de Tribunal Superior"
+  },
+  {
+    "value": "82400435",
+    "label": "Decisão Juiz Leigo"
+  },
+  {
+    "value": "25",
+    "label": "Decisão Monocrática Terminativa"
+  },
+  {
+    "value": "82400601",
+    "label": "Decisão Parcial de Mérito"
+  },
+  {
+    "value": "59",
+    "label": "Declaração de Hipossuficiência"
+  },
+  {
+    "value": "383",
+    "label": "Declinatória de competência"
+  },
+  {
+    "value": "82400602",
+    "label": "Deferimento de Assistência Judiciária Gratuita"
+  },
+  {
+    "value": "47",
+    "label": "Demonstrativo"
+  },
+  {
+    "value": "87",
+    "label": "Demonstrativo de Cálculo"
+  },
+  {
+    "value": "519",
+    "label": "Demonstrativo de Guia de Custas Prévias"
+  },
+  {
+    "value": "27",
+    "label": "Demonstrativo do Repasse do Valor da Parcela"
+  },
+  {
+    "value": "82400606",
+    "label": "Denegação da Medida Liminar de Antecipação de Tute"
+  },
+  {
+    "value": "99",
+    "label": "Denúncia"
+  },
+  {
+    "value": "406",
+    "label": "Denúncia (Outras)"
+  },
+  {
+    "value": "15",
+    "label": "Despacho"
+  },
+  {
+    "value": "82400623",
+    "label": "Despacho de Mero Expediente"
+  },
+  {
+    "value": "82400434",
+    "label": "Despacho Juiz Leigo"
+  },
+  {
+    "value": "488",
+    "label": "DESPACHO/OFÍCIO"
+  },
+  {
+    "value": "82400235",
+    "label": "DETALHAMENTO SISBAJUD - NEGATIVO"
+  },
+  {
+    "value": "12",
+    "label": "DETALHAMENTO SISBAJUD - PARCIAL/TOTAL"
+  },
+  {
+    "value": "82400283",
+    "label": "Devolução de Mandado"
+  },
+  {
+    "value": "82400668",
+    "label": "Devolução de Ofício"
+  },
+  {
+    "value": "52",
+    "label": "Documento de Comprovação"
+  },
+  {
+    "value": "82400626",
+    "label": "Documento de Inconsistência"
+  },
+  {
+    "value": "82400627",
+    "label": "Documento de Inconsistência de Advogado"
+  },
+  {
+    "value": "82400628",
+    "label": "Documento de Inconsistência de Jus Postulandi"
+  },
+  {
+    "value": "326",
+    "label": "Documento de Perito"
+  },
+  {
+    "value": "22",
+    "label": "Documento Pessoal"
+  },
+  {
+    "value": "82400196",
+    "label": "Documentos Diversos"
+  },
+  {
+    "value": "40400001",
+    "label": "DOSSIÊ PERMANENTE"
+  },
+  {
+    "value": "48",
+    "label": "E-mail"
+  },
+  {
+    "value": "82400629",
+    "label": "E-mail"
+  },
+  {
+    "value": "42",
+    "label": "eCARTA - VPost"
+  },
+  {
+    "value": "141",
+    "label": "Edital"
+  },
+  {
+    "value": "127",
+    "label": "Edital (Outros)"
+  },
+  {
+    "value": "310",
+    "label": "Edital de Alienação de Ativos"
+  },
+  {
+    "value": "82400630",
+    "label": "Edital de Chamamento"
+  },
+  {
+    "value": "181",
+    "label": "EDITAL DE CITAÇÃO"
+  },
+  {
+    "value": "82400631",
+    "label": "Edital de Citação"
+  },
+  {
+    "value": "82400632",
+    "label": "Edital de Convocação de Assembleia de Credores"
+  },
+  {
+    "value": "82400633",
+    "label": "Edital de Decretação de Falência e Relação de Cred"
+  },
+  {
+    "value": "82400634",
+    "label": "Edital de Intimação"
+  },
+  {
+    "value": "82400635",
+    "label": "Edital de Leilão"
+  },
+  {
+    "value": "82400636",
+    "label": "Edital de Leilão (Outros)"
+  },
+  {
+    "value": "82400637",
+    "label": "Edital de Leilão 1ª Praça"
+  },
+  {
+    "value": "82400638",
+    "label": "Edital de Leilão 2ª Praça"
+  },
+  {
+    "value": "82400639",
+    "label": "Edital de Leilão Único"
+  },
+  {
+    "value": "133",
+    "label": "Edital de Notificação"
+  },
+  {
+    "value": "217",
+    "label": "Embargos (outros)"
+  },
+  {
+    "value": "215",
+    "label": "Embargos de Declaração"
+  },
+  {
+    "value": "46",
+    "label": "EMBARGOS DE DECLARAÇÃO CÍVEL"
+  },
+  {
+    "value": "82400181",
+    "label": "EMBARGOS DE TERCEIRO"
+  },
+  {
+    "value": "82400213",
+    "label": "Embargos em Ação Penal"
+  },
+  {
+    "value": "216",
+    "label": "Embargos Infringentes"
+  },
+  {
+    "value": "177",
+    "label": "Embargos Infringentes e de Nulidade"
+  },
+  {
+    "value": "60",
+    "label": "Emenda à Inicial"
+  },
+  {
+    "value": "91",
+    "label": "Escritura"
+  },
+  {
+    "value": "172",
+    "label": "Estatuto"
+  },
+  {
+    "value": "82400280",
+    "label": "Eventos - Infância e Juventude"
+  },
+  {
+    "value": "89",
+    "label": "Exame Médico"
+  },
+  {
+    "value": "94",
+    "label": "Exceção de Impedimento"
+  },
+  {
+    "value": "218",
+    "label": "Exceção de Pré-Executividade"
+  },
+  {
+    "value": "82400220",
+    "label": "Exceção de Suspeição"
+  },
+  {
+    "value": "82400180",
+    "label": "EXE.PROVISÓRIA/CUMPRIMENTO PROVISÓRIA DE SENTENÇA"
+  },
+  {
+    "value": "219",
+    "label": "Execução/Cumprimento de Sentença"
+  },
+  {
+    "value": "82400595",
+    "label": "Extinção de Processo"
+  },
+  {
+    "value": "36",
+    "label": "Extrato"
+  },
+  {
+    "value": "128",
+    "label": "Extrato da Ata"
+  },
+  {
+    "value": "174",
+    "label": "Fatura"
+  },
+  {
+    "value": "120",
+    "label": "Ficha do Réu/Prontuário"
+  },
+  {
+    "value": "39",
+    "label": "Ficha Financeira"
+  },
+  {
+    "value": "92",
+    "label": "Formal de Partilha"
+  },
+  {
+    "value": "86",
+    "label": "Formulários"
+  },
+  {
+    "value": "71",
+    "label": "Fotografia"
+  },
+  {
+    "value": "82400201",
+    "label": "Guia"
+  },
+  {
+    "value": "82400640",
+    "label": "Guia de Acolhimento de Criança e Adolescente"
+  },
+  {
+    "value": "82400268",
+    "label": "Guia de Acolhimento Institucional/Família"
+  },
+  {
+    "value": "82400641",
+    "label": "Guia de Atualização de Cálculo"
+  },
+  {
+    "value": "82400202",
+    "label": "Guia de Cálculo"
+  },
+  {
+    "value": "82400203",
+    "label": "Guia de Custas"
+  },
+  {
+    "value": "82400261",
+    "label": "Guia de Desacolhimento Institucional/Família"
+  },
+  {
+    "value": "82400188",
+    "label": "Guia de Execução Penal"
+  },
+  {
+    "value": "82400205",
+    "label": "Guia de Fiança"
+  },
+  {
+    "value": "82400642",
+    "label": "Guia de Internação"
+  },
+  {
+    "value": "82400643",
+    "label": "Guia de Internação Definitiva"
+  },
+  {
+    "value": "82400644",
+    "label": "Guia de Internação Provisória"
+  },
+  {
+    "value": "82400206",
+    "label": "Guia de Multa"
+  },
+  {
+    "value": "82400207",
+    "label": "Guia de Preparo"
+  },
+  {
+    "value": "278",
+    "label": "Guia de Recolhimento"
+  },
+  {
+    "value": "340",
+    "label": "Guia de Recolhimento da União - GRU"
+  },
+  {
+    "value": "220",
+    "label": "Guia de Recolhimento Provisória"
+  },
+  {
+    "value": "82400267",
+    "label": "Guia de Transferência"
+  },
+  {
+    "value": "82400183",
+    "label": "HABILITAÇÃO"
+  },
+  {
+    "value": "376",
+    "label": "Impugnação"
+  },
+  {
+    "value": "354",
+    "label": "Incidente de Uniformização de Jurisprudência"
+  },
+  {
+    "value": "82400603",
+    "label": "Indeferimento de Assistência Judiciária Gratuita"
+  },
+  {
+    "value": "17",
+    "label": "Informação"
+  },
+  {
+    "value": "82400646",
+    "label": "Informação (Informação)"
+  },
+  {
+    "value": "82400647",
+    "label": "Informação - Corregedoria"
+  },
+  {
+    "value": "82400653",
+    "label": "Informação da Revogação Total de Acompanhamento da"
+  },
+  {
+    "value": "82400648",
+    "label": "Informação de Revogação"
+  },
+  {
+    "value": "82400649",
+    "label": "Informação de Revogação Parcial"
+  },
+  {
+    "value": "82400650",
+    "label": "Informação de Revogação Parcial de Acompanhamento"
+  },
+  {
+    "value": "82400651",
+    "label": "Informação de Revogação Parcial de Mandado de Moni"
+  },
+  {
+    "value": "82400652",
+    "label": "Informação de Revogação Total"
+  },
+  {
+    "value": "82400654",
+    "label": "Informação de Revogação Total do Mandado de Monita"
+  },
+  {
+    "value": "82400645",
+    "label": "Informação Espelho da Base"
+  },
+  {
+    "value": "82400655",
+    "label": "Informação Processual"
+  },
+  {
+    "value": "50",
+    "label": "Informações (Outros)"
+  },
+  {
+    "value": "269",
+    "label": "Informações - Habeas Corpus"
+  },
+  {
+    "value": "487",
+    "label": "Informações Geográficas"
+  },
+  {
+    "value": "82400624",
+    "label": "Inicial da Execução"
+  },
+  {
+    "value": "101",
+    "label": "Inquérito Policial"
+  },
+  {
+    "value": "82400662",
+    "label": "Inspeção"
+  },
+  {
+    "value": "97",
+    "label": "Instrução Normativa"
+  },
+  {
+    "value": "2",
+    "label": "Instrumento de Procuração"
+  },
+  {
+    "value": "82400199",
+    "label": "Instrumento de Procuração Autor/Recorrente"
+  },
+  {
+    "value": "82400200",
+    "label": "Instrumento de Procuração Réu/Recorrido"
+  },
+  {
+    "value": "82400596",
+    "label": "Interlocutória"
+  },
+  {
+    "value": "82400699",
+    "label": "Internação disponibilizada"
+  },
+  {
+    "value": "82400663",
+    "label": "Interrogatório"
+  },
+  {
+    "value": "28",
+    "label": "Intimação"
+  },
+  {
+    "value": "111",
+    "label": "Intimação (Outros)"
+  },
+  {
+    "value": "82400625",
+    "label": "Intimação para Audiência de Instrução"
+  },
+  {
+    "value": "82400607",
+    "label": "Juízo de Admissibilidade"
+  },
+  {
+    "value": "306",
+    "label": "Juízo de Admissibilidade de Recurso Especial"
+  },
+  {
+    "value": "307",
+    "label": "Juízo de Admissibilidade de Recurso Extraordinário"
+  },
+  {
+    "value": "308",
+    "label": "Juízo de Admissibilidade de Recurso Ordinário"
+  },
+  {
+    "value": "82400610",
+    "label": "Juízo de Retratação"
+  },
+  {
+    "value": "33",
+    "label": "Laudo"
+  },
+  {
+    "value": "236",
+    "label": "Laudo de Perícia"
+  },
+  {
+    "value": "82400656",
+    "label": "Link para Acesso a Sala de Audiência Virtual"
+  },
+  {
+    "value": "82400657",
+    "label": "Malote Digital"
+  },
+  {
+    "value": "30",
+    "label": "Mandado"
+  },
+  {
+    "value": "126",
+    "label": "Mandado (Outros)"
+  },
+  {
+    "value": "82400236",
+    "label": "Mandado (Outros)"
+  },
+  {
+    "value": "82400288",
+    "label": "Mandado Afast/Int Aud. Outras Medidas Lei 11340/06"
+  },
+  {
+    "value": "82400276",
+    "label": "Mandado Busca e Apreensão C/A - Unid. Acolhimento"
+  },
+  {
+    "value": "82400284",
+    "label": "Mandado de Abrigamento"
+  },
+  {
+    "value": "82400285",
+    "label": "Mandado de Acompanhamento"
+  },
+  {
+    "value": "82400286",
+    "label": "Mandado de Afastamento"
+  },
+  {
+    "value": "82400287",
+    "label": "Mandado de Afastamento (Outros)"
+  },
+  {
+    "value": "82400289",
+    "label": "Mandado de Apreensão"
+  },
+  {
+    "value": "82400290",
+    "label": "Mandado de Apresentação de Criança e Adolescente"
+  },
+  {
+    "value": "82400291",
+    "label": "Mandado de Arrecadação"
+  },
+  {
+    "value": "82400292",
+    "label": "Mandado de Arresto"
+  },
+  {
+    "value": "82400237",
+    "label": "Mandado de Arresto (Outros)"
+  },
+  {
+    "value": "82400294",
+    "label": "Mandado de Arresto e Avaliação"
+  },
+  {
+    "value": "82400295",
+    "label": "Mandado de Arrolamento"
+  },
+  {
+    "value": "82400296",
+    "label": "Mandado de Atendimento Médico"
+  },
+  {
+    "value": "82400297",
+    "label": "Mandado de Avaliação"
+  },
+  {
+    "value": "82400238",
+    "label": "Mandado de Avaliação (Outros)"
+  },
+  {
+    "value": "82400299",
+    "label": "Mandado de Avaliação e Remoção"
+  },
+  {
+    "value": "82400300",
+    "label": "Mandado de Avaliação Indireta"
+  },
+  {
+    "value": "82400301",
+    "label": "Mandado de Averbação"
+  },
+  {
+    "value": "82400239",
+    "label": "Mandado de Averbação (Outros)"
+  },
+  {
+    "value": "82400303",
+    "label": "Mandado de Averbação de Sentença"
+  },
+  {
+    "value": "82400304",
+    "label": "Mandado de Averbação de Sentença em Registro Civil"
+  },
+  {
+    "value": "82400270",
+    "label": "Mandado de Averbação Destituição do Poder Familiar"
+  },
+  {
+    "value": "82400306",
+    "label": "Mandado de Averbação e Cancel. de Novo Registro"
+  },
+  {
+    "value": "82400305",
+    "label": "Mandado de Averbação Sentença Registro de Imóveis"
+  },
+  {
+    "value": "82400307",
+    "label": "Mandado de Averiguação"
+  },
+  {
+    "value": "82400308",
+    "label": "Mandado de Busca"
+  },
+  {
+    "value": "82400278",
+    "label": "Mandado de Busca de C/A para acolhimento"
+  },
+  {
+    "value": "82400309",
+    "label": "Mandado de Busca e Apreensão"
+  },
+  {
+    "value": "149",
+    "label": "Mandado de Busca e Apreensão (Outros)"
+  },
+  {
+    "value": "82400277",
+    "label": "Mandado de Busca e Apreensão C/A - Ent. Guardiões"
+  },
+  {
+    "value": "82400313",
+    "label": "Mandado de Busca e Apreensão C/A Ofic. de Justiça"
+  },
+  {
+    "value": "82400311",
+    "label": "Mandado de Busca e Apreensão Criança/Adolescente"
+  },
+  {
+    "value": "82400310",
+    "label": "Mandado de Busca e Apreensão de Autos"
+  },
+  {
+    "value": "82400240",
+    "label": "Mandado de Busca, Apreensão e Depósito"
+  },
+  {
+    "value": "82400312",
+    "label": "Mandado de Busca/Apreensão C/A Autorid. Policial"
+  },
+  {
+    "value": "82400314",
+    "label": "Mandado de Busca/Apreensão de Pessoa Ofic. Justiça"
+  },
+  {
+    "value": "82400351",
+    "label": "Mandado de Cancelamento - Interceptação Telemática"
+  },
+  {
+    "value": "82400271",
+    "label": "Mandado de Cancelamento de Registro de Nascimento"
+  },
+  {
+    "value": "82400347",
+    "label": "Mandado de Cancelamento Interceptação Telefônica"
+  },
+  {
+    "value": "147",
+    "label": "Mandado de Citação"
+  },
+  {
+    "value": "82400241",
+    "label": "Mandado de Citação (Outros)"
+  },
+  {
+    "value": "82400317",
+    "label": "Mandado de Citação e Separação de Corpos"
+  },
+  {
+    "value": "82400320",
+    "label": "Mandado de Citação Intimação e Manutenção de Posse"
+  },
+  {
+    "value": "82400318",
+    "label": "Mandado de Citação por Via Postal"
+  },
+  {
+    "value": "82400242",
+    "label": "Mandado de Citação, Intimação e Imissão na Posse"
+  },
+  {
+    "value": "82400243",
+    "label": "Mandado de Citação, Intimação e Manutenção de Posse"
+  },
+  {
+    "value": "82400321",
+    "label": "Mandado de Citação, Intimação, Penhora e Avaliação"
+  },
+  {
+    "value": "82400322",
+    "label": "Mandado de Citação, Penhora e Avaliação"
+  },
+  {
+    "value": "82400323",
+    "label": "Mandado de Comparecimento em Audiência Admonitória"
+  },
+  {
+    "value": "82400324",
+    "label": "Mandado de Complemento de Diligência e Informações"
+  },
+  {
+    "value": "386",
+    "label": "Mandado de Condução Coercitiva"
+  },
+  {
+    "value": "82400244",
+    "label": "Mandado de Condução Coercitiva"
+  },
+  {
+    "value": "82400245",
+    "label": "Mandado de Constatação"
+  },
+  {
+    "value": "82400326",
+    "label": "Mandado de Convocação"
+  },
+  {
+    "value": "82400327",
+    "label": "Mandado de Convocação (Outros)"
+  },
+  {
+    "value": "82400328",
+    "label": "Mandado de Convocação de Jurado"
+  },
+  {
+    "value": "82400329",
+    "label": "Mandado de Demarcação"
+  },
+  {
+    "value": "82400330",
+    "label": "Mandado de Depósito"
+  },
+  {
+    "value": "82400331",
+    "label": "Mandado de Desconto de Pensão Alimentícia"
+  },
+  {
+    "value": "82400332",
+    "label": "Mandado de Desinternação"
+  },
+  {
+    "value": "82400333",
+    "label": "Mandado de Desocupação"
+  },
+  {
+    "value": "82400335",
+    "label": "Mandado de Despejo"
+  },
+  {
+    "value": "82400336",
+    "label": "Mandado de Despejo (Outros)"
+  },
+  {
+    "value": "82400337",
+    "label": "Mandado de Despejo com Audiência Preliminar"
+  },
+  {
+    "value": "82400352",
+    "label": "Mandado de Determinação - interceptação Telemática"
+  },
+  {
+    "value": "82400348",
+    "label": "Mandado de Determinação interceptação Telefônica"
+  },
+  {
+    "value": "82400338",
+    "label": "Mandado de Encaminhamento"
+  },
+  {
+    "value": "82400339",
+    "label": "Mandado de Entrega"
+  },
+  {
+    "value": "82400340",
+    "label": "Mandado de Entrega (Outros)"
+  },
+  {
+    "value": "82400341",
+    "label": "Mandado de Entrega Bens Arrematados/Adjudicados"
+  },
+  {
+    "value": "82400246",
+    "label": "Mandado de Entrega de Bens Arrematados/Adjudicados"
+  },
+  {
+    "value": "82400342",
+    "label": "Mandado de Imissão na Posse"
+  },
+  {
+    "value": "82400247",
+    "label": "Mandado de Imissão na Posse (Outros)"
+  },
+  {
+    "value": "82400344",
+    "label": "Mandado de Imissão na Posse em Bens Móveis"
+  },
+  {
+    "value": "82400345",
+    "label": "Mandado de Interceptação"
+  },
+  {
+    "value": "82400346",
+    "label": "Mandado de Interceptação Telefônica"
+  },
+  {
+    "value": "82400350",
+    "label": "Mandado de Interceptação Telemática"
+  },
+  {
+    "value": "82400354",
+    "label": "Mandado de Internação"
+  },
+  {
+    "value": "82400436",
+    "label": "Mandado de Internação Definitiva"
+  },
+  {
+    "value": "82400437",
+    "label": "Mandado de Internação Provisória"
+  },
+  {
+    "value": "82400355",
+    "label": "Mandado de Intimação"
+  },
+  {
+    "value": "82400248",
+    "label": "Mandado de Intimação (Outros)"
+  },
+  {
+    "value": "82400249",
+    "label": "Mandado de Intimação de Audiência (Outros)"
+  },
+  {
+    "value": "82400372",
+    "label": "Mandado de Intimação de Audiência de Suposto Pai"
+  },
+  {
+    "value": "82400373",
+    "label": "Mandado de Intimação de Audiência de Terceiros"
+  },
+  {
+    "value": "82400250",
+    "label": "Mandado de Intimação de Audiência de Testemunhas"
+  },
+  {
+    "value": "82400357",
+    "label": "Mandado de Intimação de Hasta Pública"
+  },
+  {
+    "value": "82400358",
+    "label": "Mandado de Intimação de Medidas Protetivas"
+  },
+  {
+    "value": "82400359",
+    "label": "Mandado de Intimação de Sentença"
+  },
+  {
+    "value": "82400360",
+    "label": "Mandado de Intimação de Transação Penal"
+  },
+  {
+    "value": "82400361",
+    "label": "Mandado de Intimação e Notificação"
+  },
+  {
+    "value": "82400362",
+    "label": "Mandado de Intimação e Penhora"
+  },
+  {
+    "value": "82400363",
+    "label": "Mandado de Intimação e Penhora (Outros)"
+  },
+  {
+    "value": "82400366",
+    "label": "Mandado de Intimação e Reforço de Penhora"
+  },
+  {
+    "value": "82400367",
+    "label": "Mandado de Intimação e Reforço de Penhora (Outros)"
+  },
+  {
+    "value": "82400369",
+    "label": "Mandado de Intimação e Remoção"
+  },
+  {
+    "value": "82400370",
+    "label": "Mandado de Intimação para Audiência"
+  },
+  {
+    "value": "82400375",
+    "label": "Mandado de Intimação para Audiência Admonitória"
+  },
+  {
+    "value": "82400378",
+    "label": "Mandado de Intimação para Devolução de Autos"
+  },
+  {
+    "value": "82400379",
+    "label": "Mandado de Intimação para Perícia"
+  },
+  {
+    "value": "82400368",
+    "label": "Mandado de Intimação Reforço Penhora e Avaliação"
+  },
+  {
+    "value": "82400380",
+    "label": "Mandado de Intimação, Penhora e Avaliação"
+  },
+  {
+    "value": "82400381",
+    "label": "Mandado de intimação, Penhora e Avaliação (Outros)"
+  },
+  {
+    "value": "82400382",
+    "label": "Mandado de Intimação, Penhora, Avaliação e Remoção"
+  },
+  {
+    "value": "82400383",
+    "label": "Mandado de Lacramento"
+  },
+  {
+    "value": "82400384",
+    "label": "Mandado de Levantamento"
+  },
+  {
+    "value": "82400385",
+    "label": "Mandado de Manutenção"
+  },
+  {
+    "value": "82400386",
+    "label": "Mandado de Monitoramento Eletrônico"
+  },
+  {
+    "value": "82400387",
+    "label": "Mandado de Notificação"
+  },
+  {
+    "value": "82400251",
+    "label": "Mandado de Notificação (Outros)"
+  },
+  {
+    "value": "328",
+    "label": "Mandado de Notificação em Improbidade Administrativa"
+  },
+  {
+    "value": "82400389",
+    "label": "Mandado de Notificação para Bloqueio"
+  },
+  {
+    "value": "82400390",
+    "label": "Mandado de Ordem"
+  },
+  {
+    "value": "82400391",
+    "label": "Mandado de Ordem de Desinternação"
+  },
+  {
+    "value": "82400392",
+    "label": "Mandado de Ordem de Liberação"
+  },
+  {
+    "value": "82400253",
+    "label": "Mandado de Pagamento"
+  },
+  {
+    "value": "82400428",
+    "label": "Mandado de Penhora (Outros)"
+  },
+  {
+    "value": "66",
+    "label": "Mandado de Penhora de Créditos Bancários"
+  },
+  {
+    "value": "82400254",
+    "label": "Mandado de Penhora e Avaliação"
+  },
+  {
+    "value": "82400255",
+    "label": "Mandado de Penhora no Rosto dos Autos"
+  },
+  {
+    "value": "148",
+    "label": "Mandado de Prisão"
+  },
+  {
+    "value": "82400395",
+    "label": "Mandado de Prisão Domiciliar"
+  },
+  {
+    "value": "82400397",
+    "label": "Mandado de Prisão em Razão de Execução Penal"
+  },
+  {
+    "value": "82400399",
+    "label": "Mandado de Prisão em Razão de Execução Provisória"
+  },
+  {
+    "value": "82400400",
+    "label": "Mandado de Prisão Preventiva"
+  },
+  {
+    "value": "82400401",
+    "label": "Mandado de Prisão Temporária"
+  },
+  {
+    "value": "82400349",
+    "label": "Mandado de Prorrogação de Interceptação Telefônica"
+  },
+  {
+    "value": "82400353",
+    "label": "Mandado de Prorrogação de Interceptação Telemática"
+  },
+  {
+    "value": "82400402",
+    "label": "Mandado de Recambiamento"
+  },
+  {
+    "value": "82400403",
+    "label": "Mandado de Recolhimento"
+  },
+  {
+    "value": "82400431",
+    "label": "Mandado de Reforço de Penhora e Avaliação"
+  },
+  {
+    "value": "82400404",
+    "label": "Mandado de Registro"
+  },
+  {
+    "value": "82400405",
+    "label": "Mandado de Registro (Outros)"
+  },
+  {
+    "value": "82400273",
+    "label": "Mandado de Registro de Adoção"
+  },
+  {
+    "value": "82400406",
+    "label": "Mandado de Registro de Nascimento"
+  },
+  {
+    "value": "82400274",
+    "label": "Mandado de Registro de Nascimento e Adoção"
+  },
+  {
+    "value": "82400407",
+    "label": "Mandado de Registro de Óbito"
+  },
+  {
+    "value": "82400408",
+    "label": "Mandado de Registro de Penhora"
+  },
+  {
+    "value": "82400256",
+    "label": "Mandado de Reintegração de Posse"
+  },
+  {
+    "value": "82400410",
+    "label": "Mandado de Remoção"
+  },
+  {
+    "value": "82400411",
+    "label": "Mandado de Remoção (Outros)"
+  },
+  {
+    "value": "82400412",
+    "label": "Mandado de Remoção, Ref.de Penhora e Avaliação"
+  },
+  {
+    "value": "82400257",
+    "label": "Mandado de Restituição"
+  },
+  {
+    "value": "82400414",
+    "label": "Mandado de Retificação"
+  },
+  {
+    "value": "82400416",
+    "label": "Mandado de Retificação de Registro de Casamento"
+  },
+  {
+    "value": "82400417",
+    "label": "Mandado de Retificação de Registro de Nascimento"
+  },
+  {
+    "value": "82400418",
+    "label": "Mandado de Retificação de Registro de Óbito"
+  },
+  {
+    "value": "82400419",
+    "label": "Mandado de Retificação Registro Público (Outros)"
+  },
+  {
+    "value": "82400415",
+    "label": "Mandado de Retificação Registros Públicos"
+  },
+  {
+    "value": "82400420",
+    "label": "Mandado de Salvo Conduto"
+  },
+  {
+    "value": "82400421",
+    "label": "Mandado de Sequestro"
+  },
+  {
+    "value": "82400258",
+    "label": "Mandado de Sustação e Protesto"
+  },
+  {
+    "value": "82400423",
+    "label": "Mandado de Transcrição para o Livro"
+  },
+  {
+    "value": "34",
+    "label": "Mandado de Verificação"
+  },
+  {
+    "value": "82400424",
+    "label": "Mandado de Vistoria"
+  },
+  {
+    "value": "82400425",
+    "label": "Mandado de Vistoria de Imóvel"
+  },
+  {
+    "value": "82400426",
+    "label": "Mandado de Vistoria e Liberação de Bem"
+  },
+  {
+    "value": "82400365",
+    "label": "Mandado Int/Penh - Termo dos Autos Cumpr. Sentença"
+  },
+  {
+    "value": "82400364",
+    "label": "Mandado Int/Penh no Rosto dos Autos Cump. Sentença"
+  },
+  {
+    "value": "82400377",
+    "label": "Mandado Intimação - Audiência Penhora e Avaliação"
+  },
+  {
+    "value": "82400376",
+    "label": "Mandado Intimação Audiência de Partes e Advogados"
+  },
+  {
+    "value": "82400427",
+    "label": "Mandado Penhora"
+  },
+  {
+    "value": "82400394",
+    "label": "Mandado Prisão Civil - Falta Prestação Alimentícia"
+  },
+  {
+    "value": "82400396",
+    "label": "Mandado Prisão Razão de Conversão Pena Restritiva"
+  },
+  {
+    "value": "82400398",
+    "label": "Mandado Prisão Razão de Execução Penal Definitiva"
+  },
+  {
+    "value": "82400224",
+    "label": "Manifestação"
+  },
+  {
+    "value": "521",
+    "label": "Manifestação (Outras)"
+  },
+  {
+    "value": "82400701",
+    "label": "Manifestação -"
+  },
+  {
+    "value": "82400259",
+    "label": "Manifestação Comissariado"
+  },
+  {
+    "value": "520",
+    "label": "Manifestação da Contadoria"
+  },
+  {
+    "value": "238",
+    "label": "Manifestação da Defensoria Pública"
+  },
+  {
+    "value": "82400272",
+    "label": "Manifestação de Assistentes Sociais e Psicólogos"
+  },
+  {
+    "value": "240",
+    "label": "Manifestação do Ministério Público"
+  },
+  {
+    "value": "82400658",
+    "label": "Mapa de Documentação"
+  },
+  {
+    "value": "82400698",
+    "label": "Medicamento disponibilizado"
+  },
+  {
+    "value": "163",
+    "label": "Memorando"
+  },
+  {
+    "value": "82400659",
+    "label": "Memorando"
+  },
+  {
+    "value": "353",
+    "label": "Memoriais"
+  },
+  {
+    "value": "82400660",
+    "label": "Mídia"
+  },
+  {
+    "value": "339",
+    "label": "Movimento Processual"
+  },
+  {
+    "value": "277",
+    "label": "Nota (Outros)"
+  },
+  {
+    "value": "276",
+    "label": "Nota de Culpa"
+  },
+  {
+    "value": "75",
+    "label": "Nota Fiscal"
+  },
+  {
+    "value": "486",
+    "label": "Nota Técnica"
+  },
+  {
+    "value": "288",
+    "label": "Notas Taquigráficas"
+  },
+  {
+    "value": "346",
+    "label": "Notificação"
+  },
+  {
+    "value": "82400714",
+    "label": "OBJEÇÃO AO JULGAMENTO VIRTUAL"
+  },
+  {
+    "value": "43",
+    "label": "Ofício"
+  },
+  {
+    "value": "82400667",
+    "label": "Ofício (Ofício)"
+  },
+  {
+    "value": "82400234",
+    "label": "Ofício (Outros)"
+  },
+  {
+    "value": "82400669",
+    "label": "Ofício (Outros) - Ofício (Outros)"
+  },
+  {
+    "value": "82400670",
+    "label": "Ofício Comunicando Decisões"
+  },
+  {
+    "value": "82400671",
+    "label": "Ofício Enviando Informações"
+  },
+  {
+    "value": "58",
+    "label": "Ofício Requisitório de Precatório"
+  },
+  {
+    "value": "24",
+    "label": "Ofício Requisitório de RPV - Requisição de Pequeno Valor"
+  },
+  {
+    "value": "82400672",
+    "label": "Ofício Solicitando Informações"
+  },
+  {
+    "value": "82400673",
+    "label": "Ofício Solicitando Peças"
+  },
+  {
+    "value": "82400674",
+    "label": "Ofício-Circular"
+  },
+  {
+    "value": "82400664",
+    "label": "Oitiva de Testemunha"
+  },
+  {
+    "value": "82400182",
+    "label": "OPOSIÇÃO"
+  },
+  {
+    "value": "357",
+    "label": "Orçamento"
+  },
+  {
+    "value": "82400611",
+    "label": "Ordem de Habeas Corpus"
+  },
+  {
+    "value": "313",
+    "label": "Outras Peças"
+  },
+  {
+    "value": "11",
+    "label": "Outros Documentos"
+  },
+  {
+    "value": "272",
+    "label": "PARECER"
+  },
+  {
+    "value": "309",
+    "label": "Parecer Técnico"
+  },
+  {
+    "value": "334",
+    "label": "Peça de Informação"
+  },
+  {
+    "value": "382",
+    "label": "Pedido de Arquivamento"
+  },
+  {
+    "value": "118",
+    "label": "Pedido de Assistência jurídica"
+  },
+  {
+    "value": "82100001",
+    "label": "Pedido de Desbloqueio Penhora Online/Sisbajud"
+  },
+  {
+    "value": "82400229",
+    "label": "Pedido de Desistência"
+  },
+  {
+    "value": "82400214",
+    "label": "Pedido de Desistência da Ação"
+  },
+  {
+    "value": "82400215",
+    "label": "Pedido de Desistência da Execução"
+  },
+  {
+    "value": "82400216",
+    "label": "Pedido de Desistência do Recurso"
+  },
+  {
+    "value": "82100002",
+    "label": "Pedido de Expedição de Alvará"
+  },
+  {
+    "value": "82400208",
+    "label": "Pedido de Habilitação"
+  },
+  {
+    "value": "293",
+    "label": "Pedido de liberdade provisória"
+  },
+  {
+    "value": "377",
+    "label": "Pedido de liminar/antecipação de tutela"
+  },
+  {
+    "value": "82400198",
+    "label": "Pedido de prioridade de tramitação"
+  },
+  {
+    "value": "378",
+    "label": "Pedido de reconsideração de decisão"
+  },
+  {
+    "value": "82400197",
+    "label": "Pedido de retirada de pauta"
+  },
+  {
+    "value": "381",
+    "label": "Pedido de suspensão condicional do processo"
+  },
+  {
+    "value": "82100003",
+    "label": "Pedido de suspensão do processo"
+  },
+  {
+    "value": "380",
+    "label": "Pedido de transação penal"
+  },
+  {
+    "value": "347",
+    "label": "Perfil Profissiográfico Previdenciário"
+  },
+  {
+    "value": "318",
+    "label": "Perícia"
+  },
+  {
+    "value": "13",
+    "label": "Petição"
+  },
+  {
+    "value": "82400209",
+    "label": "Petição de Habilitação"
+  },
+  {
+    "value": "1",
+    "label": "Petição Inicial"
+  },
+  {
+    "value": "391",
+    "label": "Petição Inicial (Outras)"
+  },
+  {
+    "value": "37",
+    "label": "Planilha (outros)"
+  },
+  {
+    "value": "207",
+    "label": "Planilha de Cálculo"
+  },
+  {
+    "value": "518",
+    "label": "Planilha de custas"
+  },
+  {
+    "value": "82400612",
+    "label": "Plano Individual de Atendimento"
+  },
+  {
+    "value": "23",
+    "label": "Portaria"
+  },
+  {
+    "value": "161",
+    "label": "Primeiras Declarações"
+  },
+  {
+    "value": "224",
+    "label": "Prisão em Flagrante"
+  },
+  {
+    "value": "61",
+    "label": "Processo Administrativo"
+  },
+  {
+    "value": "332",
+    "label": "Projeto"
+  },
+  {
+    "value": "82100006",
+    "label": "PROJETO DE SENTENÇA"
+  },
+  {
+    "value": "31",
+    "label": "Promoção MP/Pedido de Arquivamento"
+  },
+  {
+    "value": "84",
+    "label": "Prontuário"
+  },
+  {
+    "value": "82400613",
+    "label": "Pronúncia"
+  },
+  {
+    "value": "304",
+    "label": "Proposta de Acordo"
+  },
+  {
+    "value": "5",
+    "label": "Protocolo (outros)"
+  },
+  {
+    "value": "82400185",
+    "label": "Protocolo de Distribuição"
+  },
+  {
+    "value": "82400529",
+    "label": "Protocolo Sisbajud"
+  },
+  {
+    "value": "82400700",
+    "label": "Prova Emprestada"
+  },
+  {
+    "value": "95",
+    "label": "Quadro Resumo do Pedido"
+  },
+  {
+    "value": "489",
+    "label": "Questão de Ordem"
+  },
+  {
+    "value": "407",
+    "label": "Razões"
+  },
+  {
+    "value": "290",
+    "label": "Recebimento da Denúncia"
+  },
+  {
+    "value": "82400432",
+    "label": "Recebimento de Mandado"
+  },
+  {
+    "value": "82400675",
+    "label": "Recebimento de Ofício"
+  },
+  {
+    "value": "83",
+    "label": "Receita"
+  },
+  {
+    "value": "281",
+    "label": "Recibo"
+  },
+  {
+    "value": "82400217",
+    "label": "Reclamação"
+  },
+  {
+    "value": "250",
+    "label": "Reconvenção"
+  },
+  {
+    "value": "35",
+    "label": "Recurso"
+  },
+  {
+    "value": "253",
+    "label": "Recurso em Sentido Estrito"
+  },
+  {
+    "value": "248",
+    "label": "Recurso Especial"
+  },
+  {
+    "value": "249",
+    "label": "Recurso Extraordinário"
+  },
+  {
+    "value": "355",
+    "label": "Recurso Inominado"
+  },
+  {
+    "value": "301",
+    "label": "Recurso Ordinário"
+  },
+  {
+    "value": "82400614",
+    "label": "Reexame de Matéria Repetitiva"
+  },
+  {
+    "value": "287",
+    "label": "Registro de Ocorrência"
+  },
+  {
+    "value": "136",
+    "label": "Relatório"
+  },
+  {
+    "value": "410",
+    "label": "Relatório de Investigações"
+  },
+  {
+    "value": "82400711",
+    "label": "RELATÓRIO EM ESTUDO SOCIAL"
+  },
+  {
+    "value": "162",
+    "label": "Relatório Final"
+  },
+  {
+    "value": "82400262",
+    "label": "Relatório Psicológico"
+  },
+  {
+    "value": "82400260",
+    "label": "Relatório Psicossocial"
+  },
+  {
+    "value": "82400263",
+    "label": "Relatório Social"
+  },
+  {
+    "value": "88",
+    "label": "Renúncia"
+  },
+  {
+    "value": "251",
+    "label": "Renúncia de Mandato"
+  },
+  {
+    "value": "82400195",
+    "label": "Renúncia de Prazo"
+  },
+  {
+    "value": "320",
+    "label": "Réplica"
+  },
+  {
+    "value": "411",
+    "label": "Representação - Ato Infracional"
+  },
+  {
+    "value": "252",
+    "label": "Requerimento (Outros)"
+  },
+  {
+    "value": "82400615",
+    "label": "Requisição/Solicitação Judicial"
+  },
+  {
+    "value": "341",
+    "label": "Resolução"
+  },
+  {
+    "value": "379",
+    "label": "Resposta"
+  },
+  {
+    "value": "324",
+    "label": "Rol de Testemunhas"
+  },
+  {
+    "value": "117",
+    "label": "Salvo-Conduto"
+  },
+  {
+    "value": "14",
+    "label": "Sentença"
+  },
+  {
+    "value": "364",
+    "label": "Sentença (Outras)"
+  },
+  {
+    "value": "82400563",
+    "label": "Sentença (Outras) - Sentença de Mérito - Divórcio/"
+  },
+  {
+    "value": "82400616",
+    "label": "Sentença Normativa"
+  },
+  {
+    "value": "485",
+    "label": "SERASAJUD"
+  },
+  {
+    "value": "82400665",
+    "label": "Sessão de Julgamento"
+  },
+  {
+    "value": "82400279",
+    "label": "Sindicância - Infância e Juventude"
+  },
+  {
+    "value": "412",
+    "label": "Sisbajud"
+  },
+  {
+    "value": "98",
+    "label": "Solicitação de Honorários de Perito"
+  },
+  {
+    "value": "82400702",
+    "label": "SPC"
+  },
+  {
+    "value": "254",
+    "label": "Substabelecimento do Autor/Recorrente"
+  },
+  {
+    "value": "26",
+    "label": "Substabelecimento do Autor/Recorrente com Reserva"
+  },
+  {
+    "value": "243",
+    "label": "Substabelecimento do Autor/Recorrente sem Reserva"
+  },
+  {
+    "value": "255",
+    "label": "Substabelecimento do Réu /Recorrido"
+  },
+  {
+    "value": "374",
+    "label": "Substabelecimento do Réu/Recorrido com Reserva"
+  },
+  {
+    "value": "375",
+    "label": "Substabelecimento do Réu/Recorrido sem Reserva"
+  },
+  {
+    "value": "369",
+    "label": "Súmula"
+  },
+  {
+    "value": "82400666",
+    "label": "Sustentação Oral"
+  },
+  {
+    "value": "356",
+    "label": "Termo"
+  },
+  {
+    "value": "164",
+    "label": "Termo Circunstanciado"
+  },
+  {
+    "value": "121",
+    "label": "Termo de Abertura/Encerramento"
+  },
+  {
+    "value": "82400564",
+    "label": "Termo de Acordo de Homologação de Acordo Divórcio/"
+  },
+  {
+    "value": "122",
+    "label": "Termo de Adjudicação"
+  },
+  {
+    "value": "106",
+    "label": "Termo de Audiência"
+  },
+  {
+    "value": "222",
+    "label": "Termo de Audiência (Outros)"
+  },
+  {
+    "value": "82400713",
+    "label": "TERMO DE AUDIÊNCIA C/ PROJETO DE SENTENÇA"
+  },
+  {
+    "value": "112",
+    "label": "Termo de Caução"
+  },
+  {
+    "value": "82400194",
+    "label": "Termo de ciência"
+  },
+  {
+    "value": "125",
+    "label": "Termo de Comparecimento"
+  },
+  {
+    "value": "82400227",
+    "label": "Termo de Compensação de Débito Tributário"
+  },
+  {
+    "value": "130",
+    "label": "Termo de Compromisso"
+  },
+  {
+    "value": "115",
+    "label": "Termo de Compromisso de Fiel Depositário"
+  },
+  {
+    "value": "72",
+    "label": "Termo de Curatela"
+  },
+  {
+    "value": "160",
+    "label": "Termo de Declaração de Testemunha"
+  },
+  {
+    "value": "123",
+    "label": "Termo de Depósito"
+  },
+  {
+    "value": "350",
+    "label": "Termo de Desconstituição de Penhora"
+  },
+  {
+    "value": "131",
+    "label": "Termo de Fiança"
+  },
+  {
+    "value": "82400281",
+    "label": "Termo de Guarda - Infância e Juventude"
+  },
+  {
+    "value": "113",
+    "label": "Termo de Penhora"
+  },
+  {
+    "value": "138",
+    "label": "Termo de Publicação"
+  },
+  {
+    "value": "139",
+    "label": "Termo de Remessa"
+  },
+  {
+    "value": "280",
+    "label": "Termo de Restituição"
+  },
+  {
+    "value": "110",
+    "label": "Termo de Transcrição de Depoimento"
+  },
+  {
+    "value": "78",
+    "label": "Título de Eleitor"
+  },
+  {
+    "value": "175",
+    "label": "Título Judicial"
+  },
+  {
+    "value": "335",
+    "label": "Tradução"
+  },
+  {
+    "value": "82400218",
+    "label": "Tutela antecipada"
+  },
+  {
+    "value": "305",
+    "label": "Vídeo Probatório"
+  },
+  {
+    "value": "20",
+    "label": "Voto"
+  },
+  {
+    "value": "82400686",
+    "label": "Voto Divergente - TR"
+  },
+  {
+    "value": "384",
+    "label": "Voto Vista"
+  }
+]

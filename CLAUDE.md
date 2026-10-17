@@ -185,8 +185,10 @@ existem em nenhum outro arquivo do projeto:
   (decisoes.md#D-38).
 - **Nota** — texto livre no quadro, que cita regras pelo número. Não vai ao
   Eproc nem ao checklist (decisoes.md#D-38).
-- **Conjunto de eventos** — atalho para selecionar e ler eventos da regra de ATP;
-  o plano continua gravando os eventos um a um (decisoes.md#D-29).
+- **Conjunto** — atalho para selecionar e ler eventos, tipos de petição ou
+  documentos da regra de ATP; o plano continua gravando os códigos um a um
+  (decisoes.md#D-29, D-41). "Todos − x, y, z" quando o que fica de fora cabe em
+  até 5 peças.
 - **Consulta salva** — filtro com nome salvo numa tela de relatório do Eproc (que
   o Eproc chama de preferência da tela). Coletada só pelo nome (decisoes.md#D-32).
 - **Fila de trabalho** — o que um setor abre no Eproc para saber o que fazer: uma
@@ -326,7 +328,9 @@ opcionais, como no D-23:
   (`CAMPOS_DE_TELA` em `features/canvas/store.ts`) — sem isso todo clique
   regravaria o plano.
 - Ações preferenciais planejadas e ATP manual no painel do nó (D-28).
-- Conjuntos de eventos na regra de ATP (D-29), em `features/eventos/`.
+- Conjuntos de eventos na regra de ATP (D-29), estendidos a tipos de petição e
+  documentos (D-41), em `features/conjuntos/`. O catálogo de documentos
+  (`selControleDocumentoMultiplo`) entrou no build com o D-41.
 - Atalho de localizador (D-30) e grupos (D-31). As molduras ficam em
   `CanvasState.grupos`, **fora** de `nodes`: o resto do app lê `nodes` como "os
   localizadores". O `ReactFlowProvider` envolve também o painel lateral.

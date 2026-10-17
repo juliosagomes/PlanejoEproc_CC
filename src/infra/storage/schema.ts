@@ -3,7 +3,7 @@ import {
   ANOTACOES_CATALOGO_VERSION,
   CATALOGO_ORGAO_VERSION,
   CATALOGO_UNIDADE_VERSION,
-  CONJUNTOS_EVENTO_VERSION,
+  CONJUNTOS_VERSION,
   CORES_FLAG,
   DESCARTE_VERSION,
   EFEITOS_SEM_MOVER,
@@ -20,7 +20,7 @@ import {
   type AnotacoesCatalogo,
   type CatalogoOrgao,
   type CatalogoUnidade,
-  type ConjuntosEventoUnidade,
+  type ConjuntosUnidade,
   type ConsultaSalvaUnidade,
   type DefinicaoFlag,
   type DestinosDescarteUnidade,
@@ -127,11 +127,11 @@ export const DestinosDescarteUnidadeSchema = z.object({
   nomes: z.array(z.string()),
 }) satisfies z.ZodType<DestinosDescarteUnidade>;
 
-/** Conjuntos de eventos criados pelo usuário (decisoes.md#D-29). Chave por escopo, como os setores. */
-export const ConjuntosEventoUnidadeSchema = z.object({
-  version: z.literal(CONJUNTOS_EVENTO_VERSION),
+/** Conjuntos criados pelo usuário (decisoes.md#D-29, D-41). Chave por escopo e por catálogo, como os setores. */
+export const ConjuntosUnidadeSchema = z.object({
+  version: z.literal(CONJUNTOS_VERSION),
   itens: z.array(z.object({ id: z.string(), rotulo: z.string(), ids: z.array(z.string()) })),
-}) satisfies z.ZodType<ConjuntosEventoUnidade>;
+}) satisfies z.ZodType<ConjuntosUnidade>;
 
 /* ---------------------------------------------------------------------------
  * Regra de ATP — espelho da tela de cadastro do Eproc (decisoes.md#D-27).

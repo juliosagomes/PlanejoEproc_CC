@@ -5,9 +5,8 @@ import {
   type TipoControle,
   type TipoDataControle,
 } from '@/domain';
-import { POLOS_PETICAO, STATUS_PROCESSO, TIPOS_PETICAO } from '@/data';
-import { CatalogMulti } from '@/components/CatalogMulti';
-import { EventosMulti } from '@/features/eventos/components/EventosMulti';
+import { POLOS_PETICAO, STATUS_PROCESSO } from '@/data';
+import { SeletorComConjuntos } from '@/features/conjuntos/components/SeletorComConjuntos';
 import { Field } from './pecas';
 
 /* ============================================================================
@@ -175,7 +174,8 @@ export function GatilhoCampos({ trigger, setTrigger }: GatilhoCamposProps) {
         <>
           {(t.tipo === 'A' || t.tipo === 'E') && (
             <Field label="Evento">
-              <EventosMulti
+              <SeletorComConjuntos
+                catalogo="eventos"
                 values={t.eventoIds ?? []}
                 onChange={(ids) => setTrigger({ ...t, eventoIds: ids })}
                 ariaLabel="Eventos do gatilho"
@@ -184,26 +184,20 @@ export function GatilhoCampos({ trigger, setTrigger }: GatilhoCamposProps) {
           )}
           {(t.tipo === 'A' || t.tipo === 'P') && (
             <Field label={t.tipo === 'A' ? 'Tipo de Petição' : 'Petição'}>
-              <CatalogMulti
+              <SeletorComConjuntos
+                catalogo="tiposPeticao"
                 values={t.peticaoTipoIds ?? []}
-                options={TIPOS_PETICAO}
                 onChange={(ids) => setTrigger({ ...t, peticaoTipoIds: ids })}
-                placeholder="Buscar tipo de petição…"
                 ariaLabel="Tipos de petição do gatilho"
               />
             </Field>
           )}
           {t.tipo === 'A' && (
-            <Field
-              label="Documento"
-              ajuda="O catálogo de tipos de documento do Eproc não vem embutido: digite o nome e tecle Enter."
-            >
-              <CatalogMulti
+            <Field label="Documento">
+              <SeletorComConjuntos
+                catalogo="documentos"
                 values={t.documentos ?? []}
-                options={[]}
-                onChange={(nomes) => setTrigger({ ...t, documentos: nomes })}
-                criavel
-                placeholder="Tipo de documento…"
+                onChange={(ids) => setTrigger({ ...t, documentos: ids })}
                 ariaLabel="Tipos de documento do gatilho"
               />
             </Field>

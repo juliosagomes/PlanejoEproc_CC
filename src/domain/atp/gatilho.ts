@@ -76,7 +76,11 @@ export type AtpTrigger =
       tipo: 'A';
       eventoIds?: string[];
       peticaoTipoIds?: string[];
-      /** Tipos de documento, por nome — o catálogo (760 itens) não é embutido. */
+      /**
+       * Tipos de documento, por código de `selControleDocumentoMultiplo`
+       * (decisoes.md#D-41). Antes eram nomes digitados; um nome antigo continua
+       * aparecendo como veio.
+       */
       documentos?: string[];
       /** "Restringir petições ou documentos de" — código de `selSinPoloPeticao`. */
       restringirA?: string;
