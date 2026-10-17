@@ -1227,8 +1227,8 @@ seletor ("Processo", "Partes"…) não existem no Eproc: são só organização.
   por decisão; entra quando alguém exportar a lista.
 
 **Deliberadamente não modelado.** *Aplicar regra em processo específico* (número
-de processo é dado real, não plano); múltiplos localizadores de origem ou destino
-(o grafo já expressa: são mais arestas); grupo e prioridade da regra (são da
+de processo é dado real, não plano); ~~múltiplos localizadores de origem ou destino
+(o grafo já expressa: são mais arestas)~~ — entraram no D-42; grupo e prioridade da regra (são da
 listagem, não do cadastro).
 
 **"Nome da regra" continua**, embora o Eproc identifique a regra por número: o
@@ -1999,6 +1999,44 @@ usar o catálogo, ele vira lista de códigos com migração. Se outro catálogo
 grande pedir conjuntos (classes, assuntos), basta acrescentá-lo a
 `CATALOGOS_COM_CONJUNTO` e escrever as regras: o seletor, o painel, o checklist
 e o armazenamento já são genéricos.
+
+---
+
+## D-42 · Vários localizadores de origem e de destino na mesma regra de ATP
+
+> **Revê parte do [D-27](#d-27--a-regra-de-atp-espelha-a-tela-de-cadastro-do-eproc)**,
+> que deixava isso de fora porque "o grafo já expressa: são mais arestas".
+
+**Decisão.** O "Detalhar ATP" aceita **outros** localizadores de origem e de
+destino, além das pontas da aresta. Com duas ou mais origens, aparece a condição
+"OU"/"E" entre elas (`selOpcaoMultiplosLocalizadores`). Os outros localizadores
+ficam na `AtpRule` (`outrasOrigens`, `outrosDestinos`, `opcaoMultiplosLocalizadores`),
+por nome, e **não** desenham seta.
+
+**Por que.** No Eproc isso é **uma** regra. Desenhar uma seta para cada origem
+obrigava a repetir o detalhamento em cada uma, e o checklist listava N regras para
+cadastrar onde há uma só. Além disso, com a condição "E" as setas mentiam: elas
+dizem que o processo sai de qualquer uma das origens, e a regra só pega quem está
+em todas.
+
+**A ponta da aresta continua sendo a primeira** de cada lista, fixa no modal: é o
+que a seta mostra. Os outros são texto com sugestão (plano aberto e catálogo
+sincronizado), como os localizadores dos filtros, e aceitam localizador que ainda
+não existe. O checklist e os mapas descritivos mostram "Outros localizadores
+ORIGEM/DESTINO" nos detalhes; o contexto da linha continua "origem → destino".
+
+**Sem bump de schema.** Os três campos são opcionais, como no D-23. Um build
+anterior abre o plano, mas descarta esses campos ao gravar.
+
+**Custo assumido.** O rótulo do select da condição ("Opção para múltiplos
+localizadores") não foi levantado na tela, ao contrário das opções, que vêm de
+`listas_json/`. Renomear um localizador do plano não atualiza os nomes guardados
+nas outras origens ou destinos, como já acontece nas filas do painel.
+
+**O que precisaria mudar para evoluir.** Se os outros localizadores precisarem
+aparecer no quadro, eles podem ganhar um selo na seta ("+2"), ou setas
+secundárias derivadas que não se editam. Se o renomear incomodar, passar a guardar
+o id do nó quando o nome bate com um localizador do plano.
 
 ---
 

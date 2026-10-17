@@ -1,5 +1,6 @@
 import {
   COMPORTAMENTOS_ORIGEM,
+  OPCOES_MULTIPLOS_LOCALIZADORES,
   DIAS_SEMANA,
   TIPOS_DATA_CONTROLE,
   acaoProgramadaDef,
@@ -202,6 +203,23 @@ function detalheAcao(acao: AcaoProgramada, rotulo: string): DetalheRegra | undef
 
 export function detalhesAtp(rule: AtpRule): DetalheRegra[] {
   const out: DetalheRegra[] = [];
+
+  // As pontas da aresta já estão no contexto da linha ("origem → destino");
+  // aqui entram só os outros localizadores da mesma regra (decisoes.md#D-42).
+  const outrasOrigens = (rule.outrasOrigens ?? []).filter((n) => n.trim());
+  if (outrasOrigens.length > 0) {
+    out.push({ label: 'Outros localizadores ORIGEM', valor: outrasOrigens.join(', ') });
+    if (rule.opcaoMultiplosLocalizadores) {
+      out.push({
+        label: 'Opção para múltiplos localizadores',
+        valor: rotular(OPCOES_MULTIPLOS_LOCALIZADORES, rule.opcaoMultiplosLocalizadores),
+      });
+    }
+  }
+  const outrosDestinos = (rule.outrosDestinos ?? []).filter((n) => n.trim());
+  if (outrosDestinos.length > 0) {
+    out.push({ label: 'Outros localizadores DESTINO', valor: outrosDestinos.join(', ') });
+  }
 
   if (rule.comportamentoOrigem) {
     out.push({

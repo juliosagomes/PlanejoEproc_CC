@@ -383,6 +383,9 @@ opcionais, como no D-23:
   do plano muda ao importar; `resolverOutroPlano` acha pelos dois, e o
   `FlowCanvas` regrava quando acha por nome. Os outros planos vêm de
   `features/canvas/outrosPlanos.ts`, com cache pelo `atualizadoEm` do índice.
+- Vários localizadores de origem e destino numa regra de ATP (D-42): a ponta
+  da aresta é a primeira de cada lista, e os outros moram em
+  `AtpRule.outrasOrigens`/`outrosDestinos`, por nome, sem desenhar seta.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.
