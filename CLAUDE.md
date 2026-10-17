@@ -359,6 +359,14 @@ opcionais, como no D-23:
   aresta comum. Destinos de descarte em `features/descarte/`, chave `descarte`
   por silo. A regra pendurada entra **sempre** no checklist, sem "Implantar".
   O assistente que converte nós sem nome em notas ficou para depois.
+- Mapas descritivos (D-39), da demo 08: terceira tela ao lado de "Fluxo |
+  Painel da unidade", em `features/mapas/`. Uma chave por mapa (`mapa:<id>`) e
+  um índice, por silo. A menção (@) guarda só a referência, e o texto é
+  recalculado contra a unidade e os planos. O desenho em papel é retrato com
+  assinatura, e o editor de documento é `contenteditable` sem dependência. Todo
+  HTML lido passa por `sanitizar.ts`. As folhas são `.papel`, com tokens `--p-*`
+  fixos, iguais nos dois temas, porque papel não tem modo escuro. Mapas ainda
+  não vão no "Salvar cópia" nem no servidor.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.
