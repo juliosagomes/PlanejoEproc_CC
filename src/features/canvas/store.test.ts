@@ -760,6 +760,30 @@ describe('atalhos (D-30)', () => {
   });
 });
 
+describe('atalho para outro plano (D-40)', () => {
+  it('nasce sem destino, selecionado, e a referência se atualiza só nos atalhos', () => {
+    const a = useCanvasStore.getState().createNode({ x: 0, y: 0 });
+    const x = useCanvasStore.getState().criarAtalhoOutroPlano({ x: 50, y: 60 });
+    const no = () => useCanvasStore.getState().nodes.find((n) => n.id === x);
+    expect(no()?.data.atalhoOutroPlano).toEqual({ planoId: '', noId: '', planoNome: '', nome: '' });
+    expect(no()?.position).toEqual({ x: 50, y: 60 });
+    expect(useCanvasStore.getState().selectedId).toBe(x);
+
+    const ref = { planoId: 'p', noId: 'n', planoNome: 'Execuções', nome: 'Ag. Prazo' };
+    useCanvasStore.getState().atualizarRefsOutroPlano({ [x]: ref, [a]: ref });
+    expect(no()?.data.atalhoOutroPlano).toEqual(ref);
+    expect(useCanvasStore.getState().nodes.find((n) => n.id === a)?.data.atalhoOutroPlano).toBeUndefined();
+  });
+
+  it('em visualização não cria nem regrava', () => {
+    const x = useCanvasStore.getState().criarAtalhoOutroPlano({ x: 0, y: 0 });
+    useCanvasStore.setState({ somenteLeitura: true });
+    expect(useCanvasStore.getState().criarAtalhoOutroPlano({ x: 0, y: 0 })).toBe('');
+    useCanvasStore.getState().atualizarRefsOutroPlano({ [x]: { planoId: 'p', noId: 'n', planoNome: 'P', nome: 'N' } });
+    expect(useCanvasStore.getState().nodes.find((n) => n.id === x)?.data.atalhoOutroPlano?.planoId).toBe('');
+  });
+});
+
 describe('grupos (D-31)', () => {
   const montar = () => {
     const s = useCanvasStore.getState();

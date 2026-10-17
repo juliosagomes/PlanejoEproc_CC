@@ -1,6 +1,7 @@
 import {
   chaveMencaoAtp,
   chaveMencaoNome,
+  ehAtalho,
   type CatalogoUnidade,
   type DefinicaoFlag,
   type Plano,
@@ -143,7 +144,7 @@ function lerUnidade(unidade: CatalogoUnidade | null, cat: CatalogoMencoes): void
 function lerPlano({ id: planoId, plano }: PlanoComId, setores: readonly DefinicaoFlag[], cat: CatalogoMencoes): void {
   const nome = (id: string) => nomeDoNo(plano, id);
   for (const n of plano.nodes) {
-    if (n.data.atalhoPara || !n.data.nome.trim()) continue;
+    if (ehAtalho(n) || !n.data.nome.trim()) continue;
     const chaveLoc = chaveMencaoNome(n.data.nome);
     cat.locPorNo.set(`${planoId}/${n.id}`, chaveLoc);
     const info = obter(cat.locs, chaveLoc, () => ({

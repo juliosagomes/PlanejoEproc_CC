@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Icon } from '@/components/Icon';
-import type { BlocoFluxo } from '@/domain';
+import { ehAtalho, type BlocoFluxo } from '@/domain';
 import { useSetoresStore } from '@/features/setores/store';
 import { getAtivoId, listPlanos } from '@/infra/storage';
 import { desenharBloco, nomeDoNo } from '../fluxoPapel';
@@ -18,7 +18,7 @@ export function DialogoInserirFluxo({ onInserir, onFechar }: Props) {
   const [planoId, setPlanoId] = useState(() => getAtivoId() ?? planos[0]?.id ?? '');
   const plano = useMemo(() => (planoId ? planoPorId(planoId) : null), [planoId]);
   const locs = useMemo(
-    () => (plano ? plano.nodes.filter((n) => !n.data.atalhoPara).sort((a, b) => a.position.x - b.position.x || a.position.y - b.position.y) : []),
+    () => (plano ? plano.nodes.filter((n) => !ehAtalho(n)).sort((a, b) => a.position.x - b.position.x || a.position.y - b.position.y) : []),
     [plano],
   );
   const [marcados, setMarcados] = useState<Set<string>>(new Set());

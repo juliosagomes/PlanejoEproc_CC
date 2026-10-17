@@ -1,4 +1,4 @@
-import { nomeEfetivo } from './atalhos';
+import { nomeEfetivo, rotuloOutroPlano } from './atalhos';
 import type { CorFlag } from './flags';
 import type { Position } from './plano';
 import { nomeEntrada, type EntradaEvento } from './quadro';
@@ -106,7 +106,8 @@ export function reagruparSoltos(
 /**
  * Nome de uma ponta de aresta. A seta pode chegar no grupo, e não num
  * localizador dele: aí a ponta é a moldura, e o nome vem do rótulo. E pode
- * sair de uma entrada por evento (D-38).
+ * sair de uma entrada por evento (D-38). A ponta que é atalho para outro plano
+ * leva o plano no nome (D-40): a transição é deste plano, o destino não.
  */
 export function nomeDaPonta(
   nodes: Parameters<typeof nomeEfetivo>[0],
@@ -117,6 +118,9 @@ export function nomeDaPonta(
   const entrada = entradas.find((e) => e.id === id);
   if (entrada) return nomeEntrada(entrada.rotulo);
   const grupo = grupos.find((g) => g.id === id);
-  if (!grupo) return nomeEfetivo(nodes, id);
+  if (!grupo) {
+    const externo = nodes.find((n) => n.id === id)?.data.atalhoOutroPlano;
+    return externo ? rotuloOutroPlano(externo) : nomeEfetivo(nodes, id);
+  }
   return `Grupo "${grupo.rotulo.trim() || 'sem nome'}"`;
 }

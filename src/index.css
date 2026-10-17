@@ -764,6 +764,27 @@ body {
     background: var(--perigo-suave);
     color: var(--perigo);
   }
+  /* Atalho para outro plano (D-40): tracejado em vez de pontilhado, e o plano em cima do nome. */
+  .pj-atalho-externo {
+    border-style: dashed;
+    height: auto;
+    min-height: 34px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .pj-atalho-texto {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.2;
+  }
+  .pj-atalho-plano {
+    font-size: 10px;
+    font-weight: 500;
+    opacity: 0.8;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .react-flow__node.pj-gemeo .pj-atalho {
     box-shadow: 0 0 0 3px var(--realce-gemeo);
     border-color: var(--aviso);

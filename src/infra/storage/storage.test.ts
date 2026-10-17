@@ -217,6 +217,18 @@ describe('savePlano lazy-cria entrada no índice', () => {
     ]);
   });
 
+  it('round-trip preserva o atalho para outro plano (D-40)', () => {
+    const original = planoExemplo();
+    const [no] = original.nodes;
+    if (!no) throw new Error('fixture sem nó');
+    const ref = { planoId: 'p2', noId: 'n9', planoNome: 'Execuções', nome: 'Ag. Prazo' };
+    no.data.atalhoOutroPlano = ref;
+
+    savePlano(original);
+
+    expect(loadPlano().nodes[0]?.data.atalhoOutroPlano).toEqual(ref);
+  });
+
   // `z.number()` sozinho barra NaN mas deixa passar Infinity, que viraria uma
   // coordenada de path inválida. Um plano assim é dado corrompido: vai para o
   // backup e o app abre vazio, em vez de desenhar lixo.

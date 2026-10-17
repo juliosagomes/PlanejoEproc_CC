@@ -7,6 +7,7 @@ import { useDescarteStore } from '@/features/descarte/store';
 import { cn } from '@/utils/cn';
 import { useCanvasStore, type FlowNode } from '../store';
 import { AcoesPreferenciaisBloco } from './AcoesPreferenciaisBloco';
+import { AtalhoOutroPlanoPanel } from './AtalhoOutroPlanoPanel';
 import { AtalhoPanel } from './AtalhoPanel';
 import { AtalhosDoLocalizador } from './AtalhosDoLocalizador';
 import { RegrasSemMoverBloco } from './RegrasSemMoverBloco';
@@ -15,14 +16,19 @@ interface NodePanelProps {
   node: FlowNode;
   /** Abre a tela geral dos setores da unidade. */
   onGerenciarSetores: () => void;
+  /** Abre outro plano com o localizador em foco (decisoes.md#D-40). */
+  onAbrirOutroPlano: (alvo: { planoId: string; noId: string }) => void;
 }
 
-export function NodePanel({ node, onGerenciarSetores }: NodePanelProps) {
+export function NodePanel({ node, onGerenciarSetores, onAbrirOutroPlano }: NodePanelProps) {
+  if (node.data.atalhoOutroPlano !== undefined) {
+    return <AtalhoOutroPlanoPanel node={node} onAbrirOutroPlano={onAbrirOutroPlano} />;
+  }
   if (node.data.atalhoPara !== undefined) return <AtalhoPanel node={node} />;
   return <LocalizadorPanel node={node} onGerenciarSetores={onGerenciarSetores} />;
 }
 
-function LocalizadorPanel({ node, onGerenciarSetores }: NodePanelProps) {
+function LocalizadorPanel({ node, onGerenciarSetores }: Omit<NodePanelProps, 'onAbrirOutroPlano'>) {
   const updateNode = useCanvasStore((s) => s.updateNode);
   const deleteNode = useCanvasStore((s) => s.deleteNode);
   const somenteLeitura = useCanvasStore((s) => s.somenteLeitura);

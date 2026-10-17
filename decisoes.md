@@ -1393,7 +1393,8 @@ acende o outro, e o selo "×N" do alvo inclui os atalhos.
 **O que precisaria mudar para evoluir.** Atalho para localizador de **outro**
 plano é outra coisa — exige identidade estável entre planos e navegação entre
 eles. Se vier, o campo vira `{ planoId?, nodeId }`, e o desenho órfão já cobre o
-caso do plano apagado.
+caso do plano apagado. **Veio no D-40**, como campo ao lado, e não no lugar
+deste.
 
 ---
 
@@ -1894,6 +1895,59 @@ em 16/10/2026, e as decisões em aberto ficaram com o que a demo propunha:
   regra da unidade, com número, e não só para o recurso desenhado.
 
 ---
+
+## D-40 · Atalho para outro plano: a mudança de fluxo vira peça do quadro
+
+**Decisão.** `LocalizadorData.atalhoOutroPlano?: RefOutroPlano` faz de um nó um
+**atalho para um localizador de outro plano**: o processo sai deste desenho e
+continua lá. No quadro é a pílula do D-30, tracejada e com o plano em cima do
+nome. O clique duplo, ou o botão do painel, abre o outro plano com o localizador
+em foco. Nasce sem destino, pelo botão "Atalho para outro plano" da barra
+lateral, e o destino se escolhe no painel: primeiro o plano, depois o
+localizador. Campo opcional, sem bump.
+
+**Por que.**
+
+- **A mudança de fluxo existia só como texto.** O mapeamento da demo 13 achou
+  "Mudança de fluxo, ver plano 'Cartas Precatórias'" escrito na descrição, e o
+  plano se chamava "CPs". Nada ligava uma coisa à outra.
+- **Campo novo, e não o `atalhoPara` virando objeto.** O D-30 previu
+  `{ planoId?, nodeId }` no lugar da string. Trocar o tipo do campo pediria
+  migração, e todo lugar que hoje lê `atalhoPara` como id teria de mudar junto.
+  Com um campo ao lado, o atalho interno fica intacto, e `ehAtalho` passa a
+  reconhecer os dois.
+- **Id, com nomes de reserva.** A referência guarda `planoId` e `noId`, e
+  também `planoNome` e `nome`. O id do plano é local ao silo: importar, ou
+  baixar do servidor, gera outro. Por isso `resolverOutroPlano` tenta os ids
+  primeiro, depois o nome do localizador no plano do id, e por fim os planos
+  com o nome de reserva. Quando acha, o `FlowCanvas` regrava a referência,
+  para que o próximo silo que receber o plano ache também. Não acha, o atalho
+  fica vermelho e mostra o nome de reserva, como o órfão do D-30.
+- **A transição é deste plano, o destino não.** A seta que chega no atalho
+  entra no checklist daqui como "Minutar → Ag. Prazo (plano "Execuções")", pelo
+  `nomeDaPonta`. O atalho não vira localizador no checklist, nem na contagem:
+  o localizador de destino é tarefa do outro plano.
+- **Não é cópia.** O atalho para outro plano não acende junto com um
+  localizador de mesmo nome deste quadro (Card 2), e o painel da unidade e as
+  menções o ignoram, como ignoram o atalho interno.
+- **Um nível só, como no D-30.** O destino é sempre um localizador de verdade
+  do outro plano, nunca um atalho de lá.
+
+**O que precisaria mudar para evoluir.**
+- **O caminho de volta.** O localizador de destino não sabe quem chega nele de
+  outro plano. O "chega de…" no painel dele, ou o "também em…" da demo 13,
+  exigiria varrer os planos do silo. A função já existe (`outrosPlanos`).
+- **Voltar ao plano de onde se veio** depois de abrir o destino. Hoje é o
+  seletor de planos.
+- **Outra aba que renomeie o plano de destino** só aparece no atalho quando a
+  referência ou o plano aberto mudam. O cache de `outrosPlanos` se invalida pelo
+  `atualizadoEm` do índice, mas o `FlowCanvas` só resolve de novo quando muda
+  a chave dos atalhos.
+- **Converter a anotação "ver plano X"** da descrição em atalho, com sugestão
+  do plano certo, como a demo 13 propôs.
+
+---
+
 
 
 1. Atribuir ID sequencial (`D-N`).

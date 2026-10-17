@@ -12,6 +12,8 @@ interface SidebarProps {
   /** Notas e entradas por evento (decisoes.md#D-38): peças do quadro que não são localizador. */
   onCriarNota: () => void;
   onCriarEntrada: () => void;
+  /** Atalho para um localizador de outro plano — a mudança de fluxo (D-40). */
+  onCriarAtalhoOutroPlano: () => void;
   /** Sessão de visualização: some com a área de "Adicionar". */
   somenteLeitura?: boolean;
   /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
@@ -43,6 +45,7 @@ export function Sidebar({
   onCreateNode,
   onCriarNota,
   onCriarEntrada,
+  onCriarAtalhoOutroPlano,
   somenteLeitura = false,
   onVerTutorial,
   flags,
@@ -124,6 +127,14 @@ export function Sidebar({
             <Icon.Bolt /> Entrada
           </button>
         </div>
+        <button
+          type="button"
+          className="btn btn-sm w-full justify-center mt-1.5"
+          onClick={onCriarAtalhoOutroPlano}
+          title="O processo sai deste plano e continua num localizador de outro"
+        >
+          <span aria-hidden>⇥</span> Atalho para outro plano
+        </button>
       </div>
       )}
 

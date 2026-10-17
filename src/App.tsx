@@ -101,6 +101,7 @@ function Editor() {
   const createNode = useCanvasStore((s) => s.createNode);
   const criarNota = useCanvasStore((s) => s.criarNota);
   const criarEntrada = useCanvasStore((s) => s.criarEntrada);
+  const criarAtalhoOutroPlano = useCanvasStore((s) => s.criarAtalhoOutroPlano);
 
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
@@ -505,7 +506,8 @@ function Editor() {
   useSincronizacaoExterna({ aoMudarPlanos: recarregarDoStorage });
 
   // "Ver no fluxo" de uma menção (D-39): abre o plano onde ela está e pede à
-  // câmera que vá até o localizador quando o quadro aparecer.
+  // câmera que vá até o localizador quando o quadro aparecer. O atalho para
+  // outro plano (D-40) abre o destino pelo mesmo caminho.
   const verNoFluxo = (alvo: AlvoNoFluxo) => {
     if (alvo.planoId !== ativoId) onSwitchPlano(alvo.planoId);
     setTela('fluxo');
@@ -589,6 +591,7 @@ function Editor() {
             onCreateNode={criarNoCentro}
             onCriarNota={() => criarNota(posicaoNova())}
             onCriarEntrada={() => criarEntrada(posicaoNova())}
+            onCriarAtalhoOutroPlano={() => criarAtalhoOutroPlano(posicaoNova())}
             somenteLeitura={somenteLeitura}
             onVerTutorial={() => setTutorialManual(true)}
             flags={flags}
@@ -602,7 +605,7 @@ function Editor() {
             câmera até o localizador a partir de um botão do painel. */}
         {tela === 'fluxo' && (
         <ReactFlowProvider>
-        <FlowCanvas planoId={ativoId} />
+        <FlowCanvas planoId={ativoId} onAbrirOutroPlano={verNoFluxo} />
 
         <aside
           className="no-print bg-superficie overflow-hidden flex-shrink-0"
@@ -617,6 +620,7 @@ function Editor() {
               key={selectedNode.id}
               node={selectedNode}
               onGerenciarSetores={() => setShowSetores(true)}
+              onAbrirOutroPlano={verNoFluxo}
             />
           )}
           {selectedEdge && <EdgePanel key={selectedEdge.id} edge={selectedEdge} />}

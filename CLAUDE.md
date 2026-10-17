@@ -172,6 +172,9 @@ existem em nenhum outro arquivo do projeto:
   vontade (decisoes.md#D-22).
 - **Atalho** — nó que representa outro localizador do mesmo plano, para evitar
   setas longas; não tem nome próprio nem entra no checklist (decisoes.md#D-30).
+- **Atalho para outro plano** — a mudança de fluxo: nó que leva a um
+  localizador de outro plano do silo. A transição que chega nele é deste plano;
+  o destino, não (decisoes.md#D-40).
 - **Grupo** — moldura que organiza o desenho; não é setor, não vai ao Eproc nem
   ao checklist (decisoes.md#D-31).
 - **Regra que não move** — regra de ATP que não leva o processo a lugar
@@ -369,6 +372,13 @@ opcionais, como no D-23:
   Todo HTML lido passa ainda por `sanitizar.ts`. As folhas são `.papel`, com tokens `--p-*`
   fixos, iguais nos dois temas, porque papel não tem modo escuro. Mapas ainda
   não vão no "Salvar cópia" nem no servidor.
+- Atalho para outro plano (D-40): `LocalizadorData.atalhoOutroPlano`, campo
+  ao lado do `atalhoPara`, que continua só para o mesmo plano. `ehAtalho`
+  reconhece os dois; lugar novo que pule atalhos usa `ehAtalho`, nunca
+  `atalhoPara` direto. A referência guarda ids e nomes de reserva, porque o id
+  do plano muda ao importar; `resolverOutroPlano` acha pelos dois, e o
+  `FlowCanvas` regrava quando acha por nome. Os outros planos vêm de
+  `features/canvas/outrosPlanos.ts`, com cache pelo `atualizadoEm` do índice.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.

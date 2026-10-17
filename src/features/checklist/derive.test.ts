@@ -559,6 +559,36 @@ describe('atalhos (D-30)', () => {
   });
 });
 
+describe('atalho para outro plano (D-40)', () => {
+  it('não vira localizador, e a transição leva o plano de destino no nome', () => {
+    const origem = noLocalizador('n1', 'Minutar');
+    const externo: Localizador = {
+      id: 'x',
+      position: { x: 0, y: 0 },
+      data: {
+        nome: '',
+        ja_criado: false,
+        flags: [],
+        atalhoOutroPlano: { planoId: 'pB', noId: 'b1', planoNome: 'Execuções', nome: 'Ag. Prazo' },
+      },
+    };
+    const aresta: Edge = {
+      id: 'e1',
+      source: 'n1',
+      target: 'x',
+      data: {
+        kind: 'manual',
+        resumo: '',
+        observacao: '',
+        subitems: [{ id: 's', categoria: 'Modelo', nome: 'Vista', ja_criado: false }],
+      },
+    };
+    const g = deriveChecklist([origem, externo], [aresta]);
+    expect(g.Localizador.map((i) => i.nome)).toEqual(['Minutar']);
+    expect(g.Modelo[0]).toMatchObject({ contexto: 'Minutar → Ag. Prazo (plano "Execuções")' });
+  });
+});
+
 describe('aresta no grupo (D-31)', () => {
   it('a ponta que é moldura aparece pelo rótulo do grupo', () => {
     const aresta: Edge = {

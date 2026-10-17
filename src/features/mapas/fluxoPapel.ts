@@ -44,11 +44,15 @@ function porId(plano: Plano): Map<string, Localizador> {
   return new Map(plano.nodes.map((n) => [n.id, n]));
 }
 
-/** O nome de um nó; o atalho (D-30) não tem nome próprio, e usa o do alvo. */
+/**
+ * O nome de um nó; o atalho (D-30) não tem nome próprio, e usa o do alvo. O de
+ * outro plano (D-40) usa o nome da referência.
+ */
 export function nomeDoNo(plano: Plano, id: string): string {
   const nos = porId(plano);
   const n = nos.get(id);
   if (!n) return '';
+  if (n.data.atalhoOutroPlano) return n.data.atalhoOutroPlano.nome.trim() || 'Localizador sem nome';
   const alvo = n.data.atalhoPara ? nos.get(n.data.atalhoPara) : undefined;
   return (alvo ?? n).data.nome.trim() || 'Localizador sem nome';
 }
@@ -182,8 +186,10 @@ export function svgDoRecorte(plano: Plano, r: Recorte, setores: readonly Definic
     const flag = setor
       ? `<rect x="${x + NO_LARGURA - 25}" y="${y + 5}" width="20" height="13" rx="3" fill="var(--p-flag-${setor.cor}-bg)"/><text class="flag-tx" x="${x + NO_LARGURA - 15}" y="${y + 11.5}" fill="var(--p-flag-${setor.cor}-fg)">${esc(setor.code)}</text>`
       : '';
-    const atalho = n.data.atalhoPara ? '↪ ' : '';
-    return `<g class="${r.escolhidos.has(n.id) ? '' : 'fantasma'}"><rect class="no-r${n.data.ja_criado ? ' criado' : ''}" x="${x}" y="${y}" width="${NO_LARGURA}" height="${NO_ALTURA}" rx="7"/><foreignObject x="${x}" y="${y}" width="${NO_LARGURA - (setor ? 26 : 4)}" height="${NO_ALTURA}"><div xmlns="http://www.w3.org/1999/xhtml" class="no-t">${atalho}${esc(nomeDoNo(plano, n.id))}</div></foreignObject>${flag}</g>`;
+    const externo = n.data.atalhoOutroPlano;
+    const atalho = externo ? '⇥ ' : n.data.atalhoPara ? '↪ ' : '';
+    const outroPlano = externo ? ` · ${esc(externo.planoNome.trim() || 'plano sem nome')}` : '';
+    return `<g class="${r.escolhidos.has(n.id) ? '' : 'fantasma'}"><rect class="no-r${n.data.ja_criado ? ' criado' : ''}" x="${x}" y="${y}" width="${NO_LARGURA}" height="${NO_ALTURA}" rx="7"/><foreignObject x="${x}" y="${y}" width="${NO_LARGURA - (setor ? 26 : 4)}" height="${NO_ALTURA}"><div xmlns="http://www.w3.org/1999/xhtml" class="no-t">${atalho}${esc(nomeDoNo(plano, n.id))}${outroPlano}</div></foreignObject>${flag}</g>`;
   });
 
   const selos = r.arestas.map((e) => {

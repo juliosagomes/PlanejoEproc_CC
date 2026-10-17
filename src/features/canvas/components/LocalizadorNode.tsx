@@ -1,5 +1,5 @@
 import { Handle, Position, type NodeProps } from 'reactflow';
-import { contarPorEfeito, type LocalizadorData } from '@/domain';
+import { contarPorEfeito, type LocalizadorData, type RefOutroPlano } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/utils/cn';
 import { useCanvasStore } from '../store';
@@ -20,12 +20,25 @@ import { useCanvasStore } from '../store';
  * dali porque as definições são do plano, não do nó: o nó guarda só ids.
  */
 /**
- * `copias` não é do domínio: o `FlowCanvas` acrescenta na decoração quando o
- * mesmo localizador aparece mais de uma vez no plano.
+ * `copias` e `destinoOutroPlano` não são do domínio: o `FlowCanvas` acrescenta
+ * na decoração quando o mesmo localizador aparece mais de uma vez no plano, e
+ * o destino resolvido do atalho para outro plano (`null` = não achado).
  */
-export type LocalizadorNodeData = LocalizadorData & { copias?: number };
+export type LocalizadorNodeData = LocalizadorData & {
+  copias?: number;
+  destinoOutroPlano?: RefOutroPlano | null;
+};
 
 export function LocalizadorNode(props: NodeProps<LocalizadorNodeData>) {
+  if (props.data.atalhoOutroPlano !== undefined) {
+    return (
+      <AtalhoOutroPlanoNode
+        gravada={props.data.atalhoOutroPlano}
+        destino={props.data.destinoOutroPlano ?? null}
+        selected={props.selected ?? false}
+      />
+    );
+  }
   if (props.data.atalhoPara !== undefined) {
     return <AtalhoNode alvoId={props.data.atalhoPara} selected={props.selected ?? false} />;
   }
@@ -150,6 +163,54 @@ function AtalhoNode({ alvoId, selected }: { alvoId: string; selected: boolean })
         <span>alvo removido</span>
       ) : (
         <span className="pj-atalho-nome">{nomeAlvo || <i>sem nome</i>}</span>
+      )}
+      <Handle type="source" position={Position.Right} />
+    </div>
+  );
+}
+
+/**
+ * Atalho para outro plano (decisoes.md#D-40): a mesma pílula, com o plano de
+ * destino em cima do nome. Sem destino escolhido fica neutra, pedindo um; com
+ * destino que sumiu fica vermelha, e mostra o nome de reserva para o usuário
+ * saber o que era.
+ */
+function AtalhoOutroPlanoNode({
+  gravada,
+  destino,
+  selected,
+}: {
+  gravada: RefOutroPlano;
+  destino: RefOutroPlano | null;
+  selected: boolean;
+}) {
+  const semDestino = !gravada.planoId && !gravada.nome;
+  const orfao = !semDestino && destino === null;
+  const mostrado = destino ?? gravada;
+  return (
+    <div
+      className={cn('pj-atalho pj-atalho-externo', { selected, orfao })}
+      title={
+        semDestino
+          ? 'Atalho para outro plano: escolha o destino no painel'
+          : orfao
+            ? `"${gravada.nome}" não foi achado no plano "${gravada.planoNome}". Aponte o atalho para outro destino ou remova-o.`
+            : `Continua no plano "${mostrado.planoNome}" — clique duas vezes para abrir`
+      }
+    >
+      <Handle type="target" position={Position.Left} />
+      <span className="pj-atalho-seta" aria-hidden>
+        {orfao ? '⚠' : '⇥'}
+      </span>
+      {semDestino ? (
+        <span className="pj-atalho-nome">
+          <i>outro plano…</i>
+        </span>
+      ) : (
+        <span className="pj-atalho-texto">
+          <span className="pj-atalho-plano">{mostrado.planoNome || 'sem nome'}</span>
+          <span className="pj-atalho-nome">{mostrado.nome || <i>sem nome</i>}</span>
+        </span>
       )}
       <Handle type="source" position={Position.Right} />
     </div>

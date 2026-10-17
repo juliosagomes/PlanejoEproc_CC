@@ -1,3 +1,4 @@
+import type { RefOutroPlano } from './atalhos';
 import type { DefinicaoFlag } from './flags';
 import type { EdgeData } from './edges';
 import type { GrupoLocalizadores } from './grupos';
@@ -76,6 +77,13 @@ export interface LocalizadorData {
    * checklist; opcional, sem migração.
    */
   atalhoPara?: string;
+  /**
+   * Presente quando o nó é um **atalho para outro plano** — a mudança de fluxo
+   * (decisoes.md#D-40). Como o `atalhoPara`, sem nome próprio e fora do
+   * checklist; a seta que chega nele entra com o plano de destino no nome.
+   * Opcional, sem migração.
+   */
+  atalhoOutroPlano?: RefOutroPlano;
   /**
    * Regras de ATP que não movem o processo, penduradas aqui em vez de virarem
    * seta para um destino de descarte (decisoes.md#D-38). Opcional, sem migração.

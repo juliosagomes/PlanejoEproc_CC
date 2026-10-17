@@ -303,6 +303,9 @@ const LocalizadorDataSchema = z.object({
     .array(z.object({ id: z.string(), nome: z.string(), ja_criado: z.boolean() }))
     .optional(),
   atalhoPara: z.string().optional(),
+  atalhoOutroPlano: z
+    .object({ planoId: z.string(), noId: z.string(), planoNome: z.string(), nome: z.string() })
+    .optional(),
   regrasSemMover: z.array(RegraSemMoverSchema).optional(),
 });
 
