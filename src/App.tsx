@@ -20,6 +20,10 @@ import { useCatalogoStore } from '@/features/catalogo/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { ChecklistModal } from '@/features/checklist/components/ChecklistModal';
 import { contarChecklist, deriveChecklist } from '@/features/checklist/derive';
+import { DialogoGerarMapa } from '@/features/mapas/components/DialogoGerarMapa';
+import { TelaMapas } from '@/features/mapas/components/TelaMapas';
+import { flushMapas } from '@/features/mapas/store';
+import type { AlvoNoFluxo } from '@/features/mapas/verNoFluxo';
 import { PainelUnidade } from '@/features/painel/components/PainelUnidade';
 import { CodigosLotacaoModal } from '@/features/sessao/components/CodigosLotacaoModal';
 import { SetoresModal } from '@/features/setores/components/SetoresModal';
@@ -217,7 +221,10 @@ function Editor() {
 
   // Garante que qualquer save pendente seja gravado antes do tab fechar.
   useEffect(() => {
-    const onBeforeUnload = () => flushPersist();
+    const onBeforeUnload = () => {
+      flushPersist();
+      flushMapas();
+    };
     window.addEventListener('beforeunload', onBeforeUnload);
     return () => window.removeEventListener('beforeunload', onBeforeUnload);
   }, []);
@@ -497,6 +504,14 @@ function Editor() {
 
   useSincronizacaoExterna({ aoMudarPlanos: recarregarDoStorage });
 
+  // "Ver no fluxo" de uma menção (D-39): abre o plano onde ela está e pede à
+  // câmera que vá até o localizador quando o quadro aparecer.
+  const verNoFluxo = (alvo: AlvoNoFluxo) => {
+    if (alvo.planoId !== ativoId) onSwitchPlano(alvo.planoId);
+    setTela('fluxo');
+    useCanvasStore.getState().pedirFoco(alvo.noId);
+  };
+
   const alternarFiltroFlag = useCallback(
     (id: string) => {
       const atual = useCanvasStore.getState().filtroFlags;
@@ -565,6 +580,10 @@ function Editor() {
       <div className="flex flex-1 min-h-0">
         {tela === 'painel' && <PainelUnidade />}
 
+        {tela === 'mapas' && (
+          <TelaMapas onVerNoFluxo={verNoFluxo} onIrParaFluxo={() => setTela('fluxo')} />
+        )}
+
         {tela === 'fluxo' && sidebarVisivel && (
           <Sidebar
             onCreateNode={criarNoCentro}
@@ -615,6 +634,7 @@ function Editor() {
       />
       <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
+      <DialogoGerarMapa onGerado={() => setTela('mapas')} />
       <SetoresModal open={showSetores} onClose={() => setShowSetores(false)} />
       <DescarteModal open={showDescarte} onClose={() => setShowDescarte(false)} />
       <SyncResultadoModal onFechar={resetMensagensSync} />

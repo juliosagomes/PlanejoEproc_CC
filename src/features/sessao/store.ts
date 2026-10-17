@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Sessao } from '@/domain';
 import { flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { useConjuntosEventoStore } from '@/features/eventos/store';
+import { useMapasStore } from '@/features/mapas/store';
 import { usePainelStore } from '@/features/painel/store';
 import { useDescarteStore } from '@/features/descarte/store';
 import { useSetoresStore } from '@/features/setores/store';
@@ -110,6 +111,7 @@ function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
   useConjuntosEventoStore.getState().hidratar();
   usePainelStore.getState().hidratar();
   useDescarteStore.getState().hidratar();
+  useMapasStore.getState().hidratar();
 
   garantirAtivoValido();
   if (listPlanos().length === 0) {
@@ -272,6 +274,7 @@ export const useSessaoStore = create<SessaoStore>((set) => ({
     useSetoresStore.getState().limpar();
     useConjuntosEventoStore.getState().limpar();
     usePainelStore.getState().limpar();
+    useMapasStore.getState().limpar();
     set({
       sessao: null,
       erro: null,

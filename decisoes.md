@@ -1806,6 +1806,95 @@ a criar.
 
 ---
 
+## D-39 · Mapas descritivos: o modo de impressão virou documento editável
+
+**Decisão.** O modo de impressão (demo 08) virou um recurso próprio, **Mapas
+descritivos**: uma terceira tela ao lado de "Fluxo | Painel da unidade", com uma
+lista de mapas e dois formatos. A **paisagem** tem slides A4 deitados, com
+texto, nota, imagem e desenho do fluxo. O **retrato** é um documento A4 em pé,
+como no Word. Digitando **@**, o texto menciona um localizador, uma preferência
+ou uma regra de ATP. "Gerar mapa descritivo", na barra de seleção do quadro, cria
+um mapa pronto com o desenho e a legenda, e o usuário edita, imprime ou exporta
+em PDF.
+
+**Por que.** O usuário quer explicar o fluxo para a equipe (manual do servidor,
+rotina da secretaria, folha para o juiz) sem sair do app. Um PDF fixo não
+servia, porque cada mapa precisa de texto próprio. No Word, a citação de um
+localizador fica velha na primeira renomeação. A demo foi validada pelo usuário
+em 16/10/2026, e as decisões em aberto ficaram com o que a demo propunha:
+
+- **Os mapas são do silo**, como o painel (D-33). Um mapa pode citar vários
+  planos, e o gerado só lembra de onde veio (`origem`). Cada mapa tem uma chave
+  (`mapa:<id>`), com um índice ao lado, porque as imagens viajam dentro do mapa
+  e uma chave só regravaria todas a cada tecla. Mapa irreconhecível vai para o
+  backup.
+- **A menção é viva.** O HTML guarda só a referência (`RefMencao`: tipo, chave,
+  último nome, `eprocId`, nó de origem), e o texto é recalculado sempre que o
+  mapa abre ou o catálogo muda. A renomeação feita no Eproc é acompanhada pelo
+  `eprocId`, e a feita no plano, pelo nó de origem (`planoId/noId`). O alvo que
+  some fica riscado, com o último nome.
+- **A regra de ATP mencionável é o recurso da aresta** (`planoId/arestaId/recursoId`).
+  As ATPs cadastradas no Eproc não são coletadas (fora de escopo no CLAUDE.md),
+  e o plano não sabe o número delas (D-38).
+- **O desenho é um retrato** (`BlocoFluxo` com o SVG gravado). A legenda cita
+  os números ①②③ dele, e redesenhar sozinho os trocaria por baixo do texto. O
+  bloco guarda uma assinatura do recorte, e quando o plano muda algo que o
+  desenho mostra, aparece o aviso "Atualizar desenho". Isso substitui a antiga
+  questão "numeração fixa ou recalculada": a numeração segue a leitura no
+  momento do desenho e fica congelada até o usuário atualizar.
+- **O desenho em papel é um SVG gerado do domínio**, com o degrau e a dobra do
+  quadro (D-21). Os tipos se distinguem também pelo traço, para o preto e branco.
+  Os vãos largos do quadro são **reaproximados** (no máximo uma coluna de
+  folga), sem trocar a ordem de nada. Sem isso, um plano largo sai com o nome do
+  localizador ilegível no A4.
+- **O retrato usa o TipTap 3 (ProseMirror)**, a primeira dependência nova
+  do recurso. A primeira versão era um `contenteditable` com `execCommand` e
+  não servia. O Ctrl+Z não desfazia a menção, a imagem nem o desenho, que
+  entravam pelo DOM, e às vezes desfazia outra coisa. Também não havia tabela
+  editável, o cursor travava em volta da menção e a colagem precisava ser só
+  texto. Com o esquema (`features/mapas/editor/extensoes.ts`), a menção, o
+  número da transição, a caixa, o bloco de detalhe e o desenho são tipos
+  próprios. Tudo entra no desfazer, a colagem do Word chega filtrada pelo
+  esquema e imagem só entra embutida (`data:`), nunca de endereço remoto. O
+  formato gravado continua HTML, e todo HTML lido passa ainda por
+  `features/mapas/sanitizar.ts`. O editor pesa uns 160 KB comprimidos e é
+  carregado só quando um documento abre (`lazy` em `TelaMapas`). O
+  `dist-ext/` não tem `eval` nem `new Function` (critério 7, conferido no
+  build). A quebra de página no editor continua uma linha aproximada: nenhuma
+  biblioteca gratuita pagina como o Word. Os slides continuam sem biblioteca,
+  porque as caixas de texto são curtas.
+- **A impressão é a do Chrome**, como na demo: `window.print()` com as folhas
+  montadas no `<body>` e uma `@page` por formato. Sem jsPDF nem html2canvas, o
+  texto do PDF continua selecionável, e não há `eval` (critério de pronto nº 7).
+- **A imagem acima de 400 KB** é reduzida para 1600 px e recomprimida em JPEG.
+  O manifest já tem `unlimitedStorage`, mas a imagem regravada a cada tecla
+  pesa mesmo assim.
+- **Padrões do mapa gerado:** retrato, com legenda em tabela, mostrando o que
+  entra e sai da seleção e o detalhe das regras. As fichas com mini-mapa da demo
+  antiga ficaram de fora. Só A4.
+- **"Ver no fluxo"** abre o plano onde o alvo está e pede foco ao quadro
+  (`CanvasState.focoPendente`, estado de tela), porque o pedido chega de outra
+  tela, antes de o ReactFlow existir.
+- Em **sessão de visualização** (D-19), os mapas abrem para ler e imprimir, e
+  nada grava.
+
+**O que precisaria mudar para evoluir.**
+- **Compartilhar.** Os mapas não entram no "Salvar cópia" nem no envio ao
+  servidor. Para isso, precisam de um formato de arquivo e de um lugar no
+  pull/push, com a decisão de quem ganha num conflito.
+- **Outra aba do editor** que grave um mapa não é ouvida (`useSincronizacaoExterna`
+  só recarrega planos).
+- **Paginação de verdade** no retrato (ver a página 2 como página) não vem com
+  o TipTap gratuito. Os **slides** não têm desfazer. Se fizer falta, as caixas de
+  texto podem virar editores TipTap pequenos, e as peças podem ganhar uma pilha
+  de retratos como a do quadro.
+- **A3 e desenho dividido em duas folhas**, que a demo antiga mostrava, ficaram
+  de fora.
+- Com as **regras de ATP na sincronização**, a menção poderia apontar para a
+  regra da unidade, com número, e não só para o recurso desenhado.
+
+---
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

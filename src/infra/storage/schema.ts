@@ -7,6 +7,7 @@ import {
   CORES_FLAG,
   DESCARTE_VERSION,
   EFEITOS_SEM_MOVER,
+  MAPA_VERSION,
   ORIGENS_FILA,
   PAINEL_VERSION,
   PREF_TIPOS,
@@ -25,6 +26,8 @@ import {
   type DefinicaoFlag,
   type DestinosDescarteUnidade,
   type DobraAresta,
+  type Mapa,
+  type MapaIndexEntry,
   type AtpRule,
   type AtpTrigger,
   type Edge,
@@ -725,3 +728,57 @@ export const CatalogoUnidadeSchema = z.object({
   consultasSalvas: z.array(ConsultaSalvaUnidadeSchema).optional(),
   fontes: z.record(z.string(), FonteResultadoSchema),
 }) satisfies z.ZodType<CatalogoUnidade>;
+
+/* ---------------------------------------------------------------------------
+ * Mapas descritivos (decisoes.md#D-39). Um mapa por chave, mais um índice:
+ * as imagens viajam dentro do mapa, e regravar todos a cada tecla seria caro.
+ * ------------------------------------------------------------------------- */
+
+const BlocoFluxoSchema = z.object({
+  planoId: z.string(),
+  planoNome: z.string(),
+  nos: z.array(z.string()),
+  fora: z.boolean(),
+  assinatura: z.string(),
+  svg: z.string(),
+  desenhadoEm: z.string(),
+});
+
+const caixa = { id: z.string(), x: z.number(), y: z.number(), w: z.number(), h: z.number() };
+
+const ElementoSlideSchema = z.discriminatedUnion('tipo', [
+  z.object({ ...caixa, tipo: z.literal('texto'), html: z.string() }),
+  z.object({ ...caixa, tipo: z.literal('nota'), html: z.string() }),
+  z.object({ ...caixa, tipo: z.literal('imagem'), src: z.string() }),
+  z.object({ ...caixa, tipo: z.literal('fluxo'), fluxo: BlocoFluxoSchema }),
+]);
+
+const mapaBase = {
+  version: z.literal(MAPA_VERSION),
+  id: z.string(),
+  nome: z.string(),
+  criadoEm: z.string(),
+  atualizadoEm: z.string(),
+  origem: z
+    .object({ planoId: z.string(), planoNome: z.string(), localizadores: z.number() })
+    .optional(),
+};
+
+export const MapaSchema = z.discriminatedUnion('formato', [
+  z.object({
+    ...mapaBase,
+    formato: z.literal('paisagem'),
+    slides: z.array(z.object({ id: z.string(), elementos: z.array(ElementoSlideSchema) })),
+  }),
+  z.object({ ...mapaBase, formato: z.literal('retrato'), html: z.string() }),
+]) satisfies z.ZodType<Mapa>;
+
+export const MapasIndexSchema = z.array(
+  z.object({
+    id: z.string(),
+    nome: z.string(),
+    formato: z.enum(['paisagem', 'retrato']),
+    atualizadoEm: z.string(),
+    resumo: z.string(),
+  }),
+) satisfies z.ZodType<MapaIndexEntry[]>;

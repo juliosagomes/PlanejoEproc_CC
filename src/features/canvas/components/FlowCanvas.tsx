@@ -179,6 +179,20 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
     [nodes],
   );
   const irParaNo = useIrParaNo();
+
+  // "Ver no fluxo" de uma menção (D-39): o pedido chega antes do quadro existir,
+  // e a câmera só pode andar depois de os nós serem medidos — e depois da
+  // restauração da câmera do plano, que roda no mesmo intervalo.
+  const focoPendente = useCanvasStore((s) => s.focoPendente);
+  useEffect(() => {
+    if (focoPendente === null) return;
+    const t = window.setTimeout(() => {
+      irParaNo(focoPendente);
+      useCanvasStore.getState().pedirFoco(null);
+    }, ESPERA_MEDIR_NOS_MS * 3);
+    return () => window.clearTimeout(t);
+  }, [focoPendente, irParaNo]);
+
   const [hoverId, setHoverId] = useState<string | null>(null);
   const grupoHover = useMemo(() => {
     const chave = hoverId === null ? undefined : gemeos.chaveDe.get(hoverId);

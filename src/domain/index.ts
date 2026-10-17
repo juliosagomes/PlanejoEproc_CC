@@ -15,3 +15,4 @@ export * from './catalogoUnidade';
 export * from './anotacoesCatalogo';
 export * from './sessao';
 export * from './painel';
+export * from './mapas';

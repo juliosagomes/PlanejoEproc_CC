@@ -56,6 +56,7 @@ existindo (decisoes.md#D-16):
 | Estado canvas | Zustand |
 | Validação | Zod (apenas nas bordas) |
 | Parser XLS | `xlsx` (SheetJS) — só para importar catálogo do órgão (decisoes.md#D-6) |
+| Editor de documento | TipTap 3 (ProseMirror) — só no retrato dos mapas descritivos, carregado sob demanda (decisoes.md#D-39) |
 | Persistência | `chrome.storage.local`, atrás de `infra/plataforma/` (decisoes.md#D-12). O `localStorage` fica como backend dos testes e do `npm run dev` |
 | Extensão | Manifest V3, sem framework de extensão (nada de crxjs/webextension-polyfill) |
 | Tipos do Chrome | `@types/chrome` (devDependency) — sem ele, `chrome.*` seria `any` solto sob `strict` |
@@ -359,6 +360,15 @@ opcionais, como no D-23:
   aresta comum. Destinos de descarte em `features/descarte/`, chave `descarte`
   por silo. A regra pendurada entra **sempre** no checklist, sem "Implantar".
   O assistente que converte nós sem nome em notas ficou para depois.
+- Mapas descritivos (D-39), da demo 08: terceira tela ao lado de "Fluxo |
+  Painel da unidade", em `features/mapas/`. Uma chave por mapa (`mapa:<id>`) e
+  um índice, por silo. A menção (@) guarda só a referência, e o texto é
+  recalculado contra a unidade e os planos. O desenho em papel é retrato com
+  assinatura. O documento em retrato é TipTap, com esquema próprio em
+  `features/mapas/editor/`: tipo novo de peça é extensão lá, não HTML solto.
+  Todo HTML lido passa ainda por `sanitizar.ts`. As folhas são `.papel`, com tokens `--p-*`
+  fixos, iguais nos dois temas, porque papel não tem modo escuro. Mapas ainda
+  não vão no "Salvar cópia" nem no servidor.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.
