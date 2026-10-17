@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type DragEvent, type MouseEvent, type ReactNode } from 'react';
 import {
   Background,
   Controls,
@@ -81,6 +81,8 @@ interface FlowCanvasProps {
   planoId: string | null;
   /** Abre outro plano com o localizador em foco — o destino do atalho do D-40. */
   onAbrirOutroPlano: (alvo: { planoId: string; noId: string }) => void;
+  /** O que flutua sobre o quadro e vem de outra feature, como a barra da busca (D-43). */
+  children?: ReactNode;
 }
 
 const ESPERA_SALVAR_CAMERA_MS = 300;
@@ -90,7 +92,7 @@ const ESPERA_SALVAR_CAMERA_MS = 300;
  */
 const ESPERA_MEDIR_NOS_MS = 60;
 
-export function FlowCanvas({ planoId, onAbrirOutroPlano }: FlowCanvasProps) {
+export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
   const [arrastando, setArrastando] = useState(false);
@@ -413,6 +415,7 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano }: FlowCanvasProps) {
       </ReactFlow>
 
       <SelecaoLoteBar />
+      {children}
 
       {isEmpty && (
         <div className="empty-state">

@@ -397,6 +397,44 @@ export const Icon = {
       <circle cx="11" cy="7" r="1.1" fill="currentColor" />
     </svg>
   ),
+  /** Lupa — a busca do Ctrl+K (decisoes.md#D-43). */
+  Busca: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="6" cy="6" r="4.2" stroke="currentColor" strokeWidth="1.3" />
+      <path d="m9.2 9.2 3.2 3.2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  ),
+  /** Alvo — um localizador na busca. */
+  Alvo: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <circle cx="7" cy="7" r="5.2" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="7" cy="7" r="2" stroke="currentColor" strokeWidth="1.3" />
+    </svg>
+  ),
+  /** Seta para a direita — uma transição na busca. */
+  Seta: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M2 7h9.5M8.2 3.7 11.5 7l-3.3 3.3"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
+  /** Quatro cantos — enquadrar o fluxo inteiro. */
+  Enquadrar: (p: IconProps) => (
+    <svg {...baseProps} {...p}>
+      <path
+        d="M1.8 4.6V1.8h2.8M9.4 1.8h2.8v2.8M12.2 9.4v2.8H9.4M4.6 12.2H1.8V9.4"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  ),
   /** Check do canto direito superior do nó "já criado". 10×10. */
   CheckCorner: (p: IconProps) => (
     <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden {...p}>
