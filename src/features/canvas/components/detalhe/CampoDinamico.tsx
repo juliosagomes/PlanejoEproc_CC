@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import {
   campoVisivel,
   definirParametro,
+  temConjuntos,
   type CampoDef,
   type CampoSimplesDef,
   type OpcaoCampo,
@@ -13,7 +14,7 @@ import { CATALOGOS } from '@/data';
 import { CatalogMulti } from '@/components/CatalogMulti';
 import { SugestoesInput } from '@/components/SugestoesInput';
 import { Icon } from '@/components/Icon';
-import { EventosMulti } from '@/features/eventos/components/EventosMulti';
+import { SeletorComConjuntos } from '@/features/conjuntos/components/SeletorComConjuntos';
 import { cn } from '@/utils/cn';
 import { Field } from './pecas';
 import { useSugestoes } from './sugestoes';
@@ -144,11 +145,13 @@ function Controle({ campo, valor, onChange }: ControleProps) {
       );
     }
     case 'multi':
-      // Eventos ganham os conjuntos (decisoes.md#D-29): é a única lista em que
-      // "quase tudo" é uma seleção comum.
-      if (campo.catalogo === 'eventos') {
+      // Eventos, tipos de petição e documentos ganham os conjuntos
+      // (decisoes.md#D-29, D-41): são as listas em que "quase tudo" é uma
+      // seleção comum.
+      if (campo.catalogo && temConjuntos(campo.catalogo)) {
         return (
-          <EventosMulti
+          <SeletorComConjuntos
+            catalogo={campo.catalogo}
             values={
               Array.isArray(valor)
                 ? (valor as unknown[]).filter((v): v is string => typeof v === 'string')

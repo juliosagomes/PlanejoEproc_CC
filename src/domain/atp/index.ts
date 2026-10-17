@@ -7,7 +7,10 @@ export * from './campos';
 export * from './gatilho';
 export * from './acoes';
 export * from './filtros';
+export * from './conjuntos';
 export * from './conjuntosEvento';
+export * from './conjuntosPeticao';
+export * from './conjuntosDocumento';
 
 /**
  * O detalhamento de uma ATP, nos três blocos da tela de cadastro do Eproc:

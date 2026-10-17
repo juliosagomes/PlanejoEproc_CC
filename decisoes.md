@@ -1948,6 +1948,59 @@ localizador. Campo opcional, sem bump.
 
 ---
 
+## D-41 · Conjuntos também para tipos de petição e documentos; "Todos − x, y, z"
+
+**Decisão.** A lógica do D-29 deixa de ser só dos eventos. Os tipos de petição
+(128) e os tipos de documento (760) ganham o mesmo seletor, com conjuntos padrão,
+conjuntos da unidade, "Selecionar todos" e "Tirar". Ele aparece no gatilho "Por
+Evento OU Tipo de Petição OU Documento", em "Por Tipo de Petição" e nos filtros
+que escolhem tipo de petição. O código passou a ser genérico: `domain/atp/conjuntos.ts`
+tem o comum, as regras de cada catálogo moram em arquivo próprio, e a feature
+virou `features/conjuntos/`.
+
+**O catálogo de documentos entrou no build.** É o `selControleDocumentoMultiplo`
+da tela de cadastro de ATP, exportado pelo usuário em outubro/2026. Até aqui o
+campo era de digitação, porque a lista não estava embutida. Agora grava
+**códigos**, como os outros. Um nome digitado antes continua aparecendo como
+veio, sem conversão: o app está em beta, sem usuários, e um nome pode bater com
+dois códigos ("Alvará" é 54 e 82400438). O gatilho "Por Documento" (`O`), de
+valor único, ficou como estava, porque trocar texto por código ali muda o schema.
+
+**O catálogo de petições tinha cada tipo em dobro** (256 linhas, 128 códigos), e
+o seletor mostrava cada um duas vezes. O JSON foi deduplicado, e um teste
+confere que nenhum catálogo com conjuntos tem código repetido.
+
+**"Todos − x, y, z".** O resumo passa a escolher a exclusão quando ela cabe em
+até **5 peças** (`LIMITE_EXCLUSAO`), contando como peça cada conjunto e cada item
+avulso, e quando não é mais longa que a inclusão. No empate, fica a exclusão:
+"todos menos um" se lê melhor que a lista do que sobrou. Antes a regra exigia
+mais da metade marcada e a exclusão estritamente mais curta. Na exclusão, os
+avulsos aparecem **pelo nome**, e não como "2 avulsos": são no máximo cinco, e o
+nome é o que a pessoa precisa ler. Cada um vira um chip "− Nome", e o × dele o
+inclui de volta.
+
+Cinco é arbitrário, e foi a sugestão do usuário. Mais que isso já é lista, e a
+lista continua disponível em "Editar exceções" e no checklist.
+
+**Conjuntos padrão, validados pelo usuário.** Petições: 16 conjuntos numa lista
+plana, porque com tão poucos a categoria só acrescentaria cabeçalho. Documentos:
+25 conjuntos em cinco categorias. Os rótulos de documento vêm truncados em 50
+caracteres, então nenhuma regra depende do fim de um rótulo longo. As
+armadilhas ficaram presas em teste: "Audiência Pre*liminar*" não é liminar,
+"Carta *Ar*bitral" não é AR, e "Acordo de Não Persecução" é penal, não
+conciliação.
+
+**Uma chave por catálogo.** `conjuntosEvento` continua com o mesmo nome, para
+não perder o que já foi salvo. As novas são `conjuntosPeticao` e
+`conjuntosDocumento`, todas com o mesmo schema e no mesmo silo.
+
+**O que precisaria mudar para evoluir.** Se o gatilho "Por Documento" passar a
+usar o catálogo, ele vira lista de códigos com migração. Se outro catálogo
+grande pedir conjuntos (classes, assuntos), basta acrescentá-lo a
+`CATALOGOS_COM_CONJUNTO` e escrever as regras: o seletor, o painel, o checklist
+e o armazenamento já são genéricos.
+
+---
 
 
 1. Atribuir ID sequencial (`D-N`).

@@ -34,6 +34,7 @@ import representacaoProcessual from './compSelTipoRepresentacaoProcessual.json';
 import modificadorData from './critDataModificador.json';
 import modificadorValor from './critValorModificador.json';
 import selClassesData from './selClassesJudiciaisMultiplo.json';
+import documentos from './selControleDocumentoMultiplo.json';
 import selCompetenciaData from './selCompetencia.json';
 import grupoEventoPeticao from './selectGrupoEventoTipoPeticaoFiltro.json';
 import prazo from './selPrazoMultiplo.json';
@@ -73,6 +74,13 @@ export const STATUS_PROCESSO = cast(selStatusData);
 /** Tipos de petição. */
 export const TIPOS_PETICAO = cast(tiposPeticao);
 
+/**
+ * Tipos de documento (`selControleDocumentoMultiplo`), do gatilho "Por Evento
+ * OU Tipo de Petição OU Documento". Há rótulos repetidos com códigos
+ * diferentes ("Alvará", "Ata"): é assim no Eproc, e o código é o que vale.
+ */
+export const DOCUMENTOS = cast(documentos);
+
 /** `selSinPoloPeticao` — "Restringir petições ou documentos de". */
 export const POLOS_PETICAO = cast(poloPeticao);
 
@@ -83,6 +91,7 @@ export const POLOS_PETICAO = cast(poloPeticao);
 export const CATALOGOS: Record<CatalogoId, ItemCatalogo[]> = {
   eventos: EVENTOS,
   tiposPeticao: TIPOS_PETICAO,
+  documentos: DOCUMENTOS,
   classes: CLASSES_JUDICIAIS,
   competencias: COMPETENCIAS,
   statusProcesso: STATUS_PROCESSO,

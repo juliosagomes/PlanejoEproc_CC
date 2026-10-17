@@ -1,35 +1,18 @@
 /* ============================================================================
- * CONJUNTOS DE EVENTOS (decisoes.md#D-29)
+ * CONJUNTOS PADRÃO DE EVENTOS (decisoes.md#D-29)
  *
- * O catálogo de eventos do Eproc tem 1.077 itens. Uma regra de ATP do tipo
- * "qualquer evento, exceto os de mera ciência" seleciona mais de mil deles, e
- * o modal virava uma parede de chips. Conjunto é um **atalho de seleção e de
- * leitura**: o plano continua gravando a lista explícita de ids (é ela que se
- * marca no Eproc), e o conjunto só ajuda a montá-la e a descrevê-la.
+ * Deduzidos da própria lista (TJMG, 1º grau, outubro/2026) — a redação do
+ * Eproc é muito regular ("Audiência de X designada", "Juntada de Mandado -
+ * Cumprido"…), e é essa regularidade que torna os conjuntos confiáveis. O que
+ * é comum aos três catálogos com conjunto está em `conjuntos.ts`.
  *
- * Os conjuntos padrão são **regras sobre o rótulo**, e não listas de ids: o
- * catálogo embutido muda de versão e de tribunal, e uma regra continua valendo
- * para o evento novo que siga a mesma redação. As regras foram deduzidas da
- * própria lista (TJMG, 1º grau, outubro/2026) — a redação do Eproc é muito
- * regular ("Audiência de X designada", "Juntada de Mandado - Cumprido"…), e é
- * essa regularidade que torna os conjuntos confiáveis.
- *
- * O teste em `features/eventos/conjuntos.test.ts` confere cada conjunto contra
+ * O teste em `features/conjuntos/conjuntos.test.ts` confere cada conjunto contra
  * o catálogo real: tamanho mínimo e exemplos que precisam (e não podem) estar.
  * ========================================================================== */
 
-export interface RegraConjuntoEvento {
-  id: string;
-  rotulo: string;
-  categoria: CategoriaConjunto;
-  /** Uma frase para o usuário saber o critério sem abrir a lista. */
-  descricao: string;
-  /** Casam com o rótulo **normalizado** (`normalizarRotuloEvento`). */
-  inclui: readonly RegExp[];
-  exclui?: readonly RegExp[];
-}
+import type { RegraConjunto } from './conjuntos';
 
-export const CATEGORIAS_CONJUNTO = [
+export const CATEGORIAS_CONJUNTO_EVENTO = [
   'Comunicação e prazos',
   'Andamento',
   'Decisões e julgamento',
@@ -40,18 +23,7 @@ export const CATEGORIAS_CONJUNTO = [
   'Criminal',
 ] as const;
 
-export type CategoriaConjunto = (typeof CATEGORIAS_CONJUNTO)[number];
-
-/**
- * Sem acento e em minúsculas. A redação do catálogo é inconsistente —
- * "Decisao/Despacho", "prisao", "Concedida a substituiçao" ao lado de
- * "substituição" —, e regra com acento erraria metade dos casos.
- */
-export function normalizarRotuloEvento(rotulo: string): string {
-  return rotulo.normalize('NFD').replace(/\p{M}+/gu, '').toLowerCase();
-}
-
-export const CONJUNTOS_EVENTO_PADRAO: readonly RegraConjuntoEvento[] = [
+export const CONJUNTOS_EVENTO_PADRAO: readonly RegraConjunto[] = [
   /* ---------------- Comunicação e prazos ---------------- */
   {
     id: 'mera-ciencia',
@@ -469,132 +441,3 @@ export const CONJUNTOS_EVENTO_PADRAO: readonly RegraConjuntoEvento[] = [
     ],
   },
 ];
-
-/** Conjunto já resolvido contra um catálogo — padrão ou criado pelo usuário. */
-export interface ConjuntoEvento {
-  id: string;
-  rotulo: string;
-  categoria?: CategoriaConjunto;
-  descricao?: string;
-  ids: readonly string[];
-  personalizado: boolean;
-}
-
-interface EventoCatalogo {
-  value: string;
-  label: string;
-}
-
-export function resolverConjuntosPadrao(
-  eventos: readonly EventoCatalogo[],
-  regras: readonly RegraConjuntoEvento[] = CONJUNTOS_EVENTO_PADRAO,
-): ConjuntoEvento[] {
-  const normalizados = eventos.map((e) => ({ id: e.value, rotulo: normalizarRotuloEvento(e.label) }));
-  return regras.map((r) => ({
-    id: r.id,
-    rotulo: r.rotulo,
-    categoria: r.categoria,
-    descricao: r.descricao,
-    personalizado: false,
-    ids: normalizados
-      .filter(
-        (e) =>
-          r.inclui.some((re) => re.test(e.rotulo)) && !(r.exclui ?? []).some((re) => re.test(e.rotulo)),
-      )
-      .map((e) => e.id),
-  }));
-}
-
-/* ============================================================================
- * RESUMO DE UMA SELEÇÃO
- * ========================================================================== */
-
-export type ResumoSelecaoEventos =
-  | { modo: 'vazio' }
-  | { modo: 'todos'; total: number }
-  /** A seleção é a união de `conjuntos` mais os `avulsos`. */
-  | { modo: 'inclusao'; conjuntos: ConjuntoEvento[]; avulsos: string[]; total: number }
-  /** A seleção é tudo, menos os `conjuntos` e menos os `avulsos`. */
-  | { modo: 'exclusao'; conjuntos: ConjuntoEvento[]; avulsos: string[]; total: number };
-
-/**
- * Cobre `alvo` com conjuntos inteiramente contidos nele, maiores primeiro; o
- * que sobra vira avulso. Guloso, e não ótimo — mas a pergunta aqui é "como
- * dizer isto em poucas palavras", não um problema de cobertura exata.
- */
-function cobrir(alvo: ReadonlySet<string>, conjuntos: readonly ConjuntoEvento[]) {
-  const candidatos = conjuntos
-    .filter((c) => c.ids.length > 0 && c.ids.every((id) => alvo.has(id)))
-    .sort((a, b) => b.ids.length - a.ids.length);
-  const coberto = new Set<string>();
-  const escolhidos: ConjuntoEvento[] = [];
-  for (const c of candidatos) {
-    if (c.ids.every((id) => coberto.has(id))) continue;
-    escolhidos.push(c);
-    for (const id of c.ids) coberto.add(id);
-  }
-  const avulsos = [...alvo].filter((id) => !coberto.has(id));
-  return { escolhidos, avulsos };
-}
-
-/**
- * Descreve a seleção pelo caminho mais curto: "estes conjuntos e mais estes
- * eventos", ou "tudo, exceto estes conjuntos e estes eventos". A exclusão só é
- * considerada quando mais da metade do catálogo está marcada.
- *
- * Ids fora do `universo` (evento que saiu do catálogo) entram como avulsos da
- * inclusão: sumir com eles esconderia algo gravado no plano.
- */
-export function resumirSelecaoEventos(
-  selecionados: readonly string[],
-  universo: readonly string[],
-  conjuntos: readonly ConjuntoEvento[],
-): ResumoSelecaoEventos {
-  const sel = new Set(selecionados);
-  if (sel.size === 0) return { modo: 'vazio' };
-  const todos = new Set(universo);
-  const foraDoUniverso = [...sel].filter((id) => !todos.has(id));
-  if (foraDoUniverso.length === 0 && universo.every((id) => sel.has(id))) {
-    return { modo: 'todos', total: sel.size };
-  }
-
-  const inc = cobrir(sel, conjuntos);
-  const custoInc = inc.escolhidos.length + inc.avulsos.length;
-  const resumoInc = {
-    modo: 'inclusao' as const,
-    conjuntos: inc.escolhidos,
-    avulsos: inc.avulsos,
-    total: sel.size,
-  };
-  if (foraDoUniverso.length > 0 || sel.size * 2 <= universo.length) return resumoInc;
-
-  const complemento = new Set(universo.filter((id) => !sel.has(id)));
-  const exc = cobrir(complemento, conjuntos);
-  const custoExc = exc.escolhidos.length + exc.avulsos.length;
-  if (custoExc < custoInc) {
-    return { modo: 'exclusao', conjuntos: exc.escolhidos, avulsos: exc.avulsos, total: sel.size };
-  }
-  return resumoInc;
-}
-
-/* ============================================================================
- * CONJUNTOS PERSONALIZADOS (da unidade)
- * ========================================================================== */
-
-export const CONJUNTOS_EVENTO_VERSION = 1 as const;
-
-export interface ConjuntoEventoPersonalizado {
-  id: string;
-  rotulo: string;
-  ids: string[];
-}
-
-/**
- * A lista é da **unidade** — uma chave por silo, como os setores (D-26) —, e
- * não do plano: o plano já grava os ids explícitos, então o conjunto é só um
- * atalho de quem monta a regra, e não precisa viajar com ele.
- */
-export interface ConjuntosEventoUnidade {
-  version: typeof CONJUNTOS_EVENTO_VERSION;
-  itens: ConjuntoEventoPersonalizado[];
-}
