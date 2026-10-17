@@ -82,17 +82,18 @@ function detalheRecurso(s: Subitem): string {
         ? [s.pref.tipo && `Tipo: ${s.pref.tipo}`, s.pref.acao && `Ação: ${s.pref.acao}`].filter((x): x is string => !!x)
         : [];
   if (!linhas.length) return '';
-  return `<span class="regra-mini">${linhas.map((l) => esc(l).replace(/\n/g, '<br>')).join('<br>')}</span>`;
+  return `<p class="regra-mini">${linhas.map((l) => esc(l).replace(/\n/g, '<br>')).join('<br>')}</p>`;
 }
 
+/** Um parágrafo por recurso, que é o que o esquema do editor aceita dentro da célula e do item. */
 function recursosHtml(ctx: Contexto, e: Edge, o: OpcoesGerar): string {
   if (!e.data.subitems.length) {
-    return e.data.kind === 'manual' ? 'Sem recurso: feita à mão.' : 'Nenhum recurso cadastrado.';
+    return `<p>${e.data.kind === 'manual' ? 'Sem recurso: feita à mão.' : 'Nenhum recurso cadastrado.'}</p>`;
   }
   return e.data.subitems
     .map((s) => {
-      const caixa = o.caixas ? `<span class="caixa${s.ja_criado ? ' feita' : ''}"></span>` : '';
-      return `<span class="rec-linha">${caixa}${chipRecurso(ctx, e, s)}</span>${o.detalhe ? detalheRecurso(s) : ''}`;
+      const caixa = o.caixas ? `<span class="caixa${s.ja_criado ? ' feita' : ''}"></span> ` : '';
+      return `<p>${caixa}${chipRecurso(ctx, e, s)}</p>${o.detalhe ? detalheRecurso(s) : ''}`;
     })
     .join('');
 }
@@ -110,7 +111,7 @@ export function htmlFigura(bloco: BlocoFluxo): string {
 function legendaTabela(ctx: Contexto, r: Recorte, o: OpcoesGerar): string {
   const linhas = r.arestas.map(
     (e) =>
-      `<tr><td>${numeroHtml(e, r)}</td><td>${chipLoc(ctx, e.source)} →<br>${chipLoc(ctx, e.target)}</td><td><span class="tipo-p ${e.data.kind}">${KIND_LABELS[e.data.kind]}</span><br>${resumoDe(e)}</td><td>${recursosHtml(ctx, e, o)}</td></tr>`,
+      `<tr><td><p>${numeroHtml(e, r)}</p></td><td><p>${chipLoc(ctx, e.source)} →<br>${chipLoc(ctx, e.target)}</p></td><td><p><span class="tipo-p ${e.data.kind}">${KIND_LABELS[e.data.kind]}</span><br>${resumoDe(e)}</p></td><td>${recursosHtml(ctx, e, o)}</td></tr>`,
   );
   return `<table class="leg"><thead><tr><th>Nº</th><th>De → Para</th><th>Quando</th><th>Recursos no Eproc</th></tr></thead><tbody>${linhas.join('')}</tbody></table>`;
 }
@@ -124,7 +125,7 @@ function legendaPorOrigem(ctx: Contexto, r: Recorte, o: OpcoesGerar): string {
     .map((id) => {
       const itens = r.arestas
         .filter((e) => e.source === id)
-        .map((e) => `<li>${numeroHtml(e, r)} para ${chipLoc(ctx, e.target)}: ${resumoDe(e)}<br>${recursosHtml(ctx, e, o)}</li>`);
+        .map((e) => `<li><p>${numeroHtml(e, r)} para ${chipLoc(ctx, e.target)}: ${resumoDe(e)}</p>${recursosHtml(ctx, e, o)}</li>`);
       return `<h3>Saídas de ${chipLoc(ctx, id)}</h3><ul>${itens.join('')}</ul>`;
     })
     .join('');
@@ -142,7 +143,7 @@ export function gerarDocumento(ctx: Contexto, nome: string, o: OpcoesGerar): str
   const locs = bloco.nos
     .map((id) => {
       const n = ctx.plano.nodes.find((x) => x.id === id);
-      return `<li>${chipLoc(ctx, id)} · ${n?.data.ja_criado ? 'já existe no Eproc' : 'a criar'}</li>`;
+      return `<li><p>${chipLoc(ctx, id)} · ${n?.data.ja_criado ? 'já existe no Eproc' : 'a criar'}</p></li>`;
     })
     .join('');
   return [

@@ -1524,15 +1524,14 @@ body {
 .doc table.leg th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.04em; color: var(--p-texto-3); border-bottom: 0.4mm solid var(--p-texto); padding: 1.5mm 2mm; }
 .doc table.leg td { border-bottom: 0.25mm solid var(--p-borda); padding: 2.2mm 2mm; vertical-align: top; }
 .doc table.leg tr { break-inside: avoid; }
-.rec-linha { display: block; margin-bottom: 1mm; }
-.regra-mini { display: block; font-size: 8pt; line-height: 1.4; color: var(--p-texto-2); padding-left: 2mm; border-left: 0.5mm solid var(--p-atp-borda); margin: 0.6mm 0 1.4mm; }
+.doc table.leg p, .doc li > p { margin: 0 0 1mm; }
+.doc p.regra-mini { font-size: 8pt; line-height: 1.4; color: var(--p-texto-2); padding-left: 2mm; border-left: 0.5mm solid var(--p-atp-borda); margin: 0.6mm 0 1.4mm; }
 .doc .caixa { display: inline-block; width: 3mm; height: 3mm; border: 0.3mm solid var(--p-texto-2); border-radius: 0.5mm; margin-right: 1.4mm; vertical-align: -1px; }
 .doc .caixa.feita { background: var(--p-texto-3); border-color: var(--p-texto-3); }
 .detalhe-mencao { border-left: 3px solid var(--p-atp-borda); background: var(--p-fundo-2); padding: 2mm 3mm; margin: 0 0 3mm; font-size: 9.2pt; border-radius: 0 4px 4px 0; }
-.detalhe-mencao .dm-tit { font-weight: 700; margin-bottom: 1mm; }
-.detalhe-mencao dl { display: grid; grid-template-columns: auto 1fr; gap: 0.6mm 3mm; margin: 0; }
-.detalhe-mencao dt { color: var(--p-texto-3); }
-.detalhe-mencao dd { margin: 0; }
+.detalhe-mencao p { margin: 0 0 0.6mm; }
+.detalhe-mencao p.dm-tit { margin-bottom: 1mm; }
+.detalhe-mencao em { font-style: normal; color: var(--p-texto-3); }
 
 /* ---------- Menções ---------- */
 .mencao {
@@ -1701,3 +1700,15 @@ body {
   #impressao-mapa .folha-slide:last-child { break-after: auto; }
   #impressao-mapa .doc-impressa { page: mapa-retrato; background: #fff; }
 }
+
+/* ---------- Editor do documento (TipTap) ---------- */
+.doc-folha .ProseMirror { outline: none; min-height: 240mm; }
+.doc-folha .ProseMirror-selectednode { outline: 2px solid var(--p-atp); outline-offset: 2px; border-radius: 3px; }
+.doc-folha .ProseMirror .selectedCell { background: var(--p-atp-fundo); }
+.doc-folha .ProseMirror table.leg td, .doc-folha .ProseMirror table.leg th { position: relative; min-width: 12mm; }
+.doc-folha .ProseMirror-gapcursor:after { border-top-color: var(--p-texto); }
+.doc-folha figure.fluxo-bloco { cursor: default; }
+.doc-folha img { cursor: pointer; }
+
+.btn.ativo-formato { background: var(--destaque-suave); color: var(--texto); }
+.doc-folha .ProseMirror table.leg td, .doc-folha .ProseMirror table.leg th { outline: 1px dashed var(--p-borda); outline-offset: -1px; }

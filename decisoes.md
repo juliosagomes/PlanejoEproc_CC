@@ -1847,13 +1847,22 @@ em 16/10/2026, e as decisões em aberto ficaram com o que a demo propunha:
   Os vãos largos do quadro são **reaproximados** (no máximo uma coluna de
   folga), sem trocar a ordem de nada. Sem isso, um plano largo sai com o nome do
   localizador ilegível no A4.
-- **Editor sem dependência nova.** O retrato é um `contenteditable` com
-  `execCommand`: títulos, negrito, listas, imagem e menção cobrem o que se pediu.
-  A colagem entra como texto puro, e todo HTML lido passa por uma lista do que é
-  permitido (`features/mapas/sanitizar.ts`). Uma biblioteca de editor
-  (TipTap/ProseMirror, Lexical) traria vários pacotes e uma superfície a
-  conferir contra a CSP. A quebra de página no editor é só uma linha
-  aproximada.
+- **O retrato usa o TipTap 3 (ProseMirror)**, a primeira dependência nova
+  do recurso. A primeira versão era um `contenteditable` com `execCommand` e
+  não servia. O Ctrl+Z não desfazia a menção, a imagem nem o desenho, que
+  entravam pelo DOM, e às vezes desfazia outra coisa. Também não havia tabela
+  editável, o cursor travava em volta da menção e a colagem precisava ser só
+  texto. Com o esquema (`features/mapas/editor/extensoes.ts`), a menção, o
+  número da transição, a caixa, o bloco de detalhe e o desenho são tipos
+  próprios. Tudo entra no desfazer, a colagem do Word chega filtrada pelo
+  esquema e imagem só entra embutida (`data:`), nunca de endereço remoto. O
+  formato gravado continua HTML, e todo HTML lido passa ainda por
+  `features/mapas/sanitizar.ts`. O editor pesa uns 160 KB comprimidos e é
+  carregado só quando um documento abre (`lazy` em `TelaMapas`). O
+  `dist-ext/` não tem `eval` nem `new Function` (critério 7, conferido no
+  build). A quebra de página no editor continua uma linha aproximada: nenhuma
+  biblioteca gratuita pagina como o Word. Os slides continuam sem biblioteca,
+  porque as caixas de texto são curtas.
 - **A impressão é a do Chrome**, como na demo: `window.print()` com as folhas
   montadas no `<body>` e uma `@page` por formato. Sem jsPDF nem html2canvas, o
   texto do PDF continua selecionável, e não há `eval` (critério de pronto nº 7).
@@ -1875,9 +1884,10 @@ em 16/10/2026, e as decisões em aberto ficaram com o que a demo propunha:
   pull/push, com a decisão de quem ganha num conflito.
 - **Outra aba do editor** que grave um mapa não é ouvida (`useSincronizacaoExterna`
   só recarrega planos).
-- **Paginação de verdade** no retrato (ver a página 2 como página) e **desfazer**
-  nos slides pedem um editor mais robusto. Se for preciso, avaliar uma
-  biblioteca, conferindo a CSP no `dist-ext/` (critério 7).
+- **Paginação de verdade** no retrato (ver a página 2 como página) não vem com
+  o TipTap gratuito. Os **slides** não têm desfazer. Se fizer falta, as caixas de
+  texto podem virar editores TipTap pequenos, e as peças podem ganhar uma pilha
+  de retratos como a do quadro.
 - **A3 e desenho dividido em duas folhas**, que a demo antiga mostrava, ficaram
   de fora.
 - Com as **regras de ATP na sincronização**, a menção poderia apontar para a

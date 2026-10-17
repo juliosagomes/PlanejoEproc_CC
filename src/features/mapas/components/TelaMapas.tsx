@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { Icon } from '@/components/Icon';
 import { ItemMenu, MenuSuspenso } from '@/components/MenuSuspenso';
 import { useCanvasStore } from '@/features/canvas/store';
@@ -5,9 +6,11 @@ import { cn } from '@/utils/cn';
 import { useMapasStore } from '../store';
 import { useCatalogoMencoes } from '../useCatalogoMencoes';
 import type { AlvoNoFluxo } from '../verNoFluxo';
-import { EditorDocumento } from './EditorDocumento';
 import { EditorSlides } from './EditorSlides';
 import { IconeFormato } from './IconeFormato';
+
+// O TipTap pesa uns 160 KB comprimidos: só vem quando um documento é aberto.
+const EditorDocumento = lazy(() => import('./EditorDocumento').then((m) => ({ default: m.EditorDocumento })));
 
 interface Props {
   onVerNoFluxo: (alvo: AlvoNoFluxo) => void;
@@ -107,7 +110,9 @@ export function TelaMapas({ onVerNoFluxo, onIrParaFluxo }: Props) {
       <section className="mapas-editor">
         {!aberto && <div className="mapas-sem-mapa">Escolha um mapa na lista ou crie um novo.</div>}
         {aberto?.formato === 'retrato' && (
-          <EditorDocumento key={aberto.id} mapa={aberto} catalogo={catalogo} somenteLeitura={somenteLeitura} onVerNoFluxo={onVerNoFluxo} />
+          <Suspense fallback={<div className="mapas-sem-mapa">Abrindo o editor…</div>}>
+            <EditorDocumento key={aberto.id} mapa={aberto} catalogo={catalogo} somenteLeitura={somenteLeitura} onVerNoFluxo={onVerNoFluxo} />
+          </Suspense>
         )}
         {aberto?.formato === 'paisagem' && (
           <EditorSlides key={aberto.id} mapa={aberto} catalogo={catalogo} somenteLeitura={somenteLeitura} onVerNoFluxo={onVerNoFluxo} />

@@ -384,7 +384,7 @@ export function detalhar(r: Resolvida): DetalheMencao {
 export function htmlMencao(ref: RefMencao, nome = ref.rotulo): string {
   const id = ref.eprocId ? ` data-eproc-id="${esc(ref.eprocId)}"` : '';
   const no = ref.no ? ` data-no="${esc(ref.no)}"` : '';
-  return `<span class="mencao m-${ref.tipo}" contenteditable="false" data-tipo="${ref.tipo}" data-chave="${esc(ref.chave)}" data-rotulo="${esc(ref.rotulo)}"${id}${no}>${esc(nome)}</span>`;
+  return `<span class="mencao m-${ref.tipo}" contenteditable="false" data-tipo="${ref.tipo}" data-chave="${esc(ref.chave)}" data-rotulo="${esc(nome)}"${id}${no}>${esc(nome)}</span>`;
 }
 
 const TIPOS = new Set<string>(['loc', 'pref', 'atp']);
@@ -429,6 +429,8 @@ export function htmlDetalhe(ref: RefMencao, cat: CatalogoMencoes): string {
   const valor = (v: LinhaDetalhe['valor']) =>
     typeof v === 'string' ? esc(v).replace(/\n/g, '<br>') : v.map((x) => htmlMencao(x)).join(' ');
   const titulo = r.tipo === 'atp' ? `Regra de ATP ${htmlMencao(ref, r.nome)}` : htmlMencao(ref, r.nome);
-  return `<div class="detalhe-mencao"><div class="dm-tit">${titulo}</div><dl>${d.linhas.map((l) => `<dt>${esc(l.label)}</dt><dd>${valor(l.valor)}</dd>`).join('')}</dl></div>`;
+  // Parágrafos, e não <dl>: é o que o editor do documento consegue editar.
+  const linhas = d.linhas.map((l) => `<p><em>${esc(l.label)}:</em> ${valor(l.valor)}</p>`).join('');
+  return `<div class="detalhe-mencao"><p class="dm-tit"><b>${titulo}</b></p>${linhas}</div>`;
 }
 

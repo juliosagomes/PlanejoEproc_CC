@@ -1,45 +1,34 @@
-import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type DragEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { NodeSelection } from '@tiptap/pm/state';
+import { EditorContent, useEditor, type Editor } from '@tiptap/react';
 import type { BlocoFluxo, MapaRetrato } from '@/domain';
-import { useSetoresStore } from '@/features/setores/store';
-import { blocoDesatualizado, desenharBloco } from '../fluxoPapel';
-import { htmlFigura } from '../gerar';
+import { atributosDoBloco, extensoesDoDocumento, FiguraFluxo } from '../editor/extensoes';
+import { FiguraFluxoComVisao } from '../editor/FiguraFluxoView';
+import { sincronizarMencoes } from '../editor/mencoesNoEditor';
+import { useSugestaoMencao } from '../editor/useSugestaoMencao';
 import { escolherImagem, prepararImagem } from '../imagem';
-import { atualizarMencoes, htmlDetalhe, lerRef, type CatalogoMencoes } from '../mencoes';
-import { planoPorId } from '../planos';
-import { lerFigura, sanitizarHtml } from '../sanitizar';
+import { htmlDetalhe, lerRef, type CatalogoMencoes } from '../mencoes';
+import { sanitizarHtml } from '../sanitizar';
 import { useMapasStore } from '../store';
 import type { AlvoNoFluxo } from '../verNoFluxo';
 import { BarraMapa } from './BarraMapa';
 import { DialogoInserirFluxo } from './DialogoInserirFluxo';
 import { useCartaoMencao } from './useCartaoMencao';
-import { useMencoes } from './useMencoes';
 
 /* ============================================================================
  * EDITOR DO MAPA EM RETRATO (decisoes.md#D-39)
  *
- * Um `contenteditable` com `execCommand`, sem biblioteca de editor: cobre o que
- * o documento precisa (títulos, negrito, listas, imagem, menção) sem dependência
- * nova. O React não controla o conteúdo — ele é posto uma vez por mapa, e cada
- * `input` devolve o HTML para a store. Controlá-lo faria o cursor pular a cada
- * tecla.
- *
- * A colagem entra como texto puro: HTML de fora traria estilo e, pior, o que a
- * sanitização teria de tirar depois.
+ * TipTap (ProseMirror). O documento tem esquema (`editor/extensoes.ts`): a
+ * menção, o desenho e o bloco de detalhe são tipos próprios, e por isso tudo
+ * entra no desfazer e a colagem do Word chega filtrada pelo esquema, com a
+ * formatação que o mapa aceita. O que se grava continua HTML.
  * ========================================================================== */
 
 const ESTILOS = [
   { valor: 'p', rotulo: 'Parágrafo' },
-  { valor: 'h1', rotulo: 'Título 1' },
-  { valor: 'h2', rotulo: 'Título 2' },
-  { valor: 'h3', rotulo: 'Título 3' },
-] as const;
-
-const FORMATOS = [
-  { cmd: 'bold', rotulo: 'N', titulo: 'Negrito (Ctrl+B)', classe: 'font-bold' },
-  { cmd: 'italic', rotulo: 'I', titulo: 'Itálico (Ctrl+I)', classe: 'italic' },
-  { cmd: 'underline', rotulo: 'S', titulo: 'Sublinhado (Ctrl+U)', classe: 'underline' },
-  { cmd: 'insertUnorderedList', rotulo: '•', titulo: 'Lista com marcadores', classe: '' },
-  { cmd: 'insertOrderedList', rotulo: '1.', titulo: 'Lista numerada', classe: '' },
+  { valor: '1', rotulo: 'Título 1' },
+  { valor: '2', rotulo: 'Título 2' },
+  { valor: '3', rotulo: 'Título 3' },
 ] as const;
 
 interface Props {
@@ -49,276 +38,218 @@ interface Props {
   onVerNoFluxo: (alvo: AlvoNoFluxo) => void;
 }
 
-/** O aviso que vai dentro da figura desatualizada. Some na gravação e na impressão. */
-function avisoFluxo(planoSumiu: boolean, planoNome: string): HTMLElement {
-  const div = document.createElement('div');
-  div.className = 'fluxo-aviso';
-  div.setAttribute('contenteditable', 'false');
-  div.textContent = planoSumiu
-    ? `O plano "${planoNome}" não existe mais neste silo. O desenho fica como estava.`
-    : 'O plano mudou depois deste desenho.';
-  if (!planoSumiu) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.dataset.atualizarFluxo = '';
-    b.textContent = 'Atualizar desenho';
-    div.appendChild(b);
+function arquivoDeImagem(lista: FileList | undefined | null): File | undefined {
+  return [...(lista ?? [])].find((f) => f.type.startsWith('image/'));
+}
+
+/** Insere uma imagem escolhida ou colada onde está o cursor. */
+async function inserirImagem(editor: Editor, arquivo?: Blob): Promise<void> {
+  try {
+    const img = arquivo ? await prepararImagem(arquivo) : await escolherImagem();
+    if (img) editor.chain().focus().insertContent({ type: 'image', attrs: { src: img.src, largura: '60%' } }).run();
+  } catch (err) {
+    window.alert((err as Error).message);
   }
-  return div;
-}
-
-function marcarFluxos(folha: HTMLElement): void {
-  folha.querySelectorAll('figure.fluxo-bloco').forEach((fig) => {
-    fig.querySelector('.fluxo-aviso')?.remove();
-    const bloco = lerFigura(fig);
-    if (!bloco) return;
-    const plano = planoPorId(bloco.planoId);
-    if (blocoDesatualizado(bloco, plano)) fig.prepend(avisoFluxo(plano === null, bloco.planoNome));
-  });
-}
-
-/** O filho direto da folha onde está `no` — é depois dele que blocos novos entram. */
-function blocoDe(folha: HTMLElement, no: Node | null | undefined): Element | null {
-  let atual = no ?? null;
-  while (atual && atual.parentNode !== folha) atual = atual.parentNode;
-  return atual instanceof Element ? atual : null;
 }
 
 export function EditorDocumento({ mapa, catalogo, somenteLeitura, onVerNoFluxo }: Props) {
   const mudar = useMapasStore((s) => s.mudar);
-  const setores = useSetoresStore((s) => s.setores);
   const raizRef = useRef<HTMLDivElement>(null);
-  const folhaRef = useRef<HTMLDivElement>(null);
-  const ultimoRange = useRef<Range | null>(null);
   const [inserindoFluxo, setInserindoFluxo] = useState(false);
-  const [imagem, setImagem] = useState<{ el: HTMLImageElement; left: number; top: number } | null>(null);
+  const [, setRolagem] = useState(0);
+  const { extensao: sugestao, menu } = useSugestaoMencao(catalogo);
 
-  const salvar = useCallback(() => {
-    const folha = folhaRef.current;
-    if (!folha) return;
-    const copia = folha.cloneNode(true) as HTMLElement;
-    copia.querySelectorAll('.fluxo-aviso').forEach((el) => el.remove());
-    const html = copia.innerHTML;
-    mudar((m) => (m.formato === 'retrato' ? { ...m, html } : m));
-  }, [mudar]);
-
-  // O conteúdo é posto uma vez por mapa; dali em diante, quem manda é o DOM.
-  useEffect(() => {
-    const folha = folhaRef.current;
-    if (!folha) return;
-    folha.innerHTML = sanitizarHtml(mapa.html);
-    atualizarMencoes(folha, catalogo);
-    marcarFluxos(folha);
-    // Só na troca de mapa; o catálogo tem efeito próprio logo abaixo.
-  }, [mapa.id]);
-
-  // Sincronizou a unidade ou mexeu num plano com o mapa aberto: as menções acompanham.
-  useEffect(() => {
-    const folha = folhaRef.current;
-    if (!folha) return;
-    if (atualizarMencoes(folha, catalogo) > 0 && !somenteLeitura) salvar();
-    marcarFluxos(folha);
-  }, [catalogo, salvar, somenteLeitura]);
-
-  useEffect(() => {
-    const guardar = () => {
-      const sel = window.getSelection();
-      const folha = folhaRef.current;
-      if (sel?.rangeCount && folha?.contains(sel.anchorNode)) ultimoRange.current = sel.getRangeAt(0).cloneRange();
-    };
-    document.addEventListener('selectionchange', guardar);
-    return () => document.removeEventListener('selectionchange', guardar);
-  }, []);
-
-  const { menu, iniciar } = useMencoes(raizRef, catalogo, salvar);
-
-  const inserirDepoisDoCursor = useCallback(
-    (html: string) => {
-      const folha = folhaRef.current;
-      if (!folha) return;
-      const tpl = document.createElement('template');
-      tpl.innerHTML = html;
-      const ref = blocoDe(folha, ultimoRange.current?.startContainer);
-      if (ref) ref.after(tpl.content);
-      else folha.append(tpl.content);
-      atualizarMencoes(folha, catalogo);
-      salvar();
-    },
-    [catalogo, salvar],
+  const extensoes = useMemo(
+    () => [...extensoesDoDocumento().filter((e) => e.name !== FiguraFluxo.name), FiguraFluxoComVisao, sugestao],
+    [sugestao],
   );
+
+  const editor = useEditor(
+    {
+      extensions: extensoes,
+      content: sanitizarHtml(mapa.html),
+      editable: !somenteLeitura,
+      // A barra mostra o estado da seleção (negrito, tabela, imagem), então ela
+      // precisa redesenhar a cada transação; o documento de um mapa é pequeno.
+      shouldRerenderOnTransaction: true,
+      editorProps: {
+        attributes: { spellcheck: 'true', lang: 'pt-BR', 'aria-label': 'Documento do mapa' },
+        handlePaste: (_view, event) => {
+          const arquivo = arquivoDeImagem(event.clipboardData?.files);
+          if (!arquivo || !editorRef.current) return false;
+          void inserirImagem(editorRef.current, arquivo);
+          return true;
+        },
+        handleDrop: (_view, event) => {
+          const arquivo = arquivoDeImagem((event as DragEvent).dataTransfer?.files);
+          if (!arquivo || !editorRef.current) return false;
+          event.preventDefault();
+          void inserirImagem(editorRef.current, arquivo);
+          return true;
+        },
+      },
+      onUpdate: ({ editor: e }) => {
+        const html = e.getHTML();
+        mudar((m) => (m.formato === 'retrato' ? { ...m, html } : m));
+      },
+    },
+    [mapa.id],
+  );
+  const editorRef = useRef<Editor | null>(null);
+  editorRef.current = editor;
+
+  useEffect(() => {
+    editor?.setEditable(!somenteLeitura);
+  }, [editor, somenteLeitura]);
+
+  // Sincronizou a unidade ou mexeu num plano: as menções acompanham.
+  useEffect(() => {
+    if (editor && !editor.isDestroyed) sincronizarMencoes(editor, catalogo);
+  }, [editor, catalogo]);
 
   const cartao = useCartaoMencao(raizRef, catalogo, {
     podeEditar: !somenteLeitura,
     onVerNoFluxo,
     onInserirDetalhe: (chip) => {
-      const folha = folhaRef.current;
       const ref = lerRef(chip);
-      if (!folha || !ref) return;
-      const tpl = document.createElement('template');
-      tpl.innerHTML = htmlDetalhe(ref, catalogo);
-      const celula = chip.closest('td');
-      if (celula) celula.append(tpl.content);
-      else blocoDe(folha, chip)?.after(tpl.content);
-      salvar();
+      if (!editor || !ref) return;
+      const $pos = editor.state.doc.resolve(editor.view.posAtDOM(chip, 0));
+      // Logo depois do parágrafo da menção — ou do bloco de detalhe, se ela já estiver num.
+      const profundidade = $pos.node($pos.depth - 1)?.type.name === 'detalheMencao' ? $pos.depth - 1 : $pos.depth;
+      editor.chain().focus().insertContentAt($pos.after(profundidade), htmlDetalhe(ref, catalogo)).run();
     },
   });
 
-  const formatar = (cmd: string, valor?: string) => {
-    folhaRef.current?.focus();
-    const r = ultimoRange.current;
-    if (r) {
-      window.getSelection()?.removeAllRanges();
-      window.getSelection()?.addRange(r);
-    }
-    document.execCommand(cmd, false, valor);
-    salvar();
-  };
+  const imagemSelecionada =
+    editor && editor.state.selection instanceof NodeSelection && editor.state.selection.node.type.name === 'image';
+  const posImagem = (() => {
+    if (!editor || !imagemSelecionada) return null;
+    const el = editor.view.nodeDOM(editor.state.selection.from) as HTMLElement | null;
+    const r = el?.getBoundingClientRect();
+    return r ? { left: r.left, top: Math.max(8, r.top - 40) } : null;
+  })();
 
-  const inserirImagem = async (arquivo?: Blob) => {
-    try {
-      const img = arquivo ? await prepararImagem(arquivo) : await escolherImagem();
-      if (img) inserirDepoisDoCursor(`<p><img src="${img.src}" style="width:60%" alt=""></p>`);
-    } catch (err) {
-      window.alert((err as Error).message);
-    }
-  };
+  // A barra da tabela flutua sobre ela: na barra principal, faria tudo pular de linha.
+  const posTabela = (() => {
+    if (!editor || !editor.isActive('table')) return null;
+    const { node } = editor.view.domAtPos(editor.state.selection.from);
+    const tabela = (node instanceof Element ? node : node.parentElement)?.closest('table');
+    const r = tabela?.getBoundingClientRect();
+    return r ? { left: r.left, top: Math.max(8, r.top - 40) } : null;
+  })();
 
-  const atualizarFigura = (fig: Element) => {
-    const bloco = lerFigura(fig);
-    const plano = bloco && planoPorId(bloco.planoId);
-    if (!bloco || !plano) return;
-    const novo = desenharBloco(plano, bloco.planoId, bloco.nos, bloco.fora, setores, new Date().toISOString());
-    const tpl = document.createElement('template');
-    tpl.innerHTML = htmlFigura(novo);
-    fig.replaceWith(tpl.content);
-    salvar();
-  };
+  const estiloAtual = !editor
+    ? 'p'
+    : ([1, 2, 3] as const).find((n) => editor.isActive('heading', { level: n }))?.toString() ?? 'p';
 
-  const aoColar = (e: ClipboardEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const arquivo = [...e.clipboardData.files].find((f) => f.type.startsWith('image/'));
-    if (arquivo) void inserirImagem(arquivo);
-    else document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
-  };
+  const botao = (rotulo: string, titulo: string, ativo: boolean, acao: () => void, classe = '') => (
+    <button
+      type="button"
+      className={`btn btn-sm btn-icon btn-ghost${ativo ? ' ativo-formato' : ''}`}
+      title={titulo}
+      aria-label={titulo}
+      aria-pressed={ativo}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={acao}
+    >
+      <span className={classe}>{rotulo}</span>
+    </button>
+  );
 
-  const aoSoltar = (e: DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const arquivo = [...e.dataTransfer.files].find((f) => f.type.startsWith('image/'));
-    if (arquivo && !somenteLeitura) void inserirImagem(arquivo);
-  };
-
-  const aoClicar = (e: MouseEvent<HTMLDivElement>) => {
-    const alvo = e.target as HTMLElement;
-    const atualizar = alvo.closest('[data-atualizar-fluxo]');
-    if (atualizar) {
-      const fig = atualizar.closest('figure.fluxo-bloco');
-      if (fig) atualizarFigura(fig);
-      return;
-    }
-    if (alvo instanceof HTMLImageElement && !somenteLeitura) {
-      const r = alvo.getBoundingClientRect();
-      setImagem({ el: alvo, left: r.left, top: Math.max(8, r.top - 40) });
-    } else {
-      setImagem(null);
-    }
-  };
-
-  const ferramentas = (
+  const ferramentas = editor && (
     <>
       <select
         className="input mapa-estilo"
         aria-label="Estilo do parágrafo"
-        value=""
-        onChange={(e) => formatar('formatBlock', e.target.value)}
+        value={estiloAtual}
+        onChange={(e) => {
+          const v = e.target.value;
+          const c = editor.chain().focus();
+          if (v === 'p') c.setParagraph().run();
+          else c.setHeading({ level: Number(v) as 1 | 2 | 3 }).run();
+        }}
       >
-        <option value="" disabled hidden>
-          Estilo
-        </option>
         {ESTILOS.map((s) => (
           <option key={s.valor} value={s.valor}>
             {s.rotulo}
           </option>
         ))}
       </select>
-      {FORMATOS.map((f) => (
-        <button
-          key={f.cmd}
-          type="button"
-          className="btn btn-sm btn-icon btn-ghost"
-          title={f.titulo}
-          aria-label={f.titulo}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => formatar(f.cmd)}
-        >
-          <span className={f.classe}>{f.rotulo}</span>
-        </button>
-      ))}
+      {botao('N', 'Negrito (Ctrl+B)', editor.isActive('bold'), () => editor.chain().focus().toggleBold().run(), 'font-bold')}
+      {botao('I', 'Itálico (Ctrl+I)', editor.isActive('italic'), () => editor.chain().focus().toggleItalic().run(), 'italic')}
+      {botao('S', 'Sublinhado (Ctrl+U)', editor.isActive('underline'), () => editor.chain().focus().toggleUnderline().run(), 'underline')}
+      {botao('•', 'Lista com marcadores', editor.isActive('bulletList'), () => editor.chain().focus().toggleBulletList().run())}
+      {botao('1.', 'Lista numerada', editor.isActive('orderedList'), () => editor.chain().focus().toggleOrderedList().run())}
+      {botao('↶', 'Desfazer (Ctrl+Z)', false, () => editor.chain().focus().undo().run())}
+      {botao('↷', 'Refazer (Ctrl+Y)', false, () => editor.chain().focus().redo().run())}
       <span className="mapa-barra-sep" aria-hidden />
-      <button type="button" className="btn btn-sm btn-ghost" onMouseDown={(e) => e.preventDefault()} onClick={() => void inserirImagem()}>
+      <button type="button" className="btn btn-sm btn-ghost" onMouseDown={(e) => e.preventDefault()} onClick={() => void inserirImagem(editor)}>
         Imagem
       </button>
       <button type="button" className="btn btn-sm btn-ghost" onMouseDown={(e) => e.preventDefault()} onClick={() => setInserindoFluxo(true)}>
         Fluxo do plano
       </button>
+      <button
+        type="button"
+        className="btn btn-sm btn-ghost"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+      >
+        Tabela
+      </button>
     </>
   );
 
+  const mencionar = () => {
+    if (!editor) return;
+    const antes = editor.state.selection.$from.nodeBefore?.text ?? '';
+    editor.chain().focus().insertContent(antes && !/\s$/.test(antes) ? ' @' : '@').run();
+  };
+
   return (
     <div className="flex flex-col flex-1 min-h-0" ref={raizRef}>
-      <BarraMapa
-        mapa={mapa}
-        catalogo={catalogo}
-        somenteLeitura={somenteLeitura}
-        ferramentas={ferramentas}
-        onMencionar={() => folhaRef.current && iniciar(folhaRef.current)}
-      />
-      <div className="mapa-doc-rolagem" onScroll={() => setImagem(null)}>
-        <div
-          ref={folhaRef}
-          className="doc-folha doc papel"
-          contentEditable={!somenteLeitura}
-          suppressContentEditableWarning
-          spellCheck
-          lang="pt-BR"
-          data-mencoes=""
-          role="textbox"
-          aria-multiline="true"
-          aria-label="Documento do mapa"
-          onInput={salvar}
-          onPaste={aoColar}
-          onDrop={aoSoltar}
-          onClick={aoClicar}
-        />
+      <BarraMapa mapa={mapa} catalogo={catalogo} somenteLeitura={somenteLeitura} ferramentas={ferramentas} onMencionar={mencionar} />
+      {/* As barras flutuantes medem a tela a cada desenho; rolar precisa redesenhar. */}
+      <div className="mapa-doc-rolagem" onScroll={() => setRolagem((n) => n + 1)}>
+        <div className="doc-folha doc papel" data-mencoes="">
+          <EditorContent editor={editor} />
+        </div>
       </div>
       {menu}
       {cartao}
-      {imagem && (
-        <div className="mapa-barra-imagem" style={{ left: imagem.left, top: imagem.top }}>
+      {editor && posImagem && !somenteLeitura && (
+        <div className="mapa-barra-imagem" style={posImagem}>
           {(['33%', '60%', '100%'] as const).map((w, i) => (
             <button
               key={w}
               type="button"
               className="btn btn-sm btn-ghost"
-              onClick={() => {
-                imagem.el.style.width = w;
-                setImagem(null);
-                salvar();
-              }}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => editor.chain().focus().updateAttributes('image', { largura: w }).run()}
             >
               {['Pequena', 'Média', 'Largura toda'][i]}
             </button>
           ))}
-          <button
-            type="button"
-            className="btn btn-sm btn-ghost"
-            onClick={() => {
-              imagem.el.remove();
-              setImagem(null);
-              salvar();
-            }}
-          >
+          <button type="button" className="btn btn-sm btn-ghost" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().deleteSelection().run()}>
             Remover
           </button>
+        </div>
+      )}
+      {editor && posTabela && !somenteLeitura && (
+        <div className="mapa-barra-imagem" style={posTabela} role="toolbar" aria-label="Tabela">
+          {(
+            [
+              ['+ Linha', () => editor.chain().focus().addRowAfter().run()],
+              ['+ Coluna', () => editor.chain().focus().addColumnAfter().run()],
+              ['− Linha', () => editor.chain().focus().deleteRow().run()],
+              ['− Coluna', () => editor.chain().focus().deleteColumn().run()],
+              ['Excluir tabela', () => editor.chain().focus().deleteTable().run()],
+            ] as const
+          ).map(([rotulo, acao]) => (
+            <button key={rotulo} type="button" className="btn btn-sm btn-ghost" onMouseDown={(e) => e.preventDefault()} onClick={acao}>
+              {rotulo}
+            </button>
+          ))}
         </div>
       )}
       {inserindoFluxo && (
@@ -326,7 +257,7 @@ export function EditorDocumento({ mapa, catalogo, somenteLeitura, onVerNoFluxo }
           onFechar={() => setInserindoFluxo(false)}
           onInserir={(bloco: BlocoFluxo) => {
             setInserindoFluxo(false);
-            inserirDepoisDoCursor(htmlFigura(bloco));
+            editor?.chain().focus().insertContent({ type: 'figuraFluxo', attrs: atributosDoBloco(bloco) }).run();
           }}
         />
       )}
