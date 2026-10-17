@@ -10,14 +10,22 @@ import {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-import { nomeEfetivo, type EdgeKind } from '@/domain';
+import {
+  ehAtalhoOutroPlano,
+  mesmaRefOutroPlano,
+  nomeEfetivo,
+  resolverOutroPlano,
+  type EdgeKind,
+  type RefOutroPlano,
+} from '@/domain';
 import { NEW_NODE_DATATYPE } from '@/components/Sidebar';
 import { useTemaStore } from '@/features/tema/store';
-import { loadCamera, saveCamera } from '@/infra/storage';
+import { getAtivoId, loadCamera, saveCamera } from '@/infra/storage';
 import type { Tema } from '@/infra/storage/tema';
 import { cn } from '@/utils/cn';
 import { acharGemeos } from '../gemeos';
 import { useIrParaNo } from '../irParaNo';
+import { outrosPlanos } from '../outrosPlanos';
 import { useCanvasStore } from '../store';
 import { moldurasParaFlow } from '../grupoMudancas';
 import { pecasParaFlow } from '../pecasQuadro';
@@ -71,6 +79,8 @@ const corDoMarcador = (kind: EdgeKind | undefined, tema: Tema): string => {
 interface FlowCanvasProps {
   /** Plano aberto. A câmera é lembrada por plano (`infra/storage/cameras.ts`). */
   planoId: string | null;
+  /** Abre outro plano com o localizador em foco — o destino do atalho do D-40. */
+  onAbrirOutroPlano: (alvo: { planoId: string; noId: string }) => void;
 }
 
 const ESPERA_SALVAR_CAMERA_MS = 300;
@@ -80,7 +90,7 @@ const ESPERA_SALVAR_CAMERA_MS = 300;
  */
 const ESPERA_MEDIR_NOS_MS = 60;
 
-export function FlowCanvas({ planoId }: FlowCanvasProps) {
+export function FlowCanvas({ planoId, onAbrirOutroPlano }: FlowCanvasProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const { screenToFlowPosition, setViewport, fitView } = useReactFlow();
   const [arrastando, setArrastando] = useState(false);
@@ -174,10 +184,52 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
    * enquanto dura o hover, ele manda; ao sair, o filtro volta.
    */
   // O atalho conta como cópia do alvo (D-30): passar o mouse num acende o outro.
+  // O de outro plano não: ele não é cópia de nada que esteja neste quadro.
   const gemeos = useMemo(
-    () => acharGemeos(nodes.map((n) => ({ id: n.id, data: { nome: nomeEfetivo(nodes, n.id) } }))),
+    () =>
+      acharGemeos(
+        nodes.map((n) => ({ id: n.id, data: { nome: ehAtalhoOutroPlano(n) ? '' : nomeEfetivo(nodes, n.id) } })),
+      ),
     [nodes],
   );
+
+  /**
+   * Destino de cada atalho para outro plano (D-40), resolvido só quando as
+   * referências mudam — arrastar um nó não relê os outros planos.
+   */
+  const chaveExternos = useMemo(
+    () =>
+      nodes
+        .filter(ehAtalhoOutroPlano)
+        .map((n) => `${n.id}:${JSON.stringify(n.data.atalhoOutroPlano)}`)
+        .join('|'),
+    [nodes],
+  );
+  const destinosOutroPlano = useMemo(() => {
+    const m = new Map<string, RefOutroPlano | null>();
+    if (!chaveExternos) return m;
+    // O ativo do storage, e não a prop: na troca de plano, os nós novos podem
+    // chegar um render antes do `planoId` novo.
+    const planos = outrosPlanos(getAtivoId());
+    for (const n of useCanvasStore.getState().nodes) {
+      const ref = n.data.atalhoOutroPlano;
+      if (ref) m.set(n.id, resolverOutroPlano(ref, planos));
+    }
+    return m;
+  }, [chaveExternos, planoId]);
+
+  // Achou por nome de reserva, ou o destino foi renomeado: a referência
+  // gravada acompanha, para que o próximo silo que receber o plano ache também.
+  useEffect(() => {
+    if (somenteLeitura || destinosOutroPlano.size === 0) return;
+    const mudou: Record<string, RefOutroPlano> = {};
+    for (const n of useCanvasStore.getState().nodes) {
+      const ref = n.data.atalhoOutroPlano;
+      const destino = destinosOutroPlano.get(n.id);
+      if (ref && destino && !mesmaRefOutroPlano(ref, destino)) mudou[n.id] = destino;
+    }
+    if (Object.keys(mudou).length > 0) useCanvasStore.getState().atualizarRefsOutroPlano(mudou);
+  }, [destinosOutroPlano, somenteLeitura]);
   const irParaNo = useIrParaNo();
 
   // "Ver no fluxo" de uma menção (D-39): o pedido chega antes do quadro existir,
@@ -209,11 +261,13 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
       nodes.map((n) => {
         const chave = gemeos.chaveDe.get(n.id);
         const copias = chave === undefined ? 0 : (gemeos.grupos.get(chave)?.length ?? 0);
+        const destinoOutroPlano = destinosOutroPlano.get(n.id);
         return {
           ...n,
           // Só troca a identidade de `data` quando há o que acrescentar, para
           // não re-renderizar todos os nós a cada mudança da lista.
           ...(copias > 1 ? { data: { ...n.data, copias } } : {}),
+          ...(destinoOutroPlano !== undefined ? { data: { ...n.data, destinoOutroPlano } } : {}),
           selected: !!n.selected,
           hidden: recolhidoDe.has(n.id),
           className: cn(
@@ -222,7 +276,7 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
           ) || undefined,
         };
       }),
-    [nodes, esmaecidos, gemeos, grupoHover, recolhidoDe],
+    [nodes, esmaecidos, gemeos, grupoHover, recolhidoDe, destinosOutroPlano],
   );
   const decoratedEdges = useMemo(
     () =>
@@ -302,6 +356,8 @@ export function FlowCanvas({ planoId }: FlowCanvasProps) {
         onNodeDoubleClick={(e, n) => {
           const alvo = (n.data as { atalhoPara?: string } | undefined)?.atalhoPara;
           if (alvo) irParaNo(alvo);
+          const destino = destinosOutroPlano.get(n.id);
+          if (destino) onAbrirOutroPlano({ planoId: destino.planoId, noId: destino.noId });
           // Dentro da moldura o fundo é dela, e o duplo clique que cria
           // localizador no fundo do canvas criaria aqui também — já membro.
           if (n.type === 'grupo' && !somenteLeitura && !(n.data as { grupo: { recolhido?: boolean } }).grupo.recolhido) {

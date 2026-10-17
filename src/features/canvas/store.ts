@@ -12,6 +12,7 @@ import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import {
   CORES_FLAG,
+  REF_OUTRO_PLANO_VAZIA,
   SCHEMA_VERSION,
   alvoReal,
   flagsPadrao,
@@ -29,6 +30,7 @@ import {
   type Plano,
   type Position,
   type PrefRule,
+  type RefOutroPlano,
   type RegraSemMover,
 } from '@/domain';
 import { flushPlataforma } from '@/infra/plataforma';
@@ -166,6 +168,16 @@ interface CanvasActions {
    * Devolve o id, ou `''` em visualização ou alvo inexistente.
    */
   criarAtalho: (alvoId: string) => string;
+  /**
+   * Cria, em `position`, um atalho para outro plano ainda sem destino, e o
+   * seleciona — o destino se escolhe no painel (decisoes.md#D-40).
+   */
+  criarAtalhoOutroPlano: (position: Position) => string;
+  /**
+   * Regrava as referências que a resolução atualizou (id novo depois de
+   * importar, nome novo depois de renomear). Nó que não é atalho é ignorado.
+   */
+  atualizarRefsOutroPlano: (refs: Record<string, RefOutroPlano>) => void;
 
   // Grupos (decisoes.md#D-31)
   /** Cria uma moldura em volta dos nós e a seleciona. Devolve o id, ou `''`. */
@@ -571,6 +583,36 @@ export const useCanvasStore = create<CanvasStore>()(
         selectedId: id,
       }));
       return id;
+    },
+
+    criarAtalhoOutroPlano: (position) => {
+      if (get().somenteLeitura) return '';
+      const id = uid('n');
+      set((s) => ({
+        ...semSelecaoNenhuma(s),
+        nodes: [
+          ...comSelecao(s.nodes, new Set()),
+          {
+            id,
+            type: 'localizador',
+            position,
+            data: { nome: '', ja_criado: false, flags: [], atalhoOutroPlano: REF_OUTRO_PLANO_VAZIA },
+            selected: true,
+          },
+        ],
+        selectedId: id,
+      }));
+      return id;
+    },
+
+    atualizarRefsOutroPlano: (refs) => {
+      if (get().somenteLeitura) return;
+      set((s) => ({
+        nodes: s.nodes.map((n) => {
+          const ref = refs[n.id];
+          return ref && n.data.atalhoOutroPlano ? { ...n, data: { ...n.data, atalhoOutroPlano: ref } } : n;
+        }),
+      }));
     },
 
     addAcaoPreferencial: (nodeId, nome, ja_criado = false) => {

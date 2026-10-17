@@ -52,8 +52,11 @@ function refLoc(ctx: Contexto, noId: string): RefMencao {
   const chave = chaveMencaoNome(nome);
   const eprocId = ctx.catalogo.locs.get(chave)?.eprocId;
   // O atalho (D-30) aponta para o alvo: é o nome dele que a menção acompanha.
-  const no = ctx.plano.nodes.find((n) => n.id === noId)?.data.atalhoPara ?? noId;
-  return { tipo: 'loc', chave, rotulo: nome, no: `${ctx.planoId}/${no}`, ...(eprocId ? { eprocId } : {}) };
+  // O de outro plano (D-40) aponta para o nó de lá.
+  const data = ctx.plano.nodes.find((n) => n.id === noId)?.data;
+  const externo = data?.atalhoOutroPlano;
+  const no = externo?.planoId ? `${externo.planoId}/${externo.noId}` : `${ctx.planoId}/${data?.atalhoPara ?? noId}`;
+  return { tipo: 'loc', chave, rotulo: nome, no, ...(eprocId ? { eprocId } : {}) };
 }
 
 const chipLoc = (ctx: Contexto, noId: string) => htmlMencao(refLoc(ctx, noId));

@@ -1,3 +1,4 @@
+import { ehAtalho } from './atalhos';
 import { TELAS_CONSULTA, type TelaConsulta } from './catalogoUnidade';
 import type { Plano } from './plano';
 import { normalizarRotulo } from './setores';
@@ -120,7 +121,7 @@ export function localizadoresDaUnidade(
   const porChave = new Map<string, { nome: string; chave: string; setores: Set<string> }>();
   for (const plano of planos) {
     for (const node of plano.nodes) {
-      if (node.data.atalhoPara) continue;
+      if (ehAtalho(node)) continue;
       const nome = node.data.nome.trim();
       if (!nome) continue;
       const chave = chaveLocalizador(nome);
