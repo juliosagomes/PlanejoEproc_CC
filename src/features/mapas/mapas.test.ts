@@ -15,6 +15,7 @@ import {
   assinaturaDoRecorte,
   blocoDesatualizado,
   desenharBloco,
+  posicoesNoPapel,
   recortar,
   svgDoRecorte,
   traco,
@@ -111,14 +112,22 @@ describe('recorte do fluxo', () => {
   it('desenha em degrau, respeitando a dobra manual', () => {
     const p = planoFamilia();
     const e = { ...p.edges[0]!, data: { ...p.edges[0]!.data, dobra: { fracaoX: 0 } } };
-    const t = traco(p.nodes[0]!, p.nodes[1]!, e);
+    const t = traco(p.nodes[0]!.position, p.nodes[1]!.position, e);
     expect(t.d.startsWith('M176,228 H196 V')).toBe(true);
   });
 
   it('volta por baixo quando o destino está atrás da origem', () => {
     const p = planoFamilia();
-    const t = traco(p.nodes[2]!, p.nodes[0]!, aresta('z', 'D', 'A', 'manual'));
+    const t = traco(p.nodes[2]!.position, p.nodes[0]!.position, aresta('z', 'D', 'A', 'manual'));
     expect(t.d.split(' ')).toHaveLength(6);
+  });
+
+  it('no papel, reaproxima os vãos largos sem trocar a ordem', () => {
+    const p = planoFamilia();
+    p.nodes[4]!.position.x = 5000;
+    const pos = posicoesNoPapel(p, recortar(p, ['D', 'X'], false));
+    expect(pos.get('X')!.x - pos.get('D')!.x).toBe(176 + 90);
+    expect(pos.get('X')!.y).toBe(pos.get('D')!.y);
   });
 
   it('escapa o nome no SVG e esmaece o que está fora da seleção', () => {
@@ -185,6 +194,19 @@ describe('menções', () => {
     const c = montarCatalogo({ planos: [], unidade: u, setores: [] });
     const r = resolver({ tipo: 'loc', chave: 'ag. replica', rotulo: 'Ag. Réplica', eprocId: '111' }, c);
     expect(r?.nome).toBe('Aguardando Réplica do Autor');
+  });
+
+  it('acompanha a renomeação feita no plano pelo nó de origem', () => {
+    const div = document.createElement('div');
+    div.innerHTML = htmlMencao({ tipo: 'loc', chave: 'analisar contestacao', rotulo: 'Analisar Contestação', no: 'p1/E' });
+    const p = planoFamilia();
+    p.nodes[3]!.data.nome = 'Analisar Contestação com vários réus';
+    const c = montarCatalogo({ planos: [{ id: 'p1', plano: p }], unidade: null, setores: [] });
+    atualizarMencoes(div, c);
+    const el = div.querySelector('.mencao')!;
+    expect(el.textContent).toBe('Analisar Contestação com vários réus');
+    expect(el.classList.contains('sumiu')).toBe(false);
+    expect(el.getAttribute('data-chave')).toBe('analisar contestacao com varios reus');
   });
 
   it('atualiza o texto das menções e risca a que sumiu', () => {

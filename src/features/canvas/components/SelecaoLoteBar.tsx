@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/Icon';
+import { useMapasStore } from '@/features/mapas/store';
 import { useCanvasStore } from '../store';
 import { confirmarApagarSelecao } from '../selecao';
 
@@ -72,6 +73,16 @@ export function SelecaoLoteBar() {
           title="Cria uma moldura em volta dos localizadores selecionados"
         >
           Agrupar
+        </button>
+      )}
+      {!somenteLeitura && nos.length >= 1 && (
+        <button
+          type="button"
+          className="selecao-lote-btn"
+          onClick={() => useMapasStore.getState().pedirGeracao(nos.map((n) => n.id))}
+          title="Gera um mapa com o desenho destes localizadores e a descrição das transições, pronto para editar e imprimir"
+        >
+          <Icon.Print /> Gerar mapa descritivo
         </button>
       )}
       {!somenteLeitura && nos.length >= 1 && flags.length > 0 && (

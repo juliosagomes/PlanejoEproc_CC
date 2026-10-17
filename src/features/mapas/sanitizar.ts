@@ -25,7 +25,7 @@ const TAGS_SVG = new Set(['svg', 'g', 'path', 'rect', 'circle', 'line', 'text', 
 const REMOVER = new Set(['script', 'style', 'iframe', 'object', 'embed', 'link', 'meta', 'template', 'noscript', 'title']);
 
 const ATRIBUTOS = new Set([
-  'class', 'data-tipo', 'data-chave', 'data-rotulo', 'data-eproc-id', 'data-fluxo', 'colspan', 'rowspan',
+  'class', 'data-tipo', 'data-chave', 'data-rotulo', 'data-eproc-id', 'data-no', 'data-fluxo', 'colspan', 'rowspan',
 ]);
 
 const ATRIBUTOS_SVG = new Set([

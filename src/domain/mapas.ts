@@ -55,6 +55,10 @@ export const TIPO_MENCAO_ROTULO: Record<TipoMencao, string> = {
  * - `atp`: o plano não sabe o número das regras no Eproc (D-38), então a regra é
  *   o **recurso da aresta**: `chave` = `planoId/arestaId/recursoId`.
  *
+ * `no` (`planoId/noId`) é o nó de onde a menção a localizador nasceu, quando
+ * nasceu de um plano. É o que acompanha a renomeação feita **no plano**: o nome
+ * gravado deixa de casar, o nó continua.
+ *
  * `rotulo` é o último nome conhecido. Aparece quando o alvo sumiu, para que o
  * texto em volta continue legível e o usuário saiba o que revisar.
  */
@@ -63,6 +67,7 @@ export interface RefMencao {
   chave: string;
   rotulo: string;
   eprocId?: string;
+  no?: string;
 }
 
 export function chaveMencaoNome(nome: string): string {

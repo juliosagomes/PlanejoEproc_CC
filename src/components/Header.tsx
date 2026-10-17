@@ -60,11 +60,12 @@ export interface HeaderProps {
   onTelaChange: (tela: TelaEditor) => void;
 }
 
-export type TelaEditor = 'fluxo' | 'painel';
+export type TelaEditor = 'fluxo' | 'painel' | 'mapas';
 
 const TELA_OPTIONS: ReadonlyArray<{ id: TelaEditor; label: string }> = [
   { id: 'fluxo', label: 'Fluxo' },
   { id: 'painel', label: 'Painel da unidade' },
+  { id: 'mapas', label: 'Mapas descritivos' },
 ];
 
 function Alternador<T extends string>({

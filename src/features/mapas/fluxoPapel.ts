@@ -6,6 +6,7 @@ import {
   type EdgeKind,
   type Localizador,
   type Plano,
+  type Position,
 } from '@/domain';
 import { orientacaoDaDobra, xDaFracao, yDoDesvio, OFFSET_SMOOTHSTEP } from '@/features/canvas/dobra';
 import { esc } from './html';
@@ -99,12 +100,12 @@ interface Traco {
  * O degrau entre a alça direita da origem e a esquerda do destino. Espelha o
  * `getSmoothStepPath` nos dois ramos que o app produz (ver `canvas/dobra.ts`).
  */
-export function traco(origem: Localizador, destino: Localizador, edge: Edge): Traco {
+export function traco(origem: Position, destino: Position, edge: Edge): Traco {
   const g = {
-    sourceX: origem.position.x + NO_LARGURA,
-    sourceY: origem.position.y + NO_ALTURA / 2,
-    targetX: destino.position.x,
-    targetY: destino.position.y + NO_ALTURA / 2,
+    sourceX: origem.x + NO_LARGURA,
+    sourceY: origem.y + NO_ALTURA / 2,
+    targetX: destino.x,
+    targetY: destino.y + NO_ALTURA / 2,
   };
   const { sourceX: sx, sourceY: sy, targetX: tx, targetY: ty } = g;
   const dobra = edge.data.dobra;
@@ -124,30 +125,59 @@ export function traco(origem: Localizador, destino: Localizador, edge: Edge): Tr
   };
 }
 
+/* O quadro tem vãos largos — o usuário espalha o desenho para trabalhar —, e
+   no papel cada vão rouba tamanho de letra. As colunas e linhas do recorte são
+   reaproximadas até um vão máximo, sem trocar a ordem de nada. */
+const VAO_MAX_X = NO_LARGURA + 90;
+const VAO_MAX_Y = NO_ALTURA + 44;
+
+function compactarEixo(valores: number[], vaoMax: number): Map<number, number> {
+  const unicos = [...new Set(valores)].sort((a, b) => a - b);
+  const mapa = new Map<number, number>();
+  let atual = 0;
+  unicos.forEach((v, i) => {
+    if (i > 0) atual += Math.min(v - unicos[i - 1]!, vaoMax);
+    mapa.set(v, atual);
+  });
+  return mapa;
+}
+
+/** Posições do recorte no papel. */
+export function posicoesNoPapel(plano: Plano, r: Recorte): Map<string, Position> {
+  const nos = plano.nodes.filter((n) => r.visiveis.has(n.id));
+  const xs = compactarEixo(nos.map((n) => Math.round(n.position.x)), VAO_MAX_X);
+  const ys = compactarEixo(nos.map((n) => Math.round(n.position.y)), VAO_MAX_Y);
+  return new Map(
+    nos.map((n) => [n.id, { x: xs.get(Math.round(n.position.x))!, y: ys.get(Math.round(n.position.y))! }]),
+  );
+}
+
 function setorDoNo(n: Localizador, setores: readonly DefinicaoFlag[]): DefinicaoFlag | undefined {
   return n.data.flags.map((id) => setores.find((s) => s.id === id)).find(Boolean);
 }
 
 /** O desenho do recorte, pronto para entrar no mapa. */
 export function svgDoRecorte(plano: Plano, r: Recorte, setores: readonly DefinicaoFlag[]): string {
-  const nos = porId(plano);
   const visiveis = plano.nodes.filter((n) => r.visiveis.has(n.id));
   if (visiveis.length === 0) return '';
+  const pos = posicoesNoPapel(plano, r);
+  const em = (id: string) => pos.get(id)!;
   const folga = 24;
-  const x0 = Math.min(...visiveis.map((n) => n.position.x)) - folga;
-  const y0 = Math.min(...visiveis.map((n) => n.position.y)) - folga;
-  const x1 = Math.max(...visiveis.map((n) => n.position.x + NO_LARGURA)) + folga;
-  const y1 = Math.max(...visiveis.map((n) => n.position.y + NO_ALTURA)) + folga;
+  const todas = [...pos.values()];
+  const x0 = Math.min(...todas.map((p) => p.x)) - folga;
+  const y0 = Math.min(...todas.map((p) => p.y)) - folga;
+  const x1 = Math.max(...todas.map((p) => p.x + NO_LARGURA)) + folga;
+  const y1 = Math.max(...todas.map((p) => p.y + NO_ALTURA)) + folga;
   const deFora = (e: Edge) => (r.escolhidos.has(e.source) && r.escolhidos.has(e.target) ? '' : ' fantasma');
 
   const linhas = r.arestas.map((e) => {
-    const t = traco(nos.get(e.source)!, nos.get(e.target)!, e);
+    const t = traco(em(e.source), em(e.target), e);
     const k = e.data.kind;
     return `<g class="${deFora(e).trim()}"><path class="ar ${k}" d="${t.d}"/><path class="ponta ${k}" d="M${t.tx - 8},${t.ty - 4.5} L${t.tx},${t.ty} L${t.tx - 8},${t.ty + 4.5} z"/></g>`;
   });
 
   const cartoes = visiveis.map((n) => {
-    const { x, y } = n.position;
+    const { x, y } = em(n.id);
     const setor = setorDoNo(n, setores);
     const flag = setor
       ? `<rect x="${x + NO_LARGURA - 25}" y="${y + 5}" width="20" height="13" rx="3" fill="var(--p-flag-${setor.cor}-bg)"/><text class="flag-tx" x="${x + NO_LARGURA - 15}" y="${y + 11.5}" fill="var(--p-flag-${setor.cor}-fg)">${esc(setor.code)}</text>`
@@ -157,7 +187,7 @@ export function svgDoRecorte(plano: Plano, r: Recorte, setores: readonly Definic
   });
 
   const selos = r.arestas.map((e) => {
-    const t = traco(nos.get(e.source)!, nos.get(e.target)!, e);
+    const t = traco(em(e.source), em(e.target), e);
     const k = e.data.kind;
     return `<g class="${deFora(e).trim()}"><circle class="selo-n ${k}" cx="${t.selo.x}" cy="${t.selo.y}" r="9"/><text class="selo-t ${k}" x="${t.selo.x}" y="${t.selo.y + 0.5}">${r.numero[e.id]}</text></g>`;
   });

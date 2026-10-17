@@ -92,6 +92,8 @@ export interface CatalogoMencoes {
   itens: ItemMencao[];
   locs: Map<string, InfoLoc>;
   locPorEproc: Map<string, string>;
+  /** `planoId/noId` → chave do localizador. */
+  locPorNo: Map<string, string>;
   prefs: Map<string, InfoPref>;
   prefPorEproc: Map<string, string>;
   atps: Map<string, InfoAtp>;
@@ -142,7 +144,9 @@ function lerPlano({ id: planoId, plano }: PlanoComId, setores: readonly Definica
   const nome = (id: string) => nomeDoNo(plano, id);
   for (const n of plano.nodes) {
     if (n.data.atalhoPara || !n.data.nome.trim()) continue;
-    const info = obter(cat.locs, chaveMencaoNome(n.data.nome), () => ({
+    const chaveLoc = chaveMencaoNome(n.data.nome);
+    cat.locPorNo.set(`${planoId}/${n.id}`, chaveLoc);
+    const info = obter(cat.locs, chaveLoc, () => ({
       nome: n.data.nome.trim(),
       naUnidade: false,
       sistema: !!n.data.sistema,
@@ -205,7 +209,12 @@ function itens(cat: CatalogoMencoes): ItemMencao[] {
       setor ? `${setor.code} · ${setor.label}` : '',
       planos.length ? `em ${planos.slice(0, 2).join(', ')}${planos.length > 2 ? ` e mais ${planos.length - 2}` : ''}` : 'fora dos planos',
     ].filter(Boolean);
-    out.push({ ref: refDe('loc', chave, l.nome, l.eprocId), nome: l.nome, sub: partes.join(' · ') });
+    const uso = l.usos[0];
+    out.push({
+      ref: refDe('loc', chave, l.nome, l.eprocId, uso && `${uso.planoId}/${uso.noId}`),
+      nome: l.nome,
+      sub: partes.join(' · '),
+    });
   }
   for (const [chave, p] of cat.prefs) {
     const partes = [p.tipo ?? 'Preferência', p.grupo ? `grupo ${p.grupo}` : '', p.naUnidade ? 'na unidade' : 'só nos planos'];
@@ -217,8 +226,8 @@ function itens(cat: CatalogoMencoes): ItemMencao[] {
   return out;
 }
 
-function refDe(tipo: TipoMencao, chave: string, rotulo: string, eprocId?: string): RefMencao {
-  return { tipo, chave, rotulo, ...(eprocId ? { eprocId } : {}) };
+function refDe(tipo: TipoMencao, chave: string, rotulo: string, eprocId?: string, no?: string): RefMencao {
+  return { tipo, chave, rotulo, ...(eprocId ? { eprocId } : {}), ...(no ? { no } : {}) };
 }
 
 export function montarCatalogo(fontes: FontesMencao): CatalogoMencoes {
@@ -226,6 +235,7 @@ export function montarCatalogo(fontes: FontesMencao): CatalogoMencoes {
     itens: [],
     locs: new Map(),
     locPorEproc: new Map(),
+    locPorNo: new Map(),
     prefs: new Map(),
     prefPorEproc: new Map(),
     atps: new Map(),
@@ -282,28 +292,32 @@ export function buscarMencoes(
  * Resolução e detalhe
  * ------------------------------------------------------------------------- */
 
+/** `chave` é a chave atual do alvo — muda quando ele foi achado pelo id ou pelo nó. */
 export type Resolvida =
-  | { tipo: 'loc'; nome: string; info: InfoLoc }
-  | { tipo: 'pref'; nome: string; info: InfoPref }
-  | { tipo: 'atp'; nome: string; info: InfoAtp };
+  | { tipo: 'loc'; chave: string; nome: string; info: InfoLoc }
+  | { tipo: 'pref'; chave: string; nome: string; info: InfoPref }
+  | { tipo: 'atp'; chave: string; nome: string; info: InfoAtp };
 
 /**
  * O alvo atual da menção, ou `null` se sumiu. O `eprocId` vem antes do nome:
- * é ele que acompanha uma renomeação feita no Eproc.
+ * é ele que acompanha uma renomeação feita no Eproc. O nó vem depois: é ele que
+ * acompanha a renomeação feita no plano, quando o nome gravado não casa mais.
  */
 export function resolver(ref: RefMencao, cat: CatalogoMencoes): Resolvida | null {
   if (ref.tipo === 'atp') {
     const info = cat.atps.get(ref.chave);
-    return info ? { tipo: 'atp', nome: info.nome, info } : null;
+    return info ? { tipo: 'atp', chave: ref.chave, nome: info.nome, info } : null;
   }
   if (ref.tipo === 'loc') {
-    const chave = (ref.eprocId && cat.locPorEproc.get(ref.eprocId)) || ref.chave;
+    const porNome = cat.locs.has(ref.chave) ? ref.chave : undefined;
+    const chave =
+      (ref.eprocId && cat.locPorEproc.get(ref.eprocId)) || porNome || (ref.no && cat.locPorNo.get(ref.no)) || ref.chave;
     const info = cat.locs.get(chave);
-    return info ? { tipo: 'loc', nome: info.nome, info } : null;
+    return info ? { tipo: 'loc', chave, nome: info.nome, info } : null;
   }
   const chave = (ref.eprocId && cat.prefPorEproc.get(ref.eprocId)) || ref.chave;
   const info = cat.prefs.get(chave);
-  return info ? { tipo: 'pref', nome: info.nome, info } : null;
+  return info ? { tipo: 'pref', chave, nome: info.nome, info } : null;
 }
 
 /** Uma linha do detalhe. O valor é texto ou uma lista de outras menções. */
@@ -369,7 +383,8 @@ export function detalhar(r: Resolvida): DetalheMencao {
 /** O `<span>` de uma menção. `contenteditable=false` faz dela um bloco só para o cursor. */
 export function htmlMencao(ref: RefMencao, nome = ref.rotulo): string {
   const id = ref.eprocId ? ` data-eproc-id="${esc(ref.eprocId)}"` : '';
-  return `<span class="mencao m-${ref.tipo}" contenteditable="false" data-tipo="${ref.tipo}" data-chave="${esc(ref.chave)}" data-rotulo="${esc(ref.rotulo)}"${id}>${esc(nome)}</span>`;
+  const no = ref.no ? ` data-no="${esc(ref.no)}"` : '';
+  return `<span class="mencao m-${ref.tipo}" contenteditable="false" data-tipo="${ref.tipo}" data-chave="${esc(ref.chave)}" data-rotulo="${esc(ref.rotulo)}"${id}${no}>${esc(nome)}</span>`;
 }
 
 const TIPOS = new Set<string>(['loc', 'pref', 'atp']);
@@ -378,8 +393,9 @@ export function lerRef(el: Element): RefMencao | null {
   const tipo = el.getAttribute('data-tipo');
   const chave = el.getAttribute('data-chave');
   if (!tipo || !TIPOS.has(tipo) || !chave) return null;
-  const eprocId = el.getAttribute('data-eproc-id');
-  return refDe(tipo as TipoMencao, chave, el.getAttribute('data-rotulo') ?? chave, eprocId ?? undefined);
+  const eprocId = el.getAttribute('data-eproc-id') ?? undefined;
+  const no = el.getAttribute('data-no') ?? undefined;
+  return refDe(tipo as TipoMencao, chave, el.getAttribute('data-rotulo') ?? chave, eprocId, no);
 }
 
 /**
@@ -396,6 +412,8 @@ export function atualizarMencoes(raiz: ParentNode, cat: CatalogoMencoes): number
     el.setAttribute('title', r === null ? 'Não existe mais na unidade nem nos planos' : '');
     const texto = r ? r.nome : ref.rotulo;
     if (r && r.nome !== ref.rotulo) el.setAttribute('data-rotulo', r.nome);
+    // A referência anda junto: achada pelo id ou pelo nó, a chave nova passa a valer.
+    if (r && r.chave !== ref.chave) el.setAttribute('data-chave', r.chave);
     if (el.textContent !== texto) {
       el.textContent = texto;
       mudou++;

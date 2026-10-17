@@ -119,6 +119,12 @@ interface CanvasState {
    */
   notas: NotaFlow[];
   entradas: EntradaFlow[];
+  /**
+   * Nó que a câmera deve procurar assim que o quadro estiver na tela — o "Ver no
+   * fluxo" de uma menção (decisoes.md#D-39), que chega de outra tela, antes de
+   * o ReactFlow existir. Estado de tela: fora do slice persistido.
+   */
+  focoPendente: string | null;
 }
 
 interface CanvasActions {
@@ -211,6 +217,7 @@ interface CanvasActions {
   setPlanoNome: (nome: string) => void;
   setFlowMode: (mode: FlowMode) => void;
   setSomenteLeitura: (valor: boolean) => void;
+  pedirFoco: (id: string | null) => void;
 
   // Toggles de "já criado"
   toggleNodeCreated: (id: string) => void;
@@ -392,6 +399,7 @@ export const useCanvasStore = create<CanvasStore>()(
     grupos: [],
     notas: [],
     entradas: [],
+    focoPendente: null,
 
     // Em visualização, filtramos em vez de ignorar: `dimensions` e `select` são
     // o ReactFlow medindo e destacando o que já está na tela, e barrá-las
@@ -877,6 +885,8 @@ export const useCanvasStore = create<CanvasStore>()(
     setFlowMode: (mode) => set({ flowMode: mode }),
 
     setSomenteLeitura: (valor) => set({ somenteLeitura: valor }),
+
+    pedirFoco: (id) => set({ focoPendente: id }),
 
     toggleNodeCreated: (id) => {
       if (get().somenteLeitura) return;
