@@ -390,6 +390,15 @@ opcionais, como no D-23:
   busca é pura (`buscar.ts`) e a paleta mora dentro do `ReactFlowProvider`.
   Comando novo usa o mesmo rótulo do item de menu. A paleta prende o foco: o
   seletor de nome do painel o rouba de volta.
+- Painéis com contexto (D-44), da demo 03: rota De → Para na transição,
+  recursos em cartão (`RecursoCartao.tsx`) e entradas e saídas no localizador
+  (`LigacoesDoLocalizador.tsx`). O que é navegação fica fora do `fieldset`
+  desligado. "Completo" de cada bloco da ATP é `estadoBlocosAtp`
+  (`domain/atp/estado.ts`), e só ele.
+- A regra de ATP em português (D-45), da demo 04: `features/checklist/fraseAtp.ts`
+  gera trechos a partir dos descritores; o modal mostra a frase e a navegação
+  pelos blocos (`detalhe/FraseRegra.tsx`, `NavBlocos.tsx`), e o mapa a usa com
+  "Em texto corrido". Campo que a frase deve achar leva `data-alvo`.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.

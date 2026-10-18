@@ -10,12 +10,22 @@ interface FieldProps {
   label: string;
   ajuda?: string;
   className?: string;
+  /** Âncora para a frase em português levar até o campo (decisoes.md#D-45). */
+  alvo?: string;
+  /** Âncora de bloco, para a navegação lateral do modal. */
+  secao?: string;
+  /** Campo obrigatório ainda em branco: a borda acende. */
+  pendente?: boolean;
   children: ReactNode;
 }
 
-export function Field({ label, ajuda, className, children }: FieldProps) {
+export function Field({ label, ajuda, className, alvo, secao, pendente, children }: FieldProps) {
   return (
-    <div className={className}>
+    <div
+      className={[className, pendente && 'pendente'].filter(Boolean).join(' ') || undefined}
+      data-alvo={alvo}
+      data-secao={secao}
+    >
       <label className="label">{label}</label>
       {children}
       {ajuda && <div className="text-[11px] text-texto-3 mt-1">{ajuda}</div>}

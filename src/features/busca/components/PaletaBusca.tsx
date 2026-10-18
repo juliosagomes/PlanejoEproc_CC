@@ -3,7 +3,7 @@ import { useReactFlow } from 'reactflow';
 
 import { KIND_LABELS } from '@/domain';
 import { Icon } from '@/components/Icon';
-import { useIrParaNo } from '@/features/canvas/irParaNo';
+import { useIrParaAresta, useIrParaNo } from '@/features/canvas/irParaNo';
 import { useCanvasStore } from '@/features/canvas/store';
 import { buscarNoQuadro, pontuar, trechoCasado, type ResultadosBusca } from '../buscar';
 import { useBuscaStore } from '../store';
@@ -130,20 +130,8 @@ function useComandosDoQuadro(centroDaTela: () => { x: number; y: number }): Coma
 
 function useItens(consulta: string, resultados: ResultadosBusca, comandos: ComandoBusca[]): Item[] {
   const irParaNo = useIrParaNo();
-  const { getNode, setCenter, getZoom } = useReactFlow();
+  const irParaAresta = useIrParaAresta();
   const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
-
-  const irParaAresta = (id: string, source: string, target: string) => {
-    const a = getNode(source);
-    const b = getNode(target);
-    const centro = (n: typeof a) =>
-      n ? { x: (n.positionAbsolute?.x ?? n.position.x) + (n.width ?? 180) / 2, y: (n.positionAbsolute?.y ?? n.position.y) + (n.height ?? 50) / 2 } : null;
-    const ca = centro(a);
-    const cb = centro(b);
-    const alvo = ca && cb ? { x: (ca.x + cb.x) / 2, y: (ca.y + cb.y) / 2 } : ca ?? cb;
-    if (alvo) setCenter(alvo.x, alvo.y, { zoom: Math.max(getZoom(), 0.9), duration: 400 });
-    useCanvasStore.getState().setSelectedId(id);
-  };
 
   const itens: Item[] = [];
   for (const l of resultados.localizadores) {

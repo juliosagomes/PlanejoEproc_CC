@@ -2090,6 +2090,77 @@ outro plano com o foco num nó.
 
 ---
 
+## D-44 · Painéis com contexto: rota da transição, recursos em cartão, entradas e saídas
+
+> Da demo 03 (`demos/03-paineis-com-contexto.html`).
+
+**Decisão.** O painel da transição mostra **De → Para**, e cada ponta leva ao
+localizador. Os recursos viram **cartões**, com o nome inteiro, a categoria, o
+"Já criado no Eproc" e um botão "Detalhar" com rótulo; a regra de ATP mostra o
+preenchimento dos três blocos (Regras · Ação · Filtros). O painel do
+localizador ganha **Entradas e saídas**, que levam à transição, e o "Já existe
+no Eproc" sobe para logo abaixo do nome.
+
+**Por que.** O painel dizia só "ATP", e para saber de onde para onde era
+preciso achar a seta. O recurso cabia numa linha, com nome cortado e um raio
+sem rótulo, e nada dizia se a regra estava em branco.
+
+**O estado dos blocos é um só.** `estadoBlocosAtp` (`domain/atp/estado.ts`)
+decide o que é completo, parcial ou vazio, e lista o que falta. O cartão, a
+navegação do modal e a frase do D-45 leem dali. Só o bloco Regras tem campo
+obrigatório: ação e filtro vazios não pendem, ação sem tipo pende.
+
+**Navegar vale em visualização.** As pontas da rota, as entradas e saídas e o
+"Detalhar" (que vira "Ver") ficam fora do `fieldset` desligado (D-19). As
+setas dos atalhos do localizador (D-30) contam como dele. O "ir para a
+transição" saiu da paleta do D-43 para `useIrParaAresta`.
+
+**"Nenhuma saída" só avisa** quando algo chega e nada sai, e o localizador não
+é destino de descarte nem tem regra pendurada (D-38).
+
+**O que precisaria mudar para evoluir.** O aviso de fim de linha poderia
+aparecer também no quadro. A categoria do recurso ainda é um select no cartão;
+se incomodar, vira selo com troca por menu.
+
+---
+
+## D-45 · A regra de ATP escrita em português
+
+> Da demo 04 (`demos/04-detalhe-atp.html`).
+
+**Decisão.** O "Detalhar ATP" mostra no topo a regra numa frase corrida
+("Quando for juntada petição do tipo X, o processo que estiver em A vai para B
+e sai de A. Então o Eproc executa…"), que muda a cada campo. O que falta
+aparece grifado, e o grifo leva ao campo. À esquerda, os blocos com o estado
+de cada um. "Copiar frase" põe o texto na área de transferência. No mapa
+descritivo, a opção **"Em texto corrido"**, sob "Detalhe das regras de ATP e
+das preferências", troca a lista de campos por essa frase.
+
+**Por que.** O modal era uma rolagem longa, e quem estava em Filtros perdia de
+vista o gatilho. Entender a regra exigia ler campo por campo, e o mapa herdava
+isso.
+
+**Como a frase nasce.** `features/checklist/fraseAtp.ts`, dos mesmos
+formatadores do checklist (`fmtParametros`, `detalhesFiltros`) e do resumo dos
+conjuntos (D-29, D-41): campo novo num descritor entra na frase sem tocar no
+gerador. Sai em trechos (texto, valor, falta), e cada leitor desenha o seu: o
+modal grifa, o mapa escreve HTML com negrito e itálico, o "Copiar" põe o que
+falta entre colchetes. O texto do que falta é o de `estadoBlocosAtp`.
+
+**Regra pendurada (D-38) não "vai para" o descarte**: a frase diz que o
+processo fica onde está, e na limpeza, que perde o localizador tirado.
+
+**Fora, de propósito.** A demo sugeria a frase também no checklist e no
+Markdown copiado. Não entrou: o checklist já é a lista que a secretaria confere
+na tela do Eproc, campo a campo, e duplicar a regra ali o alongaria. A
+preferência não tem frase no modal, só no mapa, porque não tem os blocos.
+
+**O que precisaria mudar para evoluir.** Para levar a frase ao checklist, basta
+`fraseTexto(fraseAtp(...))` em `derive.ts`. Se algum tipo de controle soar
+estranho, o ajuste é em `quando()`, um caso por tipo.
+
+---
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

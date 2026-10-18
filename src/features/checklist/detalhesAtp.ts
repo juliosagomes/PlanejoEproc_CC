@@ -238,6 +238,17 @@ export function detalhesAtp(rule: AtpRule): DetalheRegra[] {
     if (d) out.push(d);
   });
 
+  out.push(...detalhesFiltros(rule));
+
+  if (rule.observacoes?.trim()) {
+    out.push({ label: 'Observações', valor: rule.observacoes.trim() });
+  }
+  return out;
+}
+
+/** Um item por filtro preenchido. Também é o que a frase em português lista (D-45). */
+export function detalhesFiltros(rule: AtpRule): DetalheRegra[] {
+  const out: DetalheRegra[] = [];
   for (const [chave, parametros] of Object.entries(rule.filtros ?? {})) {
     if (parametrosVazios(parametros)) continue;
     const def = filtroDef(chave);
@@ -254,10 +265,6 @@ export function detalhesAtp(rule: AtpRule): DetalheRegra[] {
       // Com um campo só, o rótulo do campo repete o do filtro.
       valor: unico ? linhas.map((l) => l.slice(l.indexOf(': ') + 2)).join('\n') : linhas.join('\n'),
     });
-  }
-
-  if (rule.observacoes?.trim()) {
-    out.push({ label: 'Observações', valor: rule.observacoes.trim() });
   }
   return out;
 }

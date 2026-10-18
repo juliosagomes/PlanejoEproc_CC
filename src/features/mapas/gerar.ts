@@ -2,6 +2,7 @@ import {
   KIND_LABELS,
   chaveMencaoAtp,
   chaveMencaoNome,
+  nomeDaPonta,
   type BlocoFluxo,
   type DefinicaoFlag,
   type Edge,
@@ -12,6 +13,7 @@ import {
   type Subitem,
 } from '@/domain';
 import { detalhesAtp } from '@/features/checklist/detalhesAtp';
+import { fraseAtp, fraseHtml, frasePref } from '@/features/checklist/fraseAtp';
 import { uid } from '@/utils/uid';
 import { desenharBloco, nomeDoNo, recortar, type Recorte } from './fluxoPapel';
 import { esc } from './html';
@@ -33,6 +35,11 @@ export interface OpcoesGerar {
   fora: boolean;
   /** Os campos principais da regra embaixo de cada recurso. */
   detalhe: boolean;
+  /**
+   * O detalhe como a regra escrita em português, em texto corrido, no lugar
+   * da lista de campos (decisoes.md#D-45). Só vale com `detalhe`.
+   */
+  corrido?: boolean;
   /** Caixas para marcar à caneta, para quem vai implantar. */
   caixas: boolean;
 }
@@ -77,6 +84,19 @@ function chipRecurso(ctx: Contexto, e: Edge, s: Subitem): string {
   return `${esc(s.categoria)}: ${esc(s.nome.trim() || 'sem nome')}`;
 }
 
+function detalheCorrido(ctx: Contexto, e: Edge, s: Subitem): string {
+  const trechos =
+    s.categoria === 'Regra de ATP' && s.atp
+      ? fraseAtp(s.atp, {
+          origem: nomeDaPonta(ctx.plano.nodes, ctx.plano.grupos ?? [], e.source, ctx.plano.entradas),
+          destino: nomeDaPonta(ctx.plano.nodes, ctx.plano.grupos ?? [], e.target),
+        })
+      : s.categoria === 'Preferência'
+        ? frasePref(s.pref)
+        : [];
+  return trechos.length ? `<p class="regra-mini">${fraseHtml(trechos)}</p>` : '';
+}
+
 function detalheRecurso(s: Subitem): string {
   const linhas =
     s.categoria === 'Regra de ATP' && s.atp
@@ -96,7 +116,8 @@ function recursosHtml(ctx: Contexto, e: Edge, o: OpcoesGerar): string {
   return e.data.subitems
     .map((s) => {
       const caixa = o.caixas ? `<span class="caixa${s.ja_criado ? ' feita' : ''}"></span> ` : '';
-      return `<p>${caixa}${chipRecurso(ctx, e, s)}</p>${o.detalhe ? detalheRecurso(s) : ''}`;
+      const detalhe = !o.detalhe ? '' : o.corrido ? detalheCorrido(ctx, e, s) : detalheRecurso(s);
+      return `<p>${caixa}${chipRecurso(ctx, e, s)}</p>${detalhe}`;
     })
     .join('');
 }

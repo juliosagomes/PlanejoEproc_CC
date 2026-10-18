@@ -3,21 +3,19 @@ import {
   FLOW_MODE_DESENHO,
   KIND_CATEGORIA,
   KIND_LABELS,
-  SUBITEM_CATS,
   ehRecursoRegra,
   hasDetalheSubitem,
   nomeDaPonta,
   type EdgeData,
   type EdgeKind,
   type Subitem,
-  type SubitemCategoria,
 } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { PanelHeader } from '@/components/PanelHeader';
-import { SubitemNomeInput } from '@/features/catalogo/components/SubitemNomeInput';
 import { cn } from '@/utils/cn';
 import { uid } from '@/utils/uid';
 import { temDobraManual } from '../dobra';
+import { useIrParaNo } from '../irParaNo';
 import {
   defaultAtpRule,
   defaultEdgeData,
@@ -26,6 +24,7 @@ import {
   type FlowEdge,
 } from '../store';
 import { EdgeDetailModal } from './EdgeDetailModal';
+import { RecursoCartao } from './RecursoCartao';
 
 interface EdgePanelProps {
   edge: FlowEdge;
@@ -44,6 +43,8 @@ export function EdgePanel({ edge }: EdgePanelProps) {
   const destino = useCanvasStore(
     (s) => nomeDaPonta(s.nodes, s.grupos, edge.target),
   );
+
+  const irParaNo = useIrParaNo();
 
   const data: EdgeData = edge.data ?? defaultEdgeData();
   const kind = data.kind;
@@ -112,7 +113,7 @@ export function EdgePanel({ edge }: EdgePanelProps) {
     <>
       <div className="flex flex-col h-full">
         <PanelHeader
-          eyebrow="Aresta · Transição"
+          eyebrow="Transição"
           title={KIND_LABELS[kind]}
           right={
             somenteLeitura ? undefined : (
@@ -125,7 +126,22 @@ export function EdgePanel({ edge }: EdgePanelProps) {
               </button>
             )
           }
-        />
+        >
+          {/* De onde para onde: antes só a seta no quadro dizia (decisoes.md#D-44). */}
+          <div className="rota-aresta">
+            <button type="button" className="ponta" onClick={() => irParaNo(edge.source)} title="Ir até a origem">
+              <small>De</small>
+              {origem.trim() || '(sem nome)'}
+            </button>
+            <span className="seta" aria-hidden>
+              <Icon.Seta />
+            </span>
+            <button type="button" className="ponta" onClick={() => irParaNo(edge.target)} title="Ir até o destino">
+              <small>Para</small>
+              {destino.trim() || '(sem nome)'}
+            </button>
+          </div>
+        </PanelHeader>
         <div className="flex-1 overflow-auto scroll p-4 flex flex-col gap-3.5">
           {/* Dois fieldsets em vez de um: o botão "Detalhar" fica entre eles e
               precisa continuar clicável em visualização — o detalhamento é
@@ -190,7 +206,10 @@ export function EdgePanel({ edge }: EdgePanelProps) {
               onChange={(e) => updateEdge(edge.id, { resumo: e.target.value })}
             />
           </div>
+          </fieldset>
 
+          {/* Fora do `fieldset`: o "Detalhar" de cada cartão continua valendo
+              em visualização. Cada cartão desliga os próprios campos. */}
           {kind !== 'manual' && (
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -205,9 +224,11 @@ export function EdgePanel({ edge }: EdgePanelProps) {
                     </span>
                   )}
                 </label>
-                <button type="button" className="btn btn-sm" onClick={addSub}>
-                  <Icon.Plus /> Adicionar
-                </button>
+                <fieldset disabled={somenteLeitura} className="contents">
+                  <button type="button" className="btn btn-sm" onClick={addSub}>
+                    <Icon.Plus /> Adicionar
+                  </button>
+                </fieldset>
               </div>
               {subitems.length === 0 && (
                 <div
@@ -227,86 +248,20 @@ export function EdgePanel({ edge }: EdgePanelProps) {
               )}
               <div>
                 {subitems.map((s, i) => (
-                  <div key={s.id} className={cn('subitem', s.ja_criado && 'created')}>
-                    <input
-                      type="checkbox"
-                      className="pj-check"
-                      checked={s.ja_criado}
-                      onChange={(e) => updateSub(i, { ja_criado: e.target.checked })}
-                      title="Marcar como criado no Eproc"
-                    />
-                    <select
-                      className="select"
-                      style={{ height: 26, padding: '2px 6px', fontSize: 11.5 }}
-                      value={s.categoria}
-                      onChange={(e) =>
-                        updateSub(i, { categoria: e.target.value as SubitemCategoria })
-                      }
-                    >
-                      {SUBITEM_CATS.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="flex flex-col gap-0.5 min-w-0">
-                      <SubitemNomeInput
-                        value={s.nome}
-                        categoria={s.categoria}
-                        onChange={(nome, existeNaUnidade) =>
-                          // Só liga `ja_criado`, nunca desliga: bater com o
-                          // catálogo prova que o recurso existe, mas não bater
-                          // não prova o contrário (pode ser um nome livre para
-                          // algo que o usuário já criou à mão).
-                          updateSub(i, {
-                            nome,
-                            ...(existeNaUnidade ? { ja_criado: true } : {}),
-                          })
-                        }
-                      />
-                      <textarea
-                        className="input subitem-desc text-texto-2"
-                        rows={1}
-                        placeholder="descrição (opcional)"
-                        value={s.descricao ?? ''}
-                        onChange={(e) => updateSub(i, { descricao: e.target.value })}
-                      />
-                    </div>
-                    <div className="flex items-center gap-0.5">
-                      {ehRecursoRegra(s) && (
-                        <button
-                          type="button"
-                          className={cn(
-                            'btn btn-icon btn-sm',
-                            hasDetalheSubitem(s) ? 'btn-primary' : 'btn-ghost',
-                          )}
-                          onClick={() => setDetalheAbertoId(s.id)}
-                          title={
-                            somenteLeitura
-                              ? `Ver o detalhamento d${s.categoria === 'Preferência' ? 'esta preferência' : 'esta regra'}`
-                              : hasDetalheSubitem(s)
-                                ? 'Detalhamento preenchido — clique para editar'
-                                : `Abrir detalhamento d${s.categoria === 'Preferência' ? 'esta preferência' : 'esta regra'}`
-                          }
-                        >
-                          <Icon.Bolt />
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        className="btn btn-icon btn-sm btn-ghost"
-                        onClick={() => removeSub(i)}
-                        title="Remover"
-                      >
-                        <Icon.X />
-                      </button>
-                    </div>
-                  </div>
+                  <RecursoCartao
+                    key={s.id}
+                    recurso={s}
+                    somenteLeitura={somenteLeitura}
+                    onChange={(patch) => updateSub(i, patch)}
+                    onRemover={() => removeSub(i)}
+                    onDetalhar={() => setDetalheAbertoId(s.id)}
+                  />
                 ))}
               </div>
             </div>
           )}
 
+          <fieldset disabled={somenteLeitura} className="contents">
           {/* Só aparece quando há o que restaurar. O gesto de reset é o duplo
               clique na alça; este botão é a descoberta dele — sem ele, quem
               arrastou a dobra por engano não tem como saber que dá para voltar. */}
