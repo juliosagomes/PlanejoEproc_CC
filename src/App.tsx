@@ -3,8 +3,11 @@ import { ReactFlowProvider } from 'reactflow';
 
 import { somenteVisualizacao } from '@/domain';
 import { Header, type HeaderStats, type TelaEditor } from '@/components/Header';
+import { Icon } from '@/components/Icon';
 import { Sidebar } from '@/components/Sidebar';
 import { useSincronizacaoExterna } from '@/extension/useSincronizacaoExterna';
+import { BarraBusca } from '@/features/busca/components/BarraBusca';
+import { PaletaBusca, type ComandoBusca } from '@/features/busca/components/PaletaBusca';
 import { EdgePanel } from '@/features/canvas/components/EdgePanel';
 import { FlowCanvas } from '@/features/canvas/components/FlowCanvas';
 import { confirmarApagarSelecao } from '@/features/canvas/selecao';
@@ -33,6 +36,7 @@ import { TelaLogin } from '@/features/sessao/components/TelaLogin';
 import { useSessaoStore } from '@/features/sessao/store';
 import { SyncResultadoModal } from '@/features/sync/components/SyncResultadoModal';
 import { useSyncStore } from '@/features/sync/store';
+import { useTemaStore } from '@/features/tema/store';
 import { TutorialModal } from '@/features/tutorial/components/TutorialModal';
 import { deveAbrirNaPrimeiraVez, podeAbrirAgora } from '@/features/tutorial/abertura';
 import {
@@ -531,6 +535,34 @@ function Editor() {
     });
   };
 
+  // Os mesmos rótulos dos menus do cabeçalho: quem acha um comando na busca
+  // tem de reconhecê-lo no menu depois (decisoes.md#D-43).
+  const tema = useTemaStore((s) => s.tema);
+  const alternarTema = useTemaStore((s) => s.alternar);
+  const comandosBusca: ComandoBusca[] = [
+    { id: 'checklist', rotulo: 'Abrir o checklist', icone: <Icon.Bolt />, executar: () => setShowChecklist(true) },
+    {
+      id: 'sincronizar',
+      rotulo: 'Sincronizar com a unidade',
+      icone: <Icon.Sincronizar />,
+      executar: () => void sincronizarUnidade(),
+    },
+    { id: 'salvar-copia', rotulo: 'Salvar cópia deste plano', icone: <Icon.Download />, executar: onSalvarCopiaAtivo },
+    ...(somenteLeitura ? [] : [{ id: 'novo-plano', rotulo: 'Novo plano', icone: <Icon.File />, executar: onNovo }]),
+    { id: 'setores', rotulo: 'Setores', icone: <Icon.Etiqueta />, executar: () => setShowSetores(true) },
+    { id: 'catalogo', rotulo: 'Catálogo do órgão', icone: <Icon.Library />, executar: () => setShowCatalogoOrgao(true) },
+    { id: 'descarte', rotulo: 'Destinos de descarte', icone: <Icon.Trash />, executar: () => setShowDescarte(true) },
+    { id: 'painel', rotulo: 'Ir para o Painel da unidade', icone: <Icon.Predio />, executar: () => setTela('painel') },
+    { id: 'mapas', rotulo: 'Ir para os Mapas descritivos', icone: <Icon.Print />, executar: () => setTela('mapas') },
+    {
+      id: 'tema',
+      rotulo: tema === 'escuro' ? 'Usar tema claro' : 'Usar tema escuro',
+      icone: tema === 'escuro' ? <Icon.Sol /> : <Icon.Lua />,
+      executar: alternarTema,
+    },
+    { id: 'tutorial', rotulo: 'Ver tutorial', icone: <Icon.Ajuda />, executar: () => setTutorialManual(true) },
+  ];
+
   const painelAberto = !!(selectedNode || selectedEdge || selectedGrupo || selectedNota || selectedEntrada);
 
   // Ao lado do nó novo, para a peça não nascer em cima de nada que o usuário vê.
@@ -605,7 +637,10 @@ function Editor() {
             câmera até o localizador a partir de um botão do painel. */}
         {tela === 'fluxo' && (
         <ReactFlowProvider>
-        <FlowCanvas planoId={ativoId} onAbrirOutroPlano={verNoFluxo} />
+        <FlowCanvas planoId={ativoId} onAbrirOutroPlano={verNoFluxo}>
+          <BarraBusca />
+        </FlowCanvas>
+        <PaletaBusca comandos={comandosBusca} />
 
         <aside
           className="no-print bg-superficie overflow-hidden flex-shrink-0"

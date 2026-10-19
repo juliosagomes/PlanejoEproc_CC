@@ -386,6 +386,10 @@ opcionais, como no D-23:
 - Vários localizadores de origem e destino numa regra de ATP (D-42): a ponta
   da aresta é a primeira de cada lista, e os outros moram em
   `AtpRule.outrasOrigens`/`outrosDestinos`, por nome, sem desenhar seta.
+- Busca e comandos no Ctrl+K (D-43), da demo 02, em `features/busca/`: a
+  busca é pura (`buscar.ts`) e a paleta mora dentro do `ReactFlowProvider`.
+  Comando novo usa o mesmo rótulo do item de menu. A paleta prende o foco: o
+  seletor de nome do painel o rouba de volta.
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.

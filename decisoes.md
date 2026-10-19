@@ -2040,6 +2040,56 @@ o id do nó quando o nome bate com um localizador do plano.
 
 ---
 
+## D-43 · Busca e comandos no Ctrl+K
+
+> Da demo 02 (`demos/02-busca-e-comandos.html`).
+
+**Decisão.** Ctrl+K (ou "/", fora de campo de texto) abre, no Fluxo, uma busca
+única por **localizadores, transições, setores e comandos**. Há também uma
+barra no topo do quadro que abre a mesma busca. A lógica é pura, em
+`features/busca/buscar.ts`; a paleta só desenha e executa.
+
+**Por que.** Com 40 ou 60 localizadores, achar um no quadro era dar zoom e
+procurar no olho. E as ações moravam cada uma num menu, sem atalho de teclado
+além do Delete.
+
+**Como acha.** Ignora acento e caixa. A ordem favorece o nome que **começa**
+com o termo depois de descontar o prefixo "[FAMÍLIA]" e o emoji; depois, uma
+palavra que começa com ele; depois, o meio. O setor casa pelo rótulo ou pela
+sigla exata e traz os localizadores dele, depois dos achados pelo nome. A
+transição casa pelo resumo ou pelo nome de um recurso, e quando casou pelo
+recurso a linha mostra qual. Atalhos e nós sem nome não aparecem; a seta que
+chega num atalho conta nas entradas do localizador que ele representa.
+
+**O que cada resultado faz.** Localizador: câmera até ele, selecionado, painel
+aberto (`useIrParaNo`, o mesmo do D-30). Se está num grupo recolhido, vai até a
+moldura, sem expandir: expandir seria gravar no plano. Transição: câmera no meio
+das duas pontas e o painel dela. Setor: realça os localizadores dele, pelo mesmo
+filtro da barra lateral. Sem resultado, "Criar localizador" com o nome digitado,
+no centro da tela.
+
+**Os comandos usam os rótulos dos menus** do cabeçalho (D-36), para quem achou
+um comando na busca reconhecê-lo no menu depois. Os que editam somem em
+visualização (D-19). "Enquadrar", "Novo localizador" e "Agrupar a seleção" moram
+na paleta, porque precisam da câmera ou da seleção; os outros vêm do `App`.
+
+**A paleta prende o foco.** Com o painel do localizador aberto, o seletor de
+nome (react-select) tomava o foco de volta assim que a paleta o recebia, e o que
+se digitava na busca renomeava o localizador. Visto no teste no Chrome.
+
+**Fora, de propósito.** Os atalhos que a demo mostrava ao lado dos comandos
+(N, Ctrl+S, Ctrl+G, Shift+1) não existem no app e não foram criados: Ctrl+S
+brigaria com o "salvar página" do navegador, e um atalho de uma letra só dispara
+sem querer. Também não há busca no Painel da unidade nem nos Mapas: o Ctrl+K só
+vale no Fluxo, e o TipTap dos mapas pode querer a tecla.
+
+**O que precisaria mudar para evoluir.** Para lembrar os mais usados, uma
+chave de UI por silo, como as câmeras. Para buscar em todos os planos, a lista de
+`features/canvas/outrosPlanos.ts` já existe, e o "ver no fluxo" do D-39 já abre
+outro plano com o foco num nó.
+
+---
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.
