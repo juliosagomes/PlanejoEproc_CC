@@ -233,6 +233,9 @@ const AcaoProgramadaSchema = z.object({
 const AtpRuleSchema = z.object({
   implantar: z.boolean(),
   comportamentoOrigem: z.enum(['0', '4', '1', '2', '3']).optional(),
+  outrasOrigens: z.array(z.string()).optional(),
+  opcaoMultiplosLocalizadores: z.enum(['OR', 'AND']).optional(),
+  outrosDestinos: z.array(z.string()).optional(),
   trigger: AtpTriggerSchema.optional(),
   acoes: z.array(AcaoProgramadaSchema).optional(),
   filtros: z.record(z.string(), ParametrosSchema).optional(),

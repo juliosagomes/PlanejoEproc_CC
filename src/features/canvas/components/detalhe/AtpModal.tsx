@@ -1,18 +1,21 @@
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import {
   COMPORTAMENTOS_ORIGEM,
+  OPCOES_MULTIPLOS_LOCALIZADORES,
   type AtpRule,
   type ComportamentoOrigem,
+  type OpcaoMultiplosLocalizadores,
   type TipoControle,
 } from '@/domain';
 import { TIPOS_CONTROLE } from '@/data';
+import { CatalogMulti } from '@/components/CatalogMulti';
 import { AcoesBloco } from './AcoesBloco';
 import { FiltrosBloco } from './FiltrosBloco';
 import { GatilhoCampos, trocarTipoControle } from './GatilhoCampos';
 import { ModalShell } from './ModalShell';
 import type { RegraModalProps } from './PrefModal';
 import { Field, ImplantarRow, RecursosResumo } from './pecas';
-import { SugestoesProvider } from './sugestoes';
+import { SugestoesProvider, useSugestoes } from './sugestoes';
 
 /* ============================================================================
  * Detalhamento da regra de ATP, nos três blocos da tela "Cadastrar Nova Regra
@@ -51,9 +54,32 @@ function Secao({ titulo, children }: SecaoProps) {
   );
 }
 
-function Ponta({ rotulo, nome }: { rotulo: string; nome: string }) {
+interface PontaProps {
+  rotulo: string;
+  /** A ponta da aresta: é a seta no quadro, e aqui não se edita. */
+  nome: string;
+  outros: string[];
+  setOutros: (outros: string[]) => void;
+  somenteLeitura?: boolean;
+}
+
+/**
+ * O Eproc aceita vários localizadores de origem e de destino na mesma regra
+ * (decisoes.md#D-42). O primeiro é a ponta da aresta; os outros são só nomes,
+ * e não desenham seta.
+ */
+function Ponta({ rotulo, nome, outros, setOutros, somenteLeitura }: PontaProps) {
+  const sugestoes = useSugestoes('localizador');
+  const opcoes = useMemo(
+    () =>
+      sugestoes
+        .filter((s) => s !== nome.trim())
+        .map((s) => ({ value: s, label: s })),
+    [sugestoes, nome],
+  );
+
   return (
-    <div className="min-w-0">
+    <div className="min-w-0 flex flex-col gap-1.5">
       <div className="label">{rotulo}</div>
       <div
         className="text-[13px] truncate"
@@ -67,6 +93,16 @@ function Ponta({ rotulo, nome }: { rotulo: string; nome: string }) {
       >
         {nome.trim() || <span className="text-texto-3">(sem nome)</span>}
       </div>
+      {!(somenteLeitura && outros.length === 0) && (
+        <CatalogMulti
+          values={outros}
+          options={opcoes}
+          onChange={(v) => setOutros(v.filter((x) => x.trim() && x.trim() !== nome.trim()))}
+          criavel
+          placeholder="Outros localizadores: digite e tecle Enter…"
+          ariaLabel={`Outros localizadores — ${rotulo}`}
+        />
+      )}
     </div>
   );
 }
@@ -87,6 +123,10 @@ export function AtpModal({
 }: AtpModalProps) {
   const r: AtpRule = rule ?? { implantar: false };
   const setR = (patch: Partial<AtpRule>) => onChange({ atp: { ...r, ...patch } });
+  const outrasOrigens = r.outrasOrigens ?? [];
+  const outrosDestinos = r.outrosDestinos ?? [];
+  // Lista vazia vira ausência, para o plano não carregar `[]` que não diz nada.
+  const lista = (v: string[]) => (v.length > 0 ? v : undefined);
 
   return (
     <ModalShell
@@ -134,9 +174,44 @@ export function AtpModal({
 
         <Secao titulo="Regras">
           <div className="grid grid-cols-2 gap-3">
-            <Ponta rotulo="Localizador ORIGEM" nome={origem} />
-            <Ponta rotulo="Localizador DESTINO" nome={destino} />
+            <Ponta
+              rotulo="Localizador ORIGEM"
+              nome={origem}
+              outros={outrasOrigens}
+              setOutros={(v) => setR({ outrasOrigens: lista(v) })}
+              somenteLeitura={somenteLeitura}
+            />
+            <Ponta
+              rotulo="Localizador DESTINO"
+              nome={destino}
+              outros={outrosDestinos}
+              setOutros={(v) => setR({ outrosDestinos: lista(v) })}
+              somenteLeitura={somenteLeitura}
+            />
           </div>
+
+          {outrasOrigens.length > 0 && (
+            <Field label="Opção para múltiplos localizadores">
+              <select
+                className="select"
+                value={r.opcaoMultiplosLocalizadores ?? ''}
+                onChange={(e) =>
+                  setR({
+                    opcaoMultiplosLocalizadores: (e.target.value || undefined) as
+                      | OpcaoMultiplosLocalizadores
+                      | undefined,
+                  })
+                }
+              >
+                <option value="">— selecione —</option>
+                {OPCOES_MULTIPLOS_LOCALIZADORES.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
 
           <Field label="Comportamento do Localizador ORIGEM">
             <select

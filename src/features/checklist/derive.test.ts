@@ -152,6 +152,42 @@ describe('deriveChecklist', () => {
     expect(g['Modelo']).toEqual([]);
   });
 
+  it('detalhes ATP listam os outros localizadores de origem e destino (D-42)', () => {
+    const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
+    const edges: Edge[] = [
+      {
+        id: 'e1',
+        source: 'n1',
+        target: 'n2',
+        data: {
+          kind: 'atp',
+          resumo: '',
+          observacao: '',
+          subitems: [
+            regraAtp('R', {
+              implantar: true,
+              outrasOrigens: ['C', '  '],
+              opcaoMultiplosLocalizadores: 'AND',
+              outrosDestinos: ['D', 'E'],
+            }),
+          ],
+        },
+      },
+    ];
+    const rule = deriveChecklist(nodes, edges)['Regra de ATP'][0];
+    if (rule?.kind !== 'rule') throw new Error('esperava rule');
+    expect(rule.contexto).toBe('A → B');
+    expect(rule.detalhes).toEqual([
+      { label: 'Outros localizadores ORIGEM', valor: 'C' },
+      {
+        label: 'Opção para múltiplos localizadores',
+        valor:
+          'Selecionar somente os processos que estiverem em todos os localizadores (condição "E")',
+      },
+      { label: 'Outros localizadores DESTINO', valor: 'D, E' },
+    ]);
+  });
+
   it('detalhes ATP seguem os três blocos do Eproc e resolvem os códigos', () => {
     const nodes = [noLocalizador('n1', 'A'), noLocalizador('n2', 'B')];
     const edges: Edge[] = [

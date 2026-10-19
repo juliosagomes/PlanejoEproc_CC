@@ -128,6 +128,7 @@ describe('hasAtpDetail', () => {
   it('regra recém-criada não tem detalhamento', () => {
     expect(hasAtpDetail(undefined)).toBe(false);
     expect(hasAtpDetail({ implantar: false })).toBe(false);
+    expect(hasAtpDetail({ implantar: false, outrasOrigens: [], outrosDestinos: [] })).toBe(false);
     expect(hasAtpDetail({ implantar: false, observacoes: '  ', acoes: [], filtros: {} })).toBe(
       false,
     );
@@ -141,6 +142,8 @@ describe('hasAtpDetail', () => {
   it('qualquer bloco preenchido conta', () => {
     expect(hasAtpDetail({ implantar: true })).toBe(true);
     expect(hasAtpDetail({ implantar: false, comportamentoOrigem: '3' })).toBe(true);
+    expect(hasAtpDetail({ implantar: false, outrasOrigens: ['X'] })).toBe(true);
+    expect(hasAtpDetail({ implantar: false, outrosDestinos: ['Y'] })).toBe(true);
     expect(hasAtpDetail({ implantar: false, trigger: { tipo: 'M' } })).toBe(true);
     expect(hasAtpDetail({ implantar: false, acoes: [{ id: 'a' }] })).toBe(true);
     expect(

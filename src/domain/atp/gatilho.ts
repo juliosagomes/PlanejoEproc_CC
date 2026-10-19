@@ -71,6 +71,24 @@ export const COMPORTAMENTOS_ORIGEM = [
 
 export type ComportamentoOrigem = (typeof COMPORTAMENTOS_ORIGEM)[number]['value'];
 
+/**
+ * `selOpcaoMultiplosLocalizadores` — como a regra lê a origem quando há mais de
+ * um localizador nela. O Eproc só mostra o campo a partir do segundo
+ * (decisoes.md#D-42).
+ */
+export const OPCOES_MULTIPLOS_LOCALIZADORES = [
+  {
+    value: 'OR',
+    label: 'Selecionar processos que estiverem em qualquer um dos localizadores (condição "OU")',
+  },
+  {
+    value: 'AND',
+    label: 'Selecionar somente os processos que estiverem em todos os localizadores (condição "E")',
+  },
+] as const satisfies readonly OpcaoCampo[];
+
+export type OpcaoMultiplosLocalizadores = (typeof OPCOES_MULTIPLOS_LOCALIZADORES)[number]['value'];
+
 export type AtpTrigger =
   | {
       tipo: 'A';
