@@ -242,7 +242,7 @@ function RegraLinha({ node, regra, aberta, onAlternar }: RegraLinhaProps) {
         recursosComuns={0}
         outrasRegras={0}
         onChange={aoMudarDetalhe}
-        pendurada
+        pendurada={{ efeito: regra.efeito, tira: regra.tira }}
       />
     </li>
   );

@@ -91,7 +91,8 @@ export function AcoesBloco({ acoes, setAcoes }: AcoesBlocoProps) {
         return (
           <div
             key={acao.id}
-            className="flex flex-col gap-2.5"
+            data-alvo={`acao:${acao.id}`}
+            className={`flex flex-col gap-2.5${acao.tipo ? '' : ' pendente'}`}
             style={{
               padding: '10px 12px',
               border: '1px solid var(--borda)',

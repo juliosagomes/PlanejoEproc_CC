@@ -10,6 +10,7 @@ import { AcoesPreferenciaisBloco } from './AcoesPreferenciaisBloco';
 import { AtalhoOutroPlanoPanel } from './AtalhoOutroPlanoPanel';
 import { AtalhoPanel } from './AtalhoPanel';
 import { AtalhosDoLocalizador } from './AtalhosDoLocalizador';
+import { LigacoesDoLocalizador } from './LigacoesDoLocalizador';
 import { RegrasSemMoverBloco } from './RegrasSemMoverBloco';
 
 interface NodePanelProps {
@@ -77,8 +78,8 @@ function LocalizadorPanel({ node, onGerenciarSetores }: Omit<NodePanelProps, 'on
           continua embaixo, para o que não é controle de formulário.
           `display: contents` mantém o layout: o fieldset desaparece da caixa,
           só a semântica fica. */}
-      <fieldset disabled={somenteLeitura} className="contents">
       <div className="flex-1 overflow-auto scroll p-4 flex flex-col gap-3.5">
+      <fieldset disabled={somenteLeitura} className="contents">
         <div>
           <label className="label">Nome do localizador</label>
           <LocalizadorNomeInput
@@ -97,30 +98,8 @@ function LocalizadorPanel({ node, onGerenciarSetores }: Omit<NodePanelProps, 'on
           )}
         </div>
 
-        {ehDescarte && (
-          <div className="text-[11.5px] leading-snug rounded-lg px-3 py-2" style={{ background: 'var(--aviso-suave)', border: '1px solid var(--aviso-borda)', color: 'var(--aviso-texto)' }}>
-            Este é um destino de descarte da unidade. Regra que termina aqui não
-            move o processo: em vez da seta, pendure-a no localizador de origem,
-            em “Regras que não movem”.
-          </div>
-        )}
-
-        <AcoesPreferenciaisBloco node={node} />
-
-        <RegrasSemMoverBloco node={node} />
-
-        <div>
-          <label className="label">Descrição</label>
-          <textarea
-            className="textarea"
-            rows={2}
-            value={data.descricao ?? ''}
-            onChange={(e) => updateNode(node.id, { descricao: e.target.value })}
-            placeholder="Para que serve esta etapa…"
-          />
-        </div>
-
-        {/* Sem "Já existe no Eproc" para localizador de sistema: a caixa
+        {/* Logo abaixo do nome, como status (decisoes.md#D-44). Sem "Já
+            existe no Eproc" para localizador de sistema: a caixa
             desmarcada afirmaria que falta criá-lo, e a marcada, que alguém o
             criou. Nenhuma das duas é verdade — ele simplesmente está lá. */}
         {!data.sistema && (
@@ -149,6 +128,34 @@ function LocalizadorPanel({ node, onGerenciarSetores }: Omit<NodePanelProps, 'on
             </label>
           </div>
         )}
+
+        {ehDescarte && (
+          <div className="text-[11.5px] leading-snug rounded-lg px-3 py-2" style={{ background: 'var(--aviso-suave)', border: '1px solid var(--aviso-borda)', color: 'var(--aviso-texto)' }}>
+            Este é um destino de descarte da unidade. Regra que termina aqui não
+            move o processo: em vez da seta, pendure-a no localizador de origem,
+            em “Regras que não movem”.
+          </div>
+        )}
+      </fieldset>
+
+        {/* Fora do `fieldset`: navegar pelo fluxo vale também em visualização. */}
+        <LigacoesDoLocalizador node={node} ehDescarte={ehDescarte} />
+
+      <fieldset disabled={somenteLeitura} className="contents">
+        <AcoesPreferenciaisBloco node={node} />
+
+        <RegrasSemMoverBloco node={node} />
+
+        <div>
+          <label className="label">Descrição</label>
+          <textarea
+            className="textarea"
+            rows={2}
+            value={data.descricao ?? ''}
+            onChange={(e) => updateNode(node.id, { descricao: e.target.value })}
+            placeholder="Para que serve esta etapa…"
+          />
+        </div>
 
         <div>
           <div className="flex items-baseline justify-between gap-2">
@@ -211,8 +218,8 @@ function LocalizadorPanel({ node, onGerenciarSetores }: Omit<NodePanelProps, 'on
             placeholder="Notas livres…"
           />
         </div>
-      </div>
       </fieldset>
+      </div>
     </div>
   );
 }

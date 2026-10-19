@@ -11,6 +11,7 @@ export * from './conjuntos';
 export * from './conjuntosEvento';
 export * from './conjuntosPeticao';
 export * from './conjuntosDocumento';
+export * from './estado';
 
 /**
  * O detalhamento de uma ATP, nos três blocos da tela de cadastro do Eproc:

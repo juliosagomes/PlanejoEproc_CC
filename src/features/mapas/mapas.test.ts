@@ -262,6 +262,17 @@ describe('gerar mapa a partir do fluxo', () => {
     expect(fig && lerFigura(fig)?.nos).toEqual(['A', 'B', 'D', 'E']);
   });
 
+  it('o detalhe em texto corrido troca a lista de campos pela regra em português', () => {
+    const div = document.createElement('div');
+    div.innerHTML = gerarDocumento(ctx(), 'M', { ...OPCOES, corrido: true });
+    const textos = [...div.querySelectorAll('p.regra-mini')].map((p) => p.textContent);
+    expect(textos).toContain(
+      'Quando [falta tipo de controle], o processo que estiver em Ag. Contestação vai para Analisar Reconvenção e sai de Ag. Contestação.',
+    );
+    expect(textos).toContain('Preferência de intimação.');
+    expect(div.innerHTML).not.toContain('Comportamento do Localizador ORIGEM');
+  });
+
   it('a legenda por origem agrupa pelas saídas de cada localizador', () => {
     const div = document.createElement('div');
     div.innerHTML = gerarDocumento(ctx(), 'M', { ...OPCOES, legenda: 'origem' });

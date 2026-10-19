@@ -1,4 +1,4 @@
-import type { Subitem } from '@/domain';
+import type { EfeitoSemMover, Subitem } from '@/domain';
 import { useCanvasStore } from '../store';
 import { AtpModal } from './detalhe/AtpModal';
 import { PrefModal } from './detalhe/PrefModal';
@@ -27,7 +27,7 @@ interface EdgeDetailModalProps {
   outrasRegras: number;
   onChange: (patch: Partial<Subitem>) => void;
   /** Regra pendurada num localizador (D-38); só vale para ATP. */
-  pendurada?: boolean;
+  pendurada?: { efeito: EfeitoSemMover; tira?: string };
 }
 
 /**

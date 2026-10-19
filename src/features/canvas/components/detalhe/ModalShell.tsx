@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Icon } from '@/components/Icon';
 
 interface ModalShellProps {
@@ -11,6 +11,16 @@ interface ModalShellProps {
    */
   largo?: boolean;
   onClose: () => void;
+  /** Linha abaixo do título: a rota da regra, origem → destino. */
+  rota?: ReactNode;
+  /** Faixa entre o cabeçalho e o corpo, fora da rolagem (a frase da ATP, D-45). */
+  faixa?: ReactNode;
+  /** Coluna à esquerda do corpo, fora da rolagem e do `fieldset`. */
+  nav?: ReactNode;
+  /** Botões do rodapé, antes do "Concluído". */
+  rodape?: ReactNode;
+  /** O elemento que rola, para quem precisa rolar até um campo. */
+  corpoRef?: Ref<HTMLFieldSetElement>;
   children: ReactNode;
 }
 
@@ -20,8 +30,27 @@ export function ModalShell({
   somenteLeitura,
   largo = false,
   onClose,
+  rota,
+  faixa,
+  nav,
+  rodape,
+  corpoRef,
   children,
 }: ModalShellProps) {
+  const corpo = (
+    // `fieldset[disabled]` alcança todo controle aninhado, inclusive os
+    // `react-select` dos catálogos — um lugar só para desligar o modal.
+    <fieldset
+      ref={corpoRef}
+      disabled={somenteLeitura}
+      className="px-5 py-4 flex flex-col gap-3.5 overflow-auto border-0 m-0 min-w-0"
+      // A frase da ATP ocupa altura fora da rolagem; sem descontá-la o rodapé sai da tela.
+      style={{ maxHeight: largo ? (faixa ? '58vh' : '68vh') : '60vh' }}
+    >
+      {children}
+    </fieldset>
+  );
+
   return (
     <>
       <div className="scrim no-print" onClick={onClose} />
@@ -50,6 +79,7 @@ export function ModalShell({
           <div className="flex-1">
             <div className="section-h">Detalhamento de {subtitulo}</div>
             <div className="text-[14.5px] font-semibold">{titulo}</div>
+            {rota}
             <div className="text-[11.5px] text-texto-3 mt-1">
               {somenteLeitura ? (
                 <>
@@ -76,15 +106,15 @@ export function ModalShell({
           </button>
         </div>
 
-        {/* `fieldset[disabled]` alcança todo controle aninhado, inclusive os
-            `react-select` dos catálogos — um lugar só para desligar o modal. */}
-        <fieldset
-          disabled={somenteLeitura}
-          className="px-5 py-4 flex flex-col gap-3.5 overflow-auto border-0 m-0 min-w-0"
-          style={{ maxHeight: largo ? '68vh' : '60vh' }}
-        >
-          {children}
-        </fieldset>
+        {faixa}
+        {nav ? (
+          <div className="grid min-h-0" style={{ gridTemplateColumns: '190px minmax(0, 1fr)' }}>
+            {nav}
+            {corpo}
+          </div>
+        ) : (
+          corpo
+        )}
 
         <div
           className="px-5 py-3 flex items-center gap-2 no-print"
@@ -96,6 +126,7 @@ export function ModalShell({
               : 'As alterações são salvas automaticamente no quadro.'}
           </div>
           <div className="ml-auto flex gap-2">
+            {rodape}
             <button type="button" className="btn btn-primary" onClick={onClose}>
               Concluído
             </button>

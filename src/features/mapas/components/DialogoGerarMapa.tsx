@@ -43,6 +43,7 @@ function Dialogo({ ids, onGerado }: { ids: string[]; onGerado: () => void }) {
   const [legenda, setLegenda] = useState<LegendaMapa>('tabela');
   const [fora, setFora] = useState(true);
   const [detalhe, setDetalhe] = useState(true);
+  const [corrido, setCorrido] = useState(false);
   const [caixas, setCaixas] = useState(false);
 
   const gerar = () => {
@@ -51,7 +52,7 @@ function Dialogo({ ids, onGerado }: { ids: string[]; onGerado: () => void }) {
     const agora = new Date().toISOString();
     const titulo = nome.trim() || 'Mapa descritivo';
     const ctx = { plano, planoId, ids, setores, catalogo, agora };
-    const o: OpcoesGerar = { legenda, fora, detalhe, caixas };
+    const o: OpcoesGerar = { legenda, fora, detalhe, corrido, caixas };
     const base = {
       version: MAPA_VERSION,
       id: uid('mapa'),
@@ -151,6 +152,14 @@ function Dialogo({ ids, onGerado }: { ids: string[]; onGerado: () => void }) {
             <span>
               Detalhe das regras de ATP e das preferências
               <small>Os campos principais da tela do Eproc, embaixo de cada recurso</small>
+            </span>
+          </label>
+          {/* Recuado sob o "Detalhe": é um modo dele, e sem ele não diz nada. */}
+          <label className="mapa-chk" style={{ marginLeft: 22, opacity: detalhe ? 1 : 0.5 }}>
+            <input type="checkbox" checked={corrido} disabled={!detalhe} onChange={(e) => setCorrido(e.target.checked)} />
+            <span>
+              Em texto corrido
+              <small>A regra escrita em português, como no topo do “Detalhar ATP”, no lugar da lista de campos</small>
             </span>
           </label>
           <label className="mapa-chk">

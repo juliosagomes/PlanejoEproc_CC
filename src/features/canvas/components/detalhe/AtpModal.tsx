@@ -1,21 +1,28 @@
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   COMPORTAMENTOS_ORIGEM,
   OPCOES_MULTIPLOS_LOCALIZADORES,
+  estadoBlocosAtp,
   type AtpRule,
   type ComportamentoOrigem,
+  type EfeitoSemMover,
   type OpcaoMultiplosLocalizadores,
   type TipoControle,
 } from '@/domain';
 import { TIPOS_CONTROLE } from '@/data';
 import { CatalogMulti } from '@/components/CatalogMulti';
+import { Icon } from '@/components/Icon';
+import { fraseAtp, fraseTexto } from '@/features/checklist/fraseAtp';
 import { AcoesBloco } from './AcoesBloco';
 import { FiltrosBloco } from './FiltrosBloco';
+import { FraseRegra } from './FraseRegra';
 import { GatilhoCampos, trocarTipoControle } from './GatilhoCampos';
 import { ModalShell } from './ModalShell';
+import { NavBlocos, type SecaoAtp } from './NavBlocos';
 import type { RegraModalProps } from './PrefModal';
 import { Field, ImplantarRow, RecursosResumo } from './pecas';
 import { SugestoesProvider, useSugestoes } from './sugestoes';
+import { useRolagemBlocos } from './useRolagemBlocos';
 
 /* ============================================================================
  * Detalhamento da regra de ATP, nos três blocos da tela "Cadastrar Nova Regra
@@ -32,19 +39,21 @@ interface AtpModalProps extends RegraModalProps {
   /**
    * Regra pendurada num localizador (decisoes.md#D-38): entra sempre no
    * checklist, então a caixa "Implantar" e o resumo dos recursos da aresta
-   * não dizem nada — sobra o "já criado".
+   * não dizem nada — sobra o "já criado". O efeito muda a frase em português.
    */
-  pendurada?: boolean;
+  pendurada?: { efeito: EfeitoSemMover; tira?: string };
 }
 
 interface SecaoProps {
   titulo: string;
+  secao: SecaoAtp;
   children: ReactNode;
 }
 
-function Secao({ titulo, children }: SecaoProps) {
+function Secao({ titulo, secao, children }: SecaoProps) {
   return (
     <section
+      data-secao={secao}
       className="flex flex-col gap-3"
       style={{ border: '1px solid var(--borda)', borderRadius: 8, padding: '12px 14px 14px' }}
     >
@@ -119,7 +128,7 @@ export function AtpModal({
   somenteLeitura,
   onClose,
   onChange,
-  pendurada = false,
+  pendurada,
 }: AtpModalProps) {
   const r: AtpRule = rule ?? { implantar: false };
   const setR = (patch: Partial<AtpRule>) => onChange({ atp: { ...r, ...patch } });
@@ -128,6 +137,18 @@ export function AtpModal({
   // Lista vazia vira ausência, para o plano não carregar `[]` que não diz nada.
   const lista = (v: string[]) => (v.length > 0 ? v : undefined);
 
+  const { corpoRef, atual, irSecao, irCampo } = useRolagemBlocos();
+  const estado = estadoBlocosAtp(r);
+  const pendente = (alvo: string) => estado.pendencias.some((p) => p.alvo === alvo);
+  const trechos = fraseAtp(r, { origem, destino, pendurada });
+  const [copiada, setCopiada] = useState(false);
+  const copiar = () => {
+    void navigator.clipboard?.writeText(fraseTexto(trechos)).then(() => {
+      setCopiada(true);
+      window.setTimeout(() => setCopiada(false), 1800);
+    });
+  };
+
   return (
     <ModalShell
       titulo={nome || resumo || 'Regra de ATP'}
@@ -135,6 +156,19 @@ export function AtpModal({
       somenteLeitura={somenteLeitura}
       largo
       onClose={onClose}
+      rota={
+        <div className="text-[11.5px] text-texto-2 mt-0.5 truncate">
+          {origem.trim() || '(sem nome)'} → {destino.trim() || '(sem nome)'}
+        </div>
+      }
+      faixa={<FraseRegra trechos={trechos} onIr={irCampo} />}
+      nav={<NavBlocos estado={estado} atual={atual} onIr={irSecao} />}
+      corpoRef={corpoRef}
+      rodape={
+        <button type="button" className="btn" onClick={copiar} title="Copia a regra em português, para conferir ou mandar a quem vai cadastrar">
+          <Icon.Copy /> {copiada ? 'Frase copiada' : 'Copiar frase'}
+        </button>
+      }
     >
       <SugestoesProvider>
         {pendurada ? (
@@ -172,7 +206,7 @@ export function AtpModal({
           />
         </Field>
 
-        <Secao titulo="Regras">
+        <Secao titulo="Regras" secao="regras">
           <div className="grid grid-cols-2 gap-3">
             <Ponta
               rotulo="Localizador ORIGEM"
@@ -191,7 +225,7 @@ export function AtpModal({
           </div>
 
           {outrasOrigens.length > 0 && (
-            <Field label="Opção para múltiplos localizadores">
+            <Field label="Opção para múltiplos localizadores" alvo="multiplos" pendente={pendente('multiplos')}>
               <select
                 className="select"
                 value={r.opcaoMultiplosLocalizadores ?? ''}
@@ -213,7 +247,7 @@ export function AtpModal({
             </Field>
           )}
 
-          <Field label="Comportamento do Localizador ORIGEM">
+          <Field label="Comportamento do Localizador ORIGEM" alvo="comportamento" pendente={pendente('comportamento')}>
             <select
               className="select"
               value={r.comportamentoOrigem ?? ''}
@@ -234,7 +268,7 @@ export function AtpModal({
             </select>
           </Field>
 
-          <Field label="Tipo de Controle">
+          <Field label="Tipo de Controle" alvo="tipoControle" pendente={pendente('tipoControle')}>
             <select
               className="select"
               value={r.trigger?.tipo ?? ''}
@@ -254,19 +288,21 @@ export function AtpModal({
           </Field>
 
           {r.trigger && (
-            <GatilhoCampos trigger={r.trigger} setTrigger={(trigger) => setR({ trigger })} />
+            <div data-alvo="gatilho" className="flex flex-col gap-3">
+              <GatilhoCampos trigger={r.trigger} setTrigger={(trigger) => setR({ trigger })} />
+            </div>
           )}
         </Secao>
 
-        <Secao titulo="Executar Ação">
+        <Secao titulo="Executar Ação" secao="acao">
           <AcoesBloco acoes={r.acoes ?? []} setAcoes={(acoes) => setR({ acoes })} />
         </Secao>
 
-        <Secao titulo="Filtros Opcionais">
+        <Secao titulo="Filtros Opcionais" secao="filtros">
           <FiltrosBloco filtros={r.filtros ?? {}} setFiltros={(filtros) => setR({ filtros })} />
         </Secao>
 
-        <Field label="Observações">
+        <Field label="Observações" secao="obs">
           <textarea
             className="textarea"
             rows={3}
