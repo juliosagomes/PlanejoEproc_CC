@@ -109,6 +109,7 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
   const createNode = useCanvasStore((s) => s.createNode);
   const criarNota = useCanvasStore((s) => s.criarNota);
   const criarEntrada = useCanvasStore((s) => s.criarEntrada);
+  const criarAtalhoOutroPlano = useCanvasStore((s) => s.criarAtalhoOutroPlano);
   const grupos = useCanvasStore((s) => s.grupos);
   const notas = useCanvasStore((s) => s.notas);
   const entradas = useCanvasStore((s) => s.entradas);
@@ -329,6 +330,7 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
     const peca = e.dataTransfer.getData(NEW_NODE_DATATYPE) as PecaArrastavel;
     if (peca === 'nota') criarNota(position);
     else if (peca === 'entrada') criarEntrada(position);
+    else if (peca === 'atalho') criarAtalhoOutroPlano(position);
     else createNode(position);
   };
 

@@ -8,13 +8,11 @@ import { cn } from '@/utils/cn';
  * no drop: um localizador, uma nota ou uma entrada por evento.
  */
 export const NEW_NODE_DATATYPE = 'application/x-pj-newnode';
-export type PecaArrastavel = 'localizador' | 'nota' | 'entrada';
+export type PecaArrastavel = 'localizador' | 'nota' | 'entrada' | 'atalho';
 
 interface SidebarProps {
   /** Disparado quando o usuário clica no botão (ou faz double-click no card). */
   onCreateNode: () => void;
-  /** Atalho para um localizador de outro plano — a mudança de fluxo (D-40). */
-  onCriarAtalhoOutroPlano: () => void;
   /** Sessão de visualização: some com a área de "Adicionar". */
   somenteLeitura?: boolean;
   /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
@@ -44,7 +42,6 @@ interface SidebarProps {
  */
 export function Sidebar({
   onCreateNode,
-  onCriarAtalhoOutroPlano,
   somenteLeitura = false,
   onVerTutorial,
   flags,
@@ -58,10 +55,10 @@ export function Sidebar({
     setDica(null);
   };
 
-  // Nota e entrada só nascem arrastadas: criadas por clique caíam numa posição
+  // Nota, entrada e atalho só nascem arrastados: criadas por clique caíam numa posição
   // fixa do quadro, quase sempre fora do que o usuário estava vendo. O clique
   // vira um balão que ensina o gesto.
-  const [dica, setDica] = useState<'nota' | 'entrada' | null>(null);
+  const [dica, setDica] = useState<'nota' | 'entrada' | 'atalho' | null>(null);
   useEffect(() => {
     if (!dica) return;
     const t = window.setTimeout(() => setDica(null), 3500);
@@ -140,7 +137,7 @@ export function Sidebar({
           >
             <Icon.Bolt /> Entrada
           </button>
-          {dica && (
+          {(dica === 'nota' || dica === 'entrada') && (
             <div
               role="status"
               className="sidebar-dica"
@@ -152,14 +149,28 @@ export function Sidebar({
             </div>
           )}
         </div>
-        <button
-          type="button"
-          className="btn btn-sm w-full justify-center mt-1.5"
-          onClick={onCriarAtalhoOutroPlano}
-          title="O processo sai deste plano e continua num localizador de outro"
-        >
-          <span aria-hidden>⇥</span> Atalho para outro plano
-        </button>
+        <div className="relative mt-1.5">
+          <button
+            type="button"
+            draggable
+            onDragStart={arrastar('atalho')}
+            className="btn btn-sm w-full justify-center cursor-grab"
+            onClick={() => setDica('atalho')}
+            title="Arraste para o canvas. O processo sai deste plano e continua num localizador de outro"
+          >
+            <span aria-hidden>⇥</span> Atalho para outro plano
+          </button>
+          {dica === 'atalho' && (
+            <div
+              role="status"
+              className="sidebar-dica"
+              style={{ '--seta': '50%' } as CSSProperties}
+              onClick={() => setDica(null)}
+            >
+              Arraste o atalho até o canvas e solte onde ele deve ficar.
+            </div>
+          )}
+        </div>
       </div>
       )}
 
