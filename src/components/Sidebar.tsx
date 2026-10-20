@@ -1,19 +1,18 @@
-import type { DragEvent } from 'react';
+import { useEffect, useState, type CSSProperties, type DragEvent } from 'react';
 import type { DefinicaoFlag } from '@/domain';
 import { Icon } from '@/components/Icon';
 import { cn } from '@/utils/cn';
 
-/** Tipo MIME interno usado para identificar o drag-and-drop de "novo localizador". */
+/**
+ * Tipo MIME interno do drag-and-drop de "Adicionar". O valor diz o que nasce
+ * no drop: um localizador, uma nota ou uma entrada por evento.
+ */
 export const NEW_NODE_DATATYPE = 'application/x-pj-newnode';
+export type PecaArrastavel = 'localizador' | 'nota' | 'entrada' | 'atalho';
 
 interface SidebarProps {
   /** Disparado quando o usuário clica no botão (ou faz double-click no card). */
   onCreateNode: () => void;
-  /** Notas e entradas por evento (decisoes.md#D-38): peças do quadro que não são localizador. */
-  onCriarNota: () => void;
-  onCriarEntrada: () => void;
-  /** Atalho para um localizador de outro plano — a mudança de fluxo (D-40). */
-  onCriarAtalhoOutroPlano: () => void;
   /** Sessão de visualização: some com a área de "Adicionar". */
   somenteLeitura?: boolean;
   /** Reabre o tutorial de slides. Disponível também em visualização — ler é inofensivo. */
@@ -43,9 +42,6 @@ interface SidebarProps {
  */
 export function Sidebar({
   onCreateNode,
-  onCriarNota,
-  onCriarEntrada,
-  onCriarAtalhoOutroPlano,
   somenteLeitura = false,
   onVerTutorial,
   flags,
@@ -53,10 +49,21 @@ export function Sidebar({
   onAlternarFiltroFlag,
   onGerenciarSetores,
 }: SidebarProps) {
-  const onDragStart = (e: DragEvent<HTMLDivElement>) => {
-    e.dataTransfer.setData(NEW_NODE_DATATYPE, '1');
+  const arrastar = (peca: PecaArrastavel) => (e: DragEvent<HTMLElement>) => {
+    e.dataTransfer.setData(NEW_NODE_DATATYPE, peca);
     e.dataTransfer.effectAllowed = 'move';
+    setDica(null);
   };
+
+  // Nota, entrada e atalho só nascem arrastados: criadas por clique caíam numa posição
+  // fixa do quadro, quase sempre fora do que o usuário estava vendo. O clique
+  // vira um balão que ensina o gesto.
+  const [dica, setDica] = useState<'nota' | 'entrada' | 'atalho' | null>(null);
+  useEffect(() => {
+    if (!dica) return;
+    const t = window.setTimeout(() => setDica(null), 3500);
+    return () => window.clearTimeout(t);
+  }, [dica]);
 
   return (
     <aside
@@ -77,7 +84,7 @@ export function Sidebar({
         <div className="section-h mb-2">Adicionar</div>
         <div
           draggable
-          onDragStart={onDragStart}
+          onDragStart={arrastar('localizador')}
           onDoubleClick={onCreateNode}
           className="flex flex-col items-center justify-center gap-1 rounded-lg p-3 text-center cursor-grab"
           style={{
@@ -109,32 +116,61 @@ export function Sidebar({
         >
           <Icon.Plus /> Criar nó
         </button>
-        <div className="flex gap-1.5 mt-1.5">
+        <div className="relative flex gap-1.5 mt-1.5">
           <button
             type="button"
-            className="btn btn-sm flex-1 justify-center"
-            onClick={onCriarNota}
-            title="Texto livre no quadro. Não vai ao Eproc nem ao checklist"
+            draggable
+            onDragStart={arrastar('nota')}
+            className="btn btn-sm flex-1 justify-center cursor-grab"
+            onClick={() => setDica('nota')}
+            title="Arraste para o canvas. Texto livre no quadro: não vai ao Eproc nem ao checklist"
           >
             <Icon.Pencil /> Nota
           </button>
           <button
             type="button"
-            className="btn btn-sm flex-1 justify-center"
-            onClick={onCriarEntrada}
-            title="Origem de regra disparada por evento, venha o processo de onde vier (origem “Nenhum”)"
+            draggable
+            onDragStart={arrastar('entrada')}
+            className="btn btn-sm flex-1 justify-center cursor-grab"
+            onClick={() => setDica('entrada')}
+            title="Arraste para o canvas. Origem de regra disparada por evento, venha o processo de onde vier (origem “Nenhum”)"
           >
             <Icon.Bolt /> Entrada
           </button>
+          {(dica === 'nota' || dica === 'entrada') && (
+            <div
+              role="status"
+              className="sidebar-dica"
+              style={{ '--seta': dica === 'nota' ? '25%' : '75%' } as CSSProperties}
+              onClick={() => setDica(null)}
+            >
+              Arraste {dica === 'nota' ? 'a nota' : 'a entrada'} até o canvas e solte
+              onde ela deve ficar.
+            </div>
+          )}
         </div>
-        <button
-          type="button"
-          className="btn btn-sm w-full justify-center mt-1.5"
-          onClick={onCriarAtalhoOutroPlano}
-          title="O processo sai deste plano e continua num localizador de outro"
-        >
-          <span aria-hidden>⇥</span> Atalho para outro plano
-        </button>
+        <div className="relative mt-1.5">
+          <button
+            type="button"
+            draggable
+            onDragStart={arrastar('atalho')}
+            className="btn btn-sm w-full justify-center cursor-grab"
+            onClick={() => setDica('atalho')}
+            title="Arraste para o canvas. O processo sai deste plano e continua num localizador de outro"
+          >
+            <span aria-hidden>⇥</span> Atalho para outro plano
+          </button>
+          {dica === 'atalho' && (
+            <div
+              role="status"
+              className="sidebar-dica"
+              style={{ '--seta': '50%' } as CSSProperties}
+              onClick={() => setDica(null)}
+            >
+              Arraste o atalho até o canvas e solte onde ele deve ficar.
+            </div>
+          )}
+        </div>
       </div>
       )}
 

@@ -103,9 +103,6 @@ function Editor() {
   const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
   const loadPlanoAcao = useCanvasStore((s) => s.loadPlano);
   const createNode = useCanvasStore((s) => s.createNode);
-  const criarNota = useCanvasStore((s) => s.criarNota);
-  const criarEntrada = useCanvasStore((s) => s.criarEntrada);
-  const criarAtalhoOutroPlano = useCanvasStore((s) => s.criarAtalhoOutroPlano);
 
   const [showChecklist, setShowChecklist] = useState(false);
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
@@ -566,7 +563,6 @@ function Editor() {
   const painelAberto = !!(selectedNode || selectedEdge || selectedGrupo || selectedNota || selectedEntrada);
 
   // Ao lado do nó novo, para a peça não nascer em cima de nada que o usuário vê.
-  const posicaoNova = () => ({ x: 200 + Math.random() * 80, y: 120 + Math.random() * 80 });
 
   // `Editor` só é montado com sessão ativa (ver `App`), mas o seletor devolve
   // o tipo anulável — este guarda mantém o Header com prop não-anulável.
@@ -621,9 +617,6 @@ function Editor() {
         {tela === 'fluxo' && sidebarVisivel && (
           <Sidebar
             onCreateNode={criarNoCentro}
-            onCriarNota={() => criarNota(posicaoNova())}
-            onCriarEntrada={() => criarEntrada(posicaoNova())}
-            onCriarAtalhoOutroPlano={() => criarAtalhoOutroPlano(posicaoNova())}
             somenteLeitura={somenteLeitura}
             onVerTutorial={() => setTutorialManual(true)}
             flags={flags}
