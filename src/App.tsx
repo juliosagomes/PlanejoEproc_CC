@@ -103,8 +103,6 @@ function Editor() {
   const setFiltroFlags = useCanvasStore((s) => s.setFiltroFlags);
   const loadPlanoAcao = useCanvasStore((s) => s.loadPlano);
   const createNode = useCanvasStore((s) => s.createNode);
-  const criarNota = useCanvasStore((s) => s.criarNota);
-  const criarEntrada = useCanvasStore((s) => s.criarEntrada);
   const criarAtalhoOutroPlano = useCanvasStore((s) => s.criarAtalhoOutroPlano);
 
   const [showChecklist, setShowChecklist] = useState(false);
@@ -621,8 +619,6 @@ function Editor() {
         {tela === 'fluxo' && sidebarVisivel && (
           <Sidebar
             onCreateNode={criarNoCentro}
-            onCriarNota={() => criarNota(posicaoNova())}
-            onCriarEntrada={() => criarEntrada(posicaoNova())}
             onCriarAtalhoOutroPlano={() => criarAtalhoOutroPlano(posicaoNova())}
             somenteLeitura={somenteLeitura}
             onVerTutorial={() => setTutorialManual(true)}

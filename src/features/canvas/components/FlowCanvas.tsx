@@ -18,7 +18,7 @@ import {
   type EdgeKind,
   type RefOutroPlano,
 } from '@/domain';
-import { NEW_NODE_DATATYPE } from '@/components/Sidebar';
+import { NEW_NODE_DATATYPE, type PecaArrastavel } from '@/components/Sidebar';
 import { useTemaStore } from '@/features/tema/store';
 import { getAtivoId, loadCamera, saveCamera } from '@/infra/storage';
 import type { Tema } from '@/infra/storage/tema';
@@ -107,6 +107,8 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
   const onConnect = useCanvasStore((s) => s.onConnect);
   const setSelectedId = useCanvasStore((s) => s.setSelectedId);
   const createNode = useCanvasStore((s) => s.createNode);
+  const criarNota = useCanvasStore((s) => s.criarNota);
+  const criarEntrada = useCanvasStore((s) => s.criarEntrada);
   const grupos = useCanvasStore((s) => s.grupos);
   const notas = useCanvasStore((s) => s.notas);
   const entradas = useCanvasStore((s) => s.entradas);
@@ -324,7 +326,10 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
     setArrastando(false);
     if (!Array.from(e.dataTransfer.types).includes(NEW_NODE_DATATYPE)) return;
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
-    createNode(position);
+    const peca = e.dataTransfer.getData(NEW_NODE_DATATYPE) as PecaArrastavel;
+    if (peca === 'nota') criarNota(position);
+    else if (peca === 'entrada') criarEntrada(position);
+    else createNode(position);
   };
 
   // O handler mora no wrapper, então recebe o duplo clique de qualquer

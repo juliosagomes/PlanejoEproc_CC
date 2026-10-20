@@ -225,6 +225,37 @@
   border-radius: 6px;
   box-shadow: 0 4px 14px -6px rgba(20, 22, 28, 0.18);
 }
+/* Balão de "arraste até o canvas" sob os botões Nota/Entrada da Sidebar.
+   `--seta` põe a ponta sobre o botão clicado. */
+.sidebar-dica {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  padding: 7px 9px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--texto);
+  background: var(--superficie);
+  border: 1px solid var(--destaque-borda);
+  border-radius: 6px;
+  box-shadow: 0 4px 14px -6px rgba(var(--sombra-cor), 0.25);
+  cursor: pointer;
+}
+.sidebar-dica::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: var(--seta);
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  background: var(--superficie);
+  border-left: 1px solid var(--destaque-borda);
+  border-top: 1px solid var(--destaque-borda);
+  transform: rotate(45deg);
+}
 .sugestoes-item {
   display: flex;
   flex-direction: column;
