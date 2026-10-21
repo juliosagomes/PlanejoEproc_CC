@@ -56,3 +56,23 @@ armadilha que o parser precisa sobreviver (ver abaixo).
 
 5. **`Localizador Sistema` é `"Sim"` / `"Não"`** — mesmo vocabulário do XLS, então
    o filtro do D-7 continua valendo sem tradução.
+
+## Regras de ATP (21/10/2026, decisoes.md#D-46)
+
+Capturadas no mesmo eproc1g, perfil *ULA 2ª V.FAM.SUC / Gerente*, só leitura,
+já no formato que o coletor devolve:
+
+- `automatizarLocalizadores.html` — a `#tableAutomatizacaoLocalizadores` com 13
+  das 279 regras, escolhidas pelos casos difíceis: destino com " E " (1, 182),
+  origem com OU (2) e com E (12), origem "Nenhum" (180, 182) e "Todos" (312),
+  destino P (66), desativada (180), ação manual (132, 312), por data (7), por
+  tempo (49), por documento (152). Opções não escolhidas, scripts, tooltips de
+  histórico (traziam matrícula) e o `hash` dos links já saem no coletor.
+- `automatizarLocalizadoresAlterar-N.html` — o formulário de 8 regras, recortado
+  pelo coletor: só os controles, com a opção escolhida de cada `<select>`, em três
+  blocos (`#formulario`, `#filtrosEscolhidos`, `#dadosGatilho`).
+
+**Anonimizado:** o nome do servidor nos localizadores pessoais de erro virou
+"Servidor", **inclusive dentro do base64 do `hdnATP_n`** — ali é PHP serializado
+em Latin-1, e o comprimento `s:N:` de cada string alterada foi recalculado.
+Fixture nova desta tela precisa do mesmo cuidado: o nome escapa do texto visível.

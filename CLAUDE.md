@@ -189,6 +189,11 @@ existem em nenhum outro arquivo do projeto:
   (decisoes.md#D-38).
 - **Nota** — texto livre no quadro, que cita regras pelo número. Não vai ao
   Eproc nem ao checklist (decisoes.md#D-38).
+- **Nº da regra** — o número que o Eproc dá à regra de ATP ("Regra 182"). O
+  recurso o guarda em `Subitem.eprocAtp`, e é por ele que o app sincroniza só
+  aquela regra e confere o detalhe (decisoes.md#D-46).
+- **Origem pelo filtro** — regra de origem "Nenhum" desenhada a partir do
+  localizador do filtro "Que Contenha" (decisoes.md#D-47).
 - **Conjunto** — atalho para selecionar e ler eventos, tipos de petição ou
   documentos da regra de ATP; o plano continua gravando os códigos um a um
   (decisoes.md#D-29, D-41). "Todos − x, y, z" quando o que fica de fora cabe em
@@ -236,11 +241,15 @@ Os JSONs originais ficam em `./listas_json/` na raiz. Vão para `src/data/` **s�
    - **Detalhe interno da preferência** (evento, localizador destino): exige
      avaliar `arrCamposPersonalizados` no MAIN world, ou seja `eval` — proibido
      pelo critério de "pronto" nº 7.
-   - **ATPs cadastradas** (`automatizar_localizadores`).
+   - ~~ATPs cadastradas~~ — **entraram** em outubro/2026 (decisoes.md#D-46):
+     lista sempre, detalhe opcional, e regra a regra pelo recurso.
    - **Filtros das consultas salvas** nas telas de relatório. Os nomes já são
      coletados (decisoes.md#D-32); os filtros só sairiam aplicando a consulta ou
      com `eval`.
-   - **Gerar arestas** a partir das ações preferenciais coletadas. Os vínculos já
+   - **Gerar arestas** a partir das ações preferenciais coletadas. (Para as
+     **regras de ATP**, a decisão foi tomada: desenhar a partir da regra,
+     **sempre por clique e com prévia** — decisoes.md#D-47. Gerar sozinho
+     continua fora, para as duas.) Os vínculos já
      são sincronizados e aparecem como **informação** no painel do localizador
      ("Ações Preferenciais Vinculadas"). Convertê-los em arestas do plano é outra
      coisa: muda a premissa do app, que existe para você *desenhar* o fluxo, e o
@@ -399,6 +408,18 @@ opcionais, como no D-23:
   gera trechos a partir dos descritores; o modal mostra a frase e a navegação
   pelos blocos (`detalhe/FraseRegra.tsx`, `NavBlocos.tsx`), e o mapa a usa com
   "Em texto corrido". Campo que a frase deve achar leva `data-alvo`.
+- Regras de ATP na sincronização (D-46): coletor à parte
+  (`extension/coletor/regrasAtp.ts`), parsers em `infra/eproc/parseRegrasAtp.ts`
+  e `parseRegraAtpDetalhe.ts`. As ações vêm do `hdnATP_n`, PHP serializado
+  (`phpSerializado.ts`); as pontas vêm sempre da lista, por nome. O detalhe não
+  trazido numa coleta é mantido, e toda lista acessória que falha fica com a da
+  última sincronização (`comReserva` em `aplicarColeta.ts`). A guia "Regras de
+  ATP" do painel tem a observação em chave própria do silo (`observacoesAtp`).
+  Fixture nova do Eproc: anonimize também **dentro do base64** do `hdnATP_n`,
+  recalculando o `s:N:` do PHP.
+- Desenhar a partir da regra (D-47), da demo 11, em `features/canvas/regras/`:
+  o planejamento é puro (`desenharRegra.ts`), a prévia desenha peças tracejadas
+  fora da store, e só `desenharRegras` grava. Segue o D-42 ("A E B" sem leque).
 - Cabeçalho enxuto (D-36): o nome do plano ativo **é** o seletor (duplo
   clique ou F2 renomeia), as ações moram nos menus **Plano** e **Unidade**
   (`components/MenuSuspenso.tsx`) e o progresso usa a conta do checklist.
