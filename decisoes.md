@@ -2204,7 +2204,10 @@ quando o plano e o Eproc deixavam de bater.
   com o `<select>` vazio e as opções em `input#valueOptions<Campo>`.
 - O coletor devolve só os controles, com a opção escolhida de cada `<select>`
   (≈ 20 KB por regra, de 2,2 MB): opção não escolhida pode ser nome de servidor
-  e não sai da página. O detalhe completo, sem iframe, leva alguns minutos.
+  e não sai da página. O detalhe completo, sem iframe, levou **5 min 37 s** para
+  as 279 regras (≈ 1,2 s por regra, 5,7 MB de recortes), sem nenhuma falha. As
+  216 ações programadas foram lidas do serializado sem erro; **37 regras têm
+  mais de uma ação** (a nota de 04/10 dizia que nenhuma tinha).
 - Os códigos de `selDiaSemanaDataControle` são 0 = domingo … 6 = sábado, os
   mesmos que o D-27 tinha adotado sem levantar.
 
