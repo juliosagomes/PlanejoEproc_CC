@@ -52,6 +52,8 @@ export interface HeaderProps {
   /** Abre a tela geral dos setores da unidade (decisoes.md#D-26). */
   onSetores: () => void;
   onDescarte: () => void;
+  /** Abre a lista lateral das regras de ATP da unidade, no Fluxo (decisoes.md#D-47). */
+  onRegrasAtp: () => void;
   onChecklist: () => void;
   onVerTutorial: () => void;
   stats: HeaderStats;
@@ -227,6 +229,8 @@ interface MenuUnidadeProps {
   onCatalogoOrgao: () => void;
   onSetores: () => void;
   onDescarte: () => void;
+  /** Abre a lista lateral das regras de ATP da unidade, no Fluxo (decisoes.md#D-47). */
+  onRegrasAtp: () => void;
 }
 
 function MenuUnidade(p: MenuUnidadeProps) {
@@ -244,7 +248,7 @@ function MenuUnidade(p: MenuUnidadeProps) {
       <ItemMenu
         icone={<Icon.Sincronizar />}
         rotulo={p.sincronizandoUnidade ? 'Sincronizando…' : 'Sincronizar com a unidade'}
-        descricao="Lê localizadores, modelos e textos padrão direto do Eproc, na aba em que você está logado"
+        descricao="Lê localizadores, modelos, textos padrão e regras de ATP direto do Eproc, na aba em que você está logado"
         disabled={p.sincronizandoUnidade}
         onSelect={p.onSincronizarUnidade}
       />
@@ -268,6 +272,12 @@ function MenuUnidade(p: MenuUnidadeProps) {
         rotulo="Destinos de descarte"
         descricao="Localizadores como “P”, que só preenchem o destino de regra que não move"
         onSelect={p.onDescarte}
+      />
+      <ItemMenu
+        icone={<Icon.Bolt />}
+        rotulo="Regras de ATP da unidade"
+        descricao="Lista as regras sincronizadas para desenhar no plano aberto"
+        onSelect={p.onRegrasAtp}
       />
     </MenuSuspenso>
   );
@@ -383,6 +393,7 @@ export function Header(props: HeaderProps) {
           onCatalogoOrgao={props.onCatalogoOrgao}
           onSetores={props.onSetores}
           onDescarte={props.onDescarte}
+          onRegrasAtp={props.onRegrasAtp}
         />
         <MenuMais onVerTutorial={props.onVerTutorial} />
         {noFluxo && (

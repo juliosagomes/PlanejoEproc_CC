@@ -26,7 +26,9 @@ import { cn } from '@/utils/cn';
 import { acharGemeos } from '../gemeos';
 import { useIrParaNo } from '../irParaNo';
 import { outrosPlanos } from '../outrosPlanos';
-import { useCanvasStore } from '../store';
+import { REGRA_ATP_DATATYPE, useRegrasQuadroStore } from '../regras/store';
+import { useDesenhoPrevia } from '../regras/useDesenhoPrevia';
+import { defaultEdgeData, defaultLocalizadorData, useCanvasStore, type FlowEdge, type FlowNode } from '../store';
 import { moldurasParaFlow } from '../grupoMudancas';
 import { pecasParaFlow } from '../pecasQuadro';
 import { EntradaNode } from './EntradaNode';
@@ -311,13 +313,45 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
     [edges, esmaecidos, recolhidoDe, tema],
   );
 
+  // Peças da prévia de "desenhar a partir da regra" (D-47): tracejadas, sem
+  // seleção nem arrasto, e fora da store — não são do plano até o "Desenhar".
+  const desenhoPrevia = useDesenhoPrevia();
+  const prever = useRegrasQuadroStore((s) => s.prever);
+  const fantasmas = useMemo(() => {
+    if (!desenhoPrevia) return { nos: [] as FlowNode[], arestas: [] as FlowEdge[] };
+    const op = desenhoPrevia.operacoes;
+    return {
+      nos: op.novosNos.map((n): FlowNode => ({
+        id: n.id,
+        type: 'localizador',
+        position: n.position,
+        data: { ...defaultLocalizadorData(), nome: n.nome, ja_criado: !n.sistema },
+        className: 'pj-fantasma',
+        selectable: false,
+        draggable: false,
+        connectable: false,
+      })),
+      arestas: op.novasArestas.map((a): FlowEdge => ({
+        id: a.id,
+        source: a.source,
+        target: a.target,
+        type: 'pj',
+        data: { ...defaultEdgeData(), kind: 'atp', subitems: [a.subitem] },
+        className: 'pj-fantasma',
+        markerEnd: { type: MarkerType.ArrowClosed, color: corDoMarcador('atp', tema), width: 14, height: 14 },
+      })),
+    };
+  }, [desenhoPrevia, tema]);
+
   const isEmpty = nodes.length === 0 && pecas.length === 0;
 
   const onDragOver = (e: DragEvent<HTMLDivElement>) => {
     if (somenteLeitura) return;
-    if (!Array.from(e.dataTransfer.types).includes(NEW_NODE_DATATYPE)) return;
+    const tipos = Array.from(e.dataTransfer.types);
+    const regra = tipos.includes(REGRA_ATP_DATATYPE);
+    if (!regra && !tipos.includes(NEW_NODE_DATATYPE)) return;
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    e.dataTransfer.dropEffect = regra ? 'copy' : 'move';
     if (!arrastando) setArrastando(true);
   };
   const onDragLeave = () => setArrastando(false);
@@ -325,6 +359,12 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
     if (somenteLeitura) return;
     e.preventDefault();
     setArrastando(false);
+    // Regra da unidade solta no quadro: só abre a prévia (D-47).
+    const regra = Number(e.dataTransfer.getData(REGRA_ATP_DATATYPE));
+    if (regra > 0) {
+      prever([regra]);
+      return;
+    }
     if (!Array.from(e.dataTransfer.types).includes(NEW_NODE_DATATYPE)) return;
     const position = screenToFlowPosition({ x: e.clientX, y: e.clientY });
     const peca = e.dataTransfer.getData(NEW_NODE_DATATYPE) as PecaArrastavel;
@@ -354,8 +394,8 @@ export function FlowCanvas({ planoId, onAbrirOutroPlano, children }: FlowCanvasP
       onDrop={onDrop}
     >
       <ReactFlow
-        nodes={[...molduras, ...decoratedNodes, ...pecas]}
-        edges={decoratedEdges}
+        nodes={[...molduras, ...decoratedNodes, ...pecas, ...fantasmas.nos]}
+        edges={fantasmas.arestas.length ? [...decoratedEdges, ...fantasmas.arestas] : decoratedEdges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
