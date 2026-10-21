@@ -68,7 +68,14 @@ export function EdgeDetailModal({
 
   if (subitem.categoria === 'Regra de ATP') {
     return (
-      <AtpModal {...comuns} rule={subitem.atp} origem={origem} destino={destino} pendurada={pendurada} />
+      <AtpModal
+        {...comuns}
+        rule={subitem.atp}
+        origem={origem}
+        destino={destino}
+        pendurada={pendurada}
+        eprocAtp={subitem.eprocAtp}
+      />
     );
   }
   if (subitem.categoria === 'Preferência') {
