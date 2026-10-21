@@ -13,13 +13,15 @@ import { CoberturaLista } from './CoberturaLista';
 import { FilaCard } from './FilaCard';
 import { GruposPreferencias } from './GruposPreferencias';
 import { NovaFilaForm } from './NovaFilaForm';
+import { RegrasAtpAba } from './RegrasAtpAba';
 import { TrilhoSetores } from './TrilhoSetores';
 
-type Aba = 'setor' | 'grupos';
+type Aba = 'setor' | 'grupos' | 'regras';
 
 /**
  * Painel da unidade (decisoes.md#D-33): as filas de trabalho de cada setor e a
- * cobertura dos localizadores. Ocupa o lugar do canvas; o cabeçalho alterna.
+ * cobertura dos localizadores, os grupos de preferências e as regras de ATP
+ * (D-46). Ocupa o lugar do canvas; o cabeçalho alterna.
  */
 export function PainelUnidade() {
   const setores = useSetoresStore((s) => s.setores);
@@ -56,6 +58,7 @@ export function PainelUnidade() {
             [
               ['setor', 'Por setor'],
               ['grupos', 'Grupos de preferências'],
+              ['regras', 'Regras de ATP'],
             ] as const
           ).map(([id, rotulo]) => (
             <button
@@ -74,9 +77,11 @@ export function PainelUnidade() {
           ))}
         </div>
 
-        {aba === 'grupos' ? (
+        {aba === 'regras' && <RegrasAtpAba />}
+        {aba === 'grupos' && (
           <GruposPreferencias painel={painel} setores={setores} somenteLeitura={somenteLeitura} />
-        ) : (
+        )}
+        {aba === 'setor' && (
           <div className="grid grid-cols-[230px_minmax(0,1fr)] gap-5 items-start">
             <div className="sticky top-0">
               <TrilhoSetores

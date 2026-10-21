@@ -50,6 +50,7 @@ export { consolidarSetores } from './consolidarSetores';
 export { loadCamera, saveCamera, type Camera } from './cameras';
 export { loadConjuntos, saveConjuntos } from './conjuntos';
 export { loadDestinosDescarte, saveDestinosDescarte } from './descarte';
+export { loadObservacoesRegras, saveObservacoesRegras } from './observacoesRegras';
 export { PAINEL_KEY_SUFIXO, painelKey, loadPainel, savePainel } from './painel';
 export {
   MAPAS_INDEX_SUFIXO,

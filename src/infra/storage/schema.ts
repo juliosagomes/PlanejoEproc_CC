@@ -6,6 +6,7 @@ import {
   CONJUNTOS_VERSION,
   CORES_FLAG,
   DESCARTE_VERSION,
+  OBSERVACOES_REGRAS_VERSION,
   EFEITOS_SEM_MOVER,
   MAPA_VERSION,
   ORIGENS_FILA,
@@ -26,6 +27,7 @@ import {
   type RegraAtpUnidade,
   type DefinicaoFlag,
   type DestinosDescarteUnidade,
+  type ObservacoesRegrasUnidade,
   type DobraAresta,
   type Mapa,
   type MapaIndexEntry,
@@ -130,6 +132,12 @@ export const DestinosDescarteUnidadeSchema = z.object({
   version: z.literal(DESCARTE_VERSION),
   nomes: z.array(z.string()),
 }) satisfies z.ZodType<DestinosDescarteUnidade>;
+
+/** Observações das regras de ATP (decisoes.md#D-46). Chave por escopo, fora do catálogo. */
+export const ObservacoesRegrasUnidadeSchema = z.object({
+  version: z.literal(OBSERVACOES_REGRAS_VERSION),
+  itens: z.record(z.string(), z.string()),
+}) satisfies z.ZodType<ObservacoesRegrasUnidade>;
 
 /** Conjuntos criados pelo usuário (decisoes.md#D-29, D-41). Chave por escopo e por catálogo, como os setores. */
 export const ConjuntosUnidadeSchema = z.object({

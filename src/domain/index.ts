@@ -10,6 +10,7 @@ export * from './grupos';
 export * from './quadro';
 export * from './regrasSemMover';
 export * from './descarte';
+export * from './observacoesRegras';
 export * from './catalogoOrgao';
 export * from './catalogoUnidade';
 export * from './anotacoesCatalogo';
