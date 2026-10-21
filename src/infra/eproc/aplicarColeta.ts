@@ -58,9 +58,9 @@ function resultadoDeFonte(bruta: FonteBruta | undefined, itens: number): FonteRe
 }
 
 /**
- * `anterior` é o catálogo gravado antes desta coleta. Só as preferências o
- * leem: o autocompletar delas é a fonte que o Eproc já quebrou uma vez
- * (decisoes.md#D-35), e sem ele cada falha apagaria a lista.
+ * `anterior` é o catálogo gravado antes desta coleta. Toda lista acessória que
+ * não vem `ok` fica com a dele, da mesma unidade: o catálogo é regravado
+ * inteiro, e sem isso cada falha apagaria a lista (decisoes.md#D-35, D-46).
  */
 export function aplicarColeta(
   coleta: ColetaUnidade,
@@ -133,14 +133,38 @@ export function aplicarColeta(
 
   /* --- listas acessórias: falham sem derrubar a coleta -------------------- */
 
-  const modelos = parseAcessoria(coleta, 'modelos', parseModeloPadrao, fontes);
-  const textosPadrao = parseAcessoria(coleta, 'textosPadrao', parseTextoPadrao, fontes);
-  const acoesPreferenciais = aplicarAcoesPreferenciais(coleta, fontes);
+  // Só o catálogo da mesma unidade serve de reserva: o de outra vara traria
+  // listas que não são desta.
+  const daUnidade = anterior?.unidade.chave === unidade.chave ? anterior : null;
+
+  const modelos = comReserva(
+    'modelos',
+    parseAcessoria(coleta, 'modelos', parseModeloPadrao, fontes),
+    daUnidade?.modelos,
+    fontes,
+  );
+  const textosPadrao = comReserva(
+    'textosPadrao',
+    parseAcessoria(coleta, 'textosPadrao', parseTextoPadrao, fontes),
+    daUnidade?.textosPadrao,
+    fontes,
+  );
+  const acoesPreferenciais = comReserva(
+    'acoesPreferenciais',
+    aplicarAcoesPreferenciais(coleta, fontes),
+    daUnidade?.acoesPreferenciais,
+    fontes,
+  );
   const preferencias = aplicarPreferencias(coleta, fontes, {
-    anteriores: anterior?.unidade.chave === unidade.chave ? anterior.preferencias ?? [] : [],
+    anteriores: daUnidade?.preferencias ?? [],
     acoesPreferenciais,
   });
-  const consultasSalvas = aplicarConsultasSalvas(coleta, fontes);
+  const consultasSalvas = comReserva(
+    'consultasSalvas',
+    aplicarConsultasSalvas(coleta, fontes),
+    daUnidade?.consultasSalvas,
+    fontes,
+  );
 
   return {
     ok: true,
@@ -169,6 +193,30 @@ export function aplicarColeta(
       consultasSalvas: consultasSalvas.length,
     },
   };
+}
+
+/**
+ * Fonte que não veio `ok`, ou que veio num formato que o parser recusou, fica
+ * com a lista da última sincronização da mesma unidade, e o modal diz quantos
+ * itens foram mantidos. Sem lista anterior, vale o que a coleta trouxe.
+ *
+ * As preferências têm reserva própria, porque somam os nomes vindos das ações
+ * preferenciais (D-35).
+ */
+function comReserva<T>(
+  fonte: FonteId,
+  itens: T[],
+  anteriores: T[] | undefined,
+  fontes: Partial<Record<FonteId, FonteResultado>>,
+): T[] {
+  const resultado = fontes[fonte];
+  if (resultado?.status === 'ok' || !anteriores?.length) return itens;
+  const motivo = [
+    resultado?.motivo ?? 'Fonte não coletada.',
+    `${anteriores.length} mantidos da última sincronização.`,
+  ].join(' ');
+  fontes[fonte] = { status: resultado?.status ?? 'falhou', itens: anteriores.length, motivo };
+  return anteriores;
 }
 
 /**

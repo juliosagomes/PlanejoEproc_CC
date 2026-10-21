@@ -381,6 +381,28 @@ describe('coletor do Eproc', () => {
     expect(r.resumo.modelos).toBe(0);
     expect(r.catalogo.fontes.modelos?.status).toBe('semPermissao');
   });
+
+  it('na falha, modelos e textos ficam com os da última sincronização (D-46)', async () => {
+    const completa = aplicarColeta(await coletarUnidadeNaAba());
+    if (!completa.ok) throw new Error(completa.erro);
+
+    document.body.innerHTML = MENU.replace(/<a href="[^"]*_padrao_listar[^"]*">[^<]*<\/a>/g, '');
+    const coleta = await coletarUnidadeNaAba();
+    const r = aplicarColeta(coleta, undefined, completa.catalogo);
+    if (!r.ok) throw new Error(r.erro);
+    expect(r.catalogo.modelos).toEqual(completa.catalogo.modelos);
+    expect(r.catalogo.textosPadrao).toEqual(completa.catalogo.textosPadrao);
+    expect(r.catalogo.fontes.modelos?.status).toBe('semPermissao');
+    expect(r.catalogo.fontes.modelos?.motivo).toContain('8 mantidos da última sincronização');
+
+    const deOutra = {
+      ...completa.catalogo,
+      unidade: { ...completa.catalogo.unidade, chave: 'outro::host::VX' },
+    };
+    const r2 = aplicarColeta(coleta, undefined, deOutra);
+    if (!r2.ok) throw new Error(r2.erro);
+    expect(r2.catalogo.modelos).toBeUndefined();
+  });
 });
 
 describe('coletor do Eproc — lista de preferências recusada (D-35/D-37)', () => {
