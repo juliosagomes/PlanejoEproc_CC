@@ -93,11 +93,13 @@ function lerLinha(celula: (c: Coluna) => Element | undefined): RegraAtpUnidade |
     : /^todos os localizadores$/i.test(textoOrigem)
       ? 'todos'
       : 'localizadores';
-  const origens = tipoOrigem === 'localizadores' && tdOrigem ? itensSeparados(tdOrigem) : null;
-  const destinos = tdDestino ? itensSeparados(tdDestino) : null;
+  // Lista longa de localizadores também vem em resumo e completo.
+  const origens =
+    tipoOrigem === 'localizadores' && tdOrigem ? itensSeparados(completo(tdOrigem)) : null;
+  const destinos = tdDestino ? itensSeparados(completo(tdDestino)) : null;
 
   const gatilho = tdGatilho ? completo(tdGatilho) : undefined;
-  const tipoControle = gatilho?.querySelector('b')?.textContent?.trim() ?? '';
+  const tipoControle = gatilho ? tipoDoGatilho(gatilho) : '';
   const gatilhoTexto = gatilho ? textoDaCelula(gatilho).replace(/\n/g, ' ') : '';
   const descricao = gatilhoTexto.match(/Descrição:\s*(.+)$/)?.[1]?.trim();
 
@@ -116,13 +118,34 @@ function lerLinha(celula: (c: Coluna) => Element | undefined): RegraAtpUnidade |
       ? { opcaoOrigens: origens.op === 'E' ? ('AND' as const) : ('OR' as const) }
       : {}),
     destinos: destinos?.itens ?? [],
-    tipoControle: tipoControle || gatilhoTexto.split(/[/\n]/)[0]?.trim() || '',
+    tipoControle,
     ...(gatilhoTexto ? { gatilhoTexto } : {}),
     ...(descricao ? { descricao } : {}),
     ...(acoesTexto.length ? { acoesTexto } : {}),
     ...(filtros.length ? { filtrosTexto: filtros.map((f) => f.texto) } : {}),
     ...filtroContem(filtros),
   };
+}
+
+/**
+ * O tipo de controle. Quase sempre é o `<b>` do começo ("Por Evento / …"),
+ * mas em "Por Evento ou Petição ou Documento" o tipo vem em texto e o `<b>` é
+ * o subtipo casado ("PETIÇÃO", "EVENTO").
+ */
+function tipoDoGatilho(raiz: Element): string {
+  const b = raiz.querySelector('b');
+  let antes = '';
+  for (const no of Array.from(raiz.childNodes)) {
+    if (no === b || no.contains(b)) break;
+    antes += no.textContent ?? '';
+  }
+  const texto = antes.replace(/\s+/g, ' ').replace(/\s*\/\s*$/, '').trim();
+  return (
+    texto ||
+    (b?.textContent ?? '').trim() ||
+    textoDaCelula(raiz).split(/[/\n]/)[0]?.trim() ||
+    ''
+  );
 }
 
 /** O bloco completo, quando a tela mostra também um resumo cortado. */
@@ -165,7 +188,7 @@ function itensSeparados(raiz: Element): { itens: string[]; op?: 'OU' | 'E' } {
     }
     if (!(no instanceof Element)) continue;
     if (no.tagName === 'DIV') break;
-    if (no.tagName === 'BR') continue;
+    if (no.tagName === 'BR' || no.id.startsWith('alternarVisualizacao')) continue;
     const texto = (no.textContent ?? '').trim();
     if (no.tagName === 'SPAN' && (texto === 'OU' || texto === 'E')) {
       op = texto;

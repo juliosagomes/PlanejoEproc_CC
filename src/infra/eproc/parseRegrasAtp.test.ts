@@ -55,6 +55,28 @@ describe('parseRegrasAtp (D-46)', () => {
     expect(regra(180).filtroContem).toEqual(['.Família (Proc. Comum)']);
   });
 
+  it('em "Por Evento ou Petição ou Documento" o tipo é o texto, não o <b> do subtipo', () => {
+    expect(regra(27).tipoControle).toBe('Por Evento ou Petição ou Documento');
+    expect(regra(182).tipoControle).toBe('Por Evento ou Petição ou Documento');
+    expect(regra(1).tipoControle).toBe('Por Evento');
+    expect(regra(312).tipoControle).toBe('Por Ação Manual');
+  });
+
+  it('origem e destino longos vêm em resumo e completo: vale o completo', () => {
+    // Estrutura das regras 78 e 109 da unidade, levantada em 21/10/2026.
+    const linha = `<table id="tableAutomatizacaoLocalizadores"><tbody><tr>
+      <td></td><td class="colunaRegra"><span><span>109</span></span></td><td><span><a>Expedição</a></span></td>
+      <td><div id="dadosResumidos_109">A - A<br><span> E </span><br>B - B ... <span id="alternarVisualizacao109"><a>[ + Expandir ]</a></span></div>
+          <div id="dadosCompletos_109">A - A<br><span> E </span><br>B - B</div></td>
+      <td><div id="dadosResumidos_109"><b>Por Evento</b> / X</div></td>
+      <td><div id="dadosResumidos_109">C - C<span> E </span>D - D ...</div><div id="dadosCompletos_109">C - C<span> E </span>D - D</div>
+          <br><br><div> + Executar Ação Programada:</div><div>LANÇAR EVENTO</div>Evento: <span>Y</span><br></td>
+      <td></td><td><input type="checkbox" checked></td></tr></tbody></table>`;
+    const [r] = parseRegrasAtp(linha);
+    expect(r).toMatchObject({ origens: ['A', 'B'], opcaoOrigens: 'AND', destinos: ['C', 'D'] });
+    expect(r?.acoesTexto).toEqual(['LANÇAR EVENTO · Evento: Y']);
+  });
+
   it('origem "Todos", destino P e a descrição da ação manual', () => {
     expect(regra(312)).toMatchObject({
       tipoOrigem: 'todos',
