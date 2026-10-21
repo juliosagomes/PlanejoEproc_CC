@@ -9,6 +9,7 @@ import type {
 } from '@/domain';
 import { montarUnidade } from './escopoUnidade';
 import { anexarIds, deduplicar, montarCatalogoUnidade } from './montarCatalogo';
+import { montarRegrasAtp } from './aplicarRegrasAtp';
 import { semDecoracao } from './nomeLocalizador';
 import { parseAcaoPreferencial } from './parseAcaoPreferencial';
 import { parseModeloPadrao, parseTextoPadrao } from './parseListasSimples';
@@ -42,6 +43,10 @@ export interface ResumoColeta {
   acoesPreferenciais: number;
   /** Consultas salvas nas telas de relatório (decisoes.md#D-32). */
   consultasSalvas: number;
+  /** Regras de ATP da unidade (decisoes.md#D-46). */
+  regrasAtp: number;
+  /** Quantas delas tiveram o detalhe lido nesta coleta. */
+  regrasAtpDetalhadas: number;
 }
 
 export type ResultadoColeta =
@@ -165,6 +170,15 @@ export function aplicarColeta(
     daUnidade?.consultasSalvas,
     fontes,
   );
+  const atp = montarRegrasAtp(
+    coleta.fontes.regrasAtp,
+    coleta.detalhesAtp,
+    coleta.falhasAtp,
+    daUnidade?.regrasAtp,
+    agora ?? new Date().toISOString(),
+  );
+  if (atp.resultado) fontes.regrasAtp = atp.resultado;
+  const regrasAtp = comReserva('regrasAtp', atp.regras, daUnidade?.regrasAtp, fontes);
 
   return {
     ok: true,
@@ -177,6 +191,7 @@ export function aplicarColeta(
       ...(preferencias.length > 0 ? { preferencias } : {}),
       ...(acoesPreferenciais.length > 0 ? { acoesPreferenciais } : {}),
       ...(consultasSalvas.length > 0 ? { consultasSalvas } : {}),
+      ...(regrasAtp.length > 0 ? { regrasAtp } : {}),
       ...(agora ? { agora } : {}),
     }),
     resumo: {
@@ -191,6 +206,8 @@ export function aplicarColeta(
       preferencias: preferencias.length,
       acoesPreferenciais: acoesPreferenciais.length,
       consultasSalvas: consultasSalvas.length,
+      regrasAtp: regrasAtp.length,
+      regrasAtpDetalhadas: atp.detalhadas,
     },
   };
 }

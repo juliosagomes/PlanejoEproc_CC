@@ -17,6 +17,7 @@ import { NotaPanel } from '@/features/canvas/components/NotaPanel';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
+import { DialogoSincronizarUnidade } from '@/features/catalogo/components/DialogoSincronizarUnidade';
 import { SincronizacaoUnidadeModal } from '@/features/catalogo/components/SincronizacaoUnidadeModal';
 import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
@@ -108,6 +109,7 @@ function Editor() {
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
   const [showSetores, setShowSetores] = useState(false);
   const [showDescarte, setShowDescarte] = useState(false);
+  const [showSincronizar, setShowSincronizar] = useState(false);
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
@@ -158,7 +160,6 @@ function Editor() {
   const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
   const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
   const hidratarAnotacoes = useAnotacoesStore((s) => s.hidratar);
-  const sincronizarUnidade = useUnidadeStore((s) => s.sincronizar);
   const sincronizandoUnidade = useUnidadeStore((s) => s.sincronizando);
   const resetMensagensUnidade = useUnidadeStore((s) => s.resetMensagens);
 
@@ -542,7 +543,7 @@ function Editor() {
       id: 'sincronizar',
       rotulo: 'Sincronizar com a unidade',
       icone: <Icon.Sincronizar />,
-      executar: () => void sincronizarUnidade(),
+      executar: () => setShowSincronizar(true),
     },
     { id: 'salvar-copia', rotulo: 'Salvar cópia deste plano', icone: <Icon.Download />, executar: onSalvarCopiaAtivo },
     ...(somenteLeitura ? [] : [{ id: 'novo-plano', rotulo: 'Novo plano', icone: <Icon.File />, executar: onNovo }]),
@@ -598,7 +599,7 @@ function Editor() {
         onSetores={() => setShowSetores(true)}
         onDescarte={() => setShowDescarte(true)}
         onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
-        onSincronizarUnidade={() => void sincronizarUnidade()}
+        onSincronizarUnidade={() => setShowSincronizar(true)}
         sincronizandoUnidade={sincronizandoUnidade}
         onChecklist={() => setShowChecklist(true)}
         onVerTutorial={() => setTutorialManual(true)}
@@ -664,6 +665,7 @@ function Editor() {
         open={showCatalogoOrgao}
         onClose={() => setShowCatalogoOrgao(false)}
       />
+      <DialogoSincronizarUnidade open={showSincronizar} onClose={() => setShowSincronizar(false)} />
       <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
       <DialogoGerarMapa onGerado={() => setTela('mapas')} />

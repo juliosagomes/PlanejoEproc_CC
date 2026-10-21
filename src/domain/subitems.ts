@@ -30,6 +30,12 @@ export interface Subitem {
   /** Marcado quando o recurso já existe no Eproc. */
   ja_criado: boolean;
   /**
+   * Nº da regra no Eproc, informado pelo usuário ou trazido ao desenhar a
+   * partir da regra. É o vínculo que permite sincronizar só ela e conferir o
+   * detalhe (decisoes.md#D-46). Só faz sentido na categoria "Regra de ATP".
+   */
+  eprocAtp?: number;
+  /**
    * Detalhamento da regra. Só um dos dois é usado, conforme a `categoria` —
    * mas os dois são preservados ao trocá-la, para que reclassificar por engano
    * não apague o que o usuário preencheu. Use `regraDoSubitem` para ler.

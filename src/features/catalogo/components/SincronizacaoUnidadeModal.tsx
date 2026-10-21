@@ -10,6 +10,7 @@ const ROTULO_FONTE: Record<FonteId, string> = {
   textosPadrao: 'Textos padrão',
   acoesPreferenciais: 'Ações preferenciais',
   consultasSalvas: 'Consultas salvas',
+  regrasAtp: 'Regras de ATP',
 };
 
 interface SincronizacaoUnidadeModalProps {
@@ -102,6 +103,10 @@ export function SincronizacaoUnidadeModal({ onFechar }: SincronizacaoUnidadeModa
                 valor={resumo.acoesPreferenciais}
               />
               <Linha rotulo="Consultas salvas (relatórios)" valor={resumo.consultasSalvas} />
+              <Linha rotulo="Regras de ATP" valor={resumo.regrasAtp} />
+              {resumo.regrasAtpDetalhadas > 0 && (
+                <Linha rotulo="Regras com o detalhe lido agora" valor={resumo.regrasAtpDetalhadas} />
+              )}
             </ul>
           ) : null}
 

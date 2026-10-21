@@ -1,6 +1,8 @@
 import { create } from 'zustand';
-import type { CatalogoUnidade, LocalizadorUnidade } from '@/domain';
+import type { CatalogoUnidade, LocalizadorUnidade, RegraAtpUnidade } from '@/domain';
 import { aplicarColeta, type ResumoColeta } from '@/infra/eproc/aplicarColeta';
+import { aplicarRegrasAtpNoCatalogo } from '@/infra/eproc/aplicarRegrasAtp';
+import type { ProgressoRegrasAtp } from '@/infra/eproc/tipos';
 import {
   loadCatalogoUnidadeAtiva,
   saveCatalogoUnidade,
@@ -27,11 +29,23 @@ interface UnidadeState {
   ultimoResumo: ResumoColeta | null;
   /** Só false enquanto ninguém chamou `hidratar`. */
   hidratado: boolean;
+  /** "Regra N de M" do detalhe completo das regras de ATP, enquanto corre. */
+  progressoAtp: ProgressoRegrasAtp | null;
 }
+
+export type ResultadoRegraAtp =
+  | { ok: true; regra: RegraAtpUnidade }
+  | { ok: false; erro: string };
 
 interface UnidadeActions {
   hidratar: () => void;
-  sincronizar: () => Promise<void>;
+  /**
+   * `detalheAtp` abre o formulário de cada regra de ATP, o que leva minutos.
+   * Sem ele vem só a lista, e o detalhe lido antes é mantido (D-46).
+   */
+  sincronizar: (opcoes?: { detalheAtp?: boolean }) => Promise<void>;
+  /** Traz só uma regra de ATP, com o detalhe, e a grava no catálogo (D-46). */
+  sincronizarRegraAtp: (numero: number) => Promise<ResultadoRegraAtp>;
   resetMensagens: () => void;
 }
 
@@ -43,18 +57,37 @@ export const useUnidadeStore = create<UnidadeStore>((set, get) => ({
   erro: null,
   ultimoResumo: null,
   hidratado: false,
+  progressoAtp: null,
 
   hidratar: () => {
     set({ catalogo: loadCatalogoUnidadeAtiva(), hidratado: true });
   },
 
-  sincronizar: async () => {
-    set({ sincronizando: true, erro: null, ultimoResumo: null });
+  sincronizar: async (opcoes) => {
+    set({ sincronizando: true, erro: null, ultimoResumo: null, progressoAtp: null });
     try {
       // Import tardio: `@/extension/unidade` toca `chrome.*`, e carregá-lo no
       // topo faria o `npm run dev` (e os testes) puxarem a ponte sem necessidade.
-      const { coletarDaUnidade } = await import('@/extension/unidade');
+      const { coletarDaUnidade, coletarRegrasAtp } = await import('@/extension/unidade');
       const coleta = await coletarDaUnidade();
+      if (!coleta.erro) {
+        // As regras vêm numa injeção à parte. Se ela falha, a fonte fica
+        // marcada e o catálogo anterior cobre a falta (comReserva).
+        try {
+          const atp = await coletarRegrasAtp(opcoes?.detalheAtp ? 'todas' : [], (p) =>
+            set({ progressoAtp: p }),
+          );
+          coleta.fontes.regrasAtp = atp.lista;
+          coleta.detalhesAtp = atp.detalhes;
+          coleta.falhasAtp = atp.falhas;
+        } catch (err) {
+          coleta.fontes.regrasAtp = {
+            status: 'falhou',
+            fragmentos: [],
+            motivo: err instanceof Error ? err.message : String(err),
+          };
+        }
+      }
       const resultado = aplicarColeta(coleta, undefined, get().catalogo);
       if (!resultado.ok) {
         set({ sincronizando: false, erro: resultado.erro });
@@ -66,6 +99,7 @@ export const useUnidadeStore = create<UnidadeStore>((set, get) => ({
         ultimoResumo: resultado.resumo,
         sincronizando: false,
         erro: null,
+        progressoAtp: null,
       });
     } catch (err) {
       const msg =
@@ -73,7 +107,32 @@ export const useUnidadeStore = create<UnidadeStore>((set, get) => ({
           ? err.message
           : 'Erro inesperado ao sincronizar com a unidade. Verifique o console.';
       if (!(err instanceof Error)) console.error('[unidade] sincronização falhou', err);
-      set({ sincronizando: false, erro: msg });
+      set({ sincronizando: false, erro: msg, progressoAtp: null });
+    }
+  },
+
+  sincronizarRegraAtp: async (numero) => {
+    const atual = get().catalogo;
+    if (!atual) {
+      return { ok: false, erro: 'Sincronize com a unidade primeiro: a regra é lida da mesma unidade.' };
+    }
+    try {
+      const { coletarRegrasAtp } = await import('@/extension/unidade');
+      const coleta = await coletarRegrasAtp([numero]);
+      const falha = coleta.falhas[numero];
+      const r = aplicarRegrasAtpNoCatalogo(atual, coleta);
+      if (r.erro) return { ok: false, erro: r.erro };
+      // Releitura: outra sincronização pode ter gravado no meio do caminho.
+      const base = get().catalogo ?? atual;
+      const catalogo = base === atual ? r.catalogo : { ...base, regrasAtp: r.catalogo.regrasAtp };
+      saveCatalogoUnidade(catalogo);
+      set({ catalogo });
+      const regra = catalogo.regrasAtp?.find((x) => x.numero === numero);
+      if (!regra) return { ok: false, erro: falha ?? `A regra ${numero} não existe no Eproc.` };
+      if (falha) return { ok: false, erro: falha };
+      return { ok: true, regra };
+    } catch (err) {
+      return { ok: false, erro: err instanceof Error ? err.message : String(err) };
     }
   },
 
