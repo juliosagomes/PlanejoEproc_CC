@@ -62,19 +62,29 @@ export function RecursoCartao({ recurso: s, somenteLeitura, onChange, onRemover,
     <div className={cn('recurso-cartao', s.ja_criado && 'created')}>
       <fieldset disabled={somenteLeitura} className="contents">
         <div className="flex flex-col gap-1 min-w-0">
-          <select
-            className="select self-start"
-            style={{ height: 24, padding: '1px 6px', fontSize: 11, width: 'auto' }}
-            value={s.categoria}
-            onChange={(e) => onChange({ categoria: e.target.value as SubitemCategoria })}
-            aria-label="Categoria do recurso"
-          >
-            {SUBITEM_CATS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-1.5">
+            <select
+              className="select self-start"
+              style={{ height: 24, padding: '1px 6px', fontSize: 11, width: 'auto' }}
+              value={s.categoria}
+              onChange={(e) => onChange({ categoria: e.target.value as SubitemCategoria })}
+              aria-label="Categoria do recurso"
+            >
+              {SUBITEM_CATS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+            {s.categoria === 'Regra de ATP' && s.eprocAtp && (
+              <span
+                className="mono text-[10.5px] font-semibold text-destaque"
+                title={`Vinculada à regra ${s.eprocAtp} do Eproc (decisoes.md#D-46)`}
+              >
+                Nº {s.eprocAtp}
+              </span>
+            )}
+          </div>
           <SubitemNomeInput
             value={s.nome}
             categoria={s.categoria}

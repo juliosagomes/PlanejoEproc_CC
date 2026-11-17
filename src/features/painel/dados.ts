@@ -10,6 +10,7 @@ import type { Sugestao } from '@/components/SugestoesInput';
 import { useCanvasStore } from '@/features/canvas/store';
 import { useUnidadeStore } from '@/features/catalogo/storeUnidade';
 import { getAtivoId, listPlanos, loadPlano } from '@/infra/storage';
+import type { PlanoDoSilo } from './presencaRegras';
 
 /**
  * Os localizadores de todos os planos do silo, com o ativo trocado pela versão
@@ -77,4 +78,26 @@ export function useGruposDoEproc(): string[] {
     for (const p of catalogo.preferencias ?? []) if (p.grupo) nomes.add(p.grupo);
     return [...nomes].sort((a, b) => a.localeCompare(b, 'pt-BR'));
   }, [catalogo]);
+}
+
+/**
+ * Os planos do silo com o nome, o ativo trocado pela versão viva — para a
+ * presença das regras de ATP (decisoes.md#D-46).
+ */
+export function usePlanosDoSilo(): PlanoDoSilo[] {
+  const nodes = useCanvasStore((s) => s.nodes);
+  const edges = useCanvasStore((s) => s.edges);
+  const notas = useCanvasStore((s) => s.notas);
+  return useMemo(() => {
+    const ativoId = getAtivoId();
+    const vivo = useCanvasStore.getState().getPlano();
+    const planos: PlanoDoSilo[] = listPlanos().map((e) => ({
+      id: e.id,
+      nome: e.id === ativoId ? vivo.planoNome : e.nome,
+      plano: e.id === ativoId ? vivo : loadPlano(e.id),
+    }));
+    if (ativoId === null) planos.push({ id: '', nome: vivo.planoNome, plano: vivo });
+    return planos;
+    // `nodes`, `edges` e `notas` não são lidos aqui: são o que muda quando o desenho muda.
+  }, [nodes, edges, notas]);
 }

@@ -7,6 +7,7 @@ import {
   type FonteResultado,
   type ItemCatalogoUnidade,
   type LocalizadorUnidade,
+  type RegraAtpUnidade,
   type UnidadeEproc,
 } from '@/domain';
 import { semDecoracao } from './nomeLocalizador';
@@ -78,6 +79,7 @@ export interface MontagemCatalogo {
   preferencias?: ItemCatalogoUnidade[];
   acoesPreferenciais?: AcaoPreferencialUnidade[];
   consultasSalvas?: ConsultaSalvaUnidade[];
+  regrasAtp?: RegraAtpUnidade[];
   /** Injetável para teste; padrão é agora. */
   agora?: string;
 }
@@ -93,6 +95,7 @@ export function montarCatalogoUnidade(m: MontagemCatalogo): CatalogoUnidade {
     ...(m.preferencias ? { preferencias: m.preferencias } : {}),
     ...(m.acoesPreferenciais ? { acoesPreferenciais: m.acoesPreferenciais } : {}),
     ...(m.consultasSalvas ? { consultasSalvas: m.consultasSalvas } : {}),
+    ...(m.regrasAtp ? { regrasAtp: m.regrasAtp } : {}),
     fontes: m.fontes,
   };
 }

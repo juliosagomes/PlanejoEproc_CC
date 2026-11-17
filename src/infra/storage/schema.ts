@@ -6,6 +6,7 @@ import {
   CONJUNTOS_VERSION,
   CORES_FLAG,
   DESCARTE_VERSION,
+  OBSERVACOES_REGRAS_VERSION,
   EFEITOS_SEM_MOVER,
   MAPA_VERSION,
   ORIGENS_FILA,
@@ -23,8 +24,10 @@ import {
   type CatalogoUnidade,
   type ConjuntosUnidade,
   type ConsultaSalvaUnidade,
+  type RegraAtpUnidade,
   type DefinicaoFlag,
   type DestinosDescarteUnidade,
+  type ObservacoesRegrasUnidade,
   type DobraAresta,
   type Mapa,
   type MapaIndexEntry,
@@ -129,6 +132,12 @@ export const DestinosDescarteUnidadeSchema = z.object({
   version: z.literal(DESCARTE_VERSION),
   nomes: z.array(z.string()),
 }) satisfies z.ZodType<DestinosDescarteUnidade>;
+
+/** Observações das regras de ATP (decisoes.md#D-46). Chave por escopo, fora do catálogo. */
+export const ObservacoesRegrasUnidadeSchema = z.object({
+  version: z.literal(OBSERVACOES_REGRAS_VERSION),
+  itens: z.record(z.string(), z.string()),
+}) satisfies z.ZodType<ObservacoesRegrasUnidade>;
 
 /** Conjuntos criados pelo usuário (decisoes.md#D-29, D-41). Chave por escopo e por catálogo, como os setores. */
 export const ConjuntosUnidadeSchema = z.object({
@@ -261,6 +270,7 @@ const SubitemSchema = z.object({
   nome: z.string(),
   descricao: z.string().optional(),
   ja_criado: z.boolean(),
+  eprocAtp: z.number().int().positive().optional(),
   atp: AtpRuleSchema.optional(),
   pref: PrefRuleSchema.optional(),
 }) satisfies z.ZodType<Subitem>;
@@ -716,6 +726,25 @@ const ConsultaSalvaUnidadeSchema = z.object({
   grupo: z.string().optional(),
 }) satisfies z.ZodType<ConsultaSalvaUnidade>;
 
+const RegraAtpUnidadeSchema = z.object({
+  numero: z.number(),
+  eprocId: z.string().optional(),
+  grupo: z.string().optional(),
+  ativa: z.boolean(),
+  tipoOrigem: z.enum(['localizadores', 'nenhum', 'todos']),
+  origens: z.array(z.string()),
+  opcaoOrigens: z.enum(['OR', 'AND']).optional(),
+  destinos: z.array(z.string()),
+  tipoControle: z.string(),
+  gatilhoTexto: z.string().optional(),
+  descricao: z.string().optional(),
+  acoesTexto: z.array(z.string()).optional(),
+  filtrosTexto: z.array(z.string()).optional(),
+  filtroContem: z.array(z.string()).optional(),
+  detalhe: AtpRuleSchema.optional(),
+  detalheEm: z.string().optional(),
+}) satisfies z.ZodType<RegraAtpUnidade>;
+
 const FonteResultadoSchema = z.object({
   status: z.enum(['ok', 'vazio', 'semPermissao', 'falhou']),
   itens: z.number().optional(),
@@ -732,6 +761,7 @@ export const CatalogoUnidadeSchema = z.object({
   textosPadrao: z.array(ItemCatalogoUnidadeSchema).optional(),
   acoesPreferenciais: z.array(AcaoPreferencialUnidadeSchema).optional(),
   consultasSalvas: z.array(ConsultaSalvaUnidadeSchema).optional(),
+  regrasAtp: z.array(RegraAtpUnidadeSchema).optional(),
   fontes: z.record(z.string(), FonteResultadoSchema),
 }) satisfies z.ZodType<CatalogoUnidade>;
 

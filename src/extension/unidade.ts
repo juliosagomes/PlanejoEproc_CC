@@ -1,6 +1,7 @@
-import type { ColetaUnidade } from '@/infra/eproc/tipos';
+import type { ColetaRegrasAtp, ColetaUnidade, ProgressoRegrasAtp } from '@/infra/eproc/tipos';
 import { ehExtensao } from '@/infra/plataforma';
 import { coletarUnidadeNaAba } from './coletor/eproc';
+import { coletarRegrasAtpNaAba, lerProgressoRegrasAtpNaAba } from './coletor/regrasAtp';
 import { PADROES_EPROC } from './eprocUrls';
 
 /**
@@ -34,22 +35,10 @@ export class SemAbaDoEprocError extends Error {
  * principal; fica o primeiro resultado que trouxe alguma fonte.
  */
 export async function coletarDaUnidade(): Promise<ColetaUnidade> {
-  // No `npm run dev` o app roda como página comum, sem `chrome.*`. Sem esta
-  // guarda o sintoma seria um "chrome is not defined" no lugar de uma
-  // explicação — e a coleta é justamente o recurso que só a extensão tem.
-  if (!ehExtensao() || typeof chrome?.scripting?.executeScript !== 'function') {
-    throw new Error(
-      'A sincronização com a unidade só funciona na extensão instalada no Chrome, ' +
-        'porque depende da sua sessão do Eproc na aba.',
-    );
-  }
-
-  const abas = await chrome.tabs.query({ url: PADROES_EPROC });
-  const aba = abas.find((t) => typeof t.id === 'number');
-  if (!aba || typeof aba.id !== 'number') throw new SemAbaDoEprocError();
+  const tabId = await abaDoEproc();
 
   const resultados = await chrome.scripting.executeScript({
-    target: { tabId: aba.id, allFrames: true },
+    target: { tabId, allFrames: true },
     // MAIN, não o mundo isolado padrão. As telas de Modelos e Textos Padrão só
     // paginam chamando `infraAcaoPaginar`, que é uma função **da página** — e o
     // mundo isolado, por construção, não enxerga variáveis JS da página. No
@@ -73,4 +62,64 @@ export async function coletarDaUnidade(): Promise<ColetaUnidade> {
     );
   }
   return primeira;
+}
+
+async function abaDoEproc(): Promise<number> {
+  // No `npm run dev` o app roda como página comum, sem `chrome.*`. Sem esta
+  // guarda o sintoma seria um "chrome is not defined" no lugar de uma
+  // explicação — e a coleta é justamente o recurso que só a extensão tem.
+  if (!ehExtensao() || typeof chrome?.scripting?.executeScript !== 'function') {
+    throw new Error(
+      'A sincronização com a unidade só funciona na extensão instalada no Chrome, ' +
+        'porque depende da sua sessão do Eproc na aba.',
+    );
+  }
+
+  const abas = await chrome.tabs.query({ url: PADROES_EPROC });
+  const aba = abas.find((t) => typeof t.id === 'number');
+  if (!aba || typeof aba.id !== 'number') throw new SemAbaDoEprocError();
+  return aba.id;
+}
+
+/**
+ * Coleta as regras de ATP (decisoes.md#D-46): a listagem sempre, e o
+ * formulário das regras pedidas. Com `'todas'` leva minutos; enquanto corre,
+ * `aoProgredir` recebe "N de M", lido da própria aba a cada 2 s.
+ *
+ * Só o frame principal: a listagem e os formulários são buscados por `fetch`,
+ * e rodar em todos os frames repetiria tudo.
+ */
+export async function coletarRegrasAtp(
+  numeros: number[] | 'todas',
+  aoProgredir?: (p: ProgressoRegrasAtp) => void,
+): Promise<ColetaRegrasAtp> {
+  const tabId = await abaDoEproc();
+  const relogio = aoProgredir
+    ? setInterval(() => {
+        void chrome.scripting
+          .executeScript({ target: { tabId }, world: 'MAIN', func: lerProgressoRegrasAtpNaAba })
+          .then(([r]) => {
+            const p = r?.result as ProgressoRegrasAtp | null | undefined;
+            if (p) aoProgredir(p);
+          })
+          .catch(() => undefined);
+      }, 2000)
+    : undefined;
+  try {
+    const [r] = await chrome.scripting.executeScript({
+      target: { tabId },
+      world: 'MAIN',
+      func: coletarRegrasAtpNaAba,
+      args: [numeros],
+    });
+    const coleta = r?.result as ColetaRegrasAtp | undefined;
+    if (!coleta) {
+      throw new Error(
+        'A aba do Eproc não respondeu à coleta das regras. Recarregue a página do Eproc e tente de novo.',
+      );
+    }
+    return coleta;
+  } finally {
+    if (relogio) clearInterval(relogio);
+  }
 }

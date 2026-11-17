@@ -23,6 +23,7 @@ import type { RegraModalProps } from './PrefModal';
 import { Field, ImplantarRow, RecursosResumo } from './pecas';
 import { SugestoesProvider, useSugestoes } from './sugestoes';
 import { useRolagemBlocos } from './useRolagemBlocos';
+import { VinculoEproc } from './VinculoEproc';
 
 /* ============================================================================
  * Detalhamento da regra de ATP, nos três blocos da tela "Cadastrar Nova Regra
@@ -42,6 +43,8 @@ interface AtpModalProps extends RegraModalProps {
    * não dizem nada — sobra o "já criado". O efeito muda a frase em português.
    */
   pendurada?: { efeito: EfeitoSemMover; tira?: string };
+  /** Nº da regra no Eproc, vinculado ao recurso (decisoes.md#D-46). */
+  eprocAtp?: number;
 }
 
 interface SecaoProps {
@@ -129,6 +132,7 @@ export function AtpModal({
   onClose,
   onChange,
   pendurada,
+  eprocAtp,
 }: AtpModalProps) {
   const r: AtpRule = rule ?? { implantar: false };
   const setR = (patch: Partial<AtpRule>) => onChange({ atp: { ...r, ...patch } });
@@ -205,6 +209,17 @@ export function AtpModal({
             onChange={(e) => onChange({ nome: e.target.value })}
           />
         </Field>
+
+        <VinculoEproc
+          numero={eprocAtp}
+          onNumero={(n) => onChange({ eprocAtp: n })}
+          regraAtual={rule}
+          origem={origem}
+          destino={destino}
+          pendurada={!!pendurada}
+          somenteLeitura={somenteLeitura}
+          onAplicar={(atp) => onChange({ atp, ja_criado: true })}
+        />
 
         <Secao titulo="Regras" secao="regras">
           <div className="grid grid-cols-2 gap-3">

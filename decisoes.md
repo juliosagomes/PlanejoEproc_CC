@@ -2161,6 +2161,142 @@ estranho, o ajuste é em `quando()`, um caso por tipo.
 
 ---
 
+## D-46 · Regras de ATP na sincronização, no painel e vinculadas ao recurso
+
+> Desenho aprovado em 04/10/2026 (`../ideia-regras-atp-na-sincronizacao.md`).
+> Tira "ATPs cadastradas" do Roadmap FORA de escopo.
+
+**Decisão.** "Sincronizar com a unidade" passa a trazer as regras de ATP em
+dois níveis: **a lista sempre** (`automatizar_localizadores`, uma página só) e
+**o detalhe quando pedido** (o formulário `automatizar_localizadores_alterar`
+de cada regra, mais o XHR `montarDadosGatilho`). O detalhe completo é uma caixa
+desmarcada no diálogo que agora precede a sincronização, com progresso "regra N
+de M"; regra a regra, é o botão **"Sincronizar esta regra"** do modal da ATP.
+O catálogo da unidade ganha `regrasAtp` (opcional, sem bump), e o recurso,
+`Subitem.eprocAtp`, o nº da regra no Eproc (opcional, sem bump).
+
+O Painel da unidade ganha a guia **"Regras de ATP"**: as regras agrupadas como
+no Eproc, uma **observação livre** por regra e o selo **Em plano / Divergente /
+Em nenhum plano**, contra todos os planos do silo. No modal da ATP, o nº
+vinculado permite **preencher** o recurso com o detalhe do Eproc ou ver os
+campos que **diferem**, e "Atualizar com o do Eproc".
+
+**Por que.** O mapeamento real da unidade é quase todo o "como está" (89% dos
+recursos já criados), e cada regra era copiada à mão: origem, destino, número,
+resumo. Os planos citavam 178 das 287 regras só como texto, e nada dizia
+quando o plano e o Eproc deixavam de bater.
+
+**Como a coleta foi levantada (eproc1g, 21/10/2026, só leitura).**
+
+- A listagem traz 279 regras numa página (4 MB). A situação é o checkbox
+  `ativarDesativarRegra`; o "** DESATIVADA **" está em toda linha. Gatilho e
+  filtros longos vêm duas vezes (`dadosResumidos_N` cortado, `dadosCompletos_N`
+  inteiro). Nenhum controle que escreve (`acaoDesativar`, o checkbox) é tocado.
+- No formulário, as **ações programadas** vêm inteiras em `hdnATP_n`
+  ("DESCRIÇÃO|base64"), um `InfraDTO` serializado pelo PHP, inclusive quando há
+  mais de uma — os campos visíveis mostram só a primeira. As strings são
+  Latin-1 com entidades HTML; `infra/eproc/phpSerializado.ts` lê o formato.
+- Origem e destino **não** saem do formulário com uma ponta só
+  (`selLocalizadoresRemove` vem `[]` e o id fica em `hdnIdLocalizadorRemove`).
+  Por isso as pontas vêm sempre da **lista**, por nome; o detalhe dá o resto.
+- O filtro "Evento/Tipo de Petição" só existe nos `append('…')` do script, em
+  inputs `name="…[]"`, uma posição por condição. Os filtros multi grandes vêm
+  com o `<select>` vazio e as opções em `input#valueOptions<Campo>`.
+- O coletor devolve só os controles, com a opção escolhida de cada `<select>`
+  (≈ 20 KB por regra, de 2,2 MB): opção não escolhida pode ser nome de servidor
+  e não sai da página. O detalhe completo, sem iframe, levou **5 min 37 s** para
+  as 279 regras (≈ 1,2 s por regra, 5,7 MB de recortes), sem nenhuma falha. As
+  216 ações programadas foram lidas do serializado sem erro; **37 regras têm
+  mais de uma ação** (a nota de 04/10 dizia que nenhuma tinha).
+- Os códigos de `selDiaSemanaDataControle` são 0 = domingo … 6 = sábado, os
+  mesmos que o D-27 tinha adotado sem levantar.
+
+**Coletor à parte.** `extension/coletor/regrasAtp.ts` é uma segunda injeção,
+depois da coleta da unidade, e não um trecho dela: roda também sozinha, para
+uma regra, e o progresso do detalhe completo é lido em paralelo
+(`window.__planejoProgressoAtp`).
+
+**Merge.** O **detalhe não trazido numa coleta é mantido** do catálogo
+anterior, pelo nº; regra que saiu da lista sai com ele. E, como pré-requisito,
+toda lista acessória que falha (modelos, textos padrão, ações preferenciais,
+consultas salvas, regras) fica com a da última sincronização da mesma unidade —
+o fallback que o D-35 fez só para as preferências. Sem isso, uma coleta
+interrompida apagaria as regras já trazidas.
+
+**A observação mora fora do catálogo**, numa chave do silo
+(`observacoesAtp`), pelo nº — sincronizar regrava o catálogo inteiro, o mesmo
+motivo das anotações do D-25.
+
+**Presença e conferência** (`features/painel/presencaRegras.ts`,
+`features/canvas/conferirRegra.ts`). Um plano cita a regra pelo `eprocAtp` ou,
+na falta dele, pelo nº escrito no nome do recurso, numa regra pendurada ou numa
+nota. "Divergente" é origem ou destino que não batem por nome (sem emoji,
+acento e caixa; origem "Nenhum" confere pelo localizador do filtro "Que
+Contenha" ou por uma entrada por evento), ou regra desativada. Campo a campo, a
+régua é a do checklist (`detalhesAtp`). A conferência **nunca move a seta**: só
+avisa da ponta diferente.
+
+**Custo assumido.**
+- O parser do detalhe é guiado pelos descritores (D-27): parâmetro de ação que
+  o descritor não conhece é descartado. Ficam de fora os filtros de partes em
+  lista ("Representante", "Pessoa") e o classificador de conteúdo.
+- "Por Tempo na Situação" e "Verificação sem movimentação" não tinham amostra
+  no levantamento; o parser lê o que é previsível e deve ser conferido.
+- A observação, como as outras chaves da unidade, não vai para o servidor.
+
+**O que precisaria mudar para evoluir.**
+- Relatório "Conferir com a unidade" (demo 10), por tipo de divergência, e
+  "aceito" guardado por regra: a presença já calcula a matéria-prima.
+- Detecção automática dos destinos de descarte (D-38) pelo uso nas regras.
+- Conjuntos de localizadores e de tipos de petição contra as listas das regras
+  (ideia 1 do "Plano Trabalhado").
+
+---
+
+## D-47 · Desenhar a partir da regra, por clique
+
+> Da demo 11 (`demos/11-desenhar-a-partir-da-regra.html`), aprovada em 06/10/2026.
+> Resolve o "Gerar arestas" do Roadmap FORA de escopo, na forma "por clique".
+
+**Decisão.** No Fluxo, "Unidade → Regras de ATP da unidade" (ou Ctrl+K) abre
+uma lista lateral com as regras sincronizadas: primeiro as que tocam algum
+localizador do plano, agrupadas como no Eproc; as demais pela busca. Arrastar
+uma regra para o quadro, ou clicar no "+", abre uma **prévia** — as peças
+novas tracejadas e o que vai mudar em frases. Só **"Desenhar"** aplica, num
+`set` só da store (um salvamento). "Desenhar as N" faz o grupo inteiro.
+
+**Por que.** O usuário desenha o "como está", copiando regra por regra. A
+decisão de produto que o roadmap pedia ("diagramar o que já está lá muda a
+premissa do app?") foi tomada em 06/10: pode, **desde que nada nasça sozinho**.
+
+**Como a regra vira desenho** (`features/canvas/desenharRegra.ts`, pura):
+- Localizador e transição que já existem são reaproveitados; a regra entra como
+  mais um recurso (D-24). Transição manual que recebe a regra passa a ATP.
+- **"A E B" no destino segue o D-42, não o leque da demo**: uma seta até o
+  primeiro destino, os outros em `outrosDestinos`. O "E"/"OU" da origem vira
+  `outrasOrigens` com a condição. Sem mudança de schema e sem contar a regra
+  duas vezes no checklist.
+- Origem "Nenhum": o localizador do filtro "Que Contenha" vira a origem; sem
+  ele, uma entrada por evento (D-38), reaproveitada se o rótulo já existe.
+  "Todos os localizadores" também vira entrada.
+- Destino de descarte (P, o invisível): a regra fica **pendurada** na origem,
+  manual se o tipo de controle é "Por Ação Manual".
+- O recurso nasce **já criado** e com `eprocAtp`; com o detalhe no catálogo, a
+  `AtpRule` vem preenchida, senão o resumo da lista vai para as Observações.
+  Localizador novo nasce já criado, menos o de sistema (D-23).
+- Regra que já está no plano (pelo `eprocAtp`) não é desenhada de novo.
+
+**Custo assumido.** Não há desfazer no app: a prévia é a rede de proteção. A
+posição das peças novas é simples (à direita da origem, empilhando); arrumar o
+desenho continua sendo do usuário.
+
+**O que precisaria mudar para evoluir.** Arrastar a regra para cima de um nó
+específico (escolher a origem pelo alvo do arrasto); sugerir, no painel da
+aresta, as regras do Eproc daquela transição ("Inserir" / "Vincular a…"), como
+previa a nota de 04/10.
+
+---
+
 
 1. Atribuir ID sequencial (`D-N`).
 2. Estrutura: **Decisão** (1 frase) → **Por que** → **O que precisaria mudar para evoluir**.

@@ -1,3 +1,5 @@
+import type { AtpRule } from './atp';
+
 /**
  * Catálogo lido direto da **unidade no Eproc** — o irmão automático do
  * `CatalogoOrgao`, que vem do XLS exportado à mão (decisoes.md#D-7).
@@ -117,6 +119,53 @@ export interface ConsultaSalvaUnidade {
   grupo?: string;
 }
 
+/**
+ * Uma regra de ATP cadastrada na unidade (decisoes.md#D-46).
+ *
+ * Vem em dois níveis. A **lista** (`automatizar_localizadores`) sempre vem: é
+ * uma página só e traz nº, grupo, situação, origem, destino e o resumo em
+ * texto. O **detalhe** (`detalhe`) só vem quando o usuário pede, regra a regra
+ * ou pela caixa da sincronização, porque abre um formulário por regra.
+ *
+ * Origem e destino são **nomes** (a sigla do localizador), como as filas do
+ * D-33: é por nome que o plano se liga ao Eproc.
+ */
+export interface RegraAtpUnidade {
+  /** O nº que o Eproc mostra e que o usuário cita ("Regra 182"). */
+  numero: number;
+  /** `id_controle_localizador_sistema`. Só serve para reabrir a regra. */
+  eprocId?: string;
+  grupo?: string;
+  /** O checkbox `ativarDesativarRegra`; o texto "** DESATIVADA **" mente. */
+  ativa: boolean;
+  /** "Nenhum" e "Todos os localizadores" não são localizadores. */
+  tipoOrigem: 'localizadores' | 'nenhum' | 'todos';
+  origens: string[];
+  /** Condição entre as origens, quando há mais de uma. */
+  opcaoOrigens?: 'OR' | 'AND';
+  /** Vários destinos são somados ("A E B"): o processo ganha todos. */
+  destinos: string[];
+  /** Rótulo do tipo de controle, como a lista mostra ("Por Evento"). */
+  tipoControle: string;
+  /** O tipo de controle por extenso, com eventos, petições e datas. */
+  gatilhoTexto?: string;
+  /** "Descrição" das regras "Por Ação Manual", o único nome que o Eproc dá. */
+  descricao?: string;
+  /** Ações programadas em texto, uma por item. */
+  acoesTexto?: string[];
+  /** Filtros opcionais em texto, um por item ("Classe: X"). */
+  filtrosTexto?: string[];
+  /**
+   * Localizadores dos filtros "Que Contenha". Servem de origem desenhada
+   * quando a origem no Eproc é "Nenhum" (decisoes.md#D-47).
+   */
+  filtroContem?: string[];
+  /** Regra completa, no formato do plano. Ausente até alguém trazê-la. */
+  detalhe?: AtpRule;
+  /** ISO 8601 de quando o detalhe foi lido. */
+  detalheEm?: string;
+}
+
 export type FonteStatus = 'ok' | 'vazio' | 'semPermissao' | 'falhou';
 
 export const FONTES = [
@@ -127,6 +176,7 @@ export const FONTES = [
   'textosPadrao',
   'acoesPreferenciais',
   'consultasSalvas',
+  'regrasAtp',
 ] as const;
 
 export type FonteId = (typeof FONTES)[number];
@@ -160,5 +210,7 @@ export interface CatalogoUnidade {
   acoesPreferenciais?: AcaoPreferencialUnidade[];
   /** Opcional pelo mesmo motivo dos outros: catálogo gravado antes segue validando. */
   consultasSalvas?: ConsultaSalvaUnidade[];
+  /** Regras de ATP da unidade (decisoes.md#D-46). */
+  regrasAtp?: RegraAtpUnidade[];
   fontes: Partial<Record<FonteId, FonteResultado>>;
 }

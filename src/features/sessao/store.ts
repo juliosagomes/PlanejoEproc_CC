@@ -5,6 +5,7 @@ import { useConjuntosStore } from '@/features/conjuntos/store';
 import { useMapasStore } from '@/features/mapas/store';
 import { usePainelStore } from '@/features/painel/store';
 import { useDescarteStore } from '@/features/descarte/store';
+import { useObservacoesRegrasStore } from '@/features/painel/storeObservacoes';
 import { useSetoresStore } from '@/features/setores/store';
 import { aplicarSincronizacao, garantirAtivoValido } from '@/infra/sync/aplicar';
 import {
@@ -111,6 +112,7 @@ function carregarAtivoNoCanvas(somenteLeitura: boolean): void {
   useConjuntosStore.getState().hidratar();
   usePainelStore.getState().hidratar();
   useDescarteStore.getState().hidratar();
+  useObservacoesRegrasStore.getState().hidratar();
   useMapasStore.getState().hidratar();
 
   garantirAtivoValido();

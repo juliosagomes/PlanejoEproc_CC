@@ -36,6 +36,7 @@ import {
 import { flushPlataforma } from '@/infra/plataforma';
 import { criarSavePlanoDebounced, planoVazio } from '@/infra/storage';
 import { uid } from '@/utils/uid';
+import type { OperacoesDesenho } from './desenharRegra';
 import {
   aplicarMudancasGrupos,
   reagruparAposArrasto,
@@ -207,6 +208,12 @@ interface CanvasActions {
     patch: Partial<Omit<RegraSemMover, 'id' | 'categoria'>>,
   ) => void;
   removeRegraSemMover: (nodeId: string, regraId: string) => void;
+
+  /**
+   * Aplica, de uma vez, o que "desenhar a partir da regra" planejou
+   * (decisoes.md#D-47): um `set` só, um salvamento só.
+   */
+  desenharRegras: (op: OperacoesDesenho) => void;
 
   // Seleção múltipla (Card 7)
   /** Apaga os nós e arestas selecionados, e as arestas que tocam nos nós. */
@@ -747,6 +754,55 @@ export const useCanvasStore = create<CanvasStore>()(
           n.id === nodeId ? comRegrasSemMover(n, (rs) => rs.filter((r) => r.id !== regraId)) : n,
         ),
       }));
+    },
+
+    desenharRegras: (op) => {
+      if (get().somenteLeitura) return;
+      set((s) => {
+        const novosNos: FlowNode[] = op.novosNos.map((n) => ({
+          id: n.id,
+          type: 'localizador',
+          position: n.position,
+          // Veio do Eproc: já existe lá. O de sistema segue a regra do D-23.
+          data: { ...defaultLocalizadorData(), nome: n.nome, ja_criado: !n.sistema, ...(n.sistema ? { sistema: true } : {}) },
+        }));
+        const recursos = new Map<string, OperacoesDesenho['recursos']>();
+        for (const r of op.recursos) recursos.set(r.edgeId, [...(recursos.get(r.edgeId) ?? []), r]);
+        const edges = s.edges.map((e) => {
+          const mais = recursos.get(e.id);
+          if (!mais) return e;
+          const data = e.data ?? defaultEdgeData();
+          return {
+            ...e,
+            data: {
+              ...data,
+              ...(mais.some((r) => r.paraAtp) ? { kind: 'atp' as const } : {}),
+              subitems: [...data.subitems, ...mais.map((r) => r.subitem)],
+            },
+          };
+        });
+        const novasArestas: FlowEdge[] = op.novasArestas.map((a) => ({
+          id: a.id,
+          source: a.source,
+          target: a.target,
+          sourceHandle: null,
+          targetHandle: null,
+          type: 'pj',
+          data: { ...defaultEdgeData(), kind: 'atp', subitems: [a.subitem] },
+        }));
+        const penduradas = new Map<string, RegraSemMover[]>();
+        for (const p of op.penduradas) penduradas.set(p.nodeId, [...(penduradas.get(p.nodeId) ?? []), p.regra]);
+        const nodes = [...s.nodes, ...novosNos].map((n) => {
+          const mais = penduradas.get(n.id);
+          return mais ? comRegrasSemMover(n, (rs) => [...rs, ...mais]) : n;
+        });
+        return {
+          nodes,
+          edges: [...edges, ...novasArestas],
+          entradas: [...s.entradas, ...op.novasEntradas.map((e) => ({ ...e }))],
+          grupos: reagruparSoltos(s.grupos, novosNos.map(retanguloDoNo)) as GrupoFlow[],
+        };
+      });
     },
 
     criarGrupo: (nodeIds) => {

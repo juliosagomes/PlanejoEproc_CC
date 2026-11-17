@@ -37,6 +37,35 @@ export interface ColetaUnidade {
   host: string;
   escopo: EscopoBruto | null;
   fontes: Partial<Record<FonteId, FonteBruta>>;
+  /**
+   * Formulário recortado de cada regra de ATP lida nesta coleta, pelo nº
+   * (decisoes.md#D-46). A listagem vai em `fontes.regrasAtp`.
+   */
+  detalhesAtp?: Record<string, string>;
+  /** Regras cujo formulário foi pedido e não veio, com o motivo. */
+  falhasAtp?: Record<string, string>;
   /** Preenchido só quando nada pôde ser coletado (sessão expirada, p. ex.). */
   erro?: string;
+}
+
+/**
+ * O que a coleta das regras de ATP devolve (decisoes.md#D-46). Vem de uma
+ * injeção própria, separada da coleta da unidade, porque também roda sozinha
+ * para uma regra e porque o detalhe completo leva minutos.
+ */
+export interface ColetaRegrasAtp {
+  /** A listagem, recortada: um fragmento com a tabela inteira. */
+  lista: FonteBruta;
+  /** Formulário de cada regra pedida, recortado, pelo nº da regra. */
+  detalhes: Record<string, string>;
+  /** Regras pedidas cujo formulário não veio, com o motivo. */
+  falhas: Record<string, string>;
+  /** Preenchido só quando nada pôde ser coletado. */
+  erro?: string;
+}
+
+/** Progresso do detalhe, que a página lê enquanto a coleta corre. */
+export interface ProgressoRegrasAtp {
+  feitas: number;
+  total: number;
 }

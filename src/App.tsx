@@ -16,7 +16,11 @@ import { GrupoPanel } from '@/features/canvas/components/GrupoPanel';
 import { NotaPanel } from '@/features/canvas/components/NotaPanel';
 import { NodePanel } from '@/features/canvas/components/NodePanel';
 import { cancelPersist, flushPersist, useCanvasStore } from '@/features/canvas/store';
+import { PainelRegrasUnidade } from '@/features/canvas/regras/PainelRegrasUnidade';
+import { PreviaDesenho } from '@/features/canvas/regras/PreviaDesenho';
+import { useRegrasQuadroStore } from '@/features/canvas/regras/store';
 import { CatalogoOrgaoModal } from '@/features/catalogo/components/CatalogoOrgaoModal';
+import { DialogoSincronizarUnidade } from '@/features/catalogo/components/DialogoSincronizarUnidade';
 import { SincronizacaoUnidadeModal } from '@/features/catalogo/components/SincronizacaoUnidadeModal';
 import { useAnotacoesStore } from '@/features/catalogo/storeAnotacoes';
 import { useCatalogoStore } from '@/features/catalogo/store';
@@ -108,6 +112,7 @@ function Editor() {
   const [showCatalogoOrgao, setShowCatalogoOrgao] = useState(false);
   const [showSetores, setShowSetores] = useState(false);
   const [showDescarte, setShowDescarte] = useState(false);
+  const [showSincronizar, setShowSincronizar] = useState(false);
   // Barra lateral fica visível por padrão; a marca do cabeçalho alterna. Só
   // estado de tela: quem trabalha em monitor apertado esconde e segue.
   const [sidebarVisivel, setSidebarVisivel] = useState(true);
@@ -158,7 +163,6 @@ function Editor() {
   const hidratarCatalogoOrgao = useCatalogoStore((s) => s.hidratar);
   const hidratarCatalogoUnidade = useUnidadeStore((s) => s.hidratar);
   const hidratarAnotacoes = useAnotacoesStore((s) => s.hidratar);
-  const sincronizarUnidade = useUnidadeStore((s) => s.sincronizar);
   const sincronizandoUnidade = useUnidadeStore((s) => s.sincronizando);
   const resetMensagensUnidade = useUnidadeStore((s) => s.resetMensagens);
 
@@ -532,6 +536,12 @@ function Editor() {
     });
   };
 
+  // A lista das regras desenha no plano aberto: só existe no Fluxo (D-47).
+  const abrirRegrasAtp = () => {
+    setTela('fluxo');
+    useRegrasQuadroStore.getState().alternarPainel(true);
+  };
+
   // Os mesmos rótulos dos menus do cabeçalho: quem acha um comando na busca
   // tem de reconhecê-lo no menu depois (decisoes.md#D-43).
   const tema = useTemaStore((s) => s.tema);
@@ -542,13 +552,14 @@ function Editor() {
       id: 'sincronizar',
       rotulo: 'Sincronizar com a unidade',
       icone: <Icon.Sincronizar />,
-      executar: () => void sincronizarUnidade(),
+      executar: () => setShowSincronizar(true),
     },
     { id: 'salvar-copia', rotulo: 'Salvar cópia deste plano', icone: <Icon.Download />, executar: onSalvarCopiaAtivo },
     ...(somenteLeitura ? [] : [{ id: 'novo-plano', rotulo: 'Novo plano', icone: <Icon.File />, executar: onNovo }]),
     { id: 'setores', rotulo: 'Setores', icone: <Icon.Etiqueta />, executar: () => setShowSetores(true) },
     { id: 'catalogo', rotulo: 'Catálogo do órgão', icone: <Icon.Library />, executar: () => setShowCatalogoOrgao(true) },
     { id: 'descarte', rotulo: 'Destinos de descarte', icone: <Icon.Trash />, executar: () => setShowDescarte(true) },
+    { id: 'regras-atp', rotulo: 'Regras de ATP da unidade', icone: <Icon.Bolt />, executar: abrirRegrasAtp },
     { id: 'painel', rotulo: 'Ir para o Painel da unidade', icone: <Icon.Predio />, executar: () => setTela('painel') },
     { id: 'mapas', rotulo: 'Ir para os Mapas descritivos', icone: <Icon.Print />, executar: () => setTela('mapas') },
     {
@@ -597,8 +608,9 @@ function Editor() {
         onSalvarTodos={onSalvarTodos}
         onSetores={() => setShowSetores(true)}
         onDescarte={() => setShowDescarte(true)}
+        onRegrasAtp={abrirRegrasAtp}
         onCatalogoOrgao={() => setShowCatalogoOrgao(true)}
-        onSincronizarUnidade={() => void sincronizarUnidade()}
+        onSincronizarUnidade={() => setShowSincronizar(true)}
         sincronizandoUnidade={sincronizandoUnidade}
         onChecklist={() => setShowChecklist(true)}
         onVerTutorial={() => setTutorialManual(true)}
@@ -630,8 +642,10 @@ function Editor() {
             câmera até o localizador a partir de um botão do painel. */}
         {tela === 'fluxo' && (
         <ReactFlowProvider>
+        <PainelRegrasUnidade />
         <FlowCanvas planoId={ativoId} onAbrirOutroPlano={verNoFluxo}>
           <BarraBusca />
+          <PreviaDesenho />
         </FlowCanvas>
         <PaletaBusca comandos={comandosBusca} />
 
@@ -664,6 +678,7 @@ function Editor() {
         open={showCatalogoOrgao}
         onClose={() => setShowCatalogoOrgao(false)}
       />
+      <DialogoSincronizarUnidade open={showSincronizar} onClose={() => setShowSincronizar(false)} />
       <SincronizacaoUnidadeModal onFechar={resetMensagensUnidade} />
       <ChecklistModal open={showChecklist} onClose={() => setShowChecklist(false)} />
       <DialogoGerarMapa onGerado={() => setTela('mapas')} />
